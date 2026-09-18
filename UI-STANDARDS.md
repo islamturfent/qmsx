@@ -29,7 +29,8 @@
 - Geri donulemez veya olumsuz kararlar `danger-button` kullanir: dolu `--error-500`, hover `--error-600`.
 - Header'daki dil/tema kontrolleri `.topbar-button` kullanir: 44x44px yuvarlak, ince kenarlikli, hover `--nav-hover`.
 - Sayfa seviyesindeki olusturma ve genel komut dugmeleri header icinde yer almaz; sayfa basliginin saginda veya ilgili icerik bolumunde bulunur.
-- Dil, tema ve geri donus kontrolleri header icinde kalabilir; bunlar ana islem dugmesi degildir.
+- Dil ve tema kontrolleri header icinde kalir; bunlar ana islem dugmesi degildir.
+- Geri donus baglantilari ("Listeye Don", "Dokumanlara Don" gibi) header'da tutulmaz; sayfa basliginin saginda `secondary-button` olarak yer alir.
 - Masaustunde dugmeler baslik veya form satiriyla hizalanir; mobilde tam genislige gecerek tasma olusturmaz.
 - Yeni ekranlarda farkli bir dugme stili uretilmez; mevcut siniflar yeniden kullanilir.
 

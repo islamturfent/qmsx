@@ -174,9 +174,16 @@ $activeNav = "documents";
 </head>
 <body class="has-sidebar">
     <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
-    <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong data-i18n="createDocumentTitle">Yeni Doküman</strong><span data-i18n="createDocumentText">Kontrollü dokümanın temel bilgilerini ve ilk revizyonunu oluşturun.</span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle" type="button">EN</button><button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button><a class="topbar-button topbar-link" href="documents.php" data-i18n="backToDocumentsButton">Dokümanlara Dön</a></div></div></header>
+    <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong data-i18n="createDocumentTitle">Yeni Doküman</strong><span data-i18n="createDocumentText">Kontrollü dokümanın temel bilgilerini ve ilk revizyonunu oluşturun.</span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle" type="button">EN</button><button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button></div></div></header>
     <main class="page-container narrow-page">
-        <section class="page-heading"><span class="section-kicker" data-i18n="documentManagementTitle">Doküman Yönetimi</span><h1 data-i18n="createDocumentTitle">Yeni Doküman</h1><p data-i18n="createDocumentText">Kontrollü dokümanın temel bilgilerini ve ilk revizyonunu oluşturun.</p></section>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="documentManagementTitle">Doküman Yönetimi</span>
+                <h1 data-i18n="createDocumentTitle">Yeni Doküman</h1>
+                <p data-i18n="createDocumentText">Kontrollü dokümanın temel bilgilerini ve ilk revizyonunu oluşturun.</p>
+            </div>
+            <a class="secondary-button" href="documents.php" data-i18n="backToDocumentsButton">Dokümanlara Dön</a>
+        </section>
         <section class="form-panel">
             <?php if ($formError !== ""): ?><div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div><?php endif; ?>
             <form class="auditor-form" method="post" action="document-create.php" enctype="multipart/form-data">

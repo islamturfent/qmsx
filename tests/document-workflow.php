@@ -1,7 +1,39 @@
 <?php
 // Run each case in a fresh process: php tests/document-workflow.php CASE
+// Without a CASE argument this file acts as the runner and executes every case.
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 chdir(dirname(__DIR__));
+
+$cases = ['save', 'csrf', 'stale-publish', 'draft-publish', 'request', 'approve', 'publish'];
+
+if (!isset($argv[1])) {
+    // Her vaka gercek bir sayfayi yukleyip baslik gonderip exit ettigi icin
+    // ayri bir surecte kosmasi zorunlu; burada hepsini toplayip raporluyoruz.
+    if (!function_exists('exec')) {
+        fwrite(STDERR, 'exec() kapali; vakalari tek tek calistirin: php tests/document-workflow.php CASE' . PHP_EOL);
+        exit(2);
+    }
+
+    $failed = [];
+    foreach ($cases as $caseName) {
+        $output = [];
+        $exitCode = 0;
+        exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__FILE__) . ' ' . escapeshellarg($caseName), $output, $exitCode);
+
+        $detail = '';
+        foreach ($output as $line) {
+            if (preg_match('/^(PASS|FAIL):/', trim($line))) { $detail = trim($line); break; }
+        }
+        if ($detail === '') { $detail = trim(implode(' | ', $output)); }
+        if ($exitCode !== 0) { $failed[] = $caseName; }
+
+        echo ($exitCode === 0 ? 'PASS: ' : 'FAIL: ') . $caseName . ($exitCode === 0 ? '' : ' -> ' . $detail) . PHP_EOL;
+    }
+
+    echo PHP_EOL . 'Completed ' . count($cases) . ' workflow checks; failures: ' . count($failed) . PHP_EOL;
+    exit($failed ? 1 : 0);
+}
+
 session_start();
 require 'config/database.php';
 foreach (['documents', 'document_versions', 'document_approvals', 'companies', 'company_admin_assignments', 'users', 'notifications'] as $table) {
@@ -9,8 +41,7 @@ foreach (['documents', 'document_versions', 'document_approvals', 'companies', '
     $schema = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $schema);
     $pdo->exec(str_replace('CREATE TABLE', 'CREATE TEMPORARY TABLE', $schema));
 }
-$case = $argv[1] ?? 'save';
-$cases = ['save', 'csrf', 'stale-publish', 'draft-publish', 'request', 'approve', 'publish'];
+$case = $argv[1];
 if (!in_array($case, $cases, true)) exit(2);
 $initialStatus = match ($case) { 'save', 'csrf' => 'published', 'stale-publish', 'publish' => 'approved', 'approve' => 'review', default => 'draft' };
 $expectedStatus = match ($case) { 'save' => 'draft', 'request' => 'review', 'approve' => 'approved', 'publish' => 'published', default => $initialStatus };

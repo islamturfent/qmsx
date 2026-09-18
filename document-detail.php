@@ -342,9 +342,16 @@ $activeNav = "documents";
 </head>
 <body class="has-sidebar">
     <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
-    <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong><?= htmlspecialchars($document["document_code"], ENT_QUOTES, "UTF-8") ?></strong><span><?= htmlspecialchars($document["company_name"], ENT_QUOTES, "UTF-8") ?></span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle" type="button">EN</button><button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button><a class="topbar-button topbar-link" href="documents.php" data-i18n="backToDocumentsButton">Dokümanlara Dön</a></div></div></header>
+    <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong><?= htmlspecialchars($document["document_code"], ENT_QUOTES, "UTF-8") ?></strong><span><?= htmlspecialchars($document["company_name"], ENT_QUOTES, "UTF-8") ?></span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle" type="button">EN</button><button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button></div></div></header>
     <main class="page-container">
-        <section class="page-heading"><span class="section-kicker" data-i18n="documentWorkspaceKicker">Doküman Çalışma Alanı</span><h1><?= htmlspecialchars($document["title"], ENT_QUOTES, "UTF-8") ?></h1><p><?= htmlspecialchars($document["company_name"], ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars($document["document_code"], ENT_QUOTES, "UTF-8") ?></p></section>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="documentWorkspaceKicker">Doküman Çalışma Alanı</span>
+                <h1><?= htmlspecialchars($document["title"], ENT_QUOTES, "UTF-8") ?></h1>
+                <p><?= htmlspecialchars($document["company_name"], ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars($document["document_code"], ENT_QUOTES, "UTF-8") ?></p>
+            </div>
+            <a class="secondary-button" href="documents.php" data-i18n="backToDocumentsButton">Dokümanlara Dön</a>
+        </section>
         <section class="dashboard-grid compact-dashboard-grid">
             <div class="dashboard-card"><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="documentStatusLabel">Durum</span><strong class="dashboard-card-number detail-card-value"><?= htmlspecialchars($statusLabels[$document["status"]] ?? $document["status"], ENT_QUOTES, "UTF-8") ?></strong></div></div>
             <div class="dashboard-card"><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="revisionLabel">Revizyon</span><strong class="dashboard-card-number detail-card-value"><?= htmlspecialchars($document["current_revision"], ENT_QUOTES, "UTF-8") ?></strong></div></div>
