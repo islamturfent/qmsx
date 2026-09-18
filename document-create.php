@@ -8,6 +8,9 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('document_create');
 
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -53,6 +56,8 @@ $allowedFiles = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('document_create', $_POST["csrf"] ?? null);
+
     $formData = [
         "company_id" => (int) ($_POST["company_id"] ?? 0),
         "document_code" => strtoupper(trim($_POST["document_code"] ?? "")),
@@ -187,6 +192,7 @@ $activeNav = "documents";
         <section class="form-panel">
             <?php if ($formError !== ""): ?><div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div><?php endif; ?>
             <form class="auditor-form" method="post" action="document-create.php" enctype="multipart/form-data">
+                <?= qmsCsrfField('document_create') ?>
                 <div class="form-grid">
                     <label class="form-field form-field-wide"><span data-i18n="companySelectLabel">Şirket</span><select name="company_id" required><option value="">Şirket seçin</option><?php foreach ($companies as $company): ?><option value="<?= (int) $company["id"] ?>" <?= (int) $formData["company_id"] === (int) $company["id"] ? "selected" : "" ?>><?= htmlspecialchars($company["company_name"], ENT_QUOTES, "UTF-8") ?></option><?php endforeach; ?></select></label>
                     <label class="form-field"><span data-i18n="documentCodeLabel">Doküman Kodu</span><input type="text" name="document_code" value="<?= htmlspecialchars($formData["document_code"], ENT_QUOTES, "UTF-8") ?>" required></label>
