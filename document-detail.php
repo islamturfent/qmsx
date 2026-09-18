@@ -359,7 +359,13 @@ $activeNav = "documents";
         <?php if (($_GET["workflow"] ?? "") === "archived"): ?><div class="form-message success" data-i18n="documentArchivedMessage">Doküman arşivlendi.</div><?php endif; ?>
         <?php if ($formError !== ""): ?><div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div><?php endif; ?>
 
-                <section class="page-section"><a class="primary-button" href="document-office.php?id=<?= $documentId ?>" data-i18n="officeEditorTitle">Ofis Editörü</a> <a class="secondary-button" href="document-edit.php?id=<?= $documentId ?>" data-i18n="webEditorTitle">Web Doküman Editörü</a></section>
+        <section class="page-section form-panel">
+            <div class="section-heading compact-heading"><div><span class="section-kicker" data-i18n="editorSectionKicker">Düzenleme</span><h2 data-i18n="editorSectionTitle">Dokümanı Düzenle</h2><p data-i18n="editorSectionText">Web editöründe doğrudan düzenleyin veya dosyayı Ofis uygulamasında açın.</p></div></div>
+            <div class="workflow-buttons">
+                <a class="primary-button" href="document-office.php?id=<?= $documentId ?>" data-i18n="officeEditorTitle">Ofis Editörü</a>
+                <a class="secondary-button" href="document-edit.php?id=<?= $documentId ?>" data-i18n="webEditorTitle">Web Doküman Editörü</a>
+            </div>
+        </section>
         <section class="page-section workflow-panel">
             <div class="section-heading compact-heading"><div><span class="section-kicker" data-i18n="approvalWorkflowKicker">Kontrollü Yayın</span><h2 data-i18n="approvalWorkflowTitle">Onay ve Yayın Akışı</h2><p data-i18n="approvalWorkflowText">Dokümanı incelemeye gönderin, kararı kaydedin ve yalnız onaydan sonra yayımlayın.</p></div></div>
 

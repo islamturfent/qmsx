@@ -2363,6 +2363,7 @@ body {
 
     .workflow-buttons,
     .workflow-buttons .primary-button,
+    .workflow-buttons .secondary-button,
     .workflow-buttons .danger-button {
         width: 100%;
     }
