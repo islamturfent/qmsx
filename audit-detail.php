@@ -16,15 +16,26 @@ if ($auditId <= 0) {
     exit;
 }
 
-$auditStmt = $pdo->prepare(
-    "SELECT audits.id, audits.company_id, audits.title, audits.audit_type,
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+$sql = "SELECT audits.id, audits.company_id, audits.title, audits.audit_type,
             audits.planned_date, audits.status, audits.active, companies.company_name
      FROM audits
      INNER JOIN companies ON companies.id = audits.company_id
-     WHERE audits.id = :id
-     LIMIT 1"
-);
-$auditStmt->execute(["id" => $auditId]);
+     WHERE audits.id = :id";
+$params = ["id" => $auditId];
+if (!$isSuperAdmin) {
+    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
+                WHERE company_admin_assignments.company_id = audits.company_id
+                  AND company_admin_assignments.admin_user_id = :user_id
+                  AND company_admin_assignments.active = 1)";
+    $params["user_id"] = $userId;
+}
+$sql .= " LIMIT 1";
+
+$auditStmt = $pdo->prepare($sql);
+$auditStmt->execute($params);
 $audit = $auditStmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$audit) {
