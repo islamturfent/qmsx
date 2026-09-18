@@ -16,13 +16,24 @@ if ($companyId <= 0) {
     exit;
 }
 
-$companyStmt = $pdo->prepare(
-    "SELECT id, company_name, tax_number, sector, city, contact_email, active
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+$sql = "SELECT id, company_name, tax_number, sector, city, contact_email, active
      FROM companies
-     WHERE id = :id
-     LIMIT 1"
-);
-$companyStmt->execute(["id" => $companyId]);
+     WHERE id = :id";
+$params = ["id" => $companyId];
+if (!$isSuperAdmin) {
+    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
+                WHERE company_admin_assignments.company_id = companies.id
+                  AND company_admin_assignments.admin_user_id = :user_id
+                  AND company_admin_assignments.active = 1)";
+    $params["user_id"] = $userId;
+}
+$sql .= " LIMIT 1";
+
+$companyStmt = $pdo->prepare($sql);
+$companyStmt->execute($params);
 $company = $companyStmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$company) {
