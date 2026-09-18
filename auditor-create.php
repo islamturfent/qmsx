@@ -80,16 +80,18 @@ $activeNav = "auditors";
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
-                <a class="topbar-button topbar-link" href="auditors.php" data-i18n="backToListButton">Listeye Dön</a>
             </div>
         </div>
     </header>
 
     <main class="page-container narrow-page">
-        <section class="page-heading">
-            <span class="section-kicker" data-i18n="sidebarOperationsLabel">Operasyonlar</span>
-            <h1 data-i18n="newAuditorTitle">Yeni Denetçi</h1>
-            <p data-i18n="newAuditorText">Denetçi bilgilerini girerek sisteme yeni kayıt ekleyin.</p>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="sidebarOperationsLabel">Operasyonlar</span>
+                <h1 data-i18n="newAuditorTitle">Yeni Denetçi</h1>
+                <p data-i18n="newAuditorText">Denetçi bilgilerini girerek sisteme yeni kayıt ekleyin.</p>
+            </div>
+            <a class="secondary-button" href="auditors.php" data-i18n="backToListButton">Listeye Dön</a>
         </section>
 
         <section class="form-panel">

@@ -86,15 +86,17 @@ $activeNav = "companies";
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
-                <a class="topbar-button topbar-link" href="nonconformity-detail.php?id=<?= $nonconformityId ?>" data-i18n="backToNonconformityButton">Uygunsuzluğa Dön</a>
             </div>
         </div>
     </header>
     <main class="page-container narrow-page">
-        <section class="page-heading">
-            <span class="section-kicker" data-i18n="correctiveActionsKicker">İyileştirme Takibi</span>
-            <h1 data-i18n="createCorrectiveActionTitle">Yeni Düzeltici Faaliyet</h1>
-            <p data-i18n="createCorrectiveActionText">Uygunsuzluğun kök nedenini ortadan kaldıracak faaliyeti planlayın.</p>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="correctiveActionsKicker">İyileştirme Takibi</span>
+                <h1 data-i18n="createCorrectiveActionTitle">Yeni Düzeltici Faaliyet</h1>
+                <p data-i18n="createCorrectiveActionText">Uygunsuzluğun kök nedenini ortadan kaldıracak faaliyeti planlayın.</p>
+            </div>
+            <a class="secondary-button" href="nonconformity-detail.php?id=<?= $nonconformityId ?>" data-i18n="backToNonconformityButton">Uygunsuzluğa Dön</a>
         </section>
         <section class="form-panel">
             <?php if ($formError !== ""): ?>

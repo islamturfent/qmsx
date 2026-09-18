@@ -153,7 +153,6 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
-                <a class="topbar-button topbar-link" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>" data-i18n="backToAuditButton">Denetime Dön</a>
                 <a class="topbar-button topbar-link" href="logout.php" data-i18n="logoutLabel">Çıkış</a>
             </div>
         </div>
@@ -161,12 +160,17 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
 
     <main class="page-container">
         <section class="welcome-card">
-            <span class="section-kicker" data-i18n="nonconformityWorkspaceKicker">Uygunsuzluk Çalışma Alanı</span>
-            <h1><?= htmlspecialchars($nonconformity["title"], ENT_QUOTES, "UTF-8") ?></h1>
-            <p>
-                <?= htmlspecialchars($nonconformity["company_name"], ENT_QUOTES, "UTF-8") ?>
-                · <?= htmlspecialchars($nonconformity["audit_title"], ENT_QUOTES, "UTF-8") ?>
-            </p>
+            <div class="page-heading-actions">
+                <div>
+                    <span class="section-kicker" data-i18n="nonconformityWorkspaceKicker">Uygunsuzluk Çalışma Alanı</span>
+                    <h1><?= htmlspecialchars($nonconformity["title"], ENT_QUOTES, "UTF-8") ?></h1>
+                    <p>
+                        <?= htmlspecialchars($nonconformity["company_name"], ENT_QUOTES, "UTF-8") ?>
+                        · <?= htmlspecialchars($nonconformity["audit_title"], ENT_QUOTES, "UTF-8") ?>
+                    </p>
+                </div>
+                <a class="secondary-button" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>" data-i18n="backToAuditButton">Denetime Dön</a>
+            </div>
         </section>
 
         <section class="dashboard-grid">

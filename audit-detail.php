@@ -208,7 +208,6 @@ $resultLabels = [
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
-                <a class="topbar-button topbar-link" href="company-detail.php?id=<?= (int) $audit["company_id"] ?>" data-i18n="backToCompanyButton">Şirkete Dön</a>
                 <a class="topbar-button topbar-link" href="logout.php" data-i18n="logoutLabel">Çıkış</a>
             </div>
         </div>
@@ -216,13 +215,18 @@ $resultLabels = [
 
     <main class="page-container">
         <section class="welcome-card">
-            <span class="section-kicker" data-i18n="auditWorkspaceKicker">Denetim Çalışma Alanı</span>
-            <h1><?= htmlspecialchars($audit["title"], ENT_QUOTES, "UTF-8") ?></h1>
-            <p>
-                <?= htmlspecialchars($audit["company_name"], ENT_QUOTES, "UTF-8") ?>
-                · <?= htmlspecialchars($audit["audit_type"] ?: "-", ENT_QUOTES, "UTF-8") ?>
-                · <?= htmlspecialchars($audit["planned_date"] ?: "-", ENT_QUOTES, "UTF-8") ?>
-            </p>
+            <div class="page-heading-actions">
+                <div>
+                    <span class="section-kicker" data-i18n="auditWorkspaceKicker">Denetim Çalışma Alanı</span>
+                    <h1><?= htmlspecialchars($audit["title"], ENT_QUOTES, "UTF-8") ?></h1>
+                    <p>
+                        <?= htmlspecialchars($audit["company_name"], ENT_QUOTES, "UTF-8") ?>
+                        · <?= htmlspecialchars($audit["audit_type"] ?: "-", ENT_QUOTES, "UTF-8") ?>
+                        · <?= htmlspecialchars($audit["planned_date"] ?: "-", ENT_QUOTES, "UTF-8") ?>
+                    </p>
+                </div>
+                <a class="secondary-button" href="company-detail.php?id=<?= (int) $audit["company_id"] ?>" data-i18n="backToCompanyButton">Şirkete Dön</a>
+            </div>
         </section>
 
         <section class="dashboard-grid">

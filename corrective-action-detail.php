@@ -118,15 +118,17 @@ $activeNav = "companies";
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
-                <a class="topbar-button topbar-link" href="nonconformity-detail.php?id=<?= (int) $action["nonconformity_id"] ?>" data-i18n="backToNonconformityButton">Uygunsuzluğa Dön</a>
             </div>
         </div>
     </header>
     <main class="page-container narrow-page">
-        <section class="page-heading">
-            <span class="section-kicker" data-i18n="correctiveActionsKicker">İyileştirme Takibi</span>
-            <h1 data-i18n="correctiveActionDetailTitle">Düzeltici Faaliyet Detayı</h1>
-            <p><?= htmlspecialchars($action["action_text"], ENT_QUOTES, "UTF-8") ?></p>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="correctiveActionsKicker">İyileştirme Takibi</span>
+                <h1 data-i18n="correctiveActionDetailTitle">Düzeltici Faaliyet Detayı</h1>
+                <p><?= htmlspecialchars($action["action_text"], ENT_QUOTES, "UTF-8") ?></p>
+            </div>
+            <a class="secondary-button" href="nonconformity-detail.php?id=<?= (int) $action["nonconformity_id"] ?>" data-i18n="backToNonconformityButton">Uygunsuzluğa Dön</a>
         </section>
         <section class="dashboard-grid compact-dashboard-grid">
             <div class="dashboard-card">

@@ -227,7 +227,8 @@ textarea {
     min-width: 0;
 }
 
-.page-heading-actions > .primary-button {
+.page-heading-actions > .primary-button,
+.page-heading-actions > .secondary-button {
     flex-shrink: 0;
 }
 
@@ -2305,7 +2306,8 @@ body {
         flex-direction: column;
     }
 
-    .page-heading-actions > .primary-button {
+    .page-heading-actions > .primary-button,
+    .page-heading-actions > .secondary-button {
         width: 100%;
     }
 
