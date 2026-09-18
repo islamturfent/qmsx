@@ -13,6 +13,9 @@ if (($_SESSION["qms_role"] ?? "") !== "super_admin") {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('system_admins');
 
 $systemAdminFormError = "";
 $systemAdminFormData = [
@@ -22,6 +25,8 @@ $systemAdminFormData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('system_admins', $_POST["csrf"] ?? null);
+
     $systemAdminFormData = [
         "full_name" => trim($_POST["full_name"] ?? ""),
         "username" => trim($_POST["username"] ?? ""),
@@ -134,6 +139,7 @@ $systemAdmins = $systemAdminsStmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
 
                 <form class="auditor-form" method="post" action="super-admin-admins.php">
+                <?= qmsCsrfField('system_admins') ?>
                     <div class="form-grid">
                         <label class="form-field">
                             <span data-i18n="fullNameLabel">Ad Soyad</span>
