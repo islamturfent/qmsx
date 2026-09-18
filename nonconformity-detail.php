@@ -16,18 +16,29 @@ if ($nonconformityId <= 0) {
     exit;
 }
 
-$nonconformityStmt = $pdo->prepare(
-    "SELECT nonconformities.*, companies.company_name, audits.title AS audit_title,
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+$sql = "SELECT nonconformities.*, companies.company_name, audits.title AS audit_title,
             audit_checklist_items.item_text AS checklist_item_text,
             audit_checklist_items.requirement_ref
      FROM nonconformities
      INNER JOIN companies ON companies.id = nonconformities.company_id
      INNER JOIN audits ON audits.id = nonconformities.audit_id
      LEFT JOIN audit_checklist_items ON audit_checklist_items.id = nonconformities.checklist_item_id
-     WHERE nonconformities.id = :id
-     LIMIT 1"
-);
-$nonconformityStmt->execute(["id" => $nonconformityId]);
+     WHERE nonconformities.id = :id";
+$params = ["id" => $nonconformityId];
+if (!$isSuperAdmin) {
+    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
+                WHERE company_admin_assignments.company_id = nonconformities.company_id
+                  AND company_admin_assignments.admin_user_id = :user_id
+                  AND company_admin_assignments.active = 1)";
+    $params["user_id"] = $userId;
+}
+$sql .= " LIMIT 1";
+
+$nonconformityStmt = $pdo->prepare($sql);
+$nonconformityStmt->execute($params);
 $nonconformity = $nonconformityStmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$nonconformity) {
