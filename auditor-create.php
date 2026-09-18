@@ -8,6 +8,9 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('auditor_create');
 
 $formError = "";
 $formData = [
@@ -20,6 +23,8 @@ $formData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('auditor_create', $_POST["csrf"] ?? null);
+
     $formData = [
         "company_id" => (int) ($_POST["company_id"] ?? 0),
         "first_name" => trim($_POST["first_name"] ?? ""),
@@ -100,6 +105,7 @@ $activeNav = "auditors";
             <?php endif; ?>
 
             <form class="auditor-form" method="post" action="auditor-create.php">
+                <?= qmsCsrfField('auditor_create') ?>
                 <div class="form-grid">
                     <label class="form-field form-field-wide">
                         <span data-i18n="companySelectLabel">Şirket</span>
