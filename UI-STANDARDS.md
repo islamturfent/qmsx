@@ -30,7 +30,8 @@
 - Header'daki dil/tema kontrolleri `.topbar-button` kullanir: 44x44px yuvarlak, ince kenarlikli, hover `--nav-hover`.
 - Sayfa seviyesindeki olusturma ve genel komut dugmeleri header icinde yer almaz; sayfa basliginin saginda veya ilgili icerik bolumunde bulunur.
 - Dil ve tema kontrolleri header icinde kalir; bunlar ana islem dugmesi degildir.
-- Geri donus baglantilari ("Listeye Don", "Dokumanlara Don" gibi) header'da tutulmaz; sayfa basliginin saginda `secondary-button` olarak yer alir.
+- Sayfa ici gezinme baglantilari ("Listeye Don", "Dokumanlara Don", "Denetime Don", "Kayitli Sirketler" gibi) header'da tutulmaz; sayfa basliginin saginda `secondary-button` olarak yer alir.
+- Header'da yalnizca dil/tema kontrolleri, genel gezinme (Dashboard) ve cikis baglantisi kalir.
 - Masaustunde dugmeler baslik veya form satiriyla hizalanir; mobilde tam genislige gecerek tasma olusturmaz.
 - Yeni ekranlarda farkli bir dugme stili uretilmez; mevcut siniflar yeniden kullanilir.
 
