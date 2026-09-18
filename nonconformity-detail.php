@@ -39,7 +39,13 @@ $formError = "";
 $allowedSeverities = ["minor", "major", "critical"];
 $allowedStatuses = ["open", "in_progress", "verification", "closed"];
 
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('nonconformity');
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && ($_POST["form_type"] ?? "") === "update_nonconformity") {
+    qmsCsrfVerify('nonconformity', $_POST["csrf"] ?? null);
+
     $formData = [
         "title" => trim($_POST["title"] ?? ""),
         "description" => trim($_POST["description"] ?? ""),
@@ -267,6 +273,7 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                 <?php endif; ?>
 
                 <form class="auditor-form" method="post" action="nonconformity-detail.php?id=<?= $nonconformityId ?>">
+                    <?= qmsCsrfField('nonconformity') ?>
                     <input type="hidden" name="form_type" value="update_nonconformity">
                     <div class="form-grid">
                         <label class="form-field form-field-wide">
