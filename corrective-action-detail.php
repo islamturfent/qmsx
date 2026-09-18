@@ -10,16 +10,27 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 
 $actionId = (int) ($_GET["id"] ?? 0);
-$actionStmt = $pdo->prepare(
-    "SELECT corrective_actions.*, nonconformities.title AS nonconformity_title,
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+$sql = "SELECT corrective_actions.*, nonconformities.title AS nonconformity_title,
             nonconformities.company_id, companies.company_name
      FROM corrective_actions
      INNER JOIN nonconformities ON nonconformities.id = corrective_actions.nonconformity_id
      INNER JOIN companies ON companies.id = nonconformities.company_id
-     WHERE corrective_actions.id = :id AND corrective_actions.active = 1
-     LIMIT 1"
-);
-$actionStmt->execute(["id" => $actionId]);
+     WHERE corrective_actions.id = :id AND corrective_actions.active = 1";
+$params = ["id" => $actionId];
+if (!$isSuperAdmin) {
+    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
+                WHERE company_admin_assignments.company_id = nonconformities.company_id
+                  AND company_admin_assignments.admin_user_id = :user_id
+                  AND company_admin_assignments.active = 1)";
+    $params["user_id"] = $userId;
+}
+$sql .= " LIMIT 1";
+
+$actionStmt = $pdo->prepare($sql);
+$actionStmt->execute($params);
 $action = $actionStmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$action) {
@@ -27,10 +38,95 @@ if (!$action) {
     exit;
 }
 
+$_SESSION["corrective_action_csrf"] ??= bin2hex(random_bytes(32));
+$csrfToken = $_SESSION["corrective_action_csrf"];
+
 $formError = "";
 $allowedStatuses = ["planned", "in_progress", "verification", "completed", "closed"];
+$allowedEvidenceFiles = [
+    "pdf" => ["application/pdf"],
+    "doc" => ["application/msword", "application/octet-stream"],
+    "docx" => ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/zip", "application/octet-stream"],
+    "xls" => ["application/vnd.ms-excel", "application/octet-stream"],
+    "xlsx" => ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/zip", "application/octet-stream"],
+    "jpg" => ["image/jpeg"],
+    "jpeg" => ["image/jpeg"],
+    "png" => ["image/png"],
+    "webp" => ["image/webp"]
+];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $formType = $_POST["form_type"] ?? "update_action";
+
+    if (!hash_equals($csrfToken, (string) ($_POST["csrf"] ?? ""))) {
+        http_response_code(403);
+        exit("Geçersiz istek.");
+    }
+
+    if ($formType === "upload_evidence") {
+        $note = trim($_POST["note"] ?? "");
+        $upload = $_FILES["evidence_file"] ?? null;
+
+        if (!$upload || $upload["error"] !== UPLOAD_ERR_OK || $upload["size"] > 10 * 1024 * 1024) {
+            $formError = "Kanıt dosyası yüklenemedi veya 10 MB sınırını aşıyor.";
+        } else {
+            $extension = strtolower(pathinfo($upload["name"], PATHINFO_EXTENSION));
+            $mimeType = (new finfo(FILEINFO_MIME_TYPE))->file($upload["tmp_name"]);
+            if (!isset($allowedEvidenceFiles[$extension]) || !in_array($mimeType, $allowedEvidenceFiles[$extension], true)) {
+                $formError = "Bu dosya türü kanıt olarak yüklenemez. PDF, Word, Excel veya görsel kullanın.";
+            } else {
+                $storedName = bin2hex(random_bytes(20)) . "." . $extension;
+                $storedPath = __DIR__ . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "evidence" . DIRECTORY_SEPARATOR . $storedName;
+                try {
+                    if (!move_uploaded_file($upload["tmp_name"], $storedPath)) {
+                        throw new RuntimeException("Kanıt dosyası depoya taşınamadı.");
+                    }
+                    $evidenceInsert = $pdo->prepare(
+                        "INSERT INTO corrective_action_evidence
+                            (corrective_action_id, original_file_name, stored_file_name, mime_type, file_size, note, uploaded_by)
+                         VALUES (:action_id, :original_file_name, :stored_file_name, :mime_type, :file_size, :note, :uploaded_by)"
+                    );
+                    $evidenceInsert->execute([
+                        "action_id" => $actionId,
+                        "original_file_name" => basename($upload["name"]),
+                        "stored_file_name" => $storedName,
+                        "mime_type" => $mimeType,
+                        "file_size" => (int) $upload["size"],
+                        "note" => $note !== "" ? $note : null,
+                        "uploaded_by" => $userId ?: null
+                    ]);
+                    header("Location: corrective-action-detail.php?id=" . $actionId . "&evidence=uploaded");
+                    exit;
+                } catch (Throwable $error) {
+                    if (is_file($storedPath)) {
+                        unlink($storedPath);
+                    }
+                    $formError = "Kanıt dosyası kaydedilemedi.";
+                }
+            }
+        }
+    } elseif ($formType === "delete_evidence") {
+        $evidenceId = (int) ($_POST["evidence_id"] ?? 0);
+        $evidenceLookup = $pdo->prepare(
+            "SELECT stored_file_name FROM corrective_action_evidence
+             WHERE id = :id AND corrective_action_id = :action_id AND active = 1 LIMIT 1"
+        );
+        $evidenceLookup->execute(["id" => $evidenceId, "action_id" => $actionId]);
+        $storedName = $evidenceLookup->fetchColumn();
+
+        if ($storedName === false) {
+            $formError = "Kanıt dosyası bulunamadı.";
+        } else {
+            $pdo->prepare("UPDATE corrective_action_evidence SET active = 0 WHERE id = :id")
+                ->execute(["id" => $evidenceId]);
+            $filePath = __DIR__ . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "evidence" . DIRECTORY_SEPARATOR . basename((string) $storedName);
+            if (is_file($filePath)) {
+                unlink($filePath);
+            }
+            header("Location: corrective-action-detail.php?id=" . $actionId . "&evidence=deleted");
+            exit;
+        }
+    } elseif ($formType === "update_action") {
     $formData = [
         "action_text" => trim($_POST["action_text"] ?? ""),
         "responsible_person" => trim($_POST["responsible_person"] ?? ""),
@@ -84,6 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $action = array_merge($action, $formData);
+    }
 }
 
 $statusLabels = [
@@ -93,6 +190,17 @@ $statusLabels = [
     "completed" => "Tamamlandı",
     "closed" => "Kapalı"
 ];
+$evidenceStmt = $pdo->prepare(
+    "SELECT corrective_action_evidence.*, users.full_name AS uploaded_by_name
+     FROM corrective_action_evidence
+     LEFT JOIN users ON users.id = corrective_action_evidence.uploaded_by
+     WHERE corrective_action_evidence.corrective_action_id = :action_id
+       AND corrective_action_evidence.active = 1
+     ORDER BY corrective_action_evidence.id DESC"
+);
+$evidenceStmt->execute(["action_id" => $actionId]);
+$evidenceFiles = $evidenceStmt->fetchAll(PDO::FETCH_ASSOC);
+
 $activeNav = "companies";
 
 ?>
@@ -148,10 +256,17 @@ $activeNav = "companies";
             <?php if (isset($_GET["updated"]) && $_GET["updated"] === "1"): ?>
                 <div class="form-message success" data-i18n="correctiveActionUpdatedMessage">Düzeltici faaliyet güncellendi.</div>
             <?php endif; ?>
+            <?php if (($_GET["evidence"] ?? "") === "uploaded"): ?>
+                <div class="form-message success" data-i18n="evidenceUploadedMessage">Kanıt dosyası yüklendi.</div>
+            <?php elseif (($_GET["evidence"] ?? "") === "deleted"): ?>
+                <div class="form-message success" data-i18n="evidenceDeletedMessage">Kanıt dosyası silindi.</div>
+            <?php endif; ?>
             <?php if ($formError !== ""): ?>
                 <div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div>
             <?php endif; ?>
             <form class="auditor-form" method="post" action="corrective-action-detail.php?id=<?= $actionId ?>">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, "UTF-8") ?>">
+                <input type="hidden" name="form_type" value="update_action">
                 <div class="form-grid">
                     <label class="form-field form-field-wide">
                         <span data-i18n="actionTextLabel">Faaliyet Açıklaması</span>
@@ -188,6 +303,52 @@ $activeNav = "companies";
                 </div>
                 <div class="form-actions">
                     <button class="primary-button" type="submit" data-i18n="saveCorrectiveActionButton">Faaliyeti Kaydet</button>
+                </div>
+            </form>
+        </section>
+        <section class="page-section">
+            <div class="section-heading"><div><h2 data-i18n="evidenceSectionTitle">Kanıt Dosyaları</h2><p data-i18n="evidenceSectionText">Faaliyetin tamamlandığını gösteren dosyaları indirin.</p></div></div>
+            <?php if (!$evidenceFiles): ?>
+                <div class="empty-state" data-i18n="noEvidenceText">Henüz kanıt dosyası yüklenmedi.</div>
+            <?php else: ?>
+                <div class="revision-list">
+                    <?php foreach ($evidenceFiles as $evidence): ?>
+                        <div class="revision-item">
+                            <div>
+                                <strong><?= htmlspecialchars($evidence["original_file_name"], ENT_QUOTES, "UTF-8") ?></strong>
+                                <span><?= htmlspecialchars($evidence["note"] ?: "-", ENT_QUOTES, "UTF-8") ?> · <?= number_format(((int) $evidence["file_size"]) / 1024, 1) ?> KB · <?= htmlspecialchars((string) ($evidence["uploaded_by_name"] ?? "-"), ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars((string) $evidence["created_at"], ENT_QUOTES, "UTF-8") ?></span>
+                            </div>
+                            <div class="workflow-buttons">
+                                <a class="secondary-button" href="corrective-action-evidence-download.php?id=<?= (int) $evidence["id"] ?>" data-i18n="downloadFileButton">İndir</a>
+                                <form method="post" action="corrective-action-detail.php?id=<?= $actionId ?>">
+                                    <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, "UTF-8") ?>">
+                                    <input type="hidden" name="form_type" value="delete_evidence">
+                                    <input type="hidden" name="evidence_id" value="<?= (int) $evidence["id"] ?>">
+                                    <button class="danger-button" type="submit" data-i18n="deleteEvidenceButton">Sil</button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+        <section class="page-section form-panel">
+            <div class="section-heading compact-heading"><div><h3 data-i18n="evidenceUploadTitle">Yeni Kanıt Ekle</h3><p data-i18n="evidenceUploadText">PDF, Word, Excel veya görsel yükleyebilirsiniz; dosya başına sınır 10 MB.</p></div></div>
+            <form class="auditor-form" method="post" action="corrective-action-detail.php?id=<?= $actionId ?>" enctype="multipart/form-data">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, "UTF-8") ?>">
+                <input type="hidden" name="form_type" value="upload_evidence">
+                <div class="form-grid">
+                    <label class="form-field">
+                        <span data-i18n="evidenceFileLabel">Kanıt Dosyası</span>
+                        <input type="file" name="evidence_file" required>
+                    </label>
+                    <label class="form-field">
+                        <span data-i18n="evidenceNoteLabel">Açıklama (isteğe bağlı)</span>
+                        <input type="text" name="note" maxlength="255">
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="primary-button" type="submit" data-i18n="uploadEvidenceButton">Kanıt Yükle</button>
                 </div>
             </form>
         </section>

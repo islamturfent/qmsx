@@ -689,6 +689,10 @@ body.has-sidebar .page-container.narrow-page {
     gap: 4px;
 }
 
+.revision-item form {
+    margin: 0;
+}
+
 .revision-item span {
     overflow-wrap: anywhere;
     color: var(--muted-color);

@@ -7,6 +7,9 @@ storage/documents/*
 storage/office/*
 !storage/office/.htaccess
 
+storage/evidence/*
+!storage/evidence/.htaccess
+
 # ---------------------------------------------------------------------------
 # Ortama ozel ayarlar / kimlik bilgileri
 # ---------------------------------------------------------------------------
