@@ -12,6 +12,26 @@ require_once __DIR__ . '/includes/csrf.php';
 
 $csrfToken = qmsCsrfToken('auditor_create');
 
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+// Sistem admini yalniz atandigi sirketlere denetci ekleyebilir.
+$companySql = "SELECT id, company_name FROM companies WHERE active = 1";
+$companyParams = [];
+if (!$isSuperAdmin) {
+    $companySql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
+                WHERE company_admin_assignments.company_id = companies.id
+                  AND company_admin_assignments.admin_user_id = :user_id
+                  AND company_admin_assignments.active = 1)";
+    $companyParams["user_id"] = $userId;
+}
+$companySql .= " ORDER BY company_name ASC";
+
+$companiesStmt = $pdo->prepare($companySql);
+$companiesStmt->execute($companyParams);
+$companies = $companiesStmt->fetchAll(PDO::FETCH_ASSOC);
+$allowedCompanyIds = array_map('intval', array_column($companies, 'id'));
+
 $formError = "";
 $formData = [
     "company_id" => "",
@@ -35,7 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ];
 
     if (
-        $formData["company_id"] <= 0 || $formData["first_name"] === "" ||
+        $formData["company_id"] <= 0 || !in_array($formData["company_id"], $allowedCompanyIds, true) ||
+        $formData["first_name"] === "" ||
         $formData["last_name"] === "" || $formData["email"] === "" ||
         $formData["telefon"] === "" || $formData["role"] === ""
     ) {
@@ -53,10 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-$companiesStmt = $pdo->query(
-    "SELECT id, company_name FROM companies WHERE active = 1 ORDER BY company_name ASC"
-);
-$companies = $companiesStmt->fetchAll(PDO::FETCH_ASSOC);
 $activeNav = "auditors";
 
 ?>
