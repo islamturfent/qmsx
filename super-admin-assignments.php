@@ -13,6 +13,9 @@ if (($_SESSION["qms_role"] ?? "") !== "super_admin") {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('admin_assignments');
 
 $assignmentError = "";
 $assignmentData = [
@@ -21,6 +24,8 @@ $assignmentData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('admin_assignments', $_POST["csrf"] ?? null);
+
     $assignmentData = [
         "company_id" => (int) ($_POST["company_id"] ?? 0),
         "admin_user_id" => (int) ($_POST["admin_user_id"] ?? 0)
@@ -139,6 +144,7 @@ $assignmentCount = (int) $assignmentCountStmt->fetchColumn();
                 <?php endif; ?>
 
                 <form class="auditor-form" method="post" action="super-admin-assignments.php">
+                <?= qmsCsrfField('admin_assignments') ?>
                     <div class="form-grid">
                         <label class="form-field">
                             <span data-i18n="companySelectLabel">Şirket</span>
