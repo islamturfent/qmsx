@@ -13,6 +13,9 @@ if (($_SESSION["qms_role"] ?? "") !== "super_admin") {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('companies');
 
 $companyFormError = "";
 $companyFormData = [
@@ -24,6 +27,8 @@ $companyFormData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('companies', $_POST["csrf"] ?? null);
+
     $companyFormData = [
         "company_name" => trim($_POST["company_name"] ?? ""),
         "tax_number" => trim($_POST["tax_number"] ?? ""),
@@ -132,6 +137,7 @@ $companies = $companiesStmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
 
                 <form class="auditor-form" method="post" action="super-admin-companies.php">
+                <?= qmsCsrfField('companies') ?>
                     <div class="form-grid">
                         <label class="form-field">
                             <span data-i18n="companyNameLabel">Şirket Adı</span>
