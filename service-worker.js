@@ -1,6 +1,6 @@
 // Uygulama klasorunun adindan bagimsiz calismasi icin tum yollar gorelidir;
 // service worker'in kendi konumuna gore cozulur.
-const CACHE_NAME = "qms-cache-v31";
+const CACHE_NAME = "qms-cache-v32";
 
 const APP_SHELL = [
 
@@ -9,6 +9,8 @@ const APP_SHELL = [
     "assets/css/document-editor.css",
     "assets/css/risks.css",
     "assets/css/office.css",
+    "assets/fonts/outfit-latin.woff2",
+    "assets/fonts/outfit-latin-ext.woff2",
     "assets/js/document-editor.js",
     "assets/vendor/tinymce/tinymce.min.js",
     "assets/vendor/tinymce/langs/tr.js",

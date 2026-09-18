@@ -16,6 +16,17 @@ $openNonconformityCount = (int) $pdo->query(
 )->fetchColumn();
 $documentCount = (int) $pdo->query("SELECT COUNT(*) FROM documents WHERE active = 1")->fetchColumn();
 
+require_once __DIR__ . '/includes/report-export-data.php';
+
+// Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
+// paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
+$reportMetrics = buildReportExportData(
+    $pdo,
+    (int) $_SESSION["qms_user_id"],
+    ($_SESSION["qms_role"] ?? "") === "super_admin",
+    []
+)["metrics"];
+
 $activeNav = "dashboard";
 
 ?>
@@ -89,8 +100,8 @@ $activeNav = "dashboard";
             <a class="dashboard-card metric-violet" href="reports.php">
                 <?= appIcon("trend", "dashboard-card-icon") ?>
                 <div class="dashboard-card-content">
-                    <span class="dashboard-card-label" data-i18n="performanceCardLabel">Performans</span>
-                    <strong class="dashboard-card-number">0%</strong>
+                    <span class="dashboard-card-label" data-i18n="actionCompletionKpi">Aksiyon Tamamlama</span>
+                    <strong class="dashboard-card-number"><?= $reportMetrics["action_completion_rate"] ?>%</strong>
                 </div>
             </a>
 
