@@ -11,20 +11,34 @@ require_once __DIR__ . '/config/database.php';
 
 $nonconformityId = (int) ($_GET["nonconformity_id"] ?? $_POST["nonconformity_id"] ?? 0);
 
-$nonconformityStmt = $pdo->prepare(
-    "SELECT nonconformities.id, nonconformities.title, companies.company_name
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+$sql = "SELECT nonconformities.id, nonconformities.title, companies.company_name
      FROM nonconformities
      INNER JOIN companies ON companies.id = nonconformities.company_id
-     WHERE nonconformities.id = :id AND nonconformities.active = 1
-     LIMIT 1"
-);
-$nonconformityStmt->execute(["id" => $nonconformityId]);
+     WHERE nonconformities.id = :id AND nonconformities.active = 1";
+$params = ["id" => $nonconformityId];
+if (!$isSuperAdmin) {
+    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
+                WHERE company_admin_assignments.company_id = nonconformities.company_id
+                  AND company_admin_assignments.admin_user_id = :user_id
+                  AND company_admin_assignments.active = 1)";
+    $params["user_id"] = $userId;
+}
+$sql .= " LIMIT 1";
+
+$nonconformityStmt = $pdo->prepare($sql);
+$nonconformityStmt->execute($params);
 $nonconformity = $nonconformityStmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$nonconformity) {
     header("Location: dashboard.php");
     exit;
 }
+
+$_SESSION["corrective_action_csrf"] ??= bin2hex(random_bytes(32));
+$csrfToken = $_SESSION["corrective_action_csrf"];
 
 $formError = "";
 $formData = [
@@ -34,6 +48,11 @@ $formData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (!hash_equals($csrfToken, (string) ($_POST["csrf"] ?? ""))) {
+        http_response_code(403);
+        exit("Geçersiz istek.");
+    }
+
     $formData = [
         "action_text" => trim($_POST["action_text"] ?? ""),
         "responsible_person" => trim($_POST["responsible_person"] ?? ""),
@@ -104,6 +123,7 @@ $activeNav = "companies";
             <?php endif; ?>
             <form class="auditor-form" method="post" action="corrective-action-create.php?nonconformity_id=<?= $nonconformityId ?>">
                 <input type="hidden" name="nonconformity_id" value="<?= $nonconformityId ?>">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, "UTF-8") ?>">
                 <div class="form-grid">
                     <label class="form-field form-field-wide">
                         <span data-i18n="actionTextLabel">Faaliyet Açıklaması</span>
