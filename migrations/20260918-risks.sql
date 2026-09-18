@@ -1,0 +1,41 @@
+CREATE TABLE IF NOT EXISTS risks (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    category VARCHAR(100) DEFAULT NULL,
+    responsible_person VARCHAR(150) DEFAULT NULL,
+    due_date DATE DEFAULT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'open',
+    description TEXT NOT NULL,
+    existing_controls TEXT DEFAULT NULL,
+    treatment_plan TEXT DEFAULT NULL,
+    initial_likelihood TINYINT UNSIGNED NOT NULL,
+    initial_impact TINYINT UNSIGNED NOT NULL,
+    residual_likelihood TINYINT UNSIGNED DEFAULT NULL,
+    residual_impact TINYINT UNSIGNED DEFAULT NULL,
+    created_by INT DEFAULT NULL,
+    updated_by INT DEFAULT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_risks_company (company_id),
+    INDEX idx_risks_status (status),
+    INDEX idx_risks_due (due_date),
+    CONSTRAINT fk_risks_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    CONSTRAINT fk_risks_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_risks_updater FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS risk_history (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    risk_id INT NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    residual_likelihood TINYINT UNSIGNED DEFAULT NULL,
+    residual_impact TINYINT UNSIGNED DEFAULT NULL,
+    note TEXT DEFAULT NULL,
+    changed_by INT DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_risk_history_risk (risk_id, created_at),
+    CONSTRAINT fk_risk_history_risk FOREIGN KEY (risk_id) REFERENCES risks(id) ON DELETE CASCADE,
+    CONSTRAINT fk_risk_history_user FOREIGN KEY (changed_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

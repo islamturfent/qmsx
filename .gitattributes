@@ -1,0 +1,22 @@
+# Satir sonlari acikca sabitlenir: dosyalar hem depoda hem calisma kopyasinda
+# LF kalir. Aksi halde Windows'taki core.autocrlf=true ayari ilk checkout'ta
+# tum dosyalari CRLF'e cevirip buyuk bir sahte fark olusturur.
+* text=auto eol=lf
+
+# Ikilik dosyalar - donusturulmemeli
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.woff binary
+*.woff2 binary
+*.docx binary
+*.pdf binary
+
+# Uretilmis / ucuncu taraf dosyalar
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+assets/vendor/** linguist-vendored=true
+lib/** linguist-vendored=true

@@ -1,0 +1,22 @@
+.risk-card { position: relative; }
+.risk-level { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 500; }
+.risk-level-low { background: var(--success-soft); color: var(--success-soft-text); }
+.risk-level-medium { background: var(--warning-soft); color: var(--warning-soft-text); }
+.risk-level-high { background: var(--orange-soft); color: var(--orange-soft-text); }
+.risk-level-critical { background: var(--error-soft); color: var(--error-soft-text); }
+.risk-level-unrated { background: var(--neutral-soft); color: var(--neutral-soft-text); }
+.risk-score { width: fit-content; border-radius: 8px; padding: 4px 10px; }
+.risk-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, .75fr); gap: 24px; align-items: start; }
+.risk-matrix-panel { position: sticky; top: 92px; margin-top: 24px; border: 1px solid var(--border-color); border-radius: var(--border-radius); background: var(--surface-color); padding: 24px; box-shadow: var(--shadow-theme-xs); }
+.risk-matrix-panel h2 { margin-top: 0; }
+.risk-matrix-panel p { color: var(--muted-color); }
+.risk-matrix { display: grid; grid-template-columns: 34px repeat(5, minmax(38px,1fr)); gap: 4px; align-items: center; text-align: center; }
+.risk-matrix > strong { color: var(--muted-color); font-size: 12px; }
+.risk-matrix-cell { position: relative; min-height: 46px; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; border-radius: 7px; font-weight: 800; }
+.risk-matrix-cell.is-initial { border-color: var(--text-color); }
+.risk-matrix-cell.is-residual { box-shadow: inset 0 0 0 2px var(--primary-color); }
+.risk-matrix-cell b { position: absolute; right: 3px; bottom: 1px; font-size: 9px; }
+.risk-legend { display: flex; gap: 16px; margin-top: 12px; color: var(--muted-color); font-size: 12px; }
+.risk-assumption { font-size: 12px; }
+@media (max-width: 1000px) { .risk-layout { grid-template-columns: 1fr; } .risk-matrix-panel { position: static; } }
+@media (max-width: 600px) { .risk-matrix-panel { padding: 14px; } .risk-matrix { grid-template-columns: 26px repeat(5,minmax(36px,1fr)); } .risk-matrix-cell { min-height: 40px; } }

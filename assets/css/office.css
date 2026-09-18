@@ -1,0 +1,2 @@
+.office-frame { width: 100%; height: max(600px, calc(100dvh - 250px)); border: 1px solid var(--border-color); border-radius: 8px; background: var(--surface-color); }
+@media (max-width: 600px) { .office-frame { height: 75dvh; min-height: 420px; } }

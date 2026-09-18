@@ -1,0 +1,32 @@
+{
+    "name": "QMS Yönetim Sistemi",
+    "short_name": "QMS",
+    "description": "Kalite, denetim, performans ve raporlama süreçleri için SaaS kalite yönetim sistemi.",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#f9fafb",
+    "theme_color": "#465fff",
+    "categories": ["business", "productivity"],
+    "icons": [
+        {
+            "src": "assets/icons/qms-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/icons/qms-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/icons/qms-icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}
