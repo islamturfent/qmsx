@@ -8,10 +8,14 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$csrfToken = qmsCsrfToken('notifications');
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('notifications', $_POST["csrf"] ?? null);
+
     $formType = $_POST["form_type"] ?? "";
     if ($formType === "mark_read") {
         $notificationId = (int) ($_POST["notification_id"] ?? 0);
@@ -59,7 +63,7 @@ $activeNav = "notifications";
     <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
     <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong data-i18n="notificationCenterTitle">Bildirim Merkezi</strong><span data-i18n="notificationCenterText">Onay, karar ve yayın hareketlerinizi takip edin.</span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle" type="button">EN</button><button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button></div></div></header>
     <main class="page-container">
-        <section class="page-heading page-heading-actions"><div><span class="section-kicker" data-i18n="sidebarOverviewLabel">Genel</span><h1 data-i18n="notificationCenterTitle">Bildirim Merkezi</h1><p data-i18n="notificationCenterText">Onay, karar ve yayın hareketlerinizi takip edin.</p></div><?php if ((int) $counts["unread_count"] > 0): ?><form method="post" action="notifications.php"><input type="hidden" name="form_type" value="mark_all_read"><button class="primary-button" type="submit" data-i18n="markAllReadButton">Tümünü Okundu İşaretle</button></form><?php endif; ?></section>
+        <section class="page-heading page-heading-actions"><div><span class="section-kicker" data-i18n="sidebarOverviewLabel">Genel</span><h1 data-i18n="notificationCenterTitle">Bildirim Merkezi</h1><p data-i18n="notificationCenterText">Onay, karar ve yayın hareketlerinizi takip edin.</p></div><?php if ((int) $counts["unread_count"] > 0): ?><form method="post" action="notifications.php"><?= qmsCsrfField('notifications') ?><input type="hidden" name="form_type" value="mark_all_read"><button class="primary-button" type="submit" data-i18n="markAllReadButton">Tümünü Okundu İşaretle</button></form><?php endif; ?></section>
         <section class="dashboard-grid compact-dashboard-grid">
             <a class="dashboard-card metric-blue" href="notifications.php"><?= appIcon("table", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="allNotificationsLabel">Tüm Bildirimler</span><strong class="dashboard-card-number"><?= (int) $counts["total"] ?></strong></div></a>
             <a class="dashboard-card metric-orange" href="notifications.php?filter=unread"><?= appIcon("alert", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="unreadNotificationsLabel">Okunmamış</span><strong class="dashboard-card-number"><?= (int) $counts["unread_count"] ?></strong></div></a>
@@ -73,7 +77,7 @@ $activeNav = "notifications";
                         <article class="notification-item <?= (int) $notification["is_read"] === 0 ? "unread" : "" ?>">
                             <div class="notification-icon"><?= (int) $notification["is_read"] === 0 ? "!" : "✓" ?></div>
                             <div class="notification-content"><strong><?= htmlspecialchars($notification["title"], ENT_QUOTES, "UTF-8") ?></strong><p><?= htmlspecialchars($notification["message"] ?: "", ENT_QUOTES, "UTF-8") ?></p><span><?= htmlspecialchars($notification["created_at"], ENT_QUOTES, "UTF-8") ?></span></div>
-                            <div class="notification-actions"><?php if ($notification["link_url"]): ?><a class="primary-button" href="<?= htmlspecialchars($notification["link_url"], ENT_QUOTES, "UTF-8") ?>" data-i18n="openRecordButton">Kaydı Aç</a><?php endif; ?><?php if ((int) $notification["is_read"] === 0): ?><form method="post" action="notifications.php"><input type="hidden" name="form_type" value="mark_read"><input type="hidden" name="notification_id" value="<?= (int) $notification["id"] ?>"><button class="secondary-button" type="submit" data-i18n="markReadButton">Okundu</button></form><?php endif; ?></div>
+                            <div class="notification-actions"><?php if ($notification["link_url"]): ?><a class="primary-button" href="<?= htmlspecialchars($notification["link_url"], ENT_QUOTES, "UTF-8") ?>" data-i18n="openRecordButton">Kaydı Aç</a><?php endif; ?><?php if ((int) $notification["is_read"] === 0): ?><form method="post" action="notifications.php"><?= qmsCsrfField('notifications') ?><input type="hidden" name="form_type" value="mark_read"><input type="hidden" name="notification_id" value="<?= (int) $notification["id"] ?>"><button class="secondary-button" type="submit" data-i18n="markReadButton">Okundu</button></form><?php endif; ?></div>
                         </article>
                     <?php endforeach; ?>
                 </div>
