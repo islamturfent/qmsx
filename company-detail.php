@@ -30,6 +30,10 @@ if (!$company) {
     exit;
 }
 
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('company_audit');
+
 $auditFormError = "";
 $auditFormData = [
     "title" => "",
@@ -38,6 +42,8 @@ $auditFormData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && ($_POST["form_type"] ?? "") === "create_audit") {
+    qmsCsrfVerify('company_audit', $_POST["csrf"] ?? null);
+
     $auditFormData = [
         "title" => trim($_POST["title"] ?? ""),
         "audit_type" => trim($_POST["audit_type"] ?? ""),
@@ -205,6 +211,7 @@ $openNonconformityCount = (int) $openNonconformityCountStmt->fetchColumn();
                 <?php endif; ?>
 
                 <form class="auditor-form" method="post" action="company-detail.php?id=<?= $companyId ?>">
+                <?= qmsCsrfField('company_audit') ?>
                     <input type="hidden" name="form_type" value="create_audit">
 
                     <div class="form-grid">
