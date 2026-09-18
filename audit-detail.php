@@ -35,7 +35,13 @@ if (!$audit) {
 $formError = "";
 $allowedResults = ["pending", "compliant", "noncompliant", "not_applicable"];
 
+require_once __DIR__ . '/includes/csrf.php';
+
+$csrfToken = qmsCsrfToken('audit_detail');
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    qmsCsrfVerify('audit_detail', $_POST["csrf"] ?? null);
+
     $formType = $_POST["form_type"] ?? "";
 
     if ($formType === "create_checklist_item") {
@@ -276,6 +282,7 @@ $resultLabels = [
                 <?php endif; ?>
 
                 <form class="auditor-form" method="post" action="audit-detail.php?id=<?= $auditId ?>">
+                    <?= qmsCsrfField('audit_detail') ?>
                     <input type="hidden" name="form_type" value="create_checklist_item">
                     <div class="form-grid">
                         <label class="form-field form-field-wide">
@@ -342,6 +349,7 @@ $resultLabels = [
 
                 <?php foreach ($checklistItems as $item): ?>
                     <form class="checklist-item-form" method="post" action="audit-detail.php?id=<?= $auditId ?>">
+                        <?= qmsCsrfField('audit_detail') ?>
                         <input type="hidden" name="item_id" value="<?= (int) $item["id"] ?>">
                         <div class="checklist-item-heading">
                             <div>
