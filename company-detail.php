@@ -134,7 +134,6 @@ $openNonconformityCount = (int) $openNonconformityCountStmt->fetchColumn();
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
-                <a class="topbar-button topbar-link" href="super-admin-companies.php" data-i18n="companiesTitle">Kayıtlı Şirketler</a>
                 <a class="topbar-button topbar-link" href="logout.php" data-i18n="logoutLabel">Çıkış</a>
             </div>
         </div>
@@ -142,11 +141,16 @@ $openNonconformityCount = (int) $openNonconformityCountStmt->fetchColumn();
 
     <main class="page-container">
         <section class="welcome-card">
-            <span class="section-kicker" data-i18n="companyWorkspaceKicker">Şirket Çalışma Alanı</span>
-            <h1><?= htmlspecialchars($company["company_name"], ENT_QUOTES, "UTF-8") ?></h1>
-            <p>
-                <?= htmlspecialchars(trim(($company["city"] ?? "") . " " . ($company["sector"] ?? "")), ENT_QUOTES, "UTF-8") ?>
-            </p>
+            <div class="page-heading-actions">
+                <div>
+                    <span class="section-kicker" data-i18n="companyWorkspaceKicker">Şirket Çalışma Alanı</span>
+                    <h1><?= htmlspecialchars($company["company_name"], ENT_QUOTES, "UTF-8") ?></h1>
+                    <p>
+                        <?= htmlspecialchars(trim(($company["city"] ?? "") . " " . ($company["sector"] ?? "")), ENT_QUOTES, "UTF-8") ?>
+                    </p>
+                </div>
+                <a class="secondary-button" href="super-admin-companies.php" data-i18n="companiesTitle">Kayıtlı Şirketler</a>
+            </div>
         </section>
 
         <section class="dashboard-grid">
