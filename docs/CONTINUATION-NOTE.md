@@ -63,6 +63,54 @@ carried over from earlier assumptions.
   report dataset on every dashboard view; if that page ever feels slow, replace it
   with an aggregate query.
 
+## Security hardening (2026-09-19)
+
+### CSRF
+
+- A shared helper now exists: `includes/csrf.php` with `qmsCsrfToken($scope)`,
+  `qmsCsrfVerify($scope, $provided)` and `qmsCsrfField($scope)`. New forms must use
+  it; do not re-implement the pattern page by page.
+- Fixed in this pass (these pages had no verification at all): `notifications`,
+  `super-admin-assignments`, `super-admin-admins`, `super-admin-companies`,
+  `company-detail`, `auditor-create`, `nonconformity-detail`, `audit-detail`,
+  `document-create`, plus `corrective-action-create` and `corrective-action-detail`
+  which were closed earlier the same day.
+- Already protected before this pass: `document-detail`, `document-edit`,
+  `document-office`, `office-settings`, `risk-create`, `risk-detail`. They use
+  module-specific helpers that still work; unify them onto `includes/csrf.php`
+  when those files are next touched.
+- Verification habit worth repeating: for each page confirm that
+  `count(<form)` equals `count(qmsCsrfField(`. A form that is missing its hidden
+  field breaks silently, and a page-level check would not catch it.
+- **Still open**: `login.php` (login CSRF / session fixation - needs its own
+  design, not a blind copy of the pattern) and `wopi.php` (WOPI authenticates with
+  access tokens, so the CSRF model differs). Both are decisions, not mechanical
+  edits.
+
+### Tenant scoping
+
+- Agreed mechanism: `company_admin_assignments` EXISTS check. Super admin sees
+  everything; everyone else sees only assigned companies.
+- Fixed in this pass (records were previously fetched by id alone, so changing the
+  id exposed another company's data):
+  - `audit-detail` - audit and checklist
+  - `nonconformity-detail` - nonconformity
+  - `company-detail` - company record (tax number and contact e-mail included)
+  - `auditors` - the list showed every company's auditors
+  - `auditor-create` - the company dropdown listed all companies **and** the posted
+    `company_id` was not validated; both are now bound to the scope
+  - `dashboard` - the four counters were system-wide totals
+  - `corrective-action-detail` and `corrective-action-create` - fixed earlier
+- Scoping that already existed and should be reused rather than rewritten:
+  `qmsEditorDocument()` for documents, `qmsRiskFind()`/`qmsRiskScope()` for risks,
+  `document-create`/`documents`, `actions` and `reports`.
+- `document-approvals` is scoped to the signed-in approver rather than to the
+  company. That is defensible; a company-scope check would be stricter.
+- `super-admin-*` pages are role-gated, so unscoped queries there are correct.
+- Behaviour was verified against real data, not just by reading the SQL: with the
+  new audit query an assigned admin receives the row and an unassigned one
+  receives 0 rows, while the old query returned it to everyone.
+
 ## Version control
 
 - The repository was created on 2026-09-19 (`main` branch).
@@ -101,6 +149,9 @@ carried over from earlier assumptions.
 
 - Excel/PDF export extension is the next module candidate; agree the scope with
   the user before implementing.
+- `login.php` and `wopi.php` still need a CSRF decision (see Security hardening).
+- Phase 2 (CAPA) is half done: evidence files are implemented, notifications for
+  corrective-action events are still missing.
 - Dead CSS classes with no markup: `admin-action-grid`, `admin-action-button`,
   `form-section`, `editor-toolbar`, `topbar-action-link`. Safe to remove after a
   re-check.
