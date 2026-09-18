@@ -9,12 +9,34 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 
-$auditorCount = (int) $pdo->query("SELECT COUNT(*) FROM auditors WHERE active = 1")->fetchColumn();
-$activeAuditCount = (int) $pdo->query("SELECT COUNT(*) FROM audits WHERE active = 1")->fetchColumn();
-$openNonconformityCount = (int) $pdo->query(
-    "SELECT COUNT(*) FROM nonconformities WHERE active = 1 AND status <> 'closed'"
-)->fetchColumn();
-$documentCount = (int) $pdo->query("SELECT COUNT(*) FROM documents WHERE active = 1")->fetchColumn();
+$userId = (int) ($_SESSION["qms_user_id"] ?? 0);
+$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
+
+// Sayaclar da tenant kapsamina uyar: sistem admini yalniz atandigi sirketleri gorur.
+$scopeClause = "";
+$scopeParams = [];
+if (!$isSuperAdmin) {
+    $assignmentStmt = $pdo->prepare("SELECT company_id FROM company_admin_assignments WHERE admin_user_id = :user_id AND active = 1");
+    $assignmentStmt->execute(["user_id" => $userId]);
+    $companyIds = array_map('intval', $assignmentStmt->fetchAll(PDO::FETCH_COLUMN));
+    if ($companyIds) {
+        $scopeClause = " AND company_id IN (" . implode(',', array_fill(0, count($companyIds), '?')) . ")";
+        $scopeParams = $companyIds;
+    } else {
+        $scopeClause = " AND 1 = 0";
+    }
+}
+
+$scopedCount = static function (string $sql) use ($pdo, $scopeParams): int {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($scopeParams);
+    return (int) $stmt->fetchColumn();
+};
+
+$auditorCount = $scopedCount("SELECT COUNT(*) FROM auditors WHERE active = 1" . $scopeClause);
+$activeAuditCount = $scopedCount("SELECT COUNT(*) FROM audits WHERE active = 1" . $scopeClause);
+$openNonconformityCount = $scopedCount("SELECT COUNT(*) FROM nonconformities WHERE active = 1 AND status <> 'closed'" . $scopeClause);
+$documentCount = $scopedCount("SELECT COUNT(*) FROM documents WHERE active = 1" . $scopeClause);
 
 require_once __DIR__ . '/includes/report-export-data.php';
 
