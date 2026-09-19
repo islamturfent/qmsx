@@ -10,6 +10,9 @@ storage/office/*
 storage/evidence/*
 !storage/evidence/.htaccess
 
+storage/avatars/*
+!storage/avatars/.htaccess
+
 # ---------------------------------------------------------------------------
 # Ortama ozel ayarlar / kimlik bilgileri
 # ---------------------------------------------------------------------------

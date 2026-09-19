@@ -2407,3 +2407,335 @@ body {
     }
 
 }
+
+/* ==========================================================================
+   Header kullanici menusu (TailAdmin'deki profil menusu karsiligi)
+   ========================================================================== */
+.user-menu {
+    position: relative;
+}
+
+.user-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    background: var(--surface-color);
+    color: var(--text-body);
+    padding: 0 12px 0 6px;
+    cursor: pointer;
+}
+
+.user-menu-toggle:hover {
+    background: var(--nav-hover);
+}
+
+.user-menu-avatar {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--brand-50);
+    color: var(--brand-500);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.user-menu-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-menu-name {
+    max-width: 150px;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 60;
+    min-width: 210px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: var(--surface-color);
+    box-shadow: var(--shadow-theme-lg);
+    padding: 6px;
+}
+
+.user-menu-dropdown[hidden] {
+    display: none;
+}
+
+.user-menu-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-bottom: 1px solid var(--border-row);
+    padding: 10px 12px;
+}
+
+.user-menu-head strong {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-menu-head span {
+    color: var(--muted-color);
+    font-size: 12px;
+}
+
+.user-menu-item {
+    display: block;
+    border-radius: 8px;
+    color: var(--text-body);
+    padding: 9px 12px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.user-menu-item:hover {
+    background: var(--nav-hover);
+    text-decoration: none;
+}
+
+@media (max-width: 640px) {
+    .user-menu-name {
+        display: none;
+    }
+
+    .user-menu-toggle {
+        padding: 0 6px;
+    }
+}
+
+/* ==========================================================================
+   Modal (TailAdmin tarzi duzenleme penceresi)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 24px;
+    background: rgba(16, 24, 40, 0.5);
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal-panel {
+    width: 100%;
+    max-width: 640px;
+    margin: auto;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--border-radius);
+    background: var(--surface-color);
+    box-shadow: var(--shadow-theme-xl);
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--border-row);
+    padding: 20px 24px;
+}
+
+.modal-header h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-header p {
+    margin: 0;
+    color: var(--muted-color);
+    font-size: 14px;
+}
+
+.modal-close {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted-color);
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: var(--nav-hover);
+    color: var(--text-body);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--border-row);
+    padding: 16px 24px;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Profil sayfasi yerlesimi
+   ========================================================================== */
+.profile-card {
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--border-radius);
+    background: var(--surface-color);
+    box-shadow: var(--shadow-theme-xs);
+}
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr);
+    gap: 24px;
+    align-items: start;
+    margin-top: 24px;
+}
+
+.profile-stack {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profile-cover {
+    height: 96px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    background: linear-gradient(135deg, var(--brand-100), var(--brand-50));
+}
+
+.profile-avatar {
+    display: flex;
+    width: 80px;
+    height: 80px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: -44px 0 0 24px;
+    border: 4px solid var(--surface-color);
+    border-radius: 50%;
+    background: var(--brand-50);
+    color: var(--brand-500);
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.profile-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-name {
+    padding: 12px 24px 20px;
+}
+
+.profile-name h2 {
+    margin: 0 0 2px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.profile-name p {
+    margin: 0;
+    color: var(--muted-color);
+    font-size: 14px;
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-top: 1px solid var(--border-row);
+    padding: 20px 24px;
+}
+
+.profile-detail dt {
+    margin: 0;
+    color: var(--muted-color);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.profile-detail dd {
+    margin: 2px 0 0;
+    color: var(--text-color);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.profile-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--border-row);
+    padding: 20px 24px;
+}
+
+.profile-card-header h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.profile-card-header p {
+    margin: 0;
+    color: var(--muted-color);
+    font-size: 14px;
+}
+
+.profile-card-body {
+    padding: 20px 24px;
+}
+
+@media (max-width: 900px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-overlay {
+        padding: 0;
+    }
+
+    .modal-panel {
+        border-radius: 0;
+    }
+}
