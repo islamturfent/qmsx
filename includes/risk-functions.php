@@ -1,15 +1,28 @@
 <?php
 
+require_once __DIR__ . '/access.php';
+
 const QMS_RISK_STATUSES = ['open', 'monitoring', 'treated', 'closed'];
 
+/**
+ * Kullanicinin risk modulunde gorebildigi sirketler.
+ *
+ * Kapsam tek kaynaktan gelir (includes/access.php): sistem admini atandigi
+ * sirketler, sirket kullanicisi kendi sirketi, denetci atandigi denetimlerin
+ * sirketleri.
+ */
 function qmsRiskScope(PDO $pdo, int $userId, bool $super): array
 {
     if ($super) {
         return array_map('intval', $pdo->query('SELECT id FROM companies WHERE active = 1')->fetchAll(PDO::FETCH_COLUMN));
     }
-    $stmt = $pdo->prepare('SELECT c.id FROM companies c JOIN company_admin_assignments a ON a.company_id = c.id WHERE a.admin_user_id = ? AND a.active = 1 AND c.active = 1');
-    $stmt->execute([$userId]);
-    return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+
+    $role = (string) ($_SESSION['qms_role'] ?? '');
+    if (!in_array($role, ['system_admin', 'company_user', 'auditor'], true)) {
+        $role = 'system_admin';
+    }
+
+    return qmsVisibleCompanyIds($pdo, $userId, $role) ?? [];
 }
 
 function qmsRiskScore(?int $likelihood, ?int $impact): ?int
@@ -57,8 +70,13 @@ function qmsRiskFind(PDO $pdo, int $id, int $userId, bool $super, bool $lock = f
     $sql = 'SELECT r.*, c.company_name FROM risks r JOIN companies c ON c.id = r.company_id WHERE r.id = ? AND r.active = 1 AND c.active = 1';
     $params = [$id];
     if (!$super) {
-        $sql .= ' AND EXISTS (SELECT 1 FROM company_admin_assignments a WHERE a.company_id = r.company_id AND a.admin_user_id = ? AND a.active = 1)';
-        $params[] = $userId;
+        $role = (string) ($_SESSION['qms_role'] ?? '');
+        if (!in_array($role, ['system_admin', 'company_user', 'auditor'], true)) {
+            $role = 'system_admin';
+        }
+        $scope = qmsCompanyScope('r.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+        $sql .= $scope['sql'];
+        $params = array_merge($params, $scope['params']);
     }
     $stmt = $pdo->prepare($sql . ($lock ? ' FOR UPDATE' : ''));
     $stmt->execute($params);

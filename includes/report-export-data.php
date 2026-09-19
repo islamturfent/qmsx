@@ -2,27 +2,25 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/access.php';
+
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
-    $companyIds = [];
-    if (!$isSuperAdmin) {
-        $assignmentStmt = $pdo->prepare(
-            "SELECT company_id FROM company_admin_assignments WHERE admin_user_id = :user_id AND active = 1"
-        );
-        $assignmentStmt->execute(["user_id" => $userId]);
-        $companyIds = array_map('intval', $assignmentStmt->fetchAll(PDO::FETCH_COLUMN));
+    // Kapsam tek kaynaktan (includes/access.php): sistem admini atandigi
+    // sirketler, sirket kullanicisi kendi sirketi, denetci atandigi denetimlerin
+    // sirketleri, super admin kisitlamasiz.
+    $role = (string) ($_SESSION['qms_role'] ?? '');
+    if ($isSuperAdmin) {
+        $role = 'super_admin';
+    } elseif (!in_array($role, ['system_admin', 'company_user', 'auditor'], true)) {
+        $role = 'system_admin';
     }
 
-    $scopeSql = '';
-    $scopeParams = [];
-    if (!$isSuperAdmin) {
-        if ($companyIds) {
-            $scopeSql = ' AND companies.id IN (' . implode(',', array_fill(0, count($companyIds), '?')) . ')';
-            $scopeParams = $companyIds;
-        } else {
-            $scopeSql = ' AND 1 = 0';
-        }
-    }
+    $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role) ?? [];
+
+    $scope = qmsCompanyScope('companies.id', $companyIds);
+    $scopeSql = $scope['sql'];
+    $scopeParams = $scope['params'];
 
     $companyStmt = $pdo->prepare(
         'SELECT companies.id, companies.company_name FROM companies WHERE companies.active = 1'

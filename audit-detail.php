@@ -8,6 +8,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $auditId = (int) ($_GET["id"] ?? 0);
 
@@ -23,15 +24,11 @@ $sql = "SELECT audits.id, audits.company_id, audits.title, audits.audit_type,
             audits.planned_date, audits.status, audits.active, companies.company_name
      FROM audits
      INNER JOIN companies ON companies.id = audits.company_id
-     WHERE audits.id = :id";
-$params = ["id" => $auditId];
-if (!$isSuperAdmin) {
-    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
-                WHERE company_admin_assignments.company_id = audits.company_id
-                  AND company_admin_assignments.admin_user_id = :user_id
-                  AND company_admin_assignments.active = 1)";
-    $params["user_id"] = $userId;
-}
+     WHERE audits.id = ?";
+$params = [$auditId];
+$scope = qmsAuditRecordScope($pdo, $userId, 'audits.id', 'audits.company_id');
+$sql .= $scope['sql'];
+$params = array_merge($params, $scope['params']);
 $sql .= " LIMIT 1";
 
 $auditStmt = $pdo->prepare($sql);

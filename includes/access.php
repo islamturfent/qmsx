@@ -124,6 +124,33 @@ function qmsVisibleAuditIds(PDO $pdo, int $userId): ?array
 }
 
 /**
+ * Denetime bagli kayitlar icin kapsam (denetimler, uygunsuzluklar).
+ *
+ * Denetci yalnizca atandigi denetimlerin kayitlarini gorur; diger roller
+ * sirket kapsamiyla sinirlanir. Boylece bir denetci, ayni sirketteki baska bir
+ * denetimi id degistirerek acamaz.
+ *
+ * @return array{sql: string, params: array<int, int>}
+ */
+function qmsAuditRecordScope(PDO $pdo, int $userId, string $auditColumn, string $companyColumn): array
+{
+    if (qmsIsAuditor()) {
+        $auditIds = qmsVisibleAuditIds($pdo, $userId) ?? [];
+
+        if ($auditIds === []) {
+            return ['sql' => ' AND 1 = 0', 'params' => []];
+        }
+
+        return [
+            'sql' => " AND $auditColumn IN (" . implode(',', array_fill(0, count($auditIds), '?')) . ')',
+            'params' => $auditIds
+        ];
+    }
+
+    return qmsCompanyScope($companyColumn, qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+}
+
+/**
  * Rolun giris sonrasi acilis sayfasi.
  */
 function qmsLandingPage(string $role): string

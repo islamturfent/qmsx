@@ -8,6 +8,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $nonconformityId = (int) ($_GET["id"] ?? 0);
 
@@ -26,15 +27,11 @@ $sql = "SELECT nonconformities.*, companies.company_name, audits.title AS audit_
      INNER JOIN companies ON companies.id = nonconformities.company_id
      INNER JOIN audits ON audits.id = nonconformities.audit_id
      LEFT JOIN audit_checklist_items ON audit_checklist_items.id = nonconformities.checklist_item_id
-     WHERE nonconformities.id = :id";
-$params = ["id" => $nonconformityId];
-if (!$isSuperAdmin) {
-    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
-                WHERE company_admin_assignments.company_id = nonconformities.company_id
-                  AND company_admin_assignments.admin_user_id = :user_id
-                  AND company_admin_assignments.active = 1)";
-    $params["user_id"] = $userId;
-}
+     WHERE nonconformities.id = ?";
+$params = [$nonconformityId];
+$scope = qmsAuditRecordScope($pdo, $userId, 'nonconformities.audit_id', 'nonconformities.company_id');
+$sql .= $scope['sql'];
+$params = array_merge($params, $scope['params']);
 $sql .= " LIMIT 1";
 
 $nonconformityStmt = $pdo->prepare($sql);
