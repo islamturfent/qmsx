@@ -49,8 +49,20 @@ $auditFormError = "";
 $auditFormData = [
     "title" => "",
     "audit_type" => "",
-    "planned_date" => ""
+    "planned_date" => "",
+    "auditor_ids" => []
 ];
+
+// Denetime atanabilecek denetciler: yalniz bu sirketin kayitlari.
+$auditorOptionsStmt = $pdo->prepare(
+    "SELECT id, first_name, last_name, email
+     FROM auditors
+     WHERE company_id = :company_id AND active = 1
+     ORDER BY first_name, last_name"
+);
+$auditorOptionsStmt->execute(["company_id" => $companyId]);
+$auditorOptions = $auditorOptionsStmt->fetchAll(PDO::FETCH_ASSOC);
+$allowedAuditorIds = array_map('intval', array_column($auditorOptions, 'id'));
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && ($_POST["form_type"] ?? "") === "create_audit") {
     qmsCsrfVerify('company_audit', $_POST["csrf"] ?? null);
@@ -58,25 +70,51 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && ($_POST["form_type"] ?? "") === "cr
     $auditFormData = [
         "title" => trim($_POST["title"] ?? ""),
         "audit_type" => trim($_POST["audit_type"] ?? ""),
-        "planned_date" => trim($_POST["planned_date"] ?? "")
+        "planned_date" => trim($_POST["planned_date"] ?? ""),
+        "auditor_ids" => array_values(array_unique(array_intersect(
+            array_map('intval', (array) ($_POST["auditor_ids"] ?? [])),
+            $allowedAuditorIds
+        )))
     ];
 
     if ($auditFormData["title"] === "") {
         $auditFormError = "Lütfen denetim başlığını girin.";
     } else {
-        $insertAudit = $pdo->prepare(
-            "INSERT INTO audits (company_id, title, audit_type, planned_date, status, active)
-             VALUES (:company_id, :title, :audit_type, :planned_date, 'planned', 1)"
-        );
-        $insertAudit->execute([
-            "company_id" => $companyId,
-            "title" => $auditFormData["title"],
-            "audit_type" => $auditFormData["audit_type"],
-            "planned_date" => $auditFormData["planned_date"] !== "" ? $auditFormData["planned_date"] : null
-        ]);
+        try {
+            $pdo->beginTransaction();
 
-        header("Location: company-detail.php?id=" . $companyId . "&audit=created");
-        exit;
+            $insertAudit = $pdo->prepare(
+                "INSERT INTO audits (company_id, title, audit_type, planned_date, status, active)
+                 VALUES (:company_id, :title, :audit_type, :planned_date, 'planned', 1)"
+            );
+            $insertAudit->execute([
+                "company_id" => $companyId,
+                "title" => $auditFormData["title"],
+                "audit_type" => $auditFormData["audit_type"],
+                "planned_date" => $auditFormData["planned_date"] !== "" ? $auditFormData["planned_date"] : null
+            ]);
+
+            $newAuditId = (int) $pdo->lastInsertId();
+
+            if ($auditFormData["auditor_ids"]) {
+                $insertAssignment = $pdo->prepare(
+                    "INSERT INTO audit_auditors (audit_id, auditor_id) VALUES (:audit_id, :auditor_id)"
+                );
+                foreach ($auditFormData["auditor_ids"] as $auditorId) {
+                    $insertAssignment->execute(["audit_id" => $newAuditId, "auditor_id" => $auditorId]);
+                }
+            }
+
+            $pdo->commit();
+
+            header("Location: company-detail.php?id=" . $companyId . "&audit=created");
+            exit;
+        } catch (Throwable $error) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $auditFormError = "Denetim kaydedilemedi.";
+        }
     }
 }
 
@@ -252,6 +290,20 @@ $openNonconformityCount = (int) $openNonconformityCountStmt->fetchColumn();
                                 name="planned_date"
                                 value="<?= htmlspecialchars($auditFormData["planned_date"], ENT_QUOTES, "UTF-8") ?>"
                             >
+                        </label>
+
+                        <label class="form-field form-field-wide">
+                            <span data-i18n="auditAuditorsSelectLabel">Atanacak Denetçiler</span>
+                            <?php if (!$auditorOptions): ?>
+                                <small data-i18n="noCompanyAuditorsText">Bu şirkette kayıtlı denetçi yok. Önce Denetçiler bölümünden denetçi ekleyin.</small>
+                            <?php else: ?>
+                                <select name="auditor_ids[]" multiple size="<?= min(6, max(2, count($auditorOptions))) ?>">
+                                    <?php foreach ($auditorOptions as $auditorOption): ?>
+                                        <option value="<?= (int) $auditorOption["id"] ?>" <?= in_array((int) $auditorOption["id"], $auditFormData["auditor_ids"], true) ? "selected" : "" ?>><?= htmlspecialchars(trim($auditorOption["first_name"] . " " . $auditorOption["last_name"]), ENT_QUOTES, "UTF-8") ?><?= $auditorOption["email"] !== "" ? " · " . htmlspecialchars($auditorOption["email"], ENT_QUOTES, "UTF-8") : "" ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small data-i18n="auditAuditorsSelectHelp">Birden fazla seçmek için Ctrl (Mac'te Cmd) tuşuna basılı tutun.</small>
+                            <?php endif; ?>
                         </label>
                     </div>
 
