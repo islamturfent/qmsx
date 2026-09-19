@@ -124,6 +124,15 @@ function qmsVisibleAuditIds(PDO $pdo, int $userId): ?array
 }
 
 /**
+ * Rolun giris sonrasi acilis sayfasi.
+ */
+function qmsLandingPage(string $role): string
+{
+    // Denetci kendi denetim listesine duser; yonetim sayfalari ona kapali.
+    return $role === 'auditor' ? 'my-audits.php' : 'dashboard.php';
+}
+
+/**
  * Kullanicinin sirkete erisimi var mi.
  *
  * @param int[]|null $companyIds

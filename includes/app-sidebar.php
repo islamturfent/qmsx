@@ -1,7 +1,12 @@
 <?php
 
 $activeNav = $activeNav ?? "";
-$isSuperAdminNav = ($_SESSION["qms_role"] ?? "") === "super_admin";
+$sidebarRole = (string) ($_SESSION["qms_role"] ?? "");
+$isSuperAdminNav = $sidebarRole === "super_admin";
+$isManagementNav = in_array($sidebarRole, ["super_admin", "system_admin"], true);
+$isAuditorNav = $sidebarRole === "auditor";
+// Denetci operasyon modullerini ve raporlari gormez; yalniz kendi denetimleri.
+$canSeeOperations = !$isAuditorNav;
 $sidebarUnreadCount = 0;
 if (isset($pdo, $_SESSION["qms_user_id"])) {
     $sidebarNotificationStmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = 0");
@@ -49,25 +54,37 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 
     <nav class="sidebar-nav" aria-label="Ana menü">
         <span class="sidebar-section-label" data-i18n="sidebarOverviewLabel">Genel</span>
-        <a class="<?= sidebarLinkClass("dashboard", $activeNav) ?>" href="dashboard.php">
-            <?= appIcon("dashboard") ?>
-            <span data-i18n="dashboardLinkLabel">Dashboard</span>
-        </a>
+        <?php if ($isAuditorNav): ?>
+            <a class="<?= sidebarLinkClass("my_audits", $activeNav) ?>" href="my-audits.php">
+                <?= appIcon("check") ?>
+                <span data-i18n="myAuditsTitle">Denetimlerim</span>
+            </a>
+        <?php else: ?>
+            <a class="<?= sidebarLinkClass("dashboard", $activeNav) ?>" href="dashboard.php">
+                <?= appIcon("dashboard") ?>
+                <span data-i18n="dashboardLinkLabel">Dashboard</span>
+            </a>
+        <?php endif; ?>
         <a class="<?= sidebarLinkClass("notifications", $activeNav) ?>" href="notifications.php">
             <?= appIcon("notifications") ?>
             <span data-i18n="notificationCenterTitle">Bildirim Merkezi</span>
             <?php if ($sidebarUnreadCount > 0): ?><span class="sidebar-count"><?= $sidebarUnreadCount ?></span><?php endif; ?>
         </a>
+        <?php if (!$isAuditorNav): ?>
         <a class="<?= sidebarLinkClass("reports", $activeNav) ?>" href="reports.php">
             <?= appIcon("reports") ?>
             <span data-i18n="reportingTitle">Raporlama ve KPI</span>
         </a>
+        <?php endif; ?>
 
+        <?php if ($canSeeOperations): ?>
         <span class="sidebar-section-label" data-i18n="sidebarOperationsLabel">Operasyonlar</span>
+        <?php if ($isManagementNav): ?>
         <a class="<?= sidebarLinkClass("auditors", $activeNav) ?>" href="auditors.php">
             <?= appIcon("users") ?>
             <span data-i18n="auditorsCardLabel">Denetçiler</span>
         </a>
+        <?php endif; ?>
         <a class="<?= sidebarLinkClass("actions", $activeNav) ?>" href="actions.php">
             <?= appIcon("check") ?>
             <span data-i18n="actionManagementTitle">Aksiyon Yönetimi</span>
@@ -80,10 +97,13 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("documents") ?>
             <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>
         </a>
+        <?php if ($isManagementNav): ?>
         <a class="<?= sidebarLinkClass("document_approvals", $activeNav) ?>" href="document-approvals.php">
             <?= appIcon("approvals") ?>
             <span data-i18n="approvalInboxTitle">Doküman Onay Kutusu</span>
         </a>
+        <?php endif; ?>
+        <?php endif; /* canSeeOperations */ ?>
 
         <?php if ($isSuperAdminNav): ?>
             <span class="sidebar-section-label" data-i18n="sidebarManagementLabel">Sistem Yönetimi</span>

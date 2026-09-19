@@ -3,9 +3,10 @@
 session_start();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 if (isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] === true) {
-    header("Location: dashboard.php");
+    header("Location: " . qmsLandingPage((string) ($_SESSION["qms_role"] ?? "")));
     exit;
 }
 
@@ -31,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["qms_full_name"] = $user["full_name"];
         $_SESSION["qms_role"] = $user["role"];
 
-        header("Location: dashboard.php");
+        header("Location: " . qmsLandingPage((string) $user["role"]));
         exit;
     }
 

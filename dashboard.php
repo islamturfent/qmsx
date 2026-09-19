@@ -8,6 +8,13 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
+
+// Denetci rolunun kendi calisma alani var.
+if (qmsIsAuditor()) {
+    header("Location: my-audits.php");
+    exit;
+}
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
