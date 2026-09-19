@@ -10,8 +10,8 @@ declare(strict_types=1);
  *
  *   super_admin  : tum sirketler, tum moduller
  *   system_admin : yalniz atandigi sirketler (company_admin_assignments)
- *   company_user : yalniz kendi sirketi (users.company_id), salt okunur
- *   auditor      : yalniz atandigi denetimler (audits.auditor_id)
+ *   company_user : yalniz kendi sirketi (users.company_id), kisitli yazma
+ *   auditor      : yalniz atandigi denetimler (audit_auditors)
  */
 
 /** Oturumdaki rol. */
@@ -62,7 +62,8 @@ function qmsVisibleCompanyIds(PDO $pdo, int $userId, string $role): ?array
         $stmt = $pdo->prepare(
             'SELECT DISTINCT audits.company_id
              FROM audits
-             INNER JOIN auditors ON auditors.id = audits.auditor_id
+             INNER JOIN audit_auditors ON audit_auditors.audit_id = audits.id
+             INNER JOIN auditors ON auditors.id = audit_auditors.auditor_id
              WHERE auditors.user_id = :user_id AND auditors.active = 1 AND audits.active = 1'
         );
         $stmt->execute(['user_id' => $userId]);
@@ -113,7 +114,8 @@ function qmsVisibleAuditIds(PDO $pdo, int $userId): ?array
     $stmt = $pdo->prepare(
         'SELECT audits.id
          FROM audits
-         INNER JOIN auditors ON auditors.id = audits.auditor_id
+         INNER JOIN audit_auditors ON audit_auditors.audit_id = audits.id
+         INNER JOIN auditors ON auditors.id = audit_auditors.auditor_id
          WHERE auditors.user_id = :user_id AND auditors.active = 1 AND audits.active = 1'
     );
     $stmt->execute(['user_id' => $userId]);
