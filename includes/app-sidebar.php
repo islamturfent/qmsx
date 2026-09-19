@@ -97,7 +97,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             </a>
             <a class="<?= sidebarLinkClass("admins", $activeNav) ?>" href="super-admin-admins.php">
                 <?= appIcon("admins") ?>
-                <span data-i18n="manageUsersButton">Sistem Adminleri</span>
+                <span data-i18n="accountsTitle">Kullanıcı Hesapları</span>
             </a>
             <a class="<?= sidebarLinkClass("assignments", $activeNav) ?>" href="super-admin-assignments.php">
                 <?= appIcon("assignments") ?>
