@@ -1,7 +1,7 @@
 # QMS continuation note
 
 Recorded: 2026-09-18 (Europe/Istanbul).
-Last updated: 2026-09-19. The state below was re-verified on that date; it is not
+Last updated: 2026-09-24. The state below was re-verified on that date; it is not
 carried over from earlier assumptions.
 
 ## Workspace
@@ -27,9 +27,15 @@ carried over from earlier assumptions.
   | `tests/document-editor.php` | 14 |
   | `tests/document-workflow.php` | 7 |
   | `tests/office-integration.php` | 48 |
+  | `tests/training-management.php` | 25 |
+  | `tests/capa.php` | 43 |
 
-  88 checks total. All suites use temporary tables and leave real records
-  untouched (verified: `risks`, `risk_history`, `office_audit` remain empty).
+  156 checks total. All suites use temporary tables and leave real records
+  untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
+  `training_participants`, `corrective_actions`, `notifications` remain empty).
+
+- Run the suites from CMD/PowerShell, or set `TMP` to a real Windows path first;
+  Git Bash defaults `TMP=/tmp` and `tempnam()`-based tests then abort.
 
 - `tests/document-workflow.php` now runs all seven cases when called without an
   argument. Before this, only the default `save` case executed, which made the
@@ -62,6 +68,62 @@ carried over from earlier assumptions.
   always agree. It is labelled "Aksiyon Tamamlama". Note this loads the 12-month
   report dataset on every dashboard view; if that page ever feels slow, replace it
   with an aggregate query.
+
+## Training management - Faz 3 module (2026-09-24)
+
+Third product module, after documents and risks. Completes the new-module
+checklist from knowhow section 10: menu entry, permissions, DB relations, list,
+detail, status flow and a reporting surface.
+
+- Schema: `trainings` + `training_participants` (migration
+  `20260924-trainings.sql`, idempotent runner `scripts/migrate-trainings.php`).
+- Participants are the company's **system users** (company users plus system
+  admins assigned to that company) - the same model CAPA uses for its responsible
+  user. There is still no personnel/employee table; non-login employees would need
+  a schema addition.
+- Status flow `planned -> in_progress -> completed` plus `cancelled`; participant
+  status `assigned -> attended -> completed` with an optional 0-100 score.
+  `completed_date` is written on the first transition to `completed` and kept on
+  re-save.
+- Notifications: the participant is notified when added, and the company's
+  assigned system admins are notified when the training completes or is created.
+- `includes/training-functions.php` is the module's single source of truth for
+  status labels, field validation and scoped reads (`qmsTrainingFind`,
+  `qmsTrainingList`). Pages do not re-implement scope clauses.
+- Reporting surface: training count and completion rate plus a training detail
+  list in `includes/report-export-data.php`, an eighth Excel sheet (`Egitimler`)
+  and a PDF detail section, and a KPI tile plus company-performance column on
+  `reports.php`.
+- Auditor visibility follows the sibling modules rather than adding a new rule:
+  auditors see only the companies of the audits assigned to them, so the training
+  module is not reachable from their sidebar but is not separately blocked.
+  Decide explicitly if a stricter rule is wanted.
+- Verified behaviourally, not only by reading SQL: 25 temporary-table checks plus
+  a throwaway HTTP harness (real login sessions for an assigned admin, an
+  unassigned admin, an auditor and a company user) covering tenant isolation over
+  HTTP, CSRF rejection, participant add/update/remove, the completion flow, the
+  reports screen and both export files. Fixtures and uploaded files were removed
+  afterwards and the table auto-increment counters were restored.
+- Lesson for the next harness: this is a Windows environment, so pass PHP paths in
+  `C:/...` form and `curl -F` upload paths in `C:/...` form too; MSYS `/c/...`
+  paths work in the shell but not for the native binaries.
+
+### Module helper convention (2026-09-24)
+
+Each module with non-trivial rules now has its own helper file - do not put a
+scope clause or a rule set back into a page:
+
+- `includes/risk-functions.php` - risk scope, scoring, level thresholds
+- `includes/training-functions.php` - training validation, scoped reads
+- `includes/capa-functions.php` - CAPA scope, evidence paths, status timestamps,
+  notification rules (`qmsCapaNotifyStatusChange`)
+
+The CAPA extraction was done so the notification and evidence rules could be
+regression tested; `corrective-action-create`, `corrective-action-detail` and
+`corrective-action-evidence-download` now all read through it. One behaviour
+change came with it: the assignment notification created from the create screen
+now carries the action text instead of the nonconformity title, matching the
+detail screen.
 
 ## Security hardening (2026-09-19)
 
@@ -270,12 +332,14 @@ per-column emphasis, so uniform gray-500 reads washed out.
 
 ## Open items
 
-- Excel/PDF export extension was completed on 2026-09-24: the exports now carry
-  detail sheets/sections for audits, nonconformities, corrective actions and the
-  risk register, on top of the existing KPI and summary content. Excel has 7
-  sheets, the PDF adds four detail tables and prints "no records this period"
-  when a section is empty. The next module candidate is therefore open again -
-  agree the scope with the user before starting.
+- Excel/PDF export extension was completed on 2026-09-24: the exports carry
+  detail sheets/sections for audits, nonconformities, corrective actions, the
+  risk register and trainings, on top of the existing KPI and summary content.
+  Excel has 8 sheets, the PDF adds five detail tables and prints "no records this
+  period" when a section is empty.
+- Faz 3 remaining modules: tedarikci (supplier), sikayet (complaint), performans
+  (performance), yonetimin gozden gecirmesi (management review). Pick the next one
+  with the user before starting; the training module is a good template.
 - Phase 2 (CAPA) is complete: evidence files and corrective-action notifications
   are both implemented. `corrective_actions.responsible_user_id` supplies the
   recipient, so a corrective action can now be assigned to a real account.
