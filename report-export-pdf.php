@@ -53,6 +53,53 @@ foreach ($report['months'] as $month) {
         . $month['nonconformities'] . '</td></tr>';
 }
 
+// Detay tablolari.
+$severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'Kritik'];
+$statusLabels = [
+    'open' => 'Açık', 'in_progress' => 'Devam Ediyor', 'verification' => 'Doğrulama',
+    'closed' => 'Kapalı', 'planned' => 'Planlandı', 'monitoring' => 'İzlemede',
+    'treated' => 'Önlem Uygulandı', 'completed' => 'Tamamlandı',
+];
+
+$auditRows = '';
+foreach ($report['audit_list'] as $row) {
+    $auditRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['audit_type'] ?: '-') . '</td><td>' . $escape($row['status']) . '</td><td>'
+        . $escape($row['planned_date'] ?: '-') . '</td></tr>';
+}
+
+$nonconformityRows = '';
+foreach ($report['nonconformity_list'] as $row) {
+    $nonconformityRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($severityLabels[$row['severity']] ?? $row['severity']) . '</td><td>'
+        . $escape($statusLabels[$row['status']] ?? $row['status']) . '</td><td>'
+        . $escape($row['responsible_person'] ?: '-') . '</td><td>' . $escape($row['due_date'] ?: '-') . '</td></tr>';
+}
+
+$actionRows = '';
+foreach ($report['action_list'] as $row) {
+    $actionRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['action_text']) . '</td><td>'
+        . $escape($row['responsible_person'] ?: '-') . '</td><td>'
+        . $escape($statusLabels[$row['status']] ?? $row['status']) . '</td><td>'
+        . $escape($row['due_date'] ?: '-') . '</td><td>' . $escape($row['completed_at'] ?: '-') . '</td></tr>';
+}
+
+$riskRows = '';
+foreach ($report['risk_list'] as $row) {
+    $riskRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['category'] ?: '-') . '</td><td>' . $escape((string) ($row['initial_score'] ?? '-')) . '</td><td>'
+        . $escape((string) ($row['residual_score'] ?? '-')) . '</td><td>' . $escape($row['level']) . '</td><td>'
+        . $escape($statusLabels[$row['status']] ?? $row['status']) . '</td><td>'
+        . $escape($row['due_date'] ?: '-') . '</td></tr>';
+}
+
+$detailSection = static function (string $title, string $headers, string $rows): string {
+    if ($rows === '') {
+        return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
+    }
+    return '<h2>' . $title . '</h2><table class="data"><thead><tr>' . $headers . '</tr></thead><tbody>' . $rows . '</tbody></table>';
+};
+
 $metrics = $report['metrics'];
 $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     @page { margin: 28px 34px; }
@@ -90,8 +137,12 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $companyRows . '</tbody></table>
     <table class="two-column"><tr><td><h2>Aylık Trend</h2><table class="data"><thead><tr><th>Ay</th><th>Denetim</th><th>Uygunsuzluk</th></tr></thead><tbody>'
     . $trendRows . '</tbody></table></td><td><h2>Doküman Durumları</h2><table class="data"><thead><tr><th>Durum</th><th>Adet</th></tr></thead><tbody>'
-    . $statusRows . '</tbody></table></td></tr></table>
-    <div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
+    . $statusRows . '</tbody></table></td></tr></table>'
+    . $detailSection('Denetimler', '<th>Şirket</th><th>Denetim</th><th>Tür</th><th>Durum</th><th>Planlanan</th>', $auditRows)
+    . $detailSection('Uygunsuzluklar', '<th>Şirket</th><th>Uygunsuzluk</th><th>Önem</th><th>Durum</th><th>Sorumlu</th><th>Termin</th>', $nonconformityRows)
+    . $detailSection('Düzeltici Faaliyetler', '<th>Şirket</th><th>Faaliyet</th><th>Sorumlu</th><th>Durum</th><th>Termin</th><th>Kapanış</th>', $actionRows)
+    . $detailSection('Risk Kaydı', '<th>Şirket</th><th>Risk</th><th>Kategori</th><th>Başlangıç</th><th>Kalan</th><th>Seviye</th><th>Durum</th><th>Termin</th>', $riskRows)
+    . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
 $options = new Options();

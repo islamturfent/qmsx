@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/access.php';
+require_once __DIR__ . '/risk-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -16,7 +17,10 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $role = 'system_admin';
     }
 
-    $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role) ?? [];
+    // DIKKAT: `?? []` YAZMAYIN. qmsVisibleCompanyIds super admin icin null
+    // ("kisitlama yok") doner; [] ise "hicbir sirket" demektir. Sarmalamak super
+    // adminin tum rapor verisini sifirlar.
+    $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role);
 
     $scope = qmsCompanyScope('companies.id', $companyIds);
     $scopeSql = $scope['sql'];
@@ -61,14 +65,17 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
 
     $periodParams = array_merge([$startDate . ' 00:00:00', $endDate . ' 23:59:59'], $scopeParams);
     $audits = $fetchRows(
-        "SELECT audits.id, audits.company_id, audits.status, audits.created_at, companies.company_name
+        "SELECT audits.id, audits.company_id, audits.status, audits.created_at,
+                audits.title, audits.audit_type, audits.planned_date, companies.company_name
          FROM audits INNER JOIN companies ON companies.id = audits.company_id
          WHERE audits.active = 1 AND audits.created_at BETWEEN ? AND ?" . $scopeSql,
         $periodParams
     );
     $nonconformities = $fetchRows(
         "SELECT nonconformities.id, nonconformities.company_id, nonconformities.status,
-                nonconformities.created_at, nonconformities.updated_at, companies.company_name
+                nonconformities.created_at, nonconformities.updated_at, nonconformities.title,
+                nonconformities.severity, nonconformities.responsible_person, nonconformities.due_date,
+                companies.company_name
          FROM nonconformities INNER JOIN companies ON companies.id = nonconformities.company_id
          WHERE nonconformities.active = 1 AND nonconformities.created_at BETWEEN ? AND ?" . $scopeSql,
         $periodParams
@@ -76,11 +83,20 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     $actions = $fetchRows(
         "SELECT corrective_actions.id, nonconformities.company_id, corrective_actions.status,
                 corrective_actions.due_date, corrective_actions.created_at, corrective_actions.completed_at,
+                corrective_actions.action_text, corrective_actions.responsible_person,
                 companies.company_name
          FROM corrective_actions
          INNER JOIN nonconformities ON nonconformities.id = corrective_actions.nonconformity_id
          INNER JOIN companies ON companies.id = nonconformities.company_id
          WHERE corrective_actions.active = 1 AND corrective_actions.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    $risks = $fetchRows(
+        "SELECT risks.id, risks.company_id, risks.title, risks.category, risks.status, risks.due_date,
+                risks.initial_likelihood, risks.initial_impact, risks.residual_likelihood, risks.residual_impact,
+                risks.created_at, companies.company_name
+         FROM risks INNER JOIN companies ON companies.id = risks.company_id
+         WHERE risks.active = 1 AND risks.created_at BETWEEN ? AND ?" . $scopeSql,
         $periodParams
     );
     $documents = $fetchRows(
@@ -211,6 +227,61 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         }
     }
 
+    // Detay listeleri: rapor ciktilari KPI'larin yaninda kayit dokumu de verir.
+    $auditList = [];
+    foreach ($audits as $item) {
+        $auditList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'audit_type' => $item['audit_type'],
+            'status' => $item['status'],
+            'planned_date' => $item['planned_date'],
+        ];
+    }
+
+    $nonconformityList = [];
+    foreach ($nonconformities as $item) {
+        $nonconformityList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'severity' => $item['severity'],
+            'status' => $item['status'],
+            'responsible_person' => $item['responsible_person'],
+            'due_date' => $item['due_date'],
+        ];
+    }
+
+    $actionList = [];
+    foreach ($actions as $item) {
+        $actionList[] = [
+            'company_name' => $item['company_name'],
+            'action_text' => $item['action_text'],
+            'responsible_person' => $item['responsible_person'],
+            'status' => $item['status'],
+            'due_date' => $item['due_date'],
+            'completed_at' => $item['completed_at'],
+        ];
+    }
+
+    // Risk seviyesi ve puani risk moduluyle ayni kaynaktan hesaplanir.
+    $riskList = [];
+    foreach ($risks as $item) {
+        $initialScore = qmsRiskScore($item['initial_likelihood'] !== null ? (int) $item['initial_likelihood'] : null, $item['initial_impact'] !== null ? (int) $item['initial_impact'] : null);
+        $residualScore = qmsRiskScore($item['residual_likelihood'] !== null ? (int) $item['residual_likelihood'] : null, $item['residual_impact'] !== null ? (int) $item['residual_impact'] : null);
+        $effectiveScore = $residualScore ?? $initialScore;
+
+        $riskList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'category' => $item['category'],
+            'initial_score' => $initialScore,
+            'residual_score' => $residualScore,
+            'level' => qmsRiskLevelLabel(qmsRiskLevel($effectiveScore)),
+            'status' => $item['status'],
+            'due_date' => $item['due_date'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -220,5 +291,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'document_statuses' => $documentStatuses,
         'months' => array_values($months),
         'company_performance' => array_values($companyPerformance),
+        'audit_list' => $auditList,
+        'nonconformity_list' => $nonconformityList,
+        'action_list' => $actionList,
+        'risk_list' => $riskList,
     ];
 }

@@ -42,6 +42,12 @@ function qmsIsAuditor(): bool
  * []    : hicbir sirket goremez
  * [1,2] : yalniz bu sirketler
  *
+ * DIKKAT - bu tuzak iki kez gercek hata uretti:
+ * `null` "kisitlama yok" demektir, `[]` ise "hicbir sey goremez". Bu yuzden
+ * sonucu ASLA `?? []` ile sarmalamayin; super adminin tum gorunurlugunu
+ * sifirlar. Dogrudan qmsCompanyScope() / qmsAuditRecordScope() fonksiyonlarina
+ * verin, onlar null'i dogru yorumlar.
+ *
  * @return int[]|null
  */
 function qmsVisibleCompanyIds(PDO $pdo, int $userId, string $role): ?array

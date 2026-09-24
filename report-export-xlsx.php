@@ -98,6 +98,90 @@ foreach ($report['months'] as $month) {
     ];
 }
 
+// Detay sayfalari: KPI'larin yaninda kayit dokumu.
+$severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'Kritik'];
+$nonconformityStatusLabels = ['open' => 'Açık', 'in_progress' => 'Devam Ediyor', 'verification' => 'Doğrulama', 'closed' => 'Kapalı'];
+$actionStatusLabels = ['planned' => 'Planlandı', 'in_progress' => 'Çalışılıyor', 'verification' => 'Doğrulama', 'completed' => 'Tamamlandı', 'closed' => 'Kapalı'];
+$riskStatusLabels = ['open' => 'Açık', 'monitoring' => 'İzlemede', 'treated' => 'Önlem Uygulandı', 'closed' => 'Kapalı'];
+
+$auditRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Denetim', 'style' => 2],
+    ['value' => 'Tür', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Planlanan Tarih', 'style' => 2],
+]];
+foreach ($report['audit_list'] as $row) {
+    $auditRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => $row['audit_type'] ?: '-', 'style' => 3],
+        ['value' => $row['status'], 'style' => 3],
+        ['value' => $row['planned_date'] ?: '-', 'style' => 3],
+    ];
+}
+
+$nonconformityRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Uygunsuzluk', 'style' => 2],
+    ['value' => 'Önem', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Sorumlu', 'style' => 2],
+    ['value' => 'Termin', 'style' => 2],
+]];
+foreach ($report['nonconformity_list'] as $row) {
+    $nonconformityRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => $severityLabels[$row['severity']] ?? $row['severity'], 'style' => 3],
+        ['value' => $nonconformityStatusLabels[$row['status']] ?? $row['status'], 'style' => 3],
+        ['value' => $row['responsible_person'] ?: '-', 'style' => 3],
+        ['value' => $row['due_date'] ?: '-', 'style' => 3],
+    ];
+}
+
+$actionRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Faaliyet', 'style' => 2],
+    ['value' => 'Sorumlu', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Termin', 'style' => 2],
+    ['value' => 'Kapanış', 'style' => 2],
+]];
+foreach ($report['action_list'] as $row) {
+    $actionRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['action_text'], 'style' => 3],
+        ['value' => $row['responsible_person'] ?: '-', 'style' => 3],
+        ['value' => $actionStatusLabels[$row['status']] ?? $row['status'], 'style' => 3],
+        ['value' => $row['due_date'] ?: '-', 'style' => 3],
+        ['value' => $row['completed_at'] ?: '-', 'style' => 3],
+    ];
+}
+
+$riskRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Risk', 'style' => 2],
+    ['value' => 'Kategori', 'style' => 2],
+    ['value' => 'Başlangıç', 'style' => 2],
+    ['value' => 'Kalan', 'style' => 2],
+    ['value' => 'Seviye', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Termin', 'style' => 2],
+]];
+foreach ($report['risk_list'] as $row) {
+    $riskRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => $row['category'] ?: '-', 'style' => 3],
+        ['value' => $row['initial_score'] ?? '-', 'style' => 3],
+        ['value' => $row['residual_score'] ?? '-', 'style' => 3],
+        ['value' => $row['level'], 'style' => 3],
+        ['value' => $riskStatusLabels[$row['status']] ?? $row['status'], 'style' => 3],
+        ['value' => $row['due_date'] ?: '-', 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -108,6 +192,10 @@ try {
         ['name' => 'Yönetici Özeti', 'xml' => xlsxWorksheet($summaryRows, [38, 24], ['A1:B1'])],
         ['name' => 'Şirket Performansı', 'xml' => xlsxWorksheet($companyRows, [32, 14, 18, 22, 14, 18])],
         ['name' => 'Aylık Trend', 'xml' => xlsxWorksheet($trendRows, [16, 16, 20])],
+        ['name' => 'Denetimler', 'xml' => xlsxWorksheet($auditRows, [28, 34, 18, 16, 18])],
+        ['name' => 'Uygunsuzluklar', 'xml' => xlsxWorksheet($nonconformityRows, [28, 34, 16, 18, 22, 16])],
+        ['name' => 'Düzeltici Faaliyetler', 'xml' => xlsxWorksheet($actionRows, [28, 40, 22, 18, 16, 18])],
+        ['name' => 'Risk Kaydı', 'xml' => xlsxWorksheet($riskRows, [28, 34, 20, 14, 14, 16, 18, 16])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';
