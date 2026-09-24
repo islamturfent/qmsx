@@ -7,6 +7,7 @@ require_once __DIR__ . '/risk-functions.php';
 require_once __DIR__ . '/supplier-functions.php';
 require_once __DIR__ . '/complaint-functions.php';
 require_once __DIR__ . '/performance-functions.php';
+require_once __DIR__ . '/review-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -188,6 +189,21 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         array_merge([$performanceYear], $scopeParams)
     );
 
+    $reviews = $fetchRows(
+        "SELECT management_reviews.id, management_reviews.company_id, management_reviews.title,
+                management_reviews.review_date, management_reviews.period_start, management_reviews.period_end,
+                management_reviews.status, management_reviews.next_review_date, management_reviews.created_at,
+                companies.company_name,
+                (SELECT COUNT(*) FROM management_review_items
+                  WHERE management_review_items.review_id = management_reviews.id) AS item_count,
+                (SELECT COUNT(*) FROM management_review_items
+                  WHERE management_review_items.review_id = management_reviews.id
+                    AND management_review_items.item_type = 'action') AS action_count
+         FROM management_reviews INNER JOIN companies ON companies.id = management_reviews.company_id
+         WHERE management_reviews.active = 1 AND management_reviews.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+
     $openComplaints = array_filter(
         $complaints,
         static fn(array $item): bool => qmsComplaintIsOpen((string) $item['status'])
@@ -246,6 +262,7 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'supplier_average_score' => $supplierAverageScore,
         'complaint_count' => count($complaints),
         'complaint_open_count' => count($openComplaints),
+        'review_count' => count($reviews),
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -293,6 +310,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'suppliers_approved' => 0,
             'complaints' => 0,
             'complaints_open' => 0,
+            'reviews' => 0,
+            'reviews_actions' => 0,
         ];
     }
     foreach ($audits as $item) {
@@ -340,6 +359,13 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         if (qmsComplaintIsOpen((string) $item['status'])) {
             $companyPerformance[(int) $item['company_id']]['complaints_open']++;
         }
+    }
+    foreach ($reviews as $item) {
+        if (!isset($companyPerformance[(int) $item['company_id']])) {
+            continue;
+        }
+        $companyPerformance[(int) $item['company_id']]['reviews']++;
+        $companyPerformance[(int) $item['company_id']]['reviews_actions'] += (int) $item['action_count'];
     }
 
     $selectedCompanyName = 'Tüm şirketler';
@@ -471,6 +497,21 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $reviewStatusLabels = qmsReviewStatusLabels();
+    $reviewList = [];
+    foreach ($reviews as $item) {
+        $reviewList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'review_date' => $item['review_date'],
+            'period' => $item['period_start'] . ' - ' . $item['period_end'],
+            'status' => $reviewStatusLabels[$item['status']] ?? $item['status'],
+            'items' => (int) $item['item_count'],
+            'actions' => (int) $item['action_count'],
+            'next_review_date' => $item['next_review_date'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -488,5 +529,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'supplier_list' => $supplierList,
         'complaint_list' => $complaintList,
         'performance_target_list' => $performanceTargetList,
+        'review_list' => $reviewList,
     ];
 }

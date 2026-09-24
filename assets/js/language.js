@@ -883,6 +883,66 @@ Object.assign(translations.en, {
     performanceTargetsLegend: "Targets"
 });
 
+Object.assign(translations.tr, {
+    notificationGroupReviewLabel: "Gözden Geçirme"
+});
+Object.assign(translations.en, {
+    notificationGroupReviewLabel: "Management Review"
+});
+
+Object.assign(translations.tr, {
+    reviewsTitle: "Yönetimin Gözden Geçirmesi", reviewsText: "Gözden geçirme toplantılarını, girdileri ve çıkan aksiyonları izleyin.",
+    reviewRegisterKicker: "Gözden Geçirme Kayıtları", newReviewButton: "Yeni Gözden Geçirme",
+    newReviewTitle: "Yeni Gözden Geçirme",
+    newReviewText: "Toplantı kaydını oluşturun; gündem ve aksiyon kalemlerini detay sayfasından ekleyin.",
+    reviewCreatedMessage: "Gözden geçirme kaydı oluşturuldu.", reviewUpdatedMessage: "Gözden geçirme kaydı güncellendi.",
+    reviewTotalLabel: "Toplam Gözden Geçirme", reviewPlannedLabel: "Planlanan", reviewCompletedLabel: "Tamamlanan",
+    reviewActionCountLabel: "Aksiyon Kalemi", reviewStatusLabel: "Durum", reviewStatusPlannedLabel: "Planlandı",
+    reviewStatusCompletedLabel: "Tamamlandı", noReviewsText: "Filtrelere uygun gözden geçirme bulunamadı.",
+    reviewItemCountLabel: "kalem", nextReviewDateLabel: "Sonraki Gözden Geçirme",
+    backToReviewsButton: "Gözden Geçirmelere Dön", reviewTitleLabel: "Başlık", reviewDateLabel: "Toplantı Tarihi",
+    reviewPeriodStartLabel: "Dönem Başlangıcı", reviewPeriodEndLabel: "Dönem Bitişi",
+    reviewParticipantsLabel: "Katılımcılar", reviewScopeNotesLabel: "Kapsam / Not",
+    saveReviewButton: "Gözden Geçirmeyi Kaydet", reviewNoCompanyText: "Gözden geçirme eklemek için önce bir şirket gerekir. Şirket kaydınız yoksa yöneticinizle görüşün.",
+    reviewDetailTitle: "Gözden Geçirme Detayı", reviewWorkspaceKicker: "Gözden Geçirme Çalışma Alanı",
+    reviewPeriodLabel: "Dönem", reviewItemAddedMessage: "Kalem eklendi.", reviewItemUpdatedMessage: "Kalem güncellendi.",
+    reviewItemRemovedMessage: "Kalem kaldırıldı.", reviewInputsTitle: "Dönem Girdileri",
+    reviewInputsText: "Bu dönem için rapor motorundan alınan KPI değerleri; gözden geçirme kararlarının girdisidir.",
+    reviewItemsTitle: "Gündem ve Kararlar", reviewItemsText: "Girdi, karar ve aksiyon kalemleri; sorumlu, termin ve uygunsuzluk bağlantısı ile.",
+    noReviewItemsText: "Bu gözden geçirme için henüz kalem eklenmedi.", reviewItemTypeLabel: "Tür",
+    reviewItemTypeInputLabel: "Girdi", reviewItemTypeDecisionLabel: "Karar", reviewItemTypeActionLabel: "Aksiyon",
+    reviewTopicLabel: "Başlık", reviewLinkedNonconformityLabel: "Uygunsuzluk", reviewNoLinkOption: "— bağlantı yok",
+    reviewDescriptionLabel: "Açıklama", saveItemButton: "Kalemi Kaydet", removeItemButton: "Kaldır",
+    addReviewItemTitle: "Kalem Ekle", addReviewItemText: "Bir girdi, karar veya aksiyon kalemi ekleyin; aksiyonlara sorumlu ve termin atanabilir.",
+    addReviewItemButton: "Kalem Ekle", reviewCountKpi: "Gözden Geçirme", reviewsLegend: "Gözden Geçirmeler"
+});
+Object.assign(translations.en, {
+    reviewsTitle: "Management Review", reviewsText: "Track review meetings, their inputs and the actions they produce.",
+    reviewRegisterKicker: "Review Records", newReviewButton: "New Management Review",
+    newReviewTitle: "New Management Review",
+    newReviewText: "Create the meeting record; add agenda and action items on the detail screen.",
+    reviewCreatedMessage: "Management review created.", reviewUpdatedMessage: "Management review updated.",
+    reviewTotalLabel: "Total Reviews", reviewPlannedLabel: "Planned", reviewCompletedLabel: "Completed",
+    reviewActionCountLabel: "Action Items", reviewStatusLabel: "Status", reviewStatusPlannedLabel: "Planned",
+    reviewStatusCompletedLabel: "Completed", noReviewsText: "No reviews match the filters.",
+    reviewItemCountLabel: "items", nextReviewDateLabel: "Next Review",
+    backToReviewsButton: "Back to Reviews", reviewTitleLabel: "Title", reviewDateLabel: "Meeting Date",
+    reviewPeriodStartLabel: "Period Start", reviewPeriodEndLabel: "Period End",
+    reviewParticipantsLabel: "Participants", reviewScopeNotesLabel: "Scope / Notes",
+    saveReviewButton: "Save Review", reviewNoCompanyText: "A company is required before adding a review. If you have no company record, contact your administrator.",
+    reviewDetailTitle: "Review Detail", reviewWorkspaceKicker: "Review Workspace",
+    reviewPeriodLabel: "Period", reviewItemAddedMessage: "Item added.", reviewItemUpdatedMessage: "Item updated.",
+    reviewItemRemovedMessage: "Item removed.", reviewInputsTitle: "Period Inputs",
+    reviewInputsText: "KPI values for this period taken from the report engine; these are the inputs to the review decisions.",
+    reviewItemsTitle: "Agenda and Decisions", reviewItemsText: "Input, decision and action items, with responsible user, due date and nonconformity link.",
+    noReviewItemsText: "No item has been added to this review yet.", reviewItemTypeLabel: "Type",
+    reviewItemTypeInputLabel: "Input", reviewItemTypeDecisionLabel: "Decision", reviewItemTypeActionLabel: "Action",
+    reviewTopicLabel: "Title", reviewLinkedNonconformityLabel: "Nonconformity", reviewNoLinkOption: "— no link",
+    reviewDescriptionLabel: "Description", saveItemButton: "Save Item", removeItemButton: "Remove",
+    addReviewItemTitle: "Add Item", addReviewItemText: "Add an input, decision or action item; actions can carry a responsible user and due date.",
+    addReviewItemButton: "Add Item", reviewCountKpi: "Management Review", reviewsLegend: "Reviews"
+});
+
 const languageToggle = document.getElementById("languageToggle");
 
 let currentLanguage = localStorage.getItem("qms-language") || "tr";
