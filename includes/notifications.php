@@ -1,0 +1,103 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Bildirim yardimcilari.
+ *
+ * Bildirim kayitlari tek bicimde yazilsin diye burada toplanir; sayfalar
+ * dogrudan INSERT cumlesi yazmaz.
+ */
+
+/**
+ * Tek bir kullaniciya bildirim yazar. Gecersiz kullanici id'si sessizce atlanir.
+ */
+function qmsNotify(PDO $pdo, int $userId, string $type, string $title, string $message, ?string $linkUrl = null): void
+{
+    if ($userId <= 0) {
+        return;
+    }
+
+    $stmt = $pdo->prepare(
+        "INSERT INTO notifications (user_id, notification_type, title, message, link_url)
+         VALUES (:user_id, :type, :title, :message, :link_url)"
+    );
+    $stmt->execute([
+        'user_id' => $userId,
+        'type' => $type,
+        'title' => $title,
+        'message' => $message,
+        'link_url' => $linkUrl
+    ]);
+}
+
+/**
+ * Sirkete atanmis sistem adminlerine bildirim yazar.
+ *
+ * Super adminler bilincli olarak disarida birakilir: her sirketin her kaydi
+ * icin bilgilendirilmeleri gurultu olur.
+ *
+ * @param int $exceptUserId Kendisine bildirim gitmeyecek kullanici (islem yapan).
+ * @return int Bildirim yazilan kullanici sayisi.
+ */
+function qmsNotifyCompanyAdmins(
+    PDO $pdo,
+    int $companyId,
+    string $type,
+    string $title,
+    string $message,
+    ?string $linkUrl = null,
+    int $exceptUserId = 0
+): int {
+    if ($companyId <= 0) {
+        return 0;
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT users.id
+         FROM users
+         INNER JOIN company_admin_assignments ON company_admin_assignments.admin_user_id = users.id
+         WHERE company_admin_assignments.company_id = :company_id
+           AND company_admin_assignments.active = 1
+           AND users.active = 1
+           AND users.id <> :except_user_id"
+    );
+    $stmt->execute(['company_id' => $companyId, 'except_user_id' => $exceptUserId]);
+
+    $count = 0;
+    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $adminId) {
+        qmsNotify($pdo, (int) $adminId, $type, $title, $message, $linkUrl);
+        $count++;
+    }
+
+    return $count;
+}
+
+/**
+ * Bir sirkette sorumlu olabilecek kullanicilar: sirketin kendi kullanicilari ve
+ * o sirkete atanmis sistem adminleri.
+ *
+ * @return array<int, array{id: int, full_name: string, role: string}>
+ */
+function qmsCompanyResponsibleOptions(PDO $pdo, int $companyId): array
+{
+    if ($companyId <= 0) {
+        return [];
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT DISTINCT users.id, users.full_name, users.role
+         FROM users
+         LEFT JOIN company_admin_assignments ON company_admin_assignments.admin_user_id = users.id
+         WHERE users.active = 1
+           AND (
+                (users.role = 'company_user' AND users.company_id = :company_id)
+                OR (users.role = 'system_admin' AND company_admin_assignments.company_id = :company_id
+                    AND company_admin_assignments.active = 1)
+           )
+         ORDER BY users.full_name"
+    );
+    $stmt->execute(['company_id' => $companyId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}

@@ -52,6 +52,12 @@ $allowedEvidenceFiles = [
     "webp" => ["image/webp"]
 ];
 
+require_once __DIR__ . '/includes/notifications.php';
+
+// Sorumlu olabilecek kullanicilar: sirketin kullanicilari ve atanmis sistem adminleri.
+$responsibleOptions = qmsCompanyResponsibleOptions($pdo, (int) $action["company_id"]);
+$allowedResponsibleIds = array_map('intval', array_column($responsibleOptions, 'id'));
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $formType = $_POST["form_type"] ?? "update_action";
 
@@ -127,12 +133,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $formData = [
         "action_text" => trim($_POST["action_text"] ?? ""),
         "responsible_person" => trim($_POST["responsible_person"] ?? ""),
+        "responsible_user_id" => (int) ($_POST["responsible_user_id"] ?? 0),
         "due_date" => trim($_POST["due_date"] ?? ""),
         "status" => $_POST["status"] ?? "planned",
         "evidence_note" => trim($_POST["evidence_note"] ?? ""),
         "verifier_name" => trim($_POST["verifier_name"] ?? ""),
         "verification_note" => trim($_POST["verification_note"] ?? "")
     ];
+
+    if ($formData["responsible_user_id"] > 0 && !in_array($formData["responsible_user_id"], $allowedResponsibleIds, true)) {
+        $formData["responsible_user_id"] = 0;
+    }
 
     if ($formData["action_text"] === "") {
         $formError = "Lütfen düzeltici faaliyeti açıklayın.";
@@ -150,6 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "UPDATE corrective_actions
              SET action_text = :action_text,
                  responsible_person = :responsible_person,
+                 responsible_user_id = :responsible_user_id,
                  due_date = :due_date,
                  status = :status,
                  evidence_note = :evidence_note,
@@ -162,6 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $updateStmt->execute([
             "action_text" => $formData["action_text"],
             "responsible_person" => $formData["responsible_person"] !== "" ? $formData["responsible_person"] : null,
+            "responsible_user_id" => $formData["responsible_user_id"] > 0 ? $formData["responsible_user_id"] : null,
             "due_date" => $formData["due_date"] !== "" ? $formData["due_date"] : null,
             "status" => $formData["status"],
             "evidence_note" => $formData["evidence_note"] !== "" ? $formData["evidence_note"] : null,
@@ -171,6 +184,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "closed_at" => $closedAt,
             "id" => $actionId
         ]);
+
+        // Bildirimler: yeni sorumluya atama, yonetime dogrulama talebi, sorumluya
+        // kapanis. Kendi yaptigi islem icin kullaniciya bildirim gonderilmez.
+        $actionLink = "corrective-action-detail.php?id=" . $actionId;
+        $previousStatus = (string) $action["status"];
+        $previousResponsible = (int) ($action["responsible_user_id"] ?? 0);
+        $newResponsible = (int) $formData["responsible_user_id"];
+
+        if ($newResponsible > 0 && $newResponsible !== $previousResponsible && $newResponsible !== $userId) {
+            qmsNotify($pdo, $newResponsible, "corrective_action_assigned", "Size bir düzeltici faaliyet atandı", $formData["action_text"], $actionLink);
+        }
+
+        if ($formData["status"] === "verification" && $previousStatus !== "verification") {
+            qmsNotifyCompanyAdmins($pdo, (int) $action["company_id"], "corrective_action_verification", "Doğrulama bekleyen düzeltici faaliyet", $formData["action_text"], $actionLink, $userId);
+        }
+
+        if ($formData["status"] === "closed" && $previousStatus !== "closed" && $newResponsible > 0 && $newResponsible !== $userId) {
+            qmsNotify($pdo, $newResponsible, "corrective_action_closed", "Düzeltici faaliyet kapandı", $formData["action_text"], $actionLink);
+        }
 
         header("Location: corrective-action-detail.php?id=" . $actionId . "&updated=1");
         exit;
@@ -272,6 +304,16 @@ $activeNav = "companies";
                     <label class="form-field">
                         <span data-i18n="responsiblePersonLabel">Sorumlu Kişi</span>
                         <input type="text" name="responsible_person" value="<?= htmlspecialchars($action["responsible_person"] ?? "", ENT_QUOTES, "UTF-8") ?>">
+                    </label>
+                    <label class="form-field form-field-wide">
+                        <span data-i18n="responsibleUserLabel">Sorumlu Kullanıcı (isteğe bağlı)</span>
+                        <select name="responsible_user_id">
+                            <option value="0" data-i18n="responsibleUserNoneOption">— seçilmedi (bildirim gönderilmez)</option>
+                            <?php foreach ($responsibleOptions as $responsibleOption): ?>
+                                <option value="<?= (int) $responsibleOption["id"] ?>" <?= (int) ($action["responsible_user_id"] ?? 0) === (int) $responsibleOption["id"] ? "selected" : "" ?>><?= htmlspecialchars($responsibleOption["full_name"], ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars(appRoleLabel((string) $responsibleOption["role"]), ENT_QUOTES, "UTF-8") ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small data-i18n="responsibleUserHelp">Seçilirse faaliyet atandığında bu kullanıcıya bildirim gider.</small>
                     </label>
                     <label class="form-field">
                         <span data-i18n="dueDateLabel">Termin Tarihi</span>

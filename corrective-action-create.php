@@ -15,7 +15,7 @@ $nonconformityId = (int) ($_GET["nonconformity_id"] ?? $_POST["nonconformity_id"
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
-$sql = "SELECT nonconformities.id, nonconformities.title, companies.company_name
+$sql = "SELECT nonconformities.id, nonconformities.company_id, nonconformities.title, companies.company_name
      FROM nonconformities
      INNER JOIN companies ON companies.id = nonconformities.company_id
      WHERE nonconformities.id = ? AND nonconformities.active = 1";
@@ -34,6 +34,13 @@ if (!$nonconformity) {
     exit;
 }
 
+require_once __DIR__ . '/includes/notifications.php';
+
+// Sorumlu olabilecek kullanicilar: sirketin kendi kullanicilari ve o sirkete
+// atanmis sistem adminleri. Serbest metin alani disaridan gelen kisiler icin kalir.
+$responsibleOptions = qmsCompanyResponsibleOptions($pdo, (int) $nonconformity["company_id"]);
+$allowedResponsibleIds = array_map('intval', array_column($responsibleOptions, 'id'));
+
 $_SESSION["corrective_action_csrf"] ??= bin2hex(random_bytes(32));
 $csrfToken = $_SESSION["corrective_action_csrf"];
 
@@ -41,6 +48,7 @@ $formError = "";
 $formData = [
     "action_text" => "",
     "responsible_person" => "",
+    "responsible_user_id" => 0,
     "due_date" => ""
 ];
 
@@ -53,24 +61,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $formData = [
         "action_text" => trim($_POST["action_text"] ?? ""),
         "responsible_person" => trim($_POST["responsible_person"] ?? ""),
+        "responsible_user_id" => (int) ($_POST["responsible_user_id"] ?? 0),
         "due_date" => trim($_POST["due_date"] ?? "")
     ];
+
+    // Yalnizca bu sirkette sorumlu olabilecek kullanicilar kabul edilir.
+    if ($formData["responsible_user_id"] > 0 && !in_array($formData["responsible_user_id"], $allowedResponsibleIds, true)) {
+        $formData["responsible_user_id"] = 0;
+    }
 
     if ($formData["action_text"] === "") {
         $formError = "Lütfen düzeltici faaliyeti açıklayın.";
     } else {
         $insertStmt = $pdo->prepare(
             "INSERT INTO corrective_actions
-                (nonconformity_id, action_text, responsible_person, due_date, status, active)
+                (nonconformity_id, action_text, responsible_person, responsible_user_id, due_date, status, active)
              VALUES
-                (:nonconformity_id, :action_text, :responsible_person, :due_date, 'planned', 1)"
+                (:nonconformity_id, :action_text, :responsible_person, :responsible_user_id, :due_date, 'planned', 1)"
         );
         $insertStmt->execute([
             "nonconformity_id" => $nonconformityId,
             "action_text" => $formData["action_text"],
             "responsible_person" => $formData["responsible_person"] !== "" ? $formData["responsible_person"] : null,
+            "responsible_user_id" => $formData["responsible_user_id"] > 0 ? $formData["responsible_user_id"] : null,
             "due_date" => $formData["due_date"] !== "" ? $formData["due_date"] : null
         ]);
+
+        // Sorumlu bir sistem kullanicisiysa atama bildirimi gonderilir.
+        if ($formData["responsible_user_id"] > 0) {
+            qmsNotify(
+                $pdo,
+                $formData["responsible_user_id"],
+                "corrective_action_assigned",
+                "Size bir düzeltici faaliyet atandı",
+                $nonconformity["title"],
+                "corrective-action-detail.php?id=" . (int) $pdo->lastInsertId()
+            );
+        }
 
         header("Location: nonconformity-detail.php?id=" . $nonconformityId . "&action=created");
         exit;
@@ -129,6 +156,16 @@ $activeNav = "companies";
                     <label class="form-field">
                         <span data-i18n="responsiblePersonLabel">Sorumlu Kişi</span>
                         <input type="text" name="responsible_person" value="<?= htmlspecialchars($formData["responsible_person"], ENT_QUOTES, "UTF-8") ?>">
+                    </label>
+                    <label class="form-field form-field-wide">
+                        <span data-i18n="responsibleUserLabel">Sorumlu Kullanıcı (isteğe bağlı)</span>
+                        <select name="responsible_user_id">
+                            <option value="0" data-i18n="responsibleUserNoneOption">— seçilmedi (bildirim gönderilmez)</option>
+                            <?php foreach ($responsibleOptions as $responsibleOption): ?>
+                                <option value="<?= (int) $responsibleOption["id"] ?>" <?= (int) $formData["responsible_user_id"] === (int) $responsibleOption["id"] ? "selected" : "" ?>><?= htmlspecialchars($responsibleOption["full_name"], ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars(appRoleLabel((string) $responsibleOption["role"]), ENT_QUOTES, "UTF-8") ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small data-i18n="responsibleUserHelp">Seçilirse faaliyet atandığında bu kullanıcıya bildirim gider.</small>
                     </label>
                     <label class="form-field">
                         <span data-i18n="dueDateLabel">Termin Tarihi</span>
