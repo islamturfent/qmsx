@@ -15,17 +15,15 @@ $documentId = (int) ($_GET["id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
+require_once __DIR__ . '/includes/access.php';
+
 $documentSql = "SELECT documents.*, companies.company_name
                 FROM documents INNER JOIN companies ON companies.id = documents.company_id
-                WHERE documents.id = :id AND documents.active = 1";
-$documentParams = ["id" => $documentId];
-if (!$isSuperAdmin) {
-    $documentSql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
-                       WHERE company_admin_assignments.company_id = documents.company_id
-                         AND company_admin_assignments.admin_user_id = :user_id
-                         AND company_admin_assignments.active = 1)";
-    $documentParams["user_id"] = $userId;
-}
+                WHERE documents.id = ? AND documents.active = 1";
+$documentParams = [$documentId];
+$scope = qmsCompanyScope('documents.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$documentSql .= $scope['sql'];
+$documentParams = array_merge($documentParams, $scope['params']);
 $documentSql .= " LIMIT 1";
 
 $documentStmt = $pdo->prepare($documentSql);
@@ -45,6 +43,8 @@ $allowedFiles = [
 ];
 $formError = "";
 
+// Onaylayici listesi erisim kapsami degil, onay yetkinligidir: sirkete atanmis
+// sistem adminleri ve super admin onaylayabilir, bu yuzden kendi sorgusu kalir.
 $approversStmt = $pdo->prepare(
     "SELECT DISTINCT users.id, users.full_name, users.role
      FROM users

@@ -124,6 +124,19 @@ function qmsVisibleAuditIds(PDO $pdo, int $userId): ?array
 }
 
 /**
+ * Kayit bazli kapsam sorgularinda kullanilacak rol.
+ *
+ * Cagri super admin disi geldiginde oturumdaki rol kullanilir; rol bu kumeye
+ * girmiyorsa (test betikleri, arka plan isleri) sistem admini varsayilir.
+ */
+function qmsScopedRole(): string
+{
+    $role = (string) ($_SESSION['qms_role'] ?? '');
+
+    return in_array($role, ['system_admin', 'company_user', 'auditor'], true) ? $role : 'system_admin';
+}
+
+/**
  * Denetime bagli kayitlar icin kapsam (denetimler, uygunsuzluklar).
  *
  * Denetci yalnizca atandigi denetimlerin kayitlarini gorur; diger roller

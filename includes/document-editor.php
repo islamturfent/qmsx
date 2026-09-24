@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/office/locks.php';
 
 function qmsEditorHtml(string $html): string
@@ -48,8 +49,9 @@ function qmsEditorDocument(PDO $pdo, int $id, int $userId, bool $super, bool $lo
     $sql = 'SELECT d.*, c.company_name FROM documents d JOIN companies c ON c.id = d.company_id WHERE d.id = ? AND d.active = 1';
     $params = [$id];
     if (!$super) {
-        $sql .= ' AND EXISTS (SELECT 1 FROM company_admin_assignments a WHERE a.company_id = d.company_id AND a.admin_user_id = ? AND a.active = 1)';
-        $params[] = $userId;
+        $scope = qmsCompanyScope('d.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsScopedRole()));
+        $sql .= $scope['sql'];
+        $params = array_merge($params, $scope['params']);
     }
     $stmt = $pdo->prepare($sql . ($lock ? ' FOR UPDATE' : ''));
     $stmt->execute($params);

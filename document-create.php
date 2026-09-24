@@ -9,24 +9,17 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
+require_once __DIR__ . '/includes/access.php';
 
 $csrfToken = qmsCsrfToken('document_create');
 
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
-$scopeClause = "";
-$scopeParams = [];
-if (!$isSuperAdmin) {
-    $assignmentStmt = $pdo->prepare("SELECT company_id FROM company_admin_assignments WHERE admin_user_id = :user_id AND active = 1");
-    $assignmentStmt->execute(["user_id" => $userId]);
-    $companyIds = array_map('intval', $assignmentStmt->fetchAll(PDO::FETCH_COLUMN));
-    if ($companyIds) {
-        $scopeClause = " AND companies.id IN (" . implode(',', array_fill(0, count($companyIds), '?')) . ")";
-        $scopeParams = $companyIds;
-    } else {
-        $scopeClause = " AND 1 = 0";
-    }
-}
+
+// Kapsam tek kaynaktan: role gore gorunur sirketler.
+$scope = qmsCompanyScope('companies.id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$scopeClause = $scope['sql'];
+$scopeParams = $scope['params'];
 
 $companyStmt = $pdo->prepare("SELECT companies.id, companies.company_name FROM companies WHERE companies.active = 1" . $scopeClause . " ORDER BY companies.company_name");
 $companyStmt->execute($scopeParams);
