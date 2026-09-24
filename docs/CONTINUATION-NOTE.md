@@ -30,11 +30,12 @@ carried over from earlier assumptions.
   | `tests/training-management.php` | 25 |
   | `tests/capa.php` | 51 |
   | `tests/supplier-management.php` | 47 |
+  | `tests/complaint-management.php` | 47 |
 
-  211 checks total. All suites use temporary tables and leave real records
+  258 checks total. All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
-  `training_participants`, `corrective_actions`, `suppliers`, `notifications`
-  remain empty).
+  `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
+  `notifications` remain empty).
 
 - Run the suites from CMD/PowerShell, or set `TMP` to a real Windows path first;
   Git Bash defaults `TMP=/tmp` and `tempnam()`-based tests then abort.
@@ -176,6 +177,45 @@ Closes the "worth a UI pass" item from the CAPA notes.
   inline SVG icon from the map, the translated group pill, working "open record"
   links, unread highlighting, and mark-as-read (with CSRF rejection). Fixtures were
   removed afterwards.
+
+## Shared vocabularies (2026-09-25)
+
+`includes/vocabulary.php` now owns `QMS_SEVERITIES` / `qmsSeverityLabels()` /
+`qmsSeverityI18nKeys()`. Severity (minor/major/critical) is used by
+`nonconformity-detail`, `actions` and the complaint module; all three now read
+from the one file instead of duplicating the array.
+
+## Complaint management - Faz 3 module (2026-09-25)
+
+Fifth product module; extends the record chain to the field.
+
+- Schema: single table `complaints` (migration `20260926-complaints.sql`, runner
+  `scripts/migrate-complaints.php`).
+- Flow `new -> in_review -> action_planned -> resolved -> closed`, plus `rejected`.
+  `closed_date` is written on the first transition to `closed` and kept.
+- Fields: source (musteri/calisan/tedarikci/diger), channel, complainant name and
+  contact, received date, severity (shared vocabulary), due date, responsible user
+  (system-user model, same as CAPA/training) or free text, and a free-form
+  root-cause / action / resolution trail.
+- **Chain preserved**: a complaint links to an existing nonconformity of the same
+  company (`complaints.nonconformity_id`, scope-validated). The link is shown on
+  the detail screen with the corrective-action count.
+- Deliberate limit: `nonconformities.audit_id` is NOT NULL, so a complaint cannot
+  *create* a nonconformity by itself yet. That is a separate product decision (make
+  audit_id nullable / add a source column) and is left as an open question rather
+  than silently changing the nonconformity surfaces.
+- Notifications: assignment to a responsible user, critical-severity escalation to
+  the company's assigned admins, and closure to the responsible user.
+- Reporting surface: complaint count, open-complaint count and a complaint detail
+  list in `includes/report-export-data.php`, a tenth Excel sheet (`Sikayetler`), a
+  PDF detail section, and a KPI tile plus company-performance columns on
+  `reports.php`.
+- Verified behaviourally: 47 temporary-table checks plus a throwaway HTTP harness
+  (assigned admin, a second admin, an unassigned admin, a company user) covering
+  tenant isolation, CSRF rejection, the status/severity/responsible flow,
+  cross-company nonconformity-link rejection, duplicate complaint-number rejection,
+  both report exports and the notification-centre rendering in the complaint group.
+  Fixtures were removed and the auto-increment counters restored.
 
 ## Security hardening (2026-09-19)
 
@@ -386,12 +426,16 @@ per-column emphasis, so uniform gray-500 reads washed out.
 
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
-  risk register, trainings and suppliers, on top of the existing KPI and summary
-  content. Excel has 9 sheets, the PDF adds six detail tables and prints "no
-  records this period" when a section is empty.
-- Faz 3 remaining modules: sikayet (complaint), performans (performance),
-  yonetimin gozden gecirmesi (management review). Pick the next one with the user
-  before starting; the training and supplier modules are good templates.
+  risk register, trainings, suppliers and complaints, on top of the existing KPI
+  and summary content. Excel has 10 sheets, the PDF adds seven detail tables and
+  prints "no records this period" when a section is empty.
+- Faz 3 remaining modules: performans (performance), yonetimin gozden gecirmesi
+  (management review). Pick the next one with the user before starting; the
+  training, supplier and complaint modules are good templates.
+- Open product question from the complaint module: whether a complaint should be
+  able to *create* a nonconformity. That needs `nonconformities.audit_id` to become
+  nullable (or a source column) plus a review of the screens that join audits.
+  Linked-only is the current, deliberately conservative choice.
 - Migration runner gotcha (hit on 2026-09-25): `explode(';')` splits on semicolons
   inside SQL comments too. `scripts/migrate-suppliers.php` strips `^--` lines first;
   do the same in any new runner.
