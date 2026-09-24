@@ -1,7 +1,7 @@
 # QMS continuation note
 
 Recorded: 2026-09-18 (Europe/Istanbul).
-Last updated: 2026-09-24. The state below was re-verified on that date; it is not
+Last updated: 2026-09-25. The state below was re-verified on that date; it is not
 carried over from earlier assumptions.
 
 ## Workspace
@@ -28,11 +28,13 @@ carried over from earlier assumptions.
   | `tests/document-workflow.php` | 7 |
   | `tests/office-integration.php` | 48 |
   | `tests/training-management.php` | 25 |
-  | `tests/capa.php` | 43 |
+  | `tests/capa.php` | 51 |
+  | `tests/supplier-management.php` | 47 |
 
-  156 checks total. All suites use temporary tables and leave real records
+  211 checks total. All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
-  `training_participants`, `corrective_actions`, `notifications` remain empty).
+  `training_participants`, `corrective_actions`, `suppliers`, `notifications`
+  remain empty).
 
 - Run the suites from CMD/PowerShell, or set `TMP` to a real Windows path first;
   Git Bash defaults `TMP=/tmp` and `tempnam()`-based tests then abort.
@@ -124,6 +126,56 @@ regression tested; `corrective-action-create`, `corrective-action-detail` and
 change came with it: the assignment notification created from the create screen
 now carries the action text instead of the nonconformity title, matching the
 detail screen.
+
+## Supplier management - Faz 3 module (2026-09-25)
+
+Fourth product module. Designed by us: knowhow names the module but not its
+fields, so the schema is our proposal, not an extracted requirement.
+
+- Schema: `suppliers` + `supplier_evaluations` (migration `20260925-suppliers.sql`,
+  runner `scripts/migrate-suppliers.php`).
+- Approval flow `candidate -> approved -> suspended -> removed`; `approved_date` is
+  written on the first transition to `approved`.
+- Evaluations carry quality/delivery/service scores (0-100). The evaluation total
+  is the average of the scores that were entered, and the supplier's score is the
+  average of its evaluation totals. There is deliberately **no** stored score or
+  `last_evaluation_date` column - an earlier draft had one and it was dropped
+  before release, because it would have been a second source of truth.
+- Notifications: approval and suspension go to the company's assigned system
+  admins; an "unacceptable" evaluation decision also notifies them. Ordinary
+  evaluations stay silent.
+- Reporting surface: supplier count, average score and a supplier detail list in
+  `includes/report-export-data.php`, a ninth Excel sheet (`Tedarikçiler`), a PDF
+  detail section, and a KPI tile plus company-performance column on `reports.php`.
+- Verified behaviourally: 47 temporary-table checks plus a throwaway HTTP harness
+  (login sessions for an assigned admin, a second admin for the notification
+  assertions, an unassigned admin and a company user) covering tenant isolation,
+  CSRF rejection, the approval flow, evaluation add/update/remove, duplicate
+  supplier-code rejection and both report exports. Fixtures were removed and the
+  auto-increment counters restored.
+
+## Notification centre pass (2026-09-25)
+
+Closes the "worth a UI pass" item from the CAPA notes.
+
+- `includes/notifications.php` now owns a notification **type map**: type -> icon +
+  group (`capa`, `document`, `training`, `supplier`, `general`). The centre renders
+  the icon through `appIcon()` and a group pill from the same map, so a new module
+  only adds an entry there. Unknown types fall back to the general group, which
+  keeps older rows readable.
+- The old text glyphs (`!` / `✓`) used as icons are gone; the group colour lives on
+  the icon (brand / purple / success / orange / neutral token pairs), the pill stays
+  neutral.
+- `document-detail.php` wrote its three notifications with inline `INSERT`
+  statements; they now go through `qmsNotify()`. Behaviour is unchanged (same type,
+  title, message and link) and the whole document flow was re-verified over HTTP.
+- New icon `checkBadge` added to `appIcon()` for closure/completion events, so they
+  are visually distinct from assignment events.
+- Verified over HTTP with the real document flow (request -> decision -> publish)
+  plus a seeded CAPA notification: three notifications rendered, each with an
+  inline SVG icon from the map, the translated group pill, working "open record"
+  links, unread highlighting, and mark-as-read (with CSRF rejection). Fixtures were
+  removed afterwards.
 
 ## Security hardening (2026-09-19)
 
@@ -334,12 +386,15 @@ per-column emphasis, so uniform gray-500 reads washed out.
 
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
-  risk register and trainings, on top of the existing KPI and summary content.
-  Excel has 8 sheets, the PDF adds five detail tables and prints "no records this
-  period" when a section is empty.
-- Faz 3 remaining modules: tedarikci (supplier), sikayet (complaint), performans
-  (performance), yonetimin gozden gecirmesi (management review). Pick the next one
-  with the user before starting; the training module is a good template.
+  risk register, trainings and suppliers, on top of the existing KPI and summary
+  content. Excel has 9 sheets, the PDF adds six detail tables and prints "no
+  records this period" when a section is empty.
+- Faz 3 remaining modules: sikayet (complaint), performans (performance),
+  yonetimin gozden gecirmesi (management review). Pick the next one with the user
+  before starting; the training and supplier modules are good templates.
+- Migration runner gotcha (hit on 2026-09-25): `explode(';')` splits on semicolons
+  inside SQL comments too. `scripts/migrate-suppliers.php` strips `^--` lines first;
+  do the same in any new runner.
 - Phase 2 (CAPA) is complete: evidence files and corrective-action notifications
   are both implemented. `corrective_actions.responsible_user_id` supplies the
   recipient, so a corrective action can now be assigned to a real account.
