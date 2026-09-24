@@ -491,8 +491,11 @@ Two real defects were caught this way:
 
 ## Office integration
 
-- User explicitly deferred Collabora setup and will configure the connection
-  personally. Do not resume installation or modify office connection settings.
+- **Collabora/office is off-limits until the project is done** (confirmed
+  2026-09-28). Do not touch `office-settings.php`, `config/office.php`,
+  `deploy/office/`, `includes/office/*`, `wopi.php`, the web editor entry point
+  on the document detail page, or any office connection settings. The user will
+  configure the connection personally, at the end of the project.
 - Web document editor was previously reported completed: new revisions preserve
   older versions and changed approved/published documents require approval again.
 - Collabora integration code and `docs/OFFICE-INTEGRATION.md` exist. Live Word
