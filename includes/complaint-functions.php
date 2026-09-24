@@ -214,21 +214,8 @@ function qmsComplaintList(PDO $pdo, int $userId, string $role): array
  */
 function qmsComplaintNonconformityOptions(PDO $pdo, int $companyId): array
 {
-    if ($companyId <= 0) {
-        return [];
-    }
-
-    $stmt = $pdo->prepare(
-        'SELECT nonconformities.id, nonconformities.title, nonconformities.status,
-                nonconformities.severity, audits.title AS audit_title
-         FROM nonconformities
-         LEFT JOIN audits ON audits.id = nonconformities.audit_id
-         WHERE nonconformities.company_id = :company_id AND nonconformities.active = 1
-         ORDER BY nonconformities.id DESC'
-    );
-    $stmt->execute(['company_id' => $companyId]);
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Secenek listesi tek kaynaktan gelir (includes/access.php).
+    return qmsCompanyNonconformityOptions($pdo, $companyId);
 }
 
 /**

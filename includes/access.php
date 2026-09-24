@@ -179,6 +179,33 @@ function qmsLandingPage(string $role): string
 }
 
 /**
+ * Bir sirketin kayitli uygunsuzluklari (baglama secenekleri icin).
+ *
+ * Sikayet ve yonetimin gozden gecirmesi gibi moduller uygunsuzluga baglanir;
+ * secenek listesi tek kaynaktan gelir. Denetim basligi da getirilir.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function qmsCompanyNonconformityOptions(PDO $pdo, int $companyId): array
+{
+    if ($companyId <= 0) {
+        return [];
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT nonconformities.id, nonconformities.title, nonconformities.status,
+                nonconformities.severity, audits.title AS audit_title
+         FROM nonconformities
+         LEFT JOIN audits ON audits.id = nonconformities.audit_id
+         WHERE nonconformities.company_id = :company_id AND nonconformities.active = 1
+         ORDER BY nonconformities.id DESC'
+    );
+    $stmt->execute(['company_id' => $companyId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
  * Kullanicinin sirkete erisimi var mi.
  *
  * @param int[]|null $companyIds
