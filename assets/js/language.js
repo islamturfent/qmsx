@@ -193,7 +193,16 @@ const translations = {
         ,filteredRecordsLabel: "Gösterilen kayıt"
         ,noActionRecordsText: "Seçilen filtrelere uygun kayıt bulunamadı."
         ,overdueLabel: "Gecikmiş"
-        ,documentManagementTitle: "Doküman Yönetimi"
+        ,documentManagementTitle: "Doküman Yönetimi",
+        dashboardSummaryTitle: "Dönem Özeti",
+        dashboardSummaryText: "Son 12 ayın kayıtlarından yerel olarak derlenen özet; harici bir servis kullanmaz.",
+        dashboardTrendsTitle: "Son 12 Ay Trendleri",
+        dashboardTrendsText: "Aylık denetim, uygunsuzluk, tamamlanan aksiyon, eğitim ve şikayet hareketi.",
+        dashboardTrendAuditsLabel: "Denetimler",
+        dashboardTrendNonconformitiesLabel: "Uygunsuzluklar",
+        dashboardTrendActionsLabel: "Tamamlanan Aksiyon",
+        dashboardTrendTrainingsLabel: "Tamamlanan Eğitim",
+        dashboardTrendComplaintsLabel: "Şikayetler"
         ,documentManagementText: "Kontrollü dokümanları, yayın durumlarını ve revizyonları yönetin."
         ,createDocumentButton: "Yeni Doküman"
         ,documentCreatedMessage: "Doküman oluşturuldu."
@@ -500,7 +509,16 @@ const translations = {
         ,filteredRecordsLabel: "Records shown"
         ,noActionRecordsText: "No records match the selected filters."
         ,overdueLabel: "Overdue"
-        ,documentManagementTitle: "Document Management"
+        ,documentManagementTitle: "Document Management",
+        dashboardSummaryTitle: "Period Summary",
+        dashboardSummaryText: "A summary compiled locally from the last 12 months of records; it uses no external service.",
+        dashboardTrendsTitle: "Last 12 Months Trends",
+        dashboardTrendsText: "Monthly audits, nonconformities, completed actions, trainings and complaints movement.",
+        dashboardTrendAuditsLabel: "Audits",
+        dashboardTrendNonconformitiesLabel: "Nonconformities",
+        dashboardTrendActionsLabel: "Completed Actions",
+        dashboardTrendTrainingsLabel: "Completed Trainings",
+        dashboardTrendComplaintsLabel: "Complaints"
         ,documentManagementText: "Manage controlled documents, publication states and revisions."
         ,createDocumentButton: "New Document"
         ,documentCreatedMessage: "Document created."

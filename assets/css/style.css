@@ -2794,3 +2794,186 @@ body.modal-open {
 .compact-input-card .dashboard-card-number {
     font-size: 22px;
 }
+
+/* ----------------------------------------------------------------------------
+   Panel: Donem Ozeti + Son 12 Ay Trendleri
+   Token tabanlı; dark mode yalnızca token'ları çevirir, kurallar tekrarlanmaz.
+   ---------------------------------------------------------------------------- */
+.summary-card {
+    margin-top: 24px;
+}
+
+.heading-inline-icon {
+    display: inline-flex;
+    vertical-align: -3px;
+    margin-right: 8px;
+    color: var(--purple-500);
+}
+
+.heading-inline-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.summary-headline {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.summary-points {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.summary-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--gray-700);
+    padding-left: 18px;
+    position: relative;
+}
+
+.summary-point::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray-300);
+}
+
+.summary-point.tone-positive::before {
+    background: var(--success-500);
+}
+
+.summary-point.tone-warning::before {
+    background: var(--warning-500);
+}
+
+.summary-point.tone-neutral::before {
+    background: var(--brand-400);
+}
+
+.trend-list {
+    display: grid;
+    gap: 22px;
+}
+
+.trend-series {
+    display: grid;
+    gap: 8px;
+}
+
+.trend-series-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.trend-series-icon {
+    display: inline-flex;
+    color: var(--gray-500);
+}
+
+.trend-series-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.trend-strip {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.trend-bar {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+}
+
+.trend-bar-value {
+    min-height: 16px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-500);
+}
+
+.trend-bar-track {
+    height: 64px;
+    border-radius: 6px;
+    background: var(--gray-100);
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+}
+
+.trend-bar-fill {
+    display: block;
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    transition: height 0.25s ease;
+}
+
+.trend-bar-fill.bar-blue {
+    background: var(--brand-500);
+}
+
+.trend-bar-fill.bar-orange {
+    background: var(--orange-500);
+}
+
+.trend-bar-fill.bar-violet {
+    background: var(--purple-500);
+}
+
+.trend-bar-fill.bar-teal {
+    background: var(--success-500);
+}
+
+.trend-bar-fill.bar-brand {
+    background: var(--brand-500);
+}
+
+.trend-bar-label {
+    text-align: center;
+    font-size: 11px;
+    color: var(--gray-500);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 720px) {
+    .trend-strip {
+        gap: 4px;
+        overflow-x: auto;
+    }
+
+    .trend-bar {
+        min-width: 34px;
+    }
+
+    .trend-bar-label {
+        font-size: 10px;
+    }
+}

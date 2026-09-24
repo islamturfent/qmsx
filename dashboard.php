@@ -36,6 +36,7 @@ $openNonconformityCount = $scopedCount("SELECT COUNT(*) FROM nonconformities WHE
 $documentCount = $scopedCount("SELECT COUNT(*) FROM documents WHERE active = 1" . $scopeClause);
 
 require_once __DIR__ . '/includes/report-export-data.php';
+require_once __DIR__ . '/includes/dashboard-functions.php';
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -45,6 +46,10 @@ $reportMetrics = buildReportExportData(
     ($_SESSION["qms_role"] ?? "") === "super_admin",
     []
 )["metrics"];
+
+// Trend ve ozet aggregate sorgulardan gelir; rapor setini tekrar yuklemez.
+$dashboardTrend = qmsDashboardTrend($pdo, $userId, qmsCurrentRole());
+$dashboardSummary = qmsDashboardSummary($pdo, $userId, qmsCurrentRole(), $dashboardTrend);
 
 $activeNav = "dashboard";
 
@@ -131,6 +136,61 @@ $activeNav = "dashboard";
                     <strong class="dashboard-card-number"><?= $documentCount ?></strong>
                 </div>
             </a>
+        </section>
+
+        <section class="page-section console-card summary-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("sparkles", "heading-inline-icon") ?><span data-i18n="dashboardSummaryTitle">Dönem Özeti</span></h3>
+                    <p data-i18n="dashboardSummaryText">Son 12 ayın kayıtlarından yerel olarak derlenen özet; harici bir servis kullanmaz.</p>
+                </div>
+            </div>
+            <p class="summary-headline"><?= htmlspecialchars($dashboardSummary["headline"], ENT_QUOTES, "UTF-8") ?></p>
+            <ul class="summary-points">
+                <?php foreach ($dashboardSummary["points"] as $point): ?>
+                    <li class="summary-point tone-<?= htmlspecialchars($point["tone"], ENT_QUOTES, "UTF-8") ?>"><?= htmlspecialchars($point["text"], ENT_QUOTES, "UTF-8") ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardTrendsTitle">Son 12 Ay Trendleri</h3>
+                    <p data-i18n="dashboardTrendsText">Aylık denetim, uygunsuzluk, tamamlanan aksiyon, eğitim ve şikayet hareketi.</p>
+                </div>
+            </div>
+            <?php
+            $trendRows = array_values($dashboardTrend);
+            $trendSeries = [
+                ["key" => "audits", "label" => "Denetimler", "i18n" => "dashboardTrendAuditsLabel", "icon" => "check", "color" => "blue"],
+                ["key" => "nonconformities", "label" => "Uygunsuzluklar", "i18n" => "dashboardTrendNonconformitiesLabel", "icon" => "alert", "color" => "orange"],
+                ["key" => "actions_completed", "label" => "Tamamlanan Aksiyon", "i18n" => "dashboardTrendActionsLabel", "icon" => "checkBadge", "color" => "violet"],
+                ["key" => "trainings_completed", "label" => "Tamamlanan Eğitim", "i18n" => "dashboardTrendTrainingsLabel", "icon" => "training", "color" => "teal"],
+                ["key" => "complaints", "label" => "Şikayetler", "i18n" => "dashboardTrendComplaintsLabel", "icon" => "complaints", "color" => "brand"],
+            ];
+            ?>
+            <div class="trend-list">
+                <?php foreach ($trendSeries as $series): ?>
+                    <?php $seriesMax = 1; foreach ($trendRows as $row) { $seriesMax = max($seriesMax, (int) $row[$series["key"]]); } ?>
+                    <div class="trend-series">
+                        <div class="trend-series-head">
+                            <?= appIcon($series["icon"], "trend-series-icon") ?>
+                            <span data-i18n="<?= $series["i18n"] ?>"><?= htmlspecialchars($series["label"], ENT_QUOTES, "UTF-8") ?></span>
+                        </div>
+                        <div class="trend-strip">
+                            <?php foreach ($trendRows as $row): ?>
+                                <?php $trendValue = (int) $row[$series["key"]]; $trendHeight = $trendValue > 0 ? round(($trendValue / $seriesMax) * 100) : 0; ?>
+                                <div class="trend-bar" title="<?= htmlspecialchars($row["label"] . ": " . $trendValue, ENT_QUOTES, "UTF-8") ?>">
+                                    <span class="trend-bar-value"><?= $trendValue > 0 ? $trendValue : "" ?></span>
+                                    <span class="trend-bar-track"><span class="trend-bar-fill bar-<?= $series["color"] ?>" style="height:<?= $trendHeight ?>%"></span></span>
+                                    <span class="trend-bar-label"><?= htmlspecialchars($row["label"], ENT_QUOTES, "UTF-8") ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </section>
     </main>
 
