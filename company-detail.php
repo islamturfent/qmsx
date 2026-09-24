@@ -8,6 +8,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $companyId = (int) ($_GET["id"] ?? 0);
 
@@ -21,15 +22,11 @@ $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
 $sql = "SELECT id, company_name, tax_number, sector, city, contact_email, active
      FROM companies
-     WHERE id = :id";
-$params = ["id" => $companyId];
-if (!$isSuperAdmin) {
-    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
-                WHERE company_admin_assignments.company_id = companies.id
-                  AND company_admin_assignments.admin_user_id = :user_id
-                  AND company_admin_assignments.active = 1)";
-    $params["user_id"] = $userId;
-}
+     WHERE id = ?";
+$params = [$companyId];
+$scope = qmsCompanyScope('companies.id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$sql .= $scope['sql'];
+$params = array_merge($params, $scope['params']);
 $sql .= " LIMIT 1";
 
 $companyStmt = $pdo->prepare($sql);

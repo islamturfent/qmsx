@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/app-ui.php';
+require_once __DIR__ . '/includes/access.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
@@ -203,16 +204,16 @@ if ($isSuperAdmin) {
         "audits" => (int) $pdo->query("SELECT COUNT(*) FROM audits WHERE active = 1")->fetchColumn()
     ];
 } else {
+    // Kapsam tek kaynaktan: sistem admini atandigi sirketler, sirket kullanicisi
+    // kendi sirketi, denetci atandigi denetimlerin sirketleri.
+    $profileScope = qmsCompanyScope('companies.id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
     $assignedStmt = $pdo->prepare(
         "SELECT companies.id, companies.company_name, companies.city, companies.sector
          FROM companies
-         INNER JOIN company_admin_assignments ON company_admin_assignments.company_id = companies.id
-         WHERE company_admin_assignments.admin_user_id = :user_id
-           AND company_admin_assignments.active = 1
-           AND companies.active = 1
+         WHERE companies.active = 1" . $profileScope['sql'] . "
          ORDER BY companies.company_name"
     );
-    $assignedStmt->execute(["user_id" => $userId]);
+    $assignedStmt->execute($profileScope['params']);
     $assignedCompanies = $assignedStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 

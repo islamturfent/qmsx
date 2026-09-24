@@ -8,22 +8,20 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
+// Kapsam eklenirken sorgunun bir WHERE'i olmasi gerekir; "WHERE 1 = 1" bunu saglar.
 $sql = "SELECT auditors.id, auditors.first_name, auditors.last_name, auditors.email,
             auditors.telefon, auditors.role, auditors.active, companies.company_name
      FROM auditors
-     LEFT JOIN companies ON companies.id = auditors.company_id";
-$params = [];
-if (!$isSuperAdmin) {
-    $sql .= " WHERE EXISTS (SELECT 1 FROM company_admin_assignments
-                WHERE company_admin_assignments.company_id = auditors.company_id
-                  AND company_admin_assignments.admin_user_id = :user_id
-                  AND company_admin_assignments.active = 1)";
-    $params["user_id"] = $userId;
-}
+     LEFT JOIN companies ON companies.id = auditors.company_id
+     WHERE 1 = 1";
+$scope = qmsCompanyScope('auditors.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$sql .= $scope['sql'];
+$params = $scope['params'];
 $sql .= " ORDER BY auditors.id DESC";
 
 $auditorsStmt = $pdo->prepare($sql);
