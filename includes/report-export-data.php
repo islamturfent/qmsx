@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/risk-functions.php';
+require_once __DIR__ . '/supplier-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -127,6 +128,42 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $periodParams
     );
 
+    $suppliers = $fetchRows(
+        "SELECT suppliers.id, suppliers.company_id, suppliers.name, suppliers.supplier_code,
+                suppliers.category, suppliers.risk_class, suppliers.status, suppliers.approved_date,
+                suppliers.created_at, companies.company_name
+         FROM suppliers INNER JOIN companies ON companies.id = suppliers.company_id
+         WHERE suppliers.active = 1 AND suppliers.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+
+    // Tedarikci puanlari degerlendirmelerden hesaplanir (kopya kolon yok).
+    $evaluationsBySupplier = [];
+    $supplierIds = array_map('intval', array_column($suppliers, 'id'));
+    if ($supplierIds !== []) {
+        $marks = implode(',', array_fill(0, count($supplierIds), '?'));
+        $evaluationStmt = $pdo->prepare(
+            "SELECT * FROM supplier_evaluations WHERE supplier_id IN ($marks)"
+        );
+        $evaluationStmt->execute($supplierIds);
+        foreach ($evaluationStmt->fetchAll(PDO::FETCH_ASSOC) as $evaluation) {
+            $evaluationsBySupplier[(int) $evaluation['supplier_id']][] = $evaluation;
+        }
+    }
+
+    $supplierSummaries = [];
+    $supplierScoreTotal = 0.0;
+    $supplierScoreCount = 0;
+    foreach ($suppliers as $supplier) {
+        $summary = qmsSupplierEvaluationSummary($evaluationsBySupplier[(int) $supplier['id']] ?? []);
+        $supplierSummaries[(int) $supplier['id']] = $summary;
+        if ($summary['average'] !== null) {
+            $supplierScoreTotal += $summary['average'];
+            $supplierScoreCount++;
+        }
+    }
+    $supplierAverageScore = $supplierScoreCount > 0 ? round($supplierScoreTotal / $supplierScoreCount, 1) : null;
+
     $closedNonconformities = array_filter(
         $nonconformities,
         static fn(array $item): bool => $item['status'] === 'closed'
@@ -176,6 +213,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'training_completion_rate' => count($trainings) > 0
             ? round((count($completedTrainings) / count($trainings)) * 100, 1)
             : 0,
+        'supplier_count' => count($suppliers),
+        'supplier_average_score' => $supplierAverageScore,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -219,6 +258,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'completed' => 0,
             'trainings' => 0,
             'trainings_completed' => 0,
+            'suppliers' => 0,
+            'suppliers_approved' => 0,
         ];
     }
     foreach ($audits as $item) {
@@ -247,6 +288,15 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $companyPerformance[(int) $item['company_id']]['trainings']++;
         if ($item['status'] === 'completed') {
             $companyPerformance[(int) $item['company_id']]['trainings_completed']++;
+        }
+    }
+    foreach ($suppliers as $item) {
+        if (!isset($companyPerformance[(int) $item['company_id']])) {
+            continue;
+        }
+        $companyPerformance[(int) $item['company_id']]['suppliers']++;
+        if ($item['status'] === 'approved') {
+            $companyPerformance[(int) $item['company_id']]['suppliers_approved']++;
         }
     }
 
@@ -330,6 +380,24 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $supplierStatusLabels = qmsSupplierStatusLabels();
+    $supplierRiskLabels = qmsSupplierRiskLabels();
+    $supplierList = [];
+    foreach ($suppliers as $item) {
+        $summary = $supplierSummaries[(int) $item['id']];
+        $supplierList[] = [
+            'company_name' => $item['company_name'],
+            'name' => $item['name'],
+            'supplier_code' => $item['supplier_code'],
+            'category' => $item['category'],
+            'risk_class' => $supplierRiskLabels[$item['risk_class']] ?? $item['risk_class'],
+            'status' => $supplierStatusLabels[$item['status']] ?? $item['status'],
+            'approved_date' => $item['approved_date'],
+            'score' => $summary['average'],
+            'last_evaluation' => $summary['latest_date'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -344,5 +412,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'action_list' => $actionList,
         'risk_list' => $riskList,
         'training_list' => $trainingList,
+        'supplier_list' => $supplierList,
     ];
 }

@@ -29,6 +29,8 @@ $metricLabels = [
     'review_due_documents' => 'Gözden Geçirilecek Dokümanlar',
     'training_count' => 'Eğitim Sayısı',
     'training_completion_rate' => 'Eğitim Tamamlama (%)',
+    'supplier_count' => 'Tedarikçi Sayısı',
+    'supplier_average_score' => 'Tedarikçi Ortalama Puanı',
 ];
 
 $summaryRows = [
@@ -76,6 +78,8 @@ $companyRows = [[
     ['value' => 'Tamamlama (%)', 'style' => 2],
     ['value' => 'Eğitimler', 'style' => 2],
     ['value' => 'Tamamlanan Eğitim', 'style' => 2],
+    ['value' => 'Tedarikçiler', 'style' => 2],
+    ['value' => 'Onaylı Tedarikçi', 'style' => 2],
 ]];
 foreach ($report['company_performance'] as $row) {
     $rate = $row['actions'] > 0 ? round(($row['completed'] / $row['actions']) * 100, 1) : 0;
@@ -88,6 +92,8 @@ foreach ($report['company_performance'] as $row) {
         ['value' => $rate, 'style' => 3],
         ['value' => $row['trainings'], 'style' => 3],
         ['value' => $row['trainings_completed'], 'style' => 3],
+        ['value' => $row['suppliers'], 'style' => 3],
+        ['value' => $row['suppliers_approved'], 'style' => 3],
     ];
 }
 
@@ -212,6 +218,31 @@ foreach ($report['training_list'] as $row) {
     ];
 }
 
+$supplierRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Tedarikçi', 'style' => 2],
+    ['value' => 'Kod', 'style' => 2],
+    ['value' => 'Kategori', 'style' => 2],
+    ['value' => 'Risk', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Onay Tarihi', 'style' => 2],
+    ['value' => 'Puan', 'style' => 2],
+    ['value' => 'Son Değerlendirme', 'style' => 2],
+]];
+foreach ($report['supplier_list'] as $row) {
+    $supplierRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['name'], 'style' => 3],
+        ['value' => $row['supplier_code'] ?: '-', 'style' => 3],
+        ['value' => $row['category'] ?: '-', 'style' => 3],
+        ['value' => $row['risk_class'], 'style' => 3],
+        ['value' => $row['status'], 'style' => 3],
+        ['value' => $row['approved_date'] ?: '-', 'style' => 3],
+        ['value' => $row['score'] ?? '-', 'style' => 3],
+        ['value' => $row['last_evaluation'] ?: '-', 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -220,13 +251,14 @@ if ($temporaryPath === false) {
 try {
     createXlsxFile([
         ['name' => 'Yönetici Özeti', 'xml' => xlsxWorksheet($summaryRows, [38, 24], ['A1:B1'])],
-        ['name' => 'Şirket Performansı', 'xml' => xlsxWorksheet($companyRows, [32, 14, 18, 22, 14, 18, 16, 18])],
+        ['name' => 'Şirket Performansı', 'xml' => xlsxWorksheet($companyRows, [32, 14, 18, 22, 14, 18, 16, 18, 16, 18])],
         ['name' => 'Aylık Trend', 'xml' => xlsxWorksheet($trendRows, [16, 16, 20])],
         ['name' => 'Denetimler', 'xml' => xlsxWorksheet($auditRows, [28, 34, 18, 16, 18])],
         ['name' => 'Uygunsuzluklar', 'xml' => xlsxWorksheet($nonconformityRows, [28, 34, 16, 18, 22, 16])],
         ['name' => 'Düzeltici Faaliyetler', 'xml' => xlsxWorksheet($actionRows, [28, 40, 22, 18, 16, 18])],
         ['name' => 'Risk Kaydı', 'xml' => xlsxWorksheet($riskRows, [28, 34, 20, 14, 14, 16, 18, 16])],
         ['name' => 'Eğitimler', 'xml' => xlsxWorksheet($trainingRows, [28, 34, 20, 24, 16, 16, 16, 14])],
+        ['name' => 'Tedarikçiler', 'xml' => xlsxWorksheet($supplierRows, [28, 30, 14, 20, 12, 14, 16, 12, 18])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

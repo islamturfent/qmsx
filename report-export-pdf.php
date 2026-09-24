@@ -37,10 +37,11 @@ foreach ($report['company_performance'] as $row) {
     $rate = $row['actions'] > 0 ? round(($row['completed'] / $row['actions']) * 100, 1) : 0;
     $companyRows .= '<tr><td>' . $escape($row['name']) . '</td><td>' . $row['audits'] . '</td><td>'
         . $row['nonconformities'] . '</td><td>' . $row['actions'] . '</td><td>' . $rate . '%</td><td>'
-        . $row['trainings'] . '</td><td>' . $row['trainings_completed'] . '</td></tr>';
+        . $row['trainings'] . '</td><td>' . $row['trainings_completed'] . '</td><td>'
+        . $row['suppliers'] . '</td><td>' . $row['suppliers_approved'] . '</td></tr>';
 }
 if ($companyRows === '') {
-    $companyRows = '<tr><td colspan="7">Seçilen dönem için şirket verisi bulunmuyor.</td></tr>';
+    $companyRows = '<tr><td colspan="9">Seçilen dönem için şirket verisi bulunmuyor.</td></tr>';
 }
 
 $statusRows = '';
@@ -103,6 +104,15 @@ foreach ($report['training_list'] as $row) {
         . $row['participants_completed'] . '/' . $row['participants'] . '</td></tr>';
 }
 
+$supplierRows = '';
+foreach ($report['supplier_list'] as $row) {
+    $supplierRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['name']) . '</td><td>'
+        . $escape($row['supplier_code'] ?: '-') . '</td><td>' . $escape($row['category'] ?: '-') . '</td><td>'
+        . $escape($row['risk_class']) . '</td><td>' . $escape($row['status']) . '</td><td>'
+        . $escape($row['approved_date'] ?: '-') . '</td><td>' . $escape((string) ($row['score'] ?? '-')) . '</td><td>'
+        . $escape($row['last_evaluation'] ?: '-') . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -144,9 +154,12 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Eğitim Sayısı</span><strong>' . $metrics['training_count'] . '</strong></td>
       <td class="metric"><span>Eğitim Tamamlama</span><strong>' . $metrics['training_completion_rate'] . '%</strong></td>
+      <td class="metric"><span>Tedarikçi Sayısı</span><strong>' . $metrics['supplier_count'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Tedarikçi Ortalama Puanı</span><strong>' . ($metrics['supplier_average_score'] ?? '-') . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
-    <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th></tr></thead><tbody>'
+    <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th></tr></thead><tbody>'
     . $companyRows . '</tbody></table>
     <table class="two-column"><tr><td><h2>Aylık Trend</h2><table class="data"><thead><tr><th>Ay</th><th>Denetim</th><th>Uygunsuzluk</th></tr></thead><tbody>'
     . $trendRows . '</tbody></table></td><td><h2>Doküman Durumları</h2><table class="data"><thead><tr><th>Durum</th><th>Adet</th></tr></thead><tbody>'
@@ -156,6 +169,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Düzeltici Faaliyetler', '<th>Şirket</th><th>Faaliyet</th><th>Sorumlu</th><th>Durum</th><th>Termin</th><th>Kapanış</th>', $actionRows)
     . $detailSection('Risk Kaydı', '<th>Şirket</th><th>Risk</th><th>Kategori</th><th>Başlangıç</th><th>Kalan</th><th>Seviye</th><th>Durum</th><th>Termin</th>', $riskRows)
     . $detailSection('Eğitimler', '<th>Şirket</th><th>Eğitim</th><th>Kategori</th><th>Sağlayıcı</th><th>Durum</th><th>Planlanan</th><th>Tamamlanma</th><th>Katılımcı</th>', $trainingRows)
+    . $detailSection('Tedarikçiler', '<th>Şirket</th><th>Tedarikçi</th><th>Kod</th><th>Kategori</th><th>Risk</th><th>Durum</th><th>Onay Tarihi</th><th>Puan</th><th>Son Değerlendirme</th>', $supplierRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
