@@ -123,6 +123,13 @@ foreach ($report['complaint_list'] as $row) {
         . $escape($row['closed_date'] ?: '-') . '</td><td>' . $escape($row['linked_nonconformity']) . '</td></tr>';
 }
 
+$performanceRows = '';
+foreach ($report['performance_target_list'] as $row) {
+    $performanceRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['kpi']) . '</td><td>'
+        . $escape((string) $row['target_value']) . '</td><td>' . $escape((string) $row['target_year']) . '</td><td>'
+        . $escape($row['note'] ?: '-') . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -184,6 +191,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Eğitimler', '<th>Şirket</th><th>Eğitim</th><th>Kategori</th><th>Sağlayıcı</th><th>Durum</th><th>Planlanan</th><th>Tamamlanma</th><th>Katılımcı</th>', $trainingRows)
     . $detailSection('Tedarikçiler', '<th>Şirket</th><th>Tedarikçi</th><th>Kod</th><th>Kategori</th><th>Risk</th><th>Durum</th><th>Onay Tarihi</th><th>Puan</th><th>Son Değerlendirme</th>', $supplierRows)
     . $detailSection('Şikayetler', '<th>Şirket</th><th>Numara</th><th>Konu</th><th>Kaynak</th><th>Önem</th><th>Durum</th><th>Alınma</th><th>Termin</th><th>Kapanış</th><th>Uygunsuzluk</th>', $complaintRows)
+    . $detailSection('Performans Hedefleri', '<th>Şirket</th><th>KPI</th><th>Hedef</th><th>Yıl</th><th>Not</th>', $performanceRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

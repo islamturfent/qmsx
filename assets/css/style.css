@@ -2717,3 +2717,65 @@ body.modal-open {
         border-radius: 0;
     }
 }
+
+/* Performans yonetimi */
+.performance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.performance-card {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+}
+
+.performance-card .dashboard-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.performance-card .dashboard-card-icon {
+    margin-bottom: 6px;
+}
+
+.performance-target-value {
+    color: var(--muted-color);
+    font-size: 12px;
+}
+
+.performance-target-form {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.performance-target-form .form-field {
+    flex: 1;
+    margin: 0;
+}
+
+.status-pill.on-track {
+    background: var(--success-soft);
+    color: var(--success-soft-text) !important;
+}
+
+.status-pill.off-track {
+    background: var(--error-soft);
+    color: var(--error-soft-text) !important;
+}
+
+.status-pill.no-target {
+    background: var(--neutral-soft);
+    color: var(--neutral-soft-text) !important;
+}
+
+.form-message.info {
+    background: var(--brand-soft);
+    color: var(--brand-soft-text);
+    border: 1px solid var(--border-subtle);
+}

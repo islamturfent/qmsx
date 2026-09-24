@@ -6,6 +6,7 @@ require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/risk-functions.php';
 require_once __DIR__ . '/supplier-functions.php';
 require_once __DIR__ . '/complaint-functions.php';
+require_once __DIR__ . '/performance-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -173,6 +174,18 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
          FROM complaints INNER JOIN companies ON companies.id = complaints.company_id
          WHERE complaints.active = 1 AND complaints.created_at BETWEEN ? AND ?" . $scopeSql,
         $periodParams
+    );
+
+    $performanceYear = (int) substr($endDate, 0, 4);
+    $performanceTargets = $fetchRows(
+        "SELECT performance_targets.id, companies.company_name,
+                performance_targets.kpi_key, performance_targets.target_value,
+                performance_targets.target_year, performance_targets.note
+         FROM performance_targets
+         INNER JOIN companies ON companies.id = performance_targets.company_id
+         WHERE performance_targets.target_year = ?" . $scopeSql . "
+         ORDER BY companies.company_name, performance_targets.kpi_key",
+        array_merge([$performanceYear], $scopeParams)
     );
 
     $openComplaints = array_filter(
@@ -446,6 +459,18 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $performanceKpiLabels = qmsPerformanceKpiLabels();
+    $performanceTargetList = [];
+    foreach ($performanceTargets as $item) {
+        $performanceTargetList[] = [
+            'company_name' => $item['company_name'],
+            'kpi' => $performanceKpiLabels[$item['kpi_key']] ?? $item['kpi_key'],
+            'target_value' => $item['target_value'],
+            'target_year' => $item['target_year'],
+            'note' => $item['note'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -462,5 +487,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'training_list' => $trainingList,
         'supplier_list' => $supplierList,
         'complaint_list' => $complaintList,
+        'performance_target_list' => $performanceTargetList,
     ];
 }

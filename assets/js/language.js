@@ -864,6 +864,25 @@ Object.assign(translations.en, {
     complaintOpenKpi: "Open Complaints", complaintsLegend: "Complaints"
 });
 
+Object.assign(translations.tr, {
+    performanceTitle: "Performans Yönetimi", performanceText: "Şirket KPI hedeflerini belirleyin ve gerçekleşmeyi izleyin.",
+    performanceKicker: "Hedef Takibi", performanceYearLabel: "Yıl",
+    performanceNoCompanyText: "Hedef görüntülemek için yukarıdan bir şirket seçin.",
+    performanceTargetLabel: "Hedef", performanceOnTrackLabel: "Hedefte", performanceOffTrackLabel: "Hedef Dışı",
+    performanceNoTargetLabel: "Hedef Yok", saveTargetButton: "Kaydet",
+    performanceHelpText: "Gerçekleşen değerler rapor dönemine göre hesaplanır; hedefler yalnızca bu ekranda düzenlenir.",
+    performanceTargetsLegend: "Hedefler"
+});
+Object.assign(translations.en, {
+    performanceTitle: "Performance Management", performanceText: "Set company KPI targets and track progress.",
+    performanceKicker: "Target Tracking", performanceYearLabel: "Year",
+    performanceNoCompanyText: "Select a company above to view targets.",
+    performanceTargetLabel: "Target", performanceOnTrackLabel: "On Track", performanceOffTrackLabel: "Off Track",
+    performanceNoTargetLabel: "No Target", saveTargetButton: "Save",
+    performanceHelpText: "Actual values are taken from the report period; targets are edited only on this screen.",
+    performanceTargetsLegend: "Targets"
+});
+
 const languageToggle = document.getElementById("languageToggle");
 
 let currentLanguage = localStorage.getItem("qms-language") || "tr";
