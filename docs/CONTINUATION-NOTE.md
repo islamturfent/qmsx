@@ -124,6 +124,93 @@ carried over from earlier assumptions.
   breaks offline mode entirely.
 - PWA paths are relative, so the app is no longer tied to a folder name.
 
+## Roles and tenant access model
+
+Four roles are now real end to end. Until this work only `super_admin` and
+`system_admin` could sign in; `auditor` and `company_user` existed as names only.
+
+| Role | Sees | Notes |
+| --- | --- | --- |
+| `super_admin` | Everything, unrestricted | Manages companies, accounts and assignments |
+| `system_admin` | Only assigned companies (`company_admin_assignments`) | Operational modules |
+| `company_user` | Only their own company (`users.company_id`) | Limited write access, no admin screens |
+| `auditor` | Only the audits assigned to them (`audit_auditors`) | Lands on `my-audits.php`; operations and reports hidden |
+
+### Schema added for this
+
+- `users.company_id` - the company a company user belongs to
+- `auditors.user_id` - links an auditor directory row to a login account
+- `audit_auditors` - many-to-many, an audit can have **several** auditors. An
+  earlier single column (`audits.auditor_id`) was dropped again because nothing
+  used it and two ways to link auditors to audits would drift apart.
+- Migrations `scripts/migrate-roles.php` and `scripts/migrate-audit-auditors.php`
+  are idempotent. Existing rows were never rewritten (the only backfill was
+  splitting `full_name` into first/last on the profile migration, and
+  `full_name` was preserved).
+
+### Central access layer - `includes/access.php`
+
+**This is the single source of truth for visibility.** Do not write
+`company_admin_assignments` EXISTS clauses inside pages any more.
+
+- `qmsVisibleCompanyIds()` - `null` means unrestricted (super admin), `[]` means
+  nothing, otherwise the allowed company ids
+- `qmsCompanyScope($column, $ids)` - ready-made SQL fragment plus params
+- `qmsAuditRecordScope()` - auditors are scoped by **audit**, not by company, so
+  one auditor cannot open a different audit in the same company by changing the id
+- `qmsVisibleAuditIds()`, `qmsCanAccessCompany()`, `qmsScopedRole()`,
+  `qmsLandingPage()`
+
+Pages and helpers migrated: `dashboard`, `reports`, `report-export-data`,
+`risk-functions` (`qmsRiskScope`, `qmsRiskFind`), `document-editor`
+(`qmsEditorDocument`, which also covers `document-edit` and `document-office`),
+the documents chain, the actions/CAPA chain, `auditors`, `auditor-create`,
+`company-detail`, `profile` and `nonconformity-detail`.
+
+The remaining `company_admin_assignments` queries are deliberate:
+- `document-detail.php` - the approver list. That is *approval eligibility*, not
+  access: only system admins assigned to the company (and super admins) may
+  approve. Kept as its own query, with a comment in the code.
+- `super-admin-assignments.php` - the super admin screen that manages assignments.
+- `includes/access.php` - the layer itself.
+
+### Account creation
+
+`super-admin-admins.php` creates all three non-super roles. Creating an auditor
+account also creates the linked `auditors` row in the same transaction, so the
+account is immediately assignable to audits. The password minimum was raised from
+6 to 8 characters to match the profile screen.
+
+### Audit assignment
+
+Multiple auditors per audit. The assignment is edited on the audit detail page;
+the auditor role cannot change its own assignment (the form renders only for
+management roles, others see a read-only list). Auditors can also be chosen while
+creating an audit from the company screen. Only auditors of that company can be
+assigned - posted ids are intersected with the allowed list.
+
+### Menu and landing
+
+- The sidebar is role aware: auditors see only "Denetimlerim" and notifications;
+  company users lose the auditor directory, the approval inbox and all admin
+  sections.
+- `qmsLandingPage()` sends auditors to `my-audits.php` after login, and
+  `dashboard.php` redirects them there too.
+
+### Verification habit that paid off
+
+Every step was proved behaviourally, not just by reading the SQL: a company user
+sees their own company's records and cannot open another company's; an auditor
+can open their assigned audit and cannot open an unassigned one in the same
+company; super admin stays unrestricted. Temporary fixtures are created inside a
+transaction and rolled back, so no rows are left behind.
+
+Two real defects were caught this way:
+- `actions.php` - a `?? []` wrapper added while migrating would have turned
+  "unrestricted" into "sees nothing" for super admin.
+- `auditors.php` - the query had no `WHERE`, so appending a scope clause produced
+  invalid SQL; fixed with `WHERE 1 = 1`.
+
 ## Office integration
 
 - User explicitly deferred Collabora setup and will configure the connection
