@@ -27,6 +27,8 @@ $metricLabels = [
     'overdue_actions' => 'Geciken Aksiyonlar',
     'average_close_days' => 'Ortalama Kapanma (gün)',
     'review_due_documents' => 'Gözden Geçirilecek Dokümanlar',
+    'training_count' => 'Eğitim Sayısı',
+    'training_completion_rate' => 'Eğitim Tamamlama (%)',
 ];
 
 $summaryRows = [
@@ -72,6 +74,8 @@ $companyRows = [[
     ['value' => 'Düzeltici Faaliyetler', 'style' => 2],
     ['value' => 'Tamamlanan', 'style' => 2],
     ['value' => 'Tamamlama (%)', 'style' => 2],
+    ['value' => 'Eğitimler', 'style' => 2],
+    ['value' => 'Tamamlanan Eğitim', 'style' => 2],
 ]];
 foreach ($report['company_performance'] as $row) {
     $rate = $row['actions'] > 0 ? round(($row['completed'] / $row['actions']) * 100, 1) : 0;
@@ -82,6 +86,8 @@ foreach ($report['company_performance'] as $row) {
         ['value' => $row['actions'], 'style' => 3],
         ['value' => $row['completed'], 'style' => 3],
         ['value' => $rate, 'style' => 3],
+        ['value' => $row['trainings'], 'style' => 3],
+        ['value' => $row['trainings_completed'], 'style' => 3],
     ];
 }
 
@@ -103,6 +109,7 @@ $severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'K
 $nonconformityStatusLabels = ['open' => 'Açık', 'in_progress' => 'Devam Ediyor', 'verification' => 'Doğrulama', 'closed' => 'Kapalı'];
 $actionStatusLabels = ['planned' => 'Planlandı', 'in_progress' => 'Çalışılıyor', 'verification' => 'Doğrulama', 'completed' => 'Tamamlandı', 'closed' => 'Kapalı'];
 $riskStatusLabels = ['open' => 'Açık', 'monitoring' => 'İzlemede', 'treated' => 'Önlem Uygulandı', 'closed' => 'Kapalı'];
+$trainingStatusLabels = ['planned' => 'Planlandı', 'in_progress' => 'Devam Ediyor', 'completed' => 'Tamamlandı', 'cancelled' => 'İptal Edildi'];
 
 $auditRows = [[
     ['value' => 'Şirket', 'style' => 2],
@@ -182,6 +189,29 @@ foreach ($report['risk_list'] as $row) {
     ];
 }
 
+$trainingRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Eğitim', 'style' => 2],
+    ['value' => 'Kategori', 'style' => 2],
+    ['value' => 'Sağlayıcı', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Planlanan', 'style' => 2],
+    ['value' => 'Tamamlanma', 'style' => 2],
+    ['value' => 'Katılımcı', 'style' => 2],
+]];
+foreach ($report['training_list'] as $row) {
+    $trainingRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => $row['category'] ?: '-', 'style' => 3],
+        ['value' => $row['provider'] ?: '-', 'style' => 3],
+        ['value' => $trainingStatusLabels[$row['status']] ?? $row['status'], 'style' => 3],
+        ['value' => $row['planned_date'] ?: '-', 'style' => 3],
+        ['value' => $row['completed_date'] ?: '-', 'style' => 3],
+        ['value' => $row['participants_completed'] . '/' . $row['participants'], 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -190,12 +220,13 @@ if ($temporaryPath === false) {
 try {
     createXlsxFile([
         ['name' => 'Yönetici Özeti', 'xml' => xlsxWorksheet($summaryRows, [38, 24], ['A1:B1'])],
-        ['name' => 'Şirket Performansı', 'xml' => xlsxWorksheet($companyRows, [32, 14, 18, 22, 14, 18])],
+        ['name' => 'Şirket Performansı', 'xml' => xlsxWorksheet($companyRows, [32, 14, 18, 22, 14, 18, 16, 18])],
         ['name' => 'Aylık Trend', 'xml' => xlsxWorksheet($trendRows, [16, 16, 20])],
         ['name' => 'Denetimler', 'xml' => xlsxWorksheet($auditRows, [28, 34, 18, 16, 18])],
         ['name' => 'Uygunsuzluklar', 'xml' => xlsxWorksheet($nonconformityRows, [28, 34, 16, 18, 22, 16])],
         ['name' => 'Düzeltici Faaliyetler', 'xml' => xlsxWorksheet($actionRows, [28, 40, 22, 18, 16, 18])],
         ['name' => 'Risk Kaydı', 'xml' => xlsxWorksheet($riskRows, [28, 34, 20, 14, 14, 16, 18, 16])],
+        ['name' => 'Eğitimler', 'xml' => xlsxWorksheet($trainingRows, [28, 34, 20, 24, 16, 16, 16, 14])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

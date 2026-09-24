@@ -658,6 +658,61 @@ Object.assign(translations.en, {
     riskMatrixHelp: "Rows are impact; columns are likelihood.", riskHistoryTitle: "Tracking History", riskHistoryText: "Status and residual risk changes.",
     allCompaniesOption: "All companies"
 });
+Object.assign(translations.tr, {
+    trainingManagementTitle: "Eğitim Yönetimi", trainingManagementText: "Eğitimleri planlayın, katılımcıları ve tamamlanma durumunu izleyin.",
+    trainingRegisterKicker: "Eğitim Kayıtları", newTrainingButton: "Yeni Eğitim", newTrainingTitle: "Yeni Eğitim",
+    newTrainingText: "Eğitimi planlayın; katılımcıları kaydı oluşturduktan sonra ekleyin.", trainingCreatedMessage: "Eğitim kaydı oluşturuldu.",
+    trainingUpdatedMessage: "Eğitim kaydı güncellendi.", trainingTotalLabel: "Toplam Eğitim", trainingPlannedLabel: "Planlanan",
+    trainingInProgressLabel: "Devam Eden", trainingCompletedLabel: "Tamamlanan", trainingStatusLabel: "Durum",
+    trainingStatusPlannedLabel: "Planlandı", trainingStatusInProgressLabel: "Devam Ediyor", trainingStatusCompletedLabel: "Tamamlandı",
+    trainingStatusCancelledLabel: "İptal Edildi", noTrainingsText: "Filtrelere uygun eğitim bulunamadı.",
+    trainingParticipantsLabel: "katılımcı", trainingTitleLabel: "Eğitim Başlığı", trainingCategoryLabel: "Kategori",
+    trainingProviderLabel: "Eğitim Sağlayıcı", trainingTrainerLabel: "Eğitmen", trainingDurationLabel: "Süre (saat)",
+    trainingDescriptionLabel: "Açıklama", saveTrainingButton: "Eğitimi Kaydet", backToTrainingsButton: "Eğitimlere Dön",
+    trainingDetailTitle: "Eğitim Detayı", trainingWorkspaceKicker: "Eğitim Çalışma Alanı", trainingCompletionLabel: "Tamamlanma",
+    trainingCompletedDateLabel: "Tamamlanma Tarihi", trainingCompletedDateHelp: "Durum \"Tamamlandı\" olduğunda otomatik yazılır.",
+    trainingParticipantsTitle: "Katılımcılar", trainingParticipantsText: "Eğitime atanan kullanıcılar, katılım durumu ve puanları.",
+    noTrainingParticipantsText: "Bu eğitime henüz katılımcı eklenmedi.", trainingParticipantStatusLabel: "Katılım Durumu",
+    trainingParticipantScoreLabel: "Puan (0–100)", trainingParticipantNoteLabel: "Not", saveParticipantButton: "Katılımcıyı Kaydet",
+    removeParticipantButton: "Kaldır", addParticipantTitle: "Katılımcı Ekle",
+    addParticipantText: "Katılımcılar şirketin sistem kullanıcılarıdır; eklenen kullanıcıya bildirim gider.",
+    participantUserLabel: "Kullanıcı", participantSelectOption: "Kullanıcı seçin", addParticipantButton: "Katılımcı Ekle",
+    participantAllAddedText: "Bu şirketteki tüm uygun kullanıcılar zaten katılımcı listesinde.",
+    noParticipantCandidatesText: "Bu şirkette katılımcı olabilecek kullanıcı bulunmuyor.",
+    trainingParticipantAssignedLabel: "Atandı", trainingParticipantAttendedLabel: "Katıldı", trainingParticipantCompletedLabel: "Tamamladı",
+    trainingParticipantAddedMessage: "Katılımcı eklendi.", trainingParticipantUpdatedMessage: "Katılımcı güncellendi.",
+    trainingParticipantRemovedMessage: "Katılımcı kaldırıldı.",
+    trainingNoCompanyText: "Eğitim eklemek için önce bir şirket gerekir. Şirket kaydınız yoksa yöneticinizle görüşün.",
+    allOption: "Tümü", trainingCompletionKpi: "Eğitim Tamamlama", trainingsLegend: "Eğitimler"
+});
+Object.assign(translations.en, {
+    trainingManagementTitle: "Training Management", trainingManagementText: "Plan trainings and track participants and their completion status.",
+    trainingRegisterKicker: "Training Records", newTrainingButton: "New Training", newTrainingTitle: "New Training",
+    newTrainingText: "Plan the training; add participants after saving the record.", trainingCreatedMessage: "Training record created.",
+    trainingUpdatedMessage: "Training record updated.", trainingTotalLabel: "Total Trainings", trainingPlannedLabel: "Planned",
+    trainingInProgressLabel: "In Progress", trainingCompletedLabel: "Completed", trainingStatusLabel: "Status",
+    trainingStatusPlannedLabel: "Planned", trainingStatusInProgressLabel: "In Progress", trainingStatusCompletedLabel: "Completed",
+    trainingStatusCancelledLabel: "Cancelled", noTrainingsText: "No trainings match the filters.",
+    trainingParticipantsLabel: "participants", trainingTitleLabel: "Training Title", trainingCategoryLabel: "Category",
+    trainingProviderLabel: "Provider", trainingTrainerLabel: "Trainer", trainingDurationLabel: "Duration (hours)",
+    trainingDescriptionLabel: "Description", saveTrainingButton: "Save Training", backToTrainingsButton: "Back to Trainings",
+    trainingDetailTitle: "Training Detail", trainingWorkspaceKicker: "Training Workspace", trainingCompletionLabel: "Completion",
+    trainingCompletedDateLabel: "Completion Date", trainingCompletedDateHelp: "Filled in automatically when the status becomes \"Completed\".",
+    trainingParticipantsTitle: "Participants", trainingParticipantsText: "Users assigned to the training, their attendance status and scores.",
+    noTrainingParticipantsText: "No participant has been added to this training yet.", trainingParticipantStatusLabel: "Attendance Status",
+    trainingParticipantScoreLabel: "Score (0–100)", trainingParticipantNoteLabel: "Note", saveParticipantButton: "Save Participant",
+    removeParticipantButton: "Remove", addParticipantTitle: "Add Participant",
+    addParticipantText: "Participants are the company's system users; the added user is notified.",
+    participantUserLabel: "User", participantSelectOption: "Select user", addParticipantButton: "Add Participant",
+    participantAllAddedText: "All eligible users of this company are already participants.",
+    noParticipantCandidatesText: "No eligible participant user exists for this company.",
+    trainingParticipantAssignedLabel: "Assigned", trainingParticipantAttendedLabel: "Attended", trainingParticipantCompletedLabel: "Completed",
+    trainingParticipantAddedMessage: "Participant added.", trainingParticipantUpdatedMessage: "Participant updated.",
+    trainingParticipantRemovedMessage: "Participant removed.",
+    trainingNoCompanyText: "A company is required before adding a training. If you have no company record, contact your administrator.",
+    allOption: "All", trainingCompletionKpi: "Training Completion", trainingsLegend: "Trainings"
+});
+
 const languageToggle = document.getElementById("languageToggle");
 
 let currentLanguage = localStorage.getItem("qms-language") || "tr";

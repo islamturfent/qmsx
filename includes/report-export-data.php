@@ -113,6 +113,19 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
          WHERE documents.active = 1 AND documents.status <> 'archived'" . $scopeSql,
         $scopeParams
     );
+    $trainings = $fetchRows(
+        "SELECT trainings.id, trainings.company_id, trainings.title, trainings.category,
+                trainings.provider, trainings.status, trainings.planned_date, trainings.completed_date,
+                trainings.created_at, companies.company_name,
+                (SELECT COUNT(*) FROM training_participants
+                  WHERE training_participants.training_id = trainings.id) AS participant_count,
+                (SELECT COUNT(*) FROM training_participants
+                  WHERE training_participants.training_id = trainings.id
+                    AND training_participants.status = 'completed') AS participant_completed
+         FROM trainings INNER JOIN companies ON companies.id = trainings.company_id
+         WHERE trainings.active = 1 AND trainings.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
 
     $closedNonconformities = array_filter(
         $nonconformities,
@@ -141,6 +154,11 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         static fn(array $item): bool => !empty($item['review_date']) && $item['review_date'] <= $reviewThreshold
     );
 
+    $completedTrainings = array_filter(
+        $trainings,
+        static fn(array $item): bool => $item['status'] === 'completed'
+    );
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -154,6 +172,10 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             ? round($totalCloseDays / count($closedNonconformities), 1)
             : 0,
         'review_due_documents' => count($reviewDue),
+        'training_count' => count($trainings),
+        'training_completion_rate' => count($trainings) > 0
+            ? round((count($completedTrainings) / count($trainings)) * 100, 1)
+            : 0,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -195,6 +217,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'nonconformities' => 0,
             'actions' => 0,
             'completed' => 0,
+            'trainings' => 0,
+            'trainings_completed' => 0,
         ];
     }
     foreach ($audits as $item) {
@@ -214,6 +238,15 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $companyPerformance[(int) $item['company_id']]['actions']++;
         if (in_array($item['status'], ['completed', 'closed'], true)) {
             $companyPerformance[(int) $item['company_id']]['completed']++;
+        }
+    }
+    foreach ($trainings as $item) {
+        if (!isset($companyPerformance[(int) $item['company_id']])) {
+            continue;
+        }
+        $companyPerformance[(int) $item['company_id']]['trainings']++;
+        if ($item['status'] === 'completed') {
+            $companyPerformance[(int) $item['company_id']]['trainings_completed']++;
         }
     }
 
@@ -282,6 +315,21 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $trainingList = [];
+    foreach ($trainings as $item) {
+        $trainingList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'category' => $item['category'],
+            'provider' => $item['provider'],
+            'status' => $item['status'],
+            'planned_date' => $item['planned_date'],
+            'completed_date' => $item['completed_date'],
+            'participants' => (int) $item['participant_count'],
+            'participants_completed' => (int) $item['participant_completed'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -295,5 +343,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'nonconformity_list' => $nonconformityList,
         'action_list' => $actionList,
         'risk_list' => $riskList,
+        'training_list' => $trainingList,
     ];
 }

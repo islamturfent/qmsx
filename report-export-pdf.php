@@ -36,10 +36,11 @@ $companyRows = '';
 foreach ($report['company_performance'] as $row) {
     $rate = $row['actions'] > 0 ? round(($row['completed'] / $row['actions']) * 100, 1) : 0;
     $companyRows .= '<tr><td>' . $escape($row['name']) . '</td><td>' . $row['audits'] . '</td><td>'
-        . $row['nonconformities'] . '</td><td>' . $row['actions'] . '</td><td>' . $rate . '%</td></tr>';
+        . $row['nonconformities'] . '</td><td>' . $row['actions'] . '</td><td>' . $rate . '%</td><td>'
+        . $row['trainings'] . '</td><td>' . $row['trainings_completed'] . '</td></tr>';
 }
 if ($companyRows === '') {
-    $companyRows = '<tr><td colspan="5">Seçilen dönem için şirket verisi bulunmuyor.</td></tr>';
+    $companyRows = '<tr><td colspan="7">Seçilen dönem için şirket verisi bulunmuyor.</td></tr>';
 }
 
 $statusRows = '';
@@ -58,7 +59,7 @@ $severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'K
 $statusLabels = [
     'open' => 'Açık', 'in_progress' => 'Devam Ediyor', 'verification' => 'Doğrulama',
     'closed' => 'Kapalı', 'planned' => 'Planlandı', 'monitoring' => 'İzlemede',
-    'treated' => 'Önlem Uygulandı', 'completed' => 'Tamamlandı',
+    'treated' => 'Önlem Uygulandı', 'completed' => 'Tamamlandı', 'cancelled' => 'İptal Edildi',
 ];
 
 $auditRows = '';
@@ -91,6 +92,15 @@ foreach ($report['risk_list'] as $row) {
         . $escape((string) ($row['residual_score'] ?? '-')) . '</td><td>' . $escape($row['level']) . '</td><td>'
         . $escape($statusLabels[$row['status']] ?? $row['status']) . '</td><td>'
         . $escape($row['due_date'] ?: '-') . '</td></tr>';
+}
+
+$trainingRows = '';
+foreach ($report['training_list'] as $row) {
+    $trainingRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['category'] ?: '-') . '</td><td>' . $escape($row['provider'] ?: '-') . '</td><td>'
+        . $escape($statusLabels[$row['status']] ?? $row['status']) . '</td><td>'
+        . $escape($row['planned_date'] ?: '-') . '</td><td>' . $escape($row['completed_date'] ?: '-') . '</td><td>'
+        . $row['participants_completed'] . '/' . $row['participants'] . '</td></tr>';
 }
 
 $detailSection = static function (string $title, string $headers, string $rows): string {
@@ -131,9 +141,12 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
       <td class="metric"><span>Geciken Aksiyonlar</span><strong>' . $metrics['overdue_actions'] . '</strong></td>
       <td class="metric"><span>Ortalama Kapanma</span><strong>' . $metrics['average_close_days'] . ' gün</strong></td>
       <td class="metric"><span>Gözden Geçirilecek Dokümanlar</span><strong>' . $metrics['review_due_documents'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Eğitim Sayısı</span><strong>' . $metrics['training_count'] . '</strong></td>
+      <td class="metric"><span>Eğitim Tamamlama</span><strong>' . $metrics['training_completion_rate'] . '%</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
-    <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th></tr></thead><tbody>'
+    <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th></tr></thead><tbody>'
     . $companyRows . '</tbody></table>
     <table class="two-column"><tr><td><h2>Aylık Trend</h2><table class="data"><thead><tr><th>Ay</th><th>Denetim</th><th>Uygunsuzluk</th></tr></thead><tbody>'
     . $trendRows . '</tbody></table></td><td><h2>Doküman Durumları</h2><table class="data"><thead><tr><th>Durum</th><th>Adet</th></tr></thead><tbody>'
@@ -142,6 +155,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Uygunsuzluklar', '<th>Şirket</th><th>Uygunsuzluk</th><th>Önem</th><th>Durum</th><th>Sorumlu</th><th>Termin</th>', $nonconformityRows)
     . $detailSection('Düzeltici Faaliyetler', '<th>Şirket</th><th>Faaliyet</th><th>Sorumlu</th><th>Durum</th><th>Termin</th><th>Kapanış</th>', $actionRows)
     . $detailSection('Risk Kaydı', '<th>Şirket</th><th>Risk</th><th>Kategori</th><th>Başlangıç</th><th>Kalan</th><th>Seviye</th><th>Durum</th><th>Termin</th>', $riskRows)
+    . $detailSection('Eğitimler', '<th>Şirket</th><th>Eğitim</th><th>Kategori</th><th>Sağlayıcı</th><th>Durum</th><th>Planlanan</th><th>Tamamlanma</th><th>Katılımcı</th>', $trainingRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
