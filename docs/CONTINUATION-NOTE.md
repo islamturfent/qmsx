@@ -82,10 +82,20 @@ carried over from earlier assumptions.
 - Verification habit worth repeating: for each page confirm that
   `count(<form)` equals `count(qmsCsrfField(`. A form that is missing its hidden
   field breaks silently, and a page-level check would not catch it.
-- **Still open**: `login.php` (login CSRF / session fixation - needs its own
-  design, not a blind copy of the pattern) and `wopi.php` (WOPI authenticates with
-  access tokens, so the CSRF model differs). Both are decisions, not mechanical
-  edits.
+- **Resolved (2026-09-24)**:
+  - `login.php` carries its own CSRF token in the login form and rotates the
+    session id on successful login (`session_regenerate_id(true)`). Login CSRF is
+    a real attack - a victim is forced into the attacker's account and then the
+    data they enter is readable by the attacker - and the id rotation closes
+    session fixation. Verified over real HTTP: a POST without a token and with a
+    wrong token both return 403, a correct token with a wrong password reaches
+    the auth logic, and a successful login rotates the session id while keeping
+    the user signed in.
+  - `wopi.php` deliberately has **no** CSRF token. It is a server-to-server
+    endpoint that never authenticates with browser cookies: it validates a 64-hex
+    access token, an IP allow-list and optionally WOPI proof keys, and sends
+    `Referrer-Policy: no-referrer`. There is no ambient cookie authority to ride
+    on, so CSRF does not apply - adding a token would break Collabora's requests.
 
 ### Tenant scoping
 
@@ -236,9 +246,12 @@ Two real defects were caught this way:
 
 - Excel/PDF export extension is the next module candidate; agree the scope with
   the user before implementing.
-- `login.php` and `wopi.php` still need a CSRF decision (see Security hardening).
-- Phase 2 (CAPA) is half done: evidence files are implemented, notifications for
-  corrective-action events are still missing.
+- Phase 2 (CAPA) is complete: evidence files and corrective-action notifications
+  are both implemented. `corrective_actions.responsible_user_id` supplies the
+  recipient, so a corrective action can now be assigned to a real account.
+  Notifications go to the responsible user (assignment, closure) and to the
+  company's assigned system admins (verification requested); a user never gets a
+  notification for their own action. Worth a UI pass to confirm it reads well.
 - Dead CSS classes with no markup: `admin-action-grid`, `admin-action-button`,
   `form-section`, `editor-toolbar`, `topbar-action-link`. Safe to remove after a
   re-check.

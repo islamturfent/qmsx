@@ -12,7 +12,18 @@ if (isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] === true) {
 
 $loginError = "";
 
+// Giris formu icin CSRF token'i. Bu, "giris CSRF" saldirisini engeller: saldirgan
+// kurbanin tarayicisini kendi hesabina giris yapmaya zorlayip sonra kurbanin
+// girdigi verileri okuyamaz.
+$_SESSION["qms_login_csrf"] ??= bin2hex(random_bytes(32));
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $expectedLoginToken = (string) ($_SESSION["qms_login_csrf"] ?? "");
+    if ($expectedLoginToken === "" || !hash_equals($expectedLoginToken, (string) ($_POST["csrf"] ?? ""))) {
+        http_response_code(403);
+        exit("Geçersiz istek.");
+    }
+
     $username = trim($_POST["username"] ?? "");
     $password = trim($_POST["password"] ?? "");
 
@@ -26,6 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user["password_hash"])) {
+        // Oturum sabitlemeyi onlemek icin giris aninda oturum kimligi yenilenir
+        // (oturum verisi korunur, yalnizca id degisir).
+        session_regenerate_id(true);
+
         $_SESSION["qms_logged_in"] = true;
         $_SESSION["qms_user_id"] = (int) $user["id"];
         $_SESSION["qms_username"] = $user["username"];
@@ -107,6 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php endif; ?>
 
             <form class="login-form" method="post" action="login.php">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars((string) $_SESSION["qms_login_csrf"], ENT_QUOTES, "UTF-8") ?>">
                 <label class="form-field">
                     <span data-i18n="usernameLabel">Kullanıcı Adı</span>
                     <input type="text" name="username" autocomplete="username" required>
