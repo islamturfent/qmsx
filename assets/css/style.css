@@ -2963,6 +2963,91 @@ body.modal-open {
     text-overflow: ellipsis;
 }
 
+/* ----------------------------------------------------------------------------
+   Denetim raporu yuzeyi
+   ---------------------------------------------------------------------------- */
+.page-heading-actions-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.report-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.success-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 8px;
+    border: 1px solid var(--success-600);
+    background: var(--success-600);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.success-button:hover {
+    background: var(--success-700);
+    border-color: var(--success-700);
+}
+
+.success-button:focus-visible {
+    outline: 2px solid var(--success-500);
+    outline-offset: 2px;
+}
+
+.page-section-headline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.page-section-headline strong {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.report-stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.report-stat-row > div {
+    background: var(--gray-50);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.report-stat-row span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted-color);
+    margin-bottom: 4px;
+}
+
+.report-stat-row strong {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
 @media (max-width: 720px) {
     .trend-strip {
         gap: 4px;

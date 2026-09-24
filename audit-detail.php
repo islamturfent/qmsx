@@ -294,7 +294,10 @@ $resultLabels = [
                         · <?= htmlspecialchars($audit["planned_date"] ?: "-", ENT_QUOTES, "UTF-8") ?>
                     </p>
                 </div>
-                <a class="secondary-button" href="company-detail.php?id=<?= (int) $audit["company_id"] ?>" data-i18n="backToCompanyButton">Şirkete Dön</a>
+                <div class="page-heading-actions-buttons">
+                    <a class="secondary-button" href="audit-report.php?id=<?= (int) $audit["id"] ?>" data-i18n="openAuditReportButton">Denetim Raporu</a>
+                    <a class="secondary-button" href="company-detail.php?id=<?= (int) $audit["company_id"] ?>" data-i18n="backToCompanyButton">Şirkete Dön</a>
+                </div>
             </div>
         </section>
 
