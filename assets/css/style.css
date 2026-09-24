@@ -264,17 +264,6 @@ textarea {
     text-decoration: none;
 }
 
-.topbar-action-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-}
-
-.topbar-action-link:hover {
-    text-decoration: none;
-}
-
 .notification-bell {
     position: relative;
     display: inline-flex;
@@ -326,7 +315,8 @@ textarea {
     justify-content: center;
     border: 2px solid var(--surface-color);
     border-radius: 999px;
-    background: var(--error-500);
+    /* TailAdmin bildirim gostergesi bg-orange-400 */
+    background: var(--orange-500);
     color: #ffffff;
     padding: 0 4px;
     font-size: 10px;
@@ -439,12 +429,13 @@ body.has-sidebar .page-container.narrow-page {
 .filter-form input,
 .filter-form select {
     width: 100%;
-    min-height: 42px;
+    min-height: 44px;
     border: 1px solid var(--border-control);
     border-radius: var(--radius-control);
     background: var(--control-bg-color);
     color: var(--text-color);
-    padding: 0 12px;
+    padding: 0 16px;
+    box-shadow: var(--shadow-theme-xs);
     outline: none;
 }
 
@@ -1023,22 +1014,26 @@ body.has-sidebar .page-container.narrow-page {
     border-collapse: collapse;
 }
 
+/* TailAdmin tablo: th px-5 py-3 text-theme-xs font-medium text-gray-500
+   (buyuk harf yok, arka plan yok), td px-5 py-4 text-theme-sm. */
 .report-table th,
 .report-table td {
     border-bottom: 1px solid var(--border-row);
-    padding: 14px 20px;
-    font-size: 14px;
     text-align: left;
 }
 
 .report-table th {
-    background: var(--surface-hover);
-    color: var(--muted-color);
+    color: var(--gray-500);
+    padding: 12px 20px;
     font-size: 12px;
     font-weight: 500;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
     white-space: nowrap;
+}
+
+.report-table td {
+    color: var(--text-body);
+    padding: 16px 20px;
+    font-size: 14px;
 }
 
 .report-table tbody tr:hover {
@@ -1148,7 +1143,8 @@ body.has-sidebar {
     overflow: hidden;
     border-right: 1px solid var(--border-subtle);
     background: var(--surface-color);
-    padding: 20px;
+    /* TailAdmin: w-72.5 (290px) px-5 - dikey dolgu yok */
+    padding: 0 20px;
     transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
@@ -1157,8 +1153,8 @@ body.has-sidebar {
     flex-shrink: 0;
     align-items: center;
     gap: 12px;
-    min-height: 56px;
-    margin: 0 4px 20px;
+    /* TailAdmin sidebar-header: pt-8 pb-7 (32px / 28px) */
+    padding: 32px 4px 28px;
     color: var(--text-color);
     text-decoration: none;
 }
@@ -1228,11 +1224,13 @@ body.has-sidebar {
     flex-shrink: 0;
     align-items: center;
     gap: 12px;
-    min-height: 42px;
+    /* TailAdmin menu-item: rounded-lg px-3 py-2 text-theme-sm font-medium.
+       20px ikon + 8px dikey dolgu = 40px yukseklik. */
+    min-height: 40px;
     border: 0;
     border-radius: 8px;
     color: var(--text-body);
-    padding: 10px 12px;
+    padding: 8px 12px;
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
@@ -1262,8 +1260,17 @@ body.has-sidebar {
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    color: currentColor;
+    /* TailAdmin menu-item-icon: text-gray-500, aktifken text-brand-500 */
+    color: var(--gray-500);
     font-size: 16px;
+}
+
+.sidebar-link:hover .sidebar-link-icon {
+    color: var(--gray-700);
+}
+
+.sidebar-link.active .sidebar-link-icon {
+    color: var(--brand-500);
 }
 
 .sidebar-link-icon svg {
@@ -1339,9 +1346,9 @@ body.has-sidebar {
 
 .topbar-inner {
     max-width: 1200px;
-    min-height: 72px;
     margin: 0 auto;
-    padding: 12px 20px;
+    /* TailAdmin header: lg:py-4 xl:px-6 -> 16px 24px; yukseklik icerige bagli */
+    padding: 16px 24px;
     gap: 16px;
 
     display: flex;
@@ -1658,12 +1665,14 @@ body {
 .form-field select,
 .form-field textarea {
     width: 100%;
-    min-height: 42px;
+    /* TailAdmin InputField: h-11 (44px) rounded-lg px-4 py-2.5 text-sm shadow-theme-xs */
+    min-height: 44px;
     border: 1px solid var(--border-control);
     border-radius: var(--radius-control);
     background: var(--control-bg-color);
     color: var(--text-color);
-    padding: 10px 12px;
+    padding: 10px 16px;
+    box-shadow: var(--shadow-theme-xs);
     outline: none;
     transition:
         border-color 0.15s ease,
@@ -1930,24 +1939,6 @@ body {
     margin-top: 24px;
 }
 
-.form-section {
-    margin-top: 24px;
-    background: var(--surface-color);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--border-radius);
-    padding: 24px;
-    box-shadow: var(--shadow-theme-xs);
-}
-
-.super-admin-section {
-    margin-top: 24px;
-    background: var(--surface-color);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--border-radius);
-    padding: 24px;
-    box-shadow: var(--shadow-theme-xs);
-}
-
 .section-heading {
     display: flex;
     align-items: flex-start;
@@ -1998,47 +1989,6 @@ body {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-}
-
-.admin-action-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-}
-
-.admin-action-button {
-    min-height: 96px;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--border-radius);
-    background: var(--surface-color);
-    color: var(--text-color);
-    cursor: pointer;
-    padding: 20px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 12px;
-    text-decoration: none;
-    box-shadow: var(--shadow-theme-xs);
-    transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-.admin-action-button:hover {
-    border-color: var(--brand-300);
-    box-shadow: var(--shadow-theme-sm);
-    text-decoration: none;
-}
-
-.admin-action-button span {
-    font-size: 22px;
-}
-
-.admin-action-button strong {
-    font-size: 15px;
-    font-weight: 600;
 }
 
 .super-admin-console {
@@ -2251,9 +2201,6 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .admin-action-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 
     .super-admin-console {
         grid-template-columns: 1fr;
@@ -2320,9 +2267,6 @@ body {
         width: 100%;
     }
 
-    .form-section {
-        padding: 22px;
-    }
 
     .page-heading-actions {
         align-items: stretch;
@@ -2352,9 +2296,6 @@ body {
         flex: 1 1 0;
     }
 
-    .admin-action-grid {
-        grid-template-columns: 1fr;
-    }
 
 }
 
@@ -2415,27 +2356,25 @@ body {
     position: relative;
 }
 
+/* TailAdmin kullanici alani: cercevesiz; avatar + ad + ok. */
 .user-menu-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     height: 44px;
-    border: 1px solid var(--border-subtle);
-    border-radius: 999px;
-    background: var(--surface-color);
-    color: var(--text-body);
-    padding: 0 12px 0 6px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--gray-700);
+    padding: 0;
     cursor: pointer;
-}
-
-.user-menu-toggle:hover {
-    background: var(--nav-hover);
 }
 
 .user-menu-avatar {
     display: inline-flex;
-    width: 32px;
-    height: 32px;
+    /* TailAdmin: h-11 w-11 rounded-full */
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
@@ -2443,8 +2382,8 @@ body {
     border-radius: 50%;
     background: var(--brand-50);
     color: var(--brand-500);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .user-menu-avatar img {
@@ -2456,6 +2395,8 @@ body {
 
 .user-menu-name {
     max-width: 150px;
+    /* TailAdmin: text-theme-sm font-medium mr-1 */
+    margin-right: 4px;
     overflow: hidden;
     font-size: 14px;
     font-weight: 500;
@@ -2465,15 +2406,16 @@ body {
 
 .user-menu-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
+    /* TailAdmin: mt-4.25 (17px), w-65 (260px), rounded-2xl, p-3 */
+    top: calc(100% + 17px);
     right: 0;
     z-index: 60;
-    min-width: 210px;
+    width: 260px;
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
+    border-radius: 16px;
     background: var(--surface-color);
     box-shadow: var(--shadow-theme-lg);
-    padding: 6px;
+    padding: 12px;
 }
 
 .user-menu-dropdown[hidden] {
@@ -2485,25 +2427,27 @@ body {
     flex-direction: column;
     gap: 2px;
     border-bottom: 1px solid var(--border-row);
-    padding: 10px 12px;
+    padding: 0 0 10px;
 }
 
 .user-menu-head strong {
+    color: var(--gray-700);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .user-menu-head span {
-    color: var(--muted-color);
+    color: var(--gray-500);
     font-size: 12px;
 }
 
 .user-menu-item {
     display: block;
     border-radius: 8px;
-    color: var(--text-body);
-    padding: 9px 12px;
+    color: var(--gray-700);
+    padding: 8px 12px;
     font-size: 14px;
+    font-weight: 500;
     text-decoration: none;
 }
 
