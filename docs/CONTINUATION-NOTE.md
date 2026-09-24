@@ -33,8 +33,9 @@ carried over from earlier assumptions.
   | `tests/complaint-management.php` | 47 |
   | `tests/performance-management.php` | 23 |
   | `tests/review-management.php` | 33 |
+  | `tests/dashboard-trend.php` | 17 |
 
-  314 checks total. All suites use temporary tables and leave real records
+  331 checks total. All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -300,9 +301,35 @@ one source of truth instead of each owning a copy of the query.
 ### Faz 3 complete
 
 Education, supplier, complaint, performance and management review modules are
-done; the knowhow Faz 3 module list is now full. Suggested next scope (propose
-with the user): dashboard KPI depth/trends, an AI/summary view, or the still-open
-complaint-to-nonconformity creation decision.
+done; the knowhow Faz 3 module list is now full. Dashboard KPI depth/trends and
+a local auto summary were picked up next (see the dashboard panel section).
+Still open: the complaint-to-nonconformity creation decision and Collabora live
+verification.
+
+## Dashboard panel - trend + ozet (2026-09-28)
+
+Two view-level additions after Faz 3 closed, covering the dashboard KPI depth
+and an auto summary.
+
+- `includes/dashboard-functions.php` owns a scoped, **aggregate** trend builder
+  (`qmsDashboardTrend`) and a local, rule-based summary (`qmsDashboardSummary`).
+  Both run directly on GROUP BY queries - the dashboard no longer has to load the
+  full 12-month report dataset just to show its cards, and the values agree with
+  the reports because they read the same tables.
+- Trend series (last 12 months, oldest to newest): audits, nonconformities,
+  completed actions, completed trainings, complaints. Each bucketed by its own
+  timestamp (actions by `completed_at`, trainings by `completed_date`).
+- Summary is **generated locally** - no external AI service - and composes a
+  headline plus a list of insight lines with a neutral/positive/warning tone
+  (overdue actions trigger the warning). It is a narrative over the same scoped
+  counts, so it stays consistent with the reports.
+- Rendering: a "Dönem Özeti" panel and a "Son 12 Ay Trendleri" panel on
+  `dashboard.php`, token-based TailAdmin styling with no inline SVG (icons come
+  from `appIcon()`). i18n: 9 new TR/EN keys (now 702 per language).
+- Verified: 17 temporary-table checks (bucket shape, per-series counts, scope
+  isolation for super admin / company user / system admin, summary tones) plus an
+  HTTP harness (login, dashboard render, both panels present). Fixtures were
+  removed and auto-increment counters restored.
 
 ## Security hardening (2026-09-19)
 
