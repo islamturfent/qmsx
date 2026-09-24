@@ -32,8 +32,9 @@ carried over from earlier assumptions.
   | `tests/supplier-management.php` | 47 |
   | `tests/complaint-management.php` | 47 |
   | `tests/performance-management.php` | 23 |
+  | `tests/review-management.php` | 33 |
 
-  281 checks total. All suites use temporary tables and leave real records
+  314 checks total. All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -243,6 +244,65 @@ the report engine**, not a new KPI calculator.
   covering scope, CSRF, target save/upsert, a deterministic on-track verdict and
   both report exports. Fixtures were removed and the auto-increment counters
   restored.
+
+## Management review - Faz 3 module (2026-09-28)
+
+Seventh and final Faz 3 product module - the loop closes: the report engine's
+KPIs feed a review meeting, the review's decisions and actions are tracked, and
+the whole period shows up back on the reports surface.
+
+- Schema: two tables (migration `20260928-management-reviews.sql`, runner
+  `scripts/migrate-management-reviews.php`): `management_reviews` (company,
+  title, meeting date, period start/end, participants, scope notes, status
+  `planned -> completed`, optional next-review date) and `management_review_items`
+  (a `input` / `decision` / `action` item with a topic, description, optional
+  responsible user, optional due date and an optional nonconformity link).
+- Input values (the period's KPIs) are **not stored**: `review-detail.php` reads
+  them from `buildReportExportData()` for the review's company and period, the
+  same source as the reports screen and exports. No parallel KPI calculation is
+  introduced (matches the performance module's design).
+- Items link to an **existing nonconformity of the same company** only; the
+  responsible-user and nonconformity option lists come from shared access helpers
+  (`qmsCompanyResponsibleOptions`, new `qmsCompanyNonconformityOptions`).
+- Completion notification: when a review moves to `completed`, the company's
+  assigned system admins are notified (`review_completed`, group `review`); the
+  acting admin and super admins are deliberately excluded. Re-saving a completed
+  review or returning to planned sends nothing.
+- Reporting surface: a review count metric plus a review detail list in
+  `includes/report-export-data.php`, a twelfth Excel sheet (`Gözden Geçirmeler`), a
+  PDF detail section, and a KPI tile plus company-performance columns on
+  `reports.php` (Excel is now 12 sheets, the PDF nine detail tables).
+- Verified behaviourally: 33 temporary-table checks (scoped reads, item linking,
+  the completion notification rule, i18n key coverage) plus an HTTP harness
+  covering scope, creation, the KPI input panel, item add/update/remove, the
+  cross-tenant nonconformity-link rejection, CSRF, completion notification, other
+  tenants being redirected away, company-user visibility and both report exports.
+  Fixtures were removed and the auto-increment counters restored.
+
+### Bug caught by the harness (fixed before release)
+
+The cross-tenant nonconformity-link check originally set its error message but
+still inserted the item: the add/update branch's validation used
+`if ($formError === "" ...) / elseif ... / else { insert }`, and the final `else`
+did not re-check `$formError`, so a pre-set error was silently ignored and a
+foreign company's nonconformity could be linked. The insertion branch is now a
+`elseif ($formError === "")`, so a rejected link leaves the row uncreated. This
+was a real data-integrity leak that only the HTTP harness caught (the unit suite
+exercised helpers, not this page branch).
+
+### Shared option extraction
+
+`includes/access.php` grew `qmsCompanyNonconformityOptions()` (a company's
+nonconformities as link options). The complaint module's
+`qmsComplaintNonconformityOptions()` now delegates to it, so both modules read
+one source of truth instead of each owning a copy of the query.
+
+### Faz 3 complete
+
+Education, supplier, complaint, performance and management review modules are
+done; the knowhow Faz 3 module list is now full. Suggested next scope (propose
+with the user): dashboard KPI depth/trends, an AI/summary view, or the still-open
+complaint-to-nonconformity creation decision.
 
 ## Security hardening (2026-09-19)
 
@@ -454,11 +514,12 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 11 sheets, the PDF adds eight
-  detail tables and prints "no records this period" when a section is empty.
-- Faz 3 remaining modules: yonetimin gozden gecirmesi (management review). Pick it
-  with the user before starting; the training, supplier, complaint and performance
-  modules are good templates.
+  of the existing KPI and summary content. Excel has 12 sheets, the PDF adds
+  nine detail tables (the review module added the last sheet/table) and prints
+  "no records this period" when a section is empty.
+- Faz 3 is complete: all seven product modules (documents, risks, training,
+  supplier, complaint, performance, management review) are built, tested and
+  committed. See the Faz 3 complete note under the management review section.
 - Open product question from the complaint module: whether a complaint should be
   able to *create* a nonconformity. That needs `nonconformities.audit_id` to become
   nullable (or a source column) plus a review of the screens that join audits.
