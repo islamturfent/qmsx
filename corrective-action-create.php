@@ -8,33 +8,19 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/capa-functions.php';
 
 $nonconformityId = (int) ($_GET["nonconformity_id"] ?? $_POST["nonconformity_id"] ?? 0);
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
-$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
-$sql = "SELECT nonconformities.id, nonconformities.company_id, nonconformities.title, companies.company_name
-     FROM nonconformities
-     INNER JOIN companies ON companies.id = nonconformities.company_id
-     WHERE nonconformities.id = ? AND nonconformities.active = 1";
-$params = [$nonconformityId];
-$scope = qmsCompanyScope('nonconformities.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
-$sql .= $scope['sql'];
-$params = array_merge($params, $scope['params']);
-$sql .= " LIMIT 1";
-
-$nonconformityStmt = $pdo->prepare($sql);
-$nonconformityStmt->execute($params);
-$nonconformity = $nonconformityStmt->fetch(PDO::FETCH_ASSOC);
+// Kapsamli okuma: id degistirilerek baska sirketin uygunsuzlugu acilamaz.
+$nonconformity = qmsNonconformityFind($pdo, $nonconformityId, $userId, qmsCurrentRole());
 
 if (!$nonconformity) {
     header("Location: dashboard.php");
     exit;
 }
-
-require_once __DIR__ . '/includes/notifications.php';
 
 // Sorumlu olabilecek kullanicilar: sirketin kendi kullanicilari ve o sirkete
 // atanmis sistem adminleri. Serbest metin alani disaridan gelen kisiler icin kalir.
@@ -87,17 +73,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "due_date" => $formData["due_date"] !== "" ? $formData["due_date"] : null
         ]);
 
-        // Sorumlu bir sistem kullanicisiysa atama bildirimi gonderilir.
-        if ($formData["responsible_user_id"] > 0) {
-            qmsNotify(
-                $pdo,
-                $formData["responsible_user_id"],
-                "corrective_action_assigned",
-                "Size bir düzeltici faaliyet atandı",
-                $nonconformity["title"],
-                "corrective-action-detail.php?id=" . (int) $pdo->lastInsertId()
-            );
-        }
+        // Atama bildirimi tek kural setinden gelir (includes/capa-functions.php).
+        qmsCapaNotifyStatusChange($pdo, [
+            "company_id" => (int) $nonconformity["company_id"],
+            "action_text" => $formData["action_text"],
+            "link" => "corrective-action-detail.php?id=" . (int) $pdo->lastInsertId(),
+            "previous_status" => "planned",
+            "new_status" => "planned",
+            "previous_responsible_user_id" => 0,
+            "responsible_user_id" => (int) $formData["responsible_user_id"],
+            "actor_user_id" => $userId
+        ]);
 
         header("Location: nonconformity-detail.php?id=" . $nonconformityId . "&action=created");
         exit;

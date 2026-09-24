@@ -8,27 +8,13 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/capa-functions.php';
 
 $actionId = (int) ($_GET["id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
-$isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
-$sql = "SELECT corrective_actions.*, nonconformities.title AS nonconformity_title,
-            nonconformities.company_id, companies.company_name
-     FROM corrective_actions
-     INNER JOIN nonconformities ON nonconformities.id = corrective_actions.nonconformity_id
-     INNER JOIN companies ON companies.id = nonconformities.company_id
-     WHERE corrective_actions.id = ? AND corrective_actions.active = 1";
-$params = [$actionId];
-$scope = qmsCompanyScope('nonconformities.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
-$sql .= $scope['sql'];
-$params = array_merge($params, $scope['params']);
-$sql .= " LIMIT 1";
-
-$actionStmt = $pdo->prepare($sql);
-$actionStmt->execute($params);
-$action = $actionStmt->fetch(PDO::FETCH_ASSOC);
+// Kapsamli okuma: id degistirilerek baska sirketin faaliyeti acilamaz.
+$action = qmsCorrectiveActionFind($pdo, $actionId, $userId, qmsCurrentRole());
 
 if (!$action) {
     header("Location: dashboard.php");
@@ -39,7 +25,7 @@ $_SESSION["corrective_action_csrf"] ??= bin2hex(random_bytes(32));
 $csrfToken = $_SESSION["corrective_action_csrf"];
 
 $formError = "";
-$allowedStatuses = ["planned", "in_progress", "verification", "completed", "closed"];
+$allowedStatuses = QMS_CAPA_STATUSES;
 $allowedEvidenceFiles = [
     "pdf" => ["application/pdf"],
     "doc" => ["application/msword", "application/octet-stream"],
@@ -79,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $formError = "Bu dosya türü kanıt olarak yüklenemez. PDF, Word, Excel veya görsel kullanın.";
             } else {
                 $storedName = bin2hex(random_bytes(20)) . "." . $extension;
-                $storedPath = __DIR__ . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "evidence" . DIRECTORY_SEPARATOR . $storedName;
+                $storedPath = qmsCapaEvidencePath($storedName);
                 try {
                     if (!move_uploaded_file($upload["tmp_name"], $storedPath)) {
                         throw new RuntimeException("Kanıt dosyası depoya taşınamadı.");
@@ -110,19 +96,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     } elseif ($formType === "delete_evidence") {
         $evidenceId = (int) ($_POST["evidence_id"] ?? 0);
-        $evidenceLookup = $pdo->prepare(
-            "SELECT stored_file_name FROM corrective_action_evidence
-             WHERE id = :id AND corrective_action_id = :action_id AND active = 1 LIMIT 1"
-        );
-        $evidenceLookup->execute(["id" => $evidenceId, "action_id" => $actionId]);
-        $storedName = $evidenceLookup->fetchColumn();
+        // Kapsam kontrolu dahil: baska sirketin kaniti silinemez.
+        $evidence = qmsCapaEvidenceFind($pdo, $evidenceId, $userId, qmsCurrentRole());
 
-        if ($storedName === false) {
+        if (!$evidence || (int) $evidence["corrective_action_id"] !== $actionId) {
             $formError = "Kanıt dosyası bulunamadı.";
         } else {
             $pdo->prepare("UPDATE corrective_action_evidence SET active = 0 WHERE id = :id")
                 ->execute(["id" => $evidenceId]);
-            $filePath = __DIR__ . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "evidence" . DIRECTORY_SEPARATOR . basename((string) $storedName);
+            $filePath = qmsCapaEvidencePath((string) $evidence["stored_file_name"]);
             if (is_file($filePath)) {
                 unlink($filePath);
             }
@@ -150,12 +132,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif (!in_array($formData["status"], $allowedStatuses, true)) {
         $formError = "Geçerli bir durum seçin.";
     } else {
-        $completedAt = in_array($formData["status"], ["completed", "closed"], true)
-            ? ($action["completed_at"] ?: date("Y-m-d H:i:s"))
-            : null;
-        $closedAt = $formData["status"] === "closed"
-            ? ($action["closed_at"] ?: date("Y-m-d H:i:s"))
-            : null;
+        $timestamps = qmsCapaStatusTimestamps($action, $formData["status"]);
+        $completedAt = $timestamps["completed_at"];
+        $closedAt = $timestamps["closed_at"];
 
         $updateStmt = $pdo->prepare(
             "UPDATE corrective_actions
@@ -185,24 +164,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "id" => $actionId
         ]);
 
-        // Bildirimler: yeni sorumluya atama, yonetime dogrulama talebi, sorumluya
-        // kapanis. Kendi yaptigi islem icin kullaniciya bildirim gonderilmez.
-        $actionLink = "corrective-action-detail.php?id=" . $actionId;
-        $previousStatus = (string) $action["status"];
-        $previousResponsible = (int) ($action["responsible_user_id"] ?? 0);
-        $newResponsible = (int) $formData["responsible_user_id"];
-
-        if ($newResponsible > 0 && $newResponsible !== $previousResponsible && $newResponsible !== $userId) {
-            qmsNotify($pdo, $newResponsible, "corrective_action_assigned", "Size bir düzeltici faaliyet atandı", $formData["action_text"], $actionLink);
-        }
-
-        if ($formData["status"] === "verification" && $previousStatus !== "verification") {
-            qmsNotifyCompanyAdmins($pdo, (int) $action["company_id"], "corrective_action_verification", "Doğrulama bekleyen düzeltici faaliyet", $formData["action_text"], $actionLink, $userId);
-        }
-
-        if ($formData["status"] === "closed" && $previousStatus !== "closed" && $newResponsible > 0 && $newResponsible !== $userId) {
-            qmsNotify($pdo, $newResponsible, "corrective_action_closed", "Düzeltici faaliyet kapandı", $formData["action_text"], $actionLink);
-        }
+        // Bildirim kurallari tek yerde: includes/capa-functions.php.
+        qmsCapaNotifyStatusChange($pdo, [
+            "company_id" => (int) $action["company_id"],
+            "action_text" => $formData["action_text"],
+            "link" => "corrective-action-detail.php?id=" . $actionId,
+            "previous_status" => (string) $action["status"],
+            "new_status" => $formData["status"],
+            "previous_responsible_user_id" => (int) ($action["responsible_user_id"] ?? 0),
+            "responsible_user_id" => (int) $formData["responsible_user_id"],
+            "actor_user_id" => $userId
+        ]);
 
         header("Location: corrective-action-detail.php?id=" . $actionId . "&updated=1");
         exit;
@@ -212,23 +184,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-$statusLabels = [
-    "planned" => "Planlandı",
-    "in_progress" => "Çalışılıyor",
-    "verification" => "Doğrulama",
-    "completed" => "Tamamlandı",
-    "closed" => "Kapalı"
-];
-$evidenceStmt = $pdo->prepare(
-    "SELECT corrective_action_evidence.*, users.full_name AS uploaded_by_name
-     FROM corrective_action_evidence
-     LEFT JOIN users ON users.id = corrective_action_evidence.uploaded_by
-     WHERE corrective_action_evidence.corrective_action_id = :action_id
-       AND corrective_action_evidence.active = 1
-     ORDER BY corrective_action_evidence.id DESC"
-);
-$evidenceStmt->execute(["action_id" => $actionId]);
-$evidenceFiles = $evidenceStmt->fetchAll(PDO::FETCH_ASSOC);
+$statusLabels = qmsCapaStatusLabels();
+$statusI18n = qmsCapaStatusI18nKeys();
+$evidenceFiles = qmsCapaEvidenceList($pdo, $actionId);
 
 $activeNav = "companies";
 
@@ -323,7 +281,7 @@ $activeNav = "companies";
                         <span data-i18n="actionStatusLabel">Durum</span>
                         <select name="status">
                             <?php foreach ($statusLabels as $value => $label): ?>
-                                <option value="<?= $value ?>" <?= $action["status"] === $value ? "selected" : "" ?> data-i18n="actionStatus<?= str_replace(' ', '', ucwords(str_replace('_', ' ', $value))) ?>Label"><?= $label ?></option>
+                                <option value="<?= $value ?>" <?= $action["status"] === $value ? "selected" : "" ?> data-i18n="<?= $statusI18n[$value] ?>"><?= htmlspecialchars($label, ENT_QUOTES, "UTF-8") ?></option>
                             <?php endforeach; ?>
                         </select>
                     </label>
