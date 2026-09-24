@@ -31,11 +31,12 @@ carried over from earlier assumptions.
   | `tests/capa.php` | 51 |
   | `tests/supplier-management.php` | 47 |
   | `tests/complaint-management.php` | 47 |
+  | `tests/performance-management.php` | 23 |
 
-  258 checks total. All suites use temporary tables and leave real records
+  281 checks total. All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
-  `notifications` remain empty).
+  `performance_targets`, `notifications` remain empty).
 
 - Run the suites from CMD/PowerShell, or set `TMP` to a real Windows path first;
   Git Bash defaults `TMP=/tmp` and `tempnam()`-based tests then abort.
@@ -216,6 +217,32 @@ Fifth product module; extends the record chain to the field.
   cross-company nonconformity-link rejection, duplicate complaint-number rejection,
   both report exports and the notification-centre rendering in the complaint group.
   Fixtures were removed and the auto-increment counters restored.
+
+## Performance management - Faz 3 module (2026-09-25)
+
+Sixth product module. It is deliberately a **target / scorecard layer on top of
+the report engine**, not a new KPI calculator.
+
+- Schema: single table `performance_targets` (migration
+  `20260927-performance-targets.sql`, runner `scripts/migrate-performance-targets.php`).
+  One row per company + KPI key + year; saving overwrites (upsert) - there is no
+  history table yet.
+- The actual (gerceklesen) value is read from `buildReportExportData()` for the
+  selected company and year - the same source the reports screen and the exports
+  use. No parallel KPI calculation is introduced.
+- Eight targetable KPIs reuse their existing labels and directions
+  (`includes/performance-functions.php`): audit count, nonconformity rate,
+  action completion, average closure days, review-due documents, training
+  completion, supplier average score, open complaints.
+- `performance.php` shows each KPI with actual vs target, an on-track / off-track /
+  no-target verdict, and an inline save form. Scope is via `qmsCompanyScope`;
+  cross-company target writes and out-of-scope companies are rejected.
+- Reporting surface: the exports carry a `Hedefler`/`Targets` sheet and a PDF
+  detail section with the saved targets.
+- Verified behaviourally: 23 temporary-table checks plus a throwaway HTTP harness
+  covering scope, CSRF, target save/upsert, a deterministic on-track verdict and
+  both report exports. Fixtures were removed and the auto-increment counters
+  restored.
 
 ## Security hardening (2026-09-19)
 
@@ -426,12 +453,12 @@ per-column emphasis, so uniform gray-500 reads washed out.
 
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
-  risk register, trainings, suppliers and complaints, on top of the existing KPI
-  and summary content. Excel has 10 sheets, the PDF adds seven detail tables and
-  prints "no records this period" when a section is empty.
-- Faz 3 remaining modules: performans (performance), yonetimin gozden gecirmesi
-  (management review). Pick the next one with the user before starting; the
-  training, supplier and complaint modules are good templates.
+  risk register, trainings, suppliers, complaints and performance targets, on top
+  of the existing KPI and summary content. Excel has 11 sheets, the PDF adds eight
+  detail tables and prints "no records this period" when a section is empty.
+- Faz 3 remaining modules: yonetimin gozden gecirmesi (management review). Pick it
+  with the user before starting; the training, supplier, complaint and performance
+  modules are good templates.
 - Open product question from the complaint module: whether a complaint should be
   able to *create* a nonconformity. That needs `nonconformities.audit_id` to become
   nullable (or a source column) plus a review of the screens that join audits.
