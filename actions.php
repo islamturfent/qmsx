@@ -8,31 +8,15 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
-$companyIds = [];
 
-if (!$isSuperAdmin) {
-    $assignmentStmt = $pdo->prepare(
-        "SELECT company_id FROM company_admin_assignments
-         WHERE admin_user_id = :admin_user_id AND active = 1"
-    );
-    $assignmentStmt->execute(["admin_user_id" => $userId]);
-    $companyIds = array_map('intval', $assignmentStmt->fetchAll(PDO::FETCH_COLUMN));
-}
-
-$scopeClause = "";
-$scopeParams = [];
-if (!$isSuperAdmin) {
-    if ($companyIds) {
-        $placeholders = implode(',', array_fill(0, count($companyIds), '?'));
-        $scopeClause = " AND companies.id IN ($placeholders)";
-        $scopeParams = $companyIds;
-    } else {
-        $scopeClause = " AND 1 = 0";
-    }
-}
+// Kapsam tek kaynaktan: role gore gorunur sirketler (null = kisitlama yok).
+$scope = qmsCompanyScope('companies.id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$scopeClause = $scope['sql'];
+$scopeParams = $scope['params'];
 
 $nonconformityStmt = $pdo->prepare(
     "SELECT 'nonconformity' AS record_type, nonconformities.id, nonconformities.title,

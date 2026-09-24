@@ -8,6 +8,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $evidenceId = (int) ($_GET["id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -17,17 +18,13 @@ $sql = "SELECT corrective_action_evidence.*, nonconformities.company_id
         FROM corrective_action_evidence
         INNER JOIN corrective_actions ON corrective_actions.id = corrective_action_evidence.corrective_action_id
         INNER JOIN nonconformities ON nonconformities.id = corrective_actions.nonconformity_id
-        WHERE corrective_action_evidence.id = :id
+        WHERE corrective_action_evidence.id = ?
           AND corrective_action_evidence.active = 1
           AND corrective_actions.active = 1";
-$params = ["id" => $evidenceId];
-if (!$isSuperAdmin) {
-    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
-                WHERE company_admin_assignments.company_id = nonconformities.company_id
-                  AND company_admin_assignments.admin_user_id = :user_id
-                  AND company_admin_assignments.active = 1)";
-    $params["user_id"] = $userId;
-}
+$params = [$evidenceId];
+$scope = qmsCompanyScope('nonconformities.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$sql .= $scope['sql'];
+$params = array_merge($params, $scope['params']);
 $sql .= " LIMIT 1";
 
 $stmt = $pdo->prepare($sql);

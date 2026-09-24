@@ -8,6 +8,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
 
 $nonconformityId = (int) ($_GET["nonconformity_id"] ?? $_POST["nonconformity_id"] ?? 0);
 
@@ -17,15 +18,11 @@ $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 $sql = "SELECT nonconformities.id, nonconformities.title, companies.company_name
      FROM nonconformities
      INNER JOIN companies ON companies.id = nonconformities.company_id
-     WHERE nonconformities.id = :id AND nonconformities.active = 1";
-$params = ["id" => $nonconformityId];
-if (!$isSuperAdmin) {
-    $sql .= " AND EXISTS (SELECT 1 FROM company_admin_assignments
-                WHERE company_admin_assignments.company_id = nonconformities.company_id
-                  AND company_admin_assignments.admin_user_id = :user_id
-                  AND company_admin_assignments.active = 1)";
-    $params["user_id"] = $userId;
-}
+     WHERE nonconformities.id = ? AND nonconformities.active = 1";
+$params = [$nonconformityId];
+$scope = qmsCompanyScope('nonconformities.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$sql .= $scope['sql'];
+$params = array_merge($params, $scope['params']);
 $sql .= " LIMIT 1";
 
 $nonconformityStmt = $pdo->prepare($sql);
