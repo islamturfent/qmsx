@@ -101,6 +101,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("suppliers") ?>
             <span data-i18n="suppliersTitle">Tedarikçi Yönetimi</span>
         </a>
+        <a class="<?= sidebarLinkClass("complaints", $activeNav) ?>" href="complaints.php">
+            <?= appIcon("complaints") ?>
+            <span data-i18n="complaintsTitle">Şikayet Yönetimi</span>
+        </a>
         <a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="documents.php">
             <?= appIcon("documents") ?>
             <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>

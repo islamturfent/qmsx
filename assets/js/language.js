@@ -787,12 +787,81 @@ Object.assign(translations.en, {
 Object.assign(translations.tr, {
     notificationGroupCapaLabel: "Düzeltici Faaliyet", notificationGroupDocumentLabel: "Doküman",
     notificationGroupTrainingLabel: "Eğitim", notificationGroupSupplierLabel: "Tedarikçi",
-    notificationGroupGeneralLabel: "Genel"
+    notificationGroupComplaintLabel: "Şikayet", notificationGroupGeneralLabel: "Genel"
 });
 Object.assign(translations.en, {
     notificationGroupCapaLabel: "Corrective Action", notificationGroupDocumentLabel: "Document",
     notificationGroupTrainingLabel: "Training", notificationGroupSupplierLabel: "Supplier",
-    notificationGroupGeneralLabel: "General"
+    notificationGroupComplaintLabel: "Complaint", notificationGroupGeneralLabel: "General"
+});
+
+Object.assign(translations.tr, {
+    complaintsTitle: "Şikayet Yönetimi", complaintsText: "Şikayetleri kaydedin, uygunsuzlukla ilişkilendirin ve kapanışı izleyin.",
+    complaintRegisterKicker: "Şikayet Kayıtları", newComplaintButton: "Yeni Şikayet", newComplaintTitle: "Yeni Şikayet",
+    newComplaintText: "Şikayeti kaydedin; sorumlu atamasını ve uygunsuzluk bağlantısını detay sayfasından yapın.",
+    complaintCreatedMessage: "Şikayet kaydı oluşturuldu.", complaintUpdatedMessage: "Şikayet kaydı güncellendi.",
+    complaintTotalLabel: "Toplam Şikayet", complaintOpenLabel: "Açık Şikayet", complaintCriticalLabel: "Kritik",
+    complaintClosedLabel: "Kapatılan", complaintStatusLabel: "Durum", complaintSeverityLabel: "Önem",
+    complaintSourceLabel: "Kaynak", receivedDateLabel: "Alınma Tarihi", complaintSubjectLabel: "Şikayet Konusu",
+    complaintCodeLabel: "Şikayet Numarası", complaintChannelLabel: "Bildirim Kanalı",
+    complaintChannelNoneOption: "— belirtilmedi", complaintCustomerLabel: "Şikayet Eden",
+    complaintContactLabel: "İletişim Bilgisi", complaintDescriptionLabel: "Şikayet Açıklaması",
+    complaintRootCauseLabel: "Kök Neden", complaintActionNoteLabel: "Aksiyon / Düzeltici Faaliyet Notu",
+    complaintResolutionNoteLabel: "Çözüm Notu", saveComplaintButton: "Şikayeti Kaydet",
+    backToComplaintsButton: "Şikayetlere Dön", noComplaintsText: "Filtrelere uygun şikayet bulunamadı.",
+    complaintDetailTitle: "Şikayet Detayı", complaintWorkspaceKicker: "Şikayet Çalışma Alanı",
+    complaintClosedDateLabel: "Kapanış Tarihi", complaintLinkedNonconformityLabel: "Uygunsuzluk Bağlantısı",
+    complaintLinkedRecordTitle: "İlişkili Uygunsuzluk",
+    complaintLinkedRecordText: "Şikayet bu uygunsuzluğa bağlıdır; düzeltici faaliyetler uygunsuzluk üzerinden izlenir.",
+    complaintLinkedActionsLabel: "düzeltici faaliyet", complaintNoLinkOption: "— bağlantı yok",
+    complaintNoNonconformityHelp: "Bu şirkette uygunsuzluk kaydı yok; bağlamak için önce uygunsuzluk oluşturun.",
+    openNonconformityButton: "Uygunsuzluğa Git", openActionsButton: "Aksiyonlara Git",
+    complaintResponsiblePersonLabel: "Sorumlu (serbest metin)",
+    complaintResponsibleHelp: "Seçilirse atama ve kapanış bildirimi bu kullanıcıya gider.",
+    complaintNoCompanyText: "Şikayet eklemek için önce bir şirket gerekir. Şirket kaydınız yoksa yöneticinizle görüşün.",
+    complaintStatusNewLabel: "Yeni", complaintStatusInReviewLabel: "İncelemede",
+    complaintStatusActionPlannedLabel: "Aksiyon Planlandı", complaintStatusResolvedLabel: "Çözüldü",
+    complaintStatusClosedLabel: "Kapatıldı", complaintStatusRejectedLabel: "Reddedildi",
+    complaintSourceCustomerLabel: "Müşteri", complaintSourceEmployeeLabel: "Çalışan",
+    complaintSourceSupplierLabel: "Tedarikçi", complaintSourceOtherLabel: "Diğer",
+    complaintChannelEmailLabel: "E-posta", complaintChannelPhoneLabel: "Telefon",
+    complaintChannelInPersonLabel: "Yüz yüze", complaintChannelWebLabel: "Web formu",
+    complaintChannelLetterLabel: "Yazılı", complaintChannelOtherLabel: "Diğer",
+    complaintOpenKpi: "Açık Şikayet", complaintsLegend: "Şikayetler"
+});
+Object.assign(translations.en, {
+    complaintsTitle: "Complaint Management", complaintsText: "Record complaints, link them to nonconformities and track closure.",
+    complaintRegisterKicker: "Complaint Records", newComplaintButton: "New Complaint", newComplaintTitle: "New Complaint",
+    newComplaintText: "Record the complaint; assign the responsible user and link a nonconformity on the detail screen.",
+    complaintCreatedMessage: "Complaint record created.", complaintUpdatedMessage: "Complaint record updated.",
+    complaintTotalLabel: "Total Complaints", complaintOpenLabel: "Open Complaints", complaintCriticalLabel: "Critical",
+    complaintClosedLabel: "Closed", complaintStatusLabel: "Status", complaintSeverityLabel: "Severity",
+    complaintSourceLabel: "Source", receivedDateLabel: "Received Date", complaintSubjectLabel: "Complaint Subject",
+    complaintCodeLabel: "Complaint Number", complaintChannelLabel: "Notification Channel",
+    complaintChannelNoneOption: "— not specified", complaintCustomerLabel: "Complainant",
+    complaintContactLabel: "Contact Details", complaintDescriptionLabel: "Complaint Description",
+    complaintRootCauseLabel: "Root Cause", complaintActionNoteLabel: "Action / Corrective Action Note",
+    complaintResolutionNoteLabel: "Resolution Note", saveComplaintButton: "Save Complaint",
+    backToComplaintsButton: "Back to Complaints", noComplaintsText: "No complaints match the filters.",
+    complaintDetailTitle: "Complaint Detail", complaintWorkspaceKicker: "Complaint Workspace",
+    complaintClosedDateLabel: "Closure Date", complaintLinkedNonconformityLabel: "Nonconformity Link",
+    complaintLinkedRecordTitle: "Linked Nonconformity",
+    complaintLinkedRecordText: "This complaint is linked to the nonconformity; corrective actions are tracked there.",
+    complaintLinkedActionsLabel: "corrective actions", complaintNoLinkOption: "— no link",
+    complaintNoNonconformityHelp: "This company has no nonconformity record yet; create one before linking.",
+    openNonconformityButton: "Open Nonconformity", openActionsButton: "Open Actions",
+    complaintResponsiblePersonLabel: "Responsible (free text)",
+    complaintResponsibleHelp: "If selected, assignment and closure notifications go to this user.",
+    complaintNoCompanyText: "A company is required before adding a complaint. If you have no company record, contact your administrator.",
+    complaintStatusNewLabel: "New", complaintStatusInReviewLabel: "In Review",
+    complaintStatusActionPlannedLabel: "Action Planned", complaintStatusResolvedLabel: "Resolved",
+    complaintStatusClosedLabel: "Closed", complaintStatusRejectedLabel: "Rejected",
+    complaintSourceCustomerLabel: "Customer", complaintSourceEmployeeLabel: "Employee",
+    complaintSourceSupplierLabel: "Supplier", complaintSourceOtherLabel: "Other",
+    complaintChannelEmailLabel: "Email", complaintChannelPhoneLabel: "Phone",
+    complaintChannelInPersonLabel: "In person", complaintChannelWebLabel: "Web form",
+    complaintChannelLetterLabel: "Letter", complaintChannelOtherLabel: "Other",
+    complaintOpenKpi: "Open Complaints", complaintsLegend: "Complaints"
 });
 
 const languageToggle = document.getElementById("languageToggle");

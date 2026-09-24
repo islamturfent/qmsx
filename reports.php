@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/supplier-functions.php';
+require_once __DIR__ . '/includes/complaint-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
@@ -111,6 +112,16 @@ $suppliers = fetchReportRows(
     $selectedCompanyId
 );
 
+$complaints = fetchReportRows(
+    $pdo,
+    "SELECT complaints.id, complaints.company_id, complaints.status, complaints.severity,
+            complaints.subject, complaints.created_at, companies.company_name
+     FROM complaints INNER JOIN companies ON companies.id = complaints.company_id
+     WHERE complaints.active = 1 AND complaints.created_at BETWEEN ? AND ?" . $companyScopeSql,
+    $periodParams,
+    $selectedCompanyId
+);
+
 $reviewParams = $companyScopeParams;
 $reviewDocuments = fetchReportRows(
     $pdo,
@@ -163,6 +174,7 @@ foreach ($suppliers as $supplier) {
     }
 }
 $supplierAverageScore = $supplierScoreCount > 0 ? round($supplierScoreTotal / $supplierScoreCount, 1) : null;
+$openComplaintCount = count(array_filter($complaints, static fn($item) => qmsComplaintIsOpen((string) $item["status"])));
 
 $documentStatuses = ["draft" => 0, "review" => 0, "approved" => 0, "published" => 0, "archived" => 0];
 foreach ($documents as $document) {
@@ -192,7 +204,7 @@ foreach ($months as $month) $maxTrend = max($maxTrend, $month["audits"], $month[
 $companyPerformance = [];
 foreach ($companies as $company) {
     if ($selectedCompanyId > 0 && (int) $company["id"] !== $selectedCompanyId) continue;
-    $companyPerformance[(int) $company["id"]] = ["name" => $company["company_name"], "audits" => 0, "nonconformities" => 0, "actions" => 0, "completed" => 0, "trainings" => 0, "trainingsCompleted" => 0, "suppliers" => 0, "suppliersApproved" => 0];
+    $companyPerformance[(int) $company["id"]] = ["name" => $company["company_name"], "audits" => 0, "nonconformities" => 0, "actions" => 0, "completed" => 0, "trainings" => 0, "trainingsCompleted" => 0, "suppliers" => 0, "suppliersApproved" => 0, "complaints" => 0, "complaintsOpen" => 0];
 }
 foreach ($audits as $item) if (isset($companyPerformance[(int) $item["company_id"]])) $companyPerformance[(int) $item["company_id"]]["audits"]++;
 foreach ($nonconformities as $item) if (isset($companyPerformance[(int) $item["company_id"]])) $companyPerformance[(int) $item["company_id"]]["nonconformities"]++;
@@ -207,6 +219,10 @@ foreach ($trainings as $item) if (isset($companyPerformance[(int) $item["company
 foreach ($suppliers as $item) if (isset($companyPerformance[(int) $item["company_id"]])) {
     $companyPerformance[(int) $item["company_id"]]["suppliers"]++;
     if ($item["status"] === "approved") $companyPerformance[(int) $item["company_id"]]["suppliersApproved"]++;
+}
+foreach ($complaints as $item) if (isset($companyPerformance[(int) $item["company_id"]])) {
+    $companyPerformance[(int) $item["company_id"]]["complaints"]++;
+    if (qmsComplaintIsOpen((string) $item["status"])) $companyPerformance[(int) $item["company_id"]]["complaintsOpen"]++;
 }
 
 $activeNav = "reports";
@@ -245,6 +261,7 @@ $exportQuery = http_build_query([
             <div class="dashboard-card metric-orange"><?= appIcon("documents", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="reviewDueDocumentsLabel">Gözden Geçirilecek</span><strong class="dashboard-card-number"><?= count($reviewDue) ?></strong></div></div>
             <div class="dashboard-card metric-blue"><?= appIcon("training", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="trainingCompletionKpi">Eğitim Tamamlama</span><strong class="dashboard-card-number"><?= $trainingCompletionRate ?>%</strong></div></div>
             <div class="dashboard-card metric-violet"><?= appIcon("suppliers", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="supplierScoreKpi">Tedarikçi Puanı</span><strong class="dashboard-card-number"><?= $supplierAverageScore === null ? "-" : htmlspecialchars((string) $supplierAverageScore, ENT_QUOTES, "UTF-8") ?></strong></div></div>
+            <div class="dashboard-card metric-orange"><?= appIcon("complaints", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="complaintOpenKpi">Açık Şikayet</span><strong class="dashboard-card-number"><?= $openComplaintCount ?></strong></div></div>
         </section>
 
         <section class="report-layout">
@@ -252,7 +269,7 @@ $exportQuery = http_build_query([
             <article class="report-panel"><div class="section-heading compact-heading"><div><h2 data-i18n="documentStatusReportTitle">Doküman Durumları</h2><p data-i18n="documentStatusReportText">Seçilen dönemde oluşturulan dokümanlar.</p></div></div><div class="status-chart"><?php foreach ($documentStatuses as $status => $count): ?><div class="status-chart-row"><span><?= htmlspecialchars(ucfirst($status), ENT_QUOTES, "UTF-8") ?></span><div><i style="width: <?= ($count / $maxDocumentStatus) * 100 ?>%"></i></div><strong><?= $count ?></strong></div><?php endforeach; ?></div></article>
         </section>
 
-        <section class="page-section"><div class="section-heading"><div><h2 data-i18n="companyPerformanceTitle">Şirket Performansı</h2><p data-i18n="companyPerformanceText">Denetim ve aksiyon sonuçlarının şirket bazlı özeti.</p></div></div><?php if (!$companyPerformance): ?><div class="empty-state" data-i18n="noReportDataText">Seçilen dönem için rapor verisi bulunmuyor.</div><?php else: ?><div class="report-table-wrap"><table class="report-table"><thead><tr><th data-i18n="companyNameLabel">Şirket</th><th data-i18n="auditsLegend">Denetimler</th><th data-i18n="nonconformitiesLegend">Uygunsuzluklar</th><th data-i18n="correctiveActionsTitle">Düzeltici Faaliyetler</th><th data-i18n="actionCompletionKpi">Aksiyon Tamamlama</th><th data-i18n="trainingsLegend">Eğitimler</th><th data-i18n="trainingCompletionKpi">Eğitim Tamamlama</th><th data-i18n="suppliersLegend">Tedarikçiler</th></tr></thead><tbody><?php foreach ($companyPerformance as $row): $rate = $row["actions"] > 0 ? round(($row["completed"] / $row["actions"]) * 100, 1) : 0; $trainingRate = $row["trainings"] > 0 ? round(($row["trainingsCompleted"] / $row["trainings"]) * 100, 1) : 0; ?><tr><td><?= htmlspecialchars($row["name"], ENT_QUOTES, "UTF-8") ?></td><td><?= $row["audits"] ?></td><td><?= $row["nonconformities"] ?></td><td><?= $row["actions"] ?></td><td><span class="table-progress"><i style="width: <?= $rate ?>%"></i></span><strong><?= $rate ?>%</strong></td><td><?= $row["trainings"] ?></td><td><span class="table-progress"><i style="width: <?= $trainingRate ?>%"></i></span><strong><?= $trainingRate ?>%</strong></td><td><?= $row["suppliers"] ?></td></tr><?php endforeach; ?></tbody></table></div><?php endif; ?></section>
+        <section class="page-section"><div class="section-heading"><div><h2 data-i18n="companyPerformanceTitle">Şirket Performansı</h2><p data-i18n="companyPerformanceText">Denetim ve aksiyon sonuçlarının şirket bazlı özeti.</p></div></div><?php if (!$companyPerformance): ?><div class="empty-state" data-i18n="noReportDataText">Seçilen dönem için rapor verisi bulunmuyor.</div><?php else: ?><div class="report-table-wrap"><table class="report-table"><thead><tr><th data-i18n="companyNameLabel">Şirket</th><th data-i18n="auditsLegend">Denetimler</th><th data-i18n="nonconformitiesLegend">Uygunsuzluklar</th><th data-i18n="correctiveActionsTitle">Düzeltici Faaliyetler</th><th data-i18n="actionCompletionKpi">Aksiyon Tamamlama</th><th data-i18n="trainingsLegend">Eğitimler</th><th data-i18n="trainingCompletionKpi">Eğitim Tamamlama</th><th data-i18n="suppliersLegend">Tedarikçiler</th><th data-i18n="complaintsLegend">Şikayetler</th><th data-i18n="complaintOpenKpi">Açık Şikayet</th></tr></thead><tbody><?php foreach ($companyPerformance as $row): $rate = $row["actions"] > 0 ? round(($row["completed"] / $row["actions"]) * 100, 1) : 0; $trainingRate = $row["trainings"] > 0 ? round(($row["trainingsCompleted"] / $row["trainings"]) * 100, 1) : 0; ?><tr><td><?= htmlspecialchars($row["name"], ENT_QUOTES, "UTF-8") ?></td><td><?= $row["audits"] ?></td><td><?= $row["nonconformities"] ?></td><td><?= $row["actions"] ?></td><td><span class="table-progress"><i style="width: <?= $rate ?>%"></i></span><strong><?= $rate ?>%</strong></td><td><?= $row["trainings"] ?></td><td><span class="table-progress"><i style="width: <?= $trainingRate ?>%"></i></span><strong><?= $trainingRate ?>%</strong></td><td><?= $row["suppliers"] ?></td><td><?= $row["complaints"] ?></td><td><?= $row["complaintsOpen"] ?></td></tr><?php endforeach; ?></tbody></table></div><?php endif; ?></section>
     </main>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
 </body>

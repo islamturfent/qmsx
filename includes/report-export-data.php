@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/risk-functions.php';
 require_once __DIR__ . '/supplier-functions.php';
+require_once __DIR__ . '/complaint-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -164,6 +165,21 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     }
     $supplierAverageScore = $supplierScoreCount > 0 ? round($supplierScoreTotal / $supplierScoreCount, 1) : null;
 
+    $complaints = $fetchRows(
+        "SELECT complaints.id, complaints.company_id, complaints.complaint_code, complaints.subject,
+                complaints.source, complaints.channel, complaints.severity, complaints.status,
+                complaints.received_date, complaints.due_date, complaints.closed_date,
+                complaints.nonconformity_id, complaints.created_at, companies.company_name
+         FROM complaints INNER JOIN companies ON companies.id = complaints.company_id
+         WHERE complaints.active = 1 AND complaints.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+
+    $openComplaints = array_filter(
+        $complaints,
+        static fn(array $item): bool => qmsComplaintIsOpen((string) $item['status'])
+    );
+
     $closedNonconformities = array_filter(
         $nonconformities,
         static fn(array $item): bool => $item['status'] === 'closed'
@@ -215,6 +231,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             : 0,
         'supplier_count' => count($suppliers),
         'supplier_average_score' => $supplierAverageScore,
+        'complaint_count' => count($complaints),
+        'complaint_open_count' => count($openComplaints),
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -260,6 +278,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'trainings_completed' => 0,
             'suppliers' => 0,
             'suppliers_approved' => 0,
+            'complaints' => 0,
+            'complaints_open' => 0,
         ];
     }
     foreach ($audits as $item) {
@@ -297,6 +317,15 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $companyPerformance[(int) $item['company_id']]['suppliers']++;
         if ($item['status'] === 'approved') {
             $companyPerformance[(int) $item['company_id']]['suppliers_approved']++;
+        }
+    }
+    foreach ($complaints as $item) {
+        if (!isset($companyPerformance[(int) $item['company_id']])) {
+            continue;
+        }
+        $companyPerformance[(int) $item['company_id']]['complaints']++;
+        if (qmsComplaintIsOpen((string) $item['status'])) {
+            $companyPerformance[(int) $item['company_id']]['complaints_open']++;
         }
     }
 
@@ -398,6 +427,25 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $complaintStatusLabels = qmsComplaintStatusLabels();
+    $complaintSeverityLabels = qmsComplaintSeverityLabels();
+    $complaintSourceLabels = qmsComplaintSourceLabels();
+    $complaintList = [];
+    foreach ($complaints as $item) {
+        $complaintList[] = [
+            'company_name' => $item['company_name'],
+            'complaint_code' => $item['complaint_code'],
+            'subject' => $item['subject'],
+            'source' => $complaintSourceLabels[$item['source']] ?? $item['source'],
+            'severity' => $complaintSeverityLabels[$item['severity']] ?? $item['severity'],
+            'status' => $complaintStatusLabels[$item['status']] ?? $item['status'],
+            'received_date' => $item['received_date'],
+            'due_date' => $item['due_date'],
+            'closed_date' => $item['closed_date'],
+            'linked_nonconformity' => (int) $item['nonconformity_id'] > 0 ? 'Evet' : 'Hayır',
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -413,5 +461,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'risk_list' => $riskList,
         'training_list' => $trainingList,
         'supplier_list' => $supplierList,
+        'complaint_list' => $complaintList,
     ];
 }
