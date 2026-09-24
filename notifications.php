@@ -9,6 +9,8 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
+require_once __DIR__ . '/includes/app-ui.php';
+require_once __DIR__ . '/includes/notifications.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $csrfToken = qmsCsrfToken('notifications');
@@ -50,6 +52,9 @@ $countStmt = $pdo->prepare(
 $countStmt->execute(["user_id" => $userId]);
 $counts = $countStmt->fetch(PDO::FETCH_ASSOC) ?: ["total" => 0, "unread_count" => 0, "read_count" => 0];
 
+$notificationGroups = qmsNotificationGroupLabels();
+$notificationGroupI18n = qmsNotificationGroupI18nKeys();
+
 $activeNav = "notifications";
 
 ?>
@@ -74,9 +79,10 @@ $activeNav = "notifications";
             <?php if (!$notifications): ?><div class="empty-state" data-i18n="noNotificationsText">Gösterilecek bildirim bulunmuyor.</div><?php else: ?>
                 <div class="notification-list">
                     <?php foreach ($notifications as $notification): ?>
+                        <?php $notificationMeta = qmsNotificationMeta((string) $notification["notification_type"]); ?>
                         <article class="notification-item <?= (int) $notification["is_read"] === 0 ? "unread" : "" ?>">
-                            <div class="notification-icon"><?= (int) $notification["is_read"] === 0 ? "!" : "✓" ?></div>
-                            <div class="notification-content"><strong><?= htmlspecialchars($notification["title"], ENT_QUOTES, "UTF-8") ?></strong><p><?= htmlspecialchars($notification["message"] ?: "", ENT_QUOTES, "UTF-8") ?></p><span><?= htmlspecialchars($notification["created_at"], ENT_QUOTES, "UTF-8") ?></span></div>
+                            <div class="notification-icon notification-icon-<?= htmlspecialchars($notificationMeta["group"], ENT_QUOTES, "UTF-8") ?>"><?= appIcon($notificationMeta["icon"], "") ?></div>
+                            <div class="notification-content"><span class="status-pill" data-i18n="<?= $notificationGroupI18n[$notificationMeta["group"]] ?? "notificationGroupGeneralLabel" ?>"><?= htmlspecialchars($notificationGroups[$notificationMeta["group"]] ?? $notificationGroups["general"], ENT_QUOTES, "UTF-8") ?></span><strong><?= htmlspecialchars($notification["title"], ENT_QUOTES, "UTF-8") ?></strong><p><?= htmlspecialchars($notification["message"] ?: "", ENT_QUOTES, "UTF-8") ?></p><span><?= htmlspecialchars($notification["created_at"], ENT_QUOTES, "UTF-8") ?></span></div>
                             <div class="notification-actions"><?php if ($notification["link_url"]): ?><a class="primary-button" href="<?= htmlspecialchars($notification["link_url"], ENT_QUOTES, "UTF-8") ?>" data-i18n="openRecordButton">Kaydı Aç</a><?php endif; ?><?php if ((int) $notification["is_read"] === 0): ?><form method="post" action="notifications.php"><?= qmsCsrfField('notifications') ?><input type="hidden" name="form_type" value="mark_read"><input type="hidden" name="notification_id" value="<?= (int) $notification["id"] ?>"><button class="secondary-button" type="submit" data-i18n="markReadButton">Okundu</button></form><?php endif; ?></div>
                         </article>
                     <?php endforeach; ?>

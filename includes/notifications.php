@@ -32,6 +32,67 @@ function qmsNotify(PDO $pdo, int $userId, string $type, string $title, string $m
 }
 
 /**
+ * Bildirim turleri: ikon ve grup.
+ *
+ * Arayuz ikonu ve grup etiketini bu haritadan alir; bildirim merkezi tur
+ * basina ayri kod yazmaz. Tur eklerken yalnizca bu harita guncellenir.
+ *
+ * @return array<string, array{icon: string, group: string}>
+ */
+function qmsNotificationTypes(): array
+{
+    return [
+        'corrective_action_assigned' => ['icon' => 'check', 'group' => 'capa'],
+        'corrective_action_verification' => ['icon' => 'approvals', 'group' => 'capa'],
+        'corrective_action_closed' => ['icon' => 'checkBadge', 'group' => 'capa'],
+        'document_approval_request' => ['icon' => 'approvals', 'group' => 'document'],
+        'document_approval_decision' => ['icon' => 'documents', 'group' => 'document'],
+        'document_published' => ['icon' => 'documents', 'group' => 'document'],
+        'training_planned' => ['icon' => 'training', 'group' => 'training'],
+        'training_assigned' => ['icon' => 'training', 'group' => 'training'],
+        'training_completed' => ['icon' => 'checkBadge', 'group' => 'training'],
+        'supplier_approved' => ['icon' => 'suppliers', 'group' => 'supplier'],
+        'supplier_suspended' => ['icon' => 'warning', 'group' => 'supplier'],
+        'supplier_evaluation_unacceptable' => ['icon' => 'warning', 'group' => 'supplier'],
+    ];
+}
+
+/**
+ * Tek bir bildirimin ikonu ve grubu. Bilinmeyen tur genel gruba duser, boylece
+ * eski kayitlar da ikonsuz kalmaz.
+ *
+ * @return array{icon: string, group: string}
+ */
+function qmsNotificationMeta(string $type): array
+{
+    return qmsNotificationTypes()[$type] ?? ['icon' => 'notifications', 'group' => 'general'];
+}
+
+/** @return array<string, string> */
+function qmsNotificationGroupLabels(): array
+{
+    return [
+        'capa' => 'Düzeltici Faaliyet',
+        'document' => 'Doküman',
+        'training' => 'Eğitim',
+        'supplier' => 'Tedarikçi',
+        'general' => 'Genel',
+    ];
+}
+
+/** @return array<string, string> */
+function qmsNotificationGroupI18nKeys(): array
+{
+    return [
+        'capa' => 'notificationGroupCapaLabel',
+        'document' => 'notificationGroupDocumentLabel',
+        'training' => 'notificationGroupTrainingLabel',
+        'supplier' => 'notificationGroupSupplierLabel',
+        'general' => 'notificationGroupGeneralLabel',
+    ];
+}
+
+/**
  * Sirkete atanmis sistem adminlerine bildirim yazar.
  *
  * Super adminler bilincli olarak disarida birakilir: her sirketin her kaydi

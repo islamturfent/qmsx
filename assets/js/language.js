@@ -784,6 +784,17 @@ Object.assign(translations.en, {
     supplierScoreKpi: "Supplier Score", suppliersLegend: "Suppliers"
 });
 
+Object.assign(translations.tr, {
+    notificationGroupCapaLabel: "Düzeltici Faaliyet", notificationGroupDocumentLabel: "Doküman",
+    notificationGroupTrainingLabel: "Eğitim", notificationGroupSupplierLabel: "Tedarikçi",
+    notificationGroupGeneralLabel: "Genel"
+});
+Object.assign(translations.en, {
+    notificationGroupCapaLabel: "Corrective Action", notificationGroupDocumentLabel: "Document",
+    notificationGroupTrainingLabel: "Training", notificationGroupSupplierLabel: "Supplier",
+    notificationGroupGeneralLabel: "General"
+});
+
 const languageToggle = document.getElementById("languageToggle");
 
 let currentLanguage = localStorage.getItem("qms-language") || "tr";

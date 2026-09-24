@@ -9,6 +9,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/document-editor.php';
+require_once __DIR__ . '/includes/notifications.php';
 $_SESSION["document_csrf"] ??= bin2hex(random_bytes(32));
 
 $documentId = (int) ($_GET["id"] ?? 0);
@@ -197,16 +198,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "approver_user_id" => $approverId,
                 "request_note" => $requestNote !== "" ? $requestNote : null
             ]);
-            $notificationStmt = $pdo->prepare(
-                "INSERT INTO notifications (user_id, notification_type, title, message, link_url)
-                 VALUES (:user_id, 'document_approval_request', :title, :message, :link_url)"
+            qmsNotify(
+                $pdo,
+                $approverId,
+                "document_approval_request",
+                "Yeni doküman onay talebi",
+                $document["document_code"] . " · " . $document["title"],
+                "document-detail.php?id=" . $documentId
             );
-            $notificationStmt->execute([
-                "user_id" => $approverId,
-                "title" => "Yeni doküman onay talebi",
-                "message" => $document["document_code"] . " · " . $document["title"],
-                "link_url" => "document-detail.php?id=" . $documentId
-            ]);
             $pdo->prepare("UPDATE documents SET status = 'review' WHERE id = :id")
                 ->execute(["id" => $documentId]);
             $pdo->commit();
@@ -239,18 +238,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "decision_note" => $decisionNote !== "" ? $decisionNote : null,
                 "id" => $approvalId
             ]);
-            if (!empty($approval["requested_by"])) {
-                $notificationStmt = $pdo->prepare(
-                    "INSERT INTO notifications (user_id, notification_type, title, message, link_url)
-                     VALUES (:user_id, 'document_approval_decision', :title, :message, :link_url)"
-                );
-                $notificationStmt->execute([
-                    "user_id" => (int) $approval["requested_by"],
-                    "title" => $decision === "approved" ? "Doküman onaylandı" : "Doküman düzeltme için geri gönderildi",
-                    "message" => $document["document_code"] . " · " . $document["title"],
-                    "link_url" => "document-detail.php?id=" . $documentId
-                ]);
-            }
+            qmsNotify(
+                $pdo,
+                (int) ($approval["requested_by"] ?? 0),
+                "document_approval_decision",
+                $decision === "approved" ? "Doküman onaylandı" : "Doküman düzeltme için geri gönderildi",
+                $document["document_code"] . " · " . $document["title"],
+                "document-detail.php?id=" . $documentId
+            );
             $nextStatus = $decision === "approved" ? "approved" : "draft";
             $pdo->prepare("UPDATE documents SET status = :status WHERE id = :id")
                 ->execute(["status" => $nextStatus, "id" => $documentId]);
@@ -274,16 +269,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             );
             $requesterStmt->execute(["document_id" => $documentId]);
             $requesterId = (int) ($requesterStmt->fetchColumn() ?: 0);
-            if ($requesterId > 0) {
-                $pdo->prepare(
-                    "INSERT INTO notifications (user_id, notification_type, title, message, link_url)
-                     VALUES (:user_id, 'document_published', 'Doküman yayımlandı', :message, :link_url)"
-                )->execute([
-                    "user_id" => $requesterId,
-                    "message" => $document["document_code"] . " · " . $document["title"],
-                    "link_url" => "document-detail.php?id=" . $documentId
-                ]);
-            }
+            qmsNotify(
+                $pdo,
+                $requesterId,
+                "document_published",
+                "Doküman yayımlandı",
+                $document["document_code"] . " · " . $document["title"],
+                "document-detail.php?id=" . $documentId
+            );
             $pdo->commit();
             header("Location: document-detail.php?id=" . $documentId . "&workflow=published");
             exit;

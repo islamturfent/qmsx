@@ -833,6 +833,43 @@ body.has-sidebar .page-container.narrow-page {
     font-weight: 600;
 }
 
+.notification-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Grup renkleri: ikon hangi modulden geldigini tasir, etiket notr kalir. */
+.notification-icon-capa {
+    background: var(--brand-soft);
+    color: var(--brand-soft-text);
+}
+
+.notification-icon-document {
+    background: var(--purple-soft);
+    color: var(--purple-soft-text);
+}
+
+.notification-icon-training {
+    background: var(--success-soft);
+    color: var(--success-soft-text);
+}
+
+.notification-icon-supplier {
+    background: var(--orange-soft);
+    color: var(--orange-soft-text);
+}
+
+.notification-icon-general {
+    background: var(--neutral-soft);
+    color: var(--neutral-soft-text);
+}
+
+.notification-content .status-pill {
+    align-self: flex-start;
+    background: var(--neutral-soft);
+    color: var(--neutral-soft-text) !important;
+}
+
 .notification-content {
     display: flex;
     min-width: 0;

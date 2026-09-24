@@ -162,6 +162,25 @@ capaCheck(count(qmsCapaStatusI18nKeys()) === count(QMS_CAPA_STATUSES), 'Every st
 capaCheck(qmsCsrfToken('capa-a') !== qmsCsrfToken('capa-b'), 'CSRF tokens are scoped per screen');
 capaCheck(qmsCsrfToken('capa-a') === qmsCsrfToken('capa-a'), 'CSRF token is stable within a session');
 
+// ---- Bildirim arayuz haritasi (paylasilan altyapi).
+$notificationTypes = qmsNotificationTypes();
+capaCheck(isset($notificationTypes['corrective_action_assigned']) && isset($notificationTypes['corrective_action_verification']) && isset($notificationTypes['corrective_action_closed']), 'Every CAPA notification type has an icon entry');
+capaCheck(qmsNotificationMeta('corrective_action_verification')['group'] === 'capa', 'CAPA types map to the CAPA group');
+capaCheck(qmsNotificationMeta('document_published')['group'] === 'document', 'Document types map to the document group');
+capaCheck(qmsNotificationMeta('training_assigned')['group'] === 'training' && qmsNotificationMeta('supplier_approved')['group'] === 'supplier', 'Training and supplier types map to their groups');
+capaCheck(qmsNotificationMeta('bilinmeyen_tur') === ['icon' => 'notifications', 'group' => 'general'], 'Unknown type falls back to the general group');
+$groupLabels = qmsNotificationGroupLabels();
+$groupKeys = qmsNotificationGroupI18nKeys();
+capaCheck(array_keys($groupLabels) === array_keys($groupKeys), 'Every notification group has a label and an i18n key');
+$unmappedGroups = [];
+foreach ($notificationTypes as $type => $meta) {
+    if (!isset($groupLabels[$meta['group']]) || !isset($groupKeys[$meta['group']])) {
+        $unmappedGroups[] = $type;
+    }
+}
+capaCheck($unmappedGroups === [], 'Every mapped notification type points at a known group');
+capaCheck(qmsNotificationMeta('corrective_action_closed')['icon'] !== qmsNotificationMeta('corrective_action_assigned')['icon'], 'Closure and assignment use different icons');
+
 capaCheck((int) $pdo->query('SELECT COUNT(*) FROM corrective_actions')->fetchColumn() === 3, 'Temporary table holds only the fixtures');
 
 session_destroy();
