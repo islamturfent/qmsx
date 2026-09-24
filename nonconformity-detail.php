@@ -9,6 +9,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/vocabulary.php';
 
 $nonconformityId = (int) ($_GET["id"] ?? 0);
 
@@ -107,11 +108,8 @@ $statusLabels = [
     "closed" => "Kapalı"
 ];
 
-$severityLabels = [
-    "minor" => "Minör",
-    "major" => "Majör",
-    "critical" => "Kritik"
-];
+// Onem sozlugu tek kaynaktan gelir (includes/vocabulary.php).
+$severityLabels = qmsSeverityLabels();
 
 $correctiveActionsStmt = $pdo->prepare(
     "SELECT * FROM corrective_actions
