@@ -242,21 +242,58 @@ Two real defects were caught this way:
 - The web editor uses locally hosted TinyMCE 8.9.1 GPL core; see
   `docs/TINYMCE-EDITOR.md`. No Tiny Cloud/CDN/API key is used.
 
+### TailAdmin value reference (verified against their source, 2026-09-24)
+
+Component styling mirrors TailAdmin's real class values rather than approximating
+them. Source of truth for the numbers: their `sidebar.html`, `header.html` and the
+`Button`/`InputField`/`Badge` components.
+
+| Piece | TailAdmin | Here |
+| --- | --- | --- |
+| Sidebar | `w-72.5 px-5` | 290px wide, `padding: 0 20px` |
+| Sidebar brand | `pt-8 pb-7` | `padding: 32px 4px 28px` |
+| Menu item | `rounded-lg px-3 py-2 text-theme-sm font-medium` | 40px tall, `8px 12px`, 14px/500 |
+| Menu icon | `text-gray-500`, active `text-brand-500` | `--gray-500` / `--brand-500` |
+| Header | `lg:py-4 xl:px-6` | `padding: 16px 24px`, height from content |
+| Header controls | `h-11 w-11 rounded-full border-gray-200` | 44px circle, `--border-subtle` |
+| User area | borderless: `h-11 w-11` avatar + name + caret | no border, no background |
+| User dropdown | `w-65 rounded-2xl p-3 mt-4.25` | 260px, 16px radius, 12px pad, 17px offset |
+| Input | `h-11 rounded-lg px-4 py-2.5 shadow-theme-xs` | 44px, `10px 16px`, theme-xs |
+| Button | `sm: px-4 py-3` / `md: px-5 py-3.5` | 44px (their `sm` size) |
+| Table th | `px-5 py-3 text-theme-xs font-medium text-gray-500` | `12px 20px`, 12px/500 |
+| Table td | `px-5 py-4 text-theme-sm` | `16px 20px` |
+
+Two deliberate deviations: buttons use TailAdmin's `sm` size rather than `md`
+because this app's UI standards call for compact buttons, and table cells use
+`--text-body` (gray-700) instead of their gray-500 because our tables have no
+per-column emphasis, so uniform gray-500 reads washed out.
+
 ## Open items
 
-- Excel/PDF export extension is the next module candidate; agree the scope with
-  the user before implementing.
+- Excel/PDF export extension was completed on 2026-09-24: the exports now carry
+  detail sheets/sections for audits, nonconformities, corrective actions and the
+  risk register, on top of the existing KPI and summary content. Excel has 7
+  sheets, the PDF adds four detail tables and prints "no records this period"
+  when a section is empty. The next module candidate is therefore open again -
+  agree the scope with the user before starting.
 - Phase 2 (CAPA) is complete: evidence files and corrective-action notifications
   are both implemented. `corrective_actions.responsible_user_id` supplies the
   recipient, so a corrective action can now be assigned to a real account.
   Notifications go to the responsible user (assignment, closure) and to the
   company's assigned system admins (verification requested); a user never gets a
   notification for their own action. Worth a UI pass to confirm it reads well.
-- Dead CSS classes with no markup: `admin-action-grid`, `admin-action-button`,
-  `form-section`, `editor-toolbar`, `topbar-action-link`. Safe to remove after a
-  re-check.
-- `language.js` may still hold unused keys; the scan attempted earlier was
-  unreliable, so re-verify before deleting anything.
+- Dead CSS was removed on 2026-09-24: `admin-action-grid`, `admin-action-button`,
+  `form-section`, `super-admin-section`, `editor-toolbar` and `topbar-action-link`.
+  Reminder for next time: deleting the main block is not enough - the media queries
+  referenced them too, and a first pass missed those leftovers.
+- Unused `language.js` keys were removed on 2026-09-24 (30 keys, TR and EN).
+  **Scan gotcha:** a naive "is this key used" scan gives false positives. Keys built
+  dynamically (`data-i18n="actionStatus<?= ... ?>Label"`) and keys picked with
+  single quotes in PHP (`'loginLinkLabel'`) both look unused. Check both patterns
+  before deleting.
+- `qmsVisibleCompanyIds()` returning `null` means "no restriction". Wrapping the
+  result in `?? []` silently turns a super admin into "sees nothing" - this trap
+  produced two real bugs. See the warning in `includes/access.php`.
 
 ## Working preferences
 
