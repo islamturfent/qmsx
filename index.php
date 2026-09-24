@@ -29,7 +29,7 @@ $isLoggedIn = isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] ==
         <div class="topbar-inner">
 
             <div class="brand">
-                <div class="brand-icon">Q</div>
+                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QMS"></div>
 
                 <div class="brand-text">
                     <strong>QMS</strong>

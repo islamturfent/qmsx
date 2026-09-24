@@ -267,7 +267,7 @@ $resultLabels = [
     <header class="topbar">
         <div class="topbar-inner">
             <a class="brand" href="dashboard.php">
-                <div class="brand-icon">Q</div>
+                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QMS"></div>
                 <div class="brand-text">
                     <strong>QMS</strong>
                     <span>Quality Management System</span>

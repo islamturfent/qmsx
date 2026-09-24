@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="brand">
                 <a class="brand" href="index.php">
-                <div class="brand-icon">Q</div>
+                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QMS"></div>
 
                 <div class="brand-text">
                     <strong>QMS</strong>
