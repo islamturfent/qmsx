@@ -16,6 +16,27 @@ require_once __DIR__ . '/notifications.php';
 /** Faaliyet durum akisi. */
 const QMS_CAPA_STATUSES = ['planned', 'in_progress', 'verification', 'completed', 'closed'];
 
+/** Faaliyet turleri. */
+const QMS_CAPA_TYPES = ['corrective', 'preventive'];
+
+/** @return array<string, string> */
+function qmsCapaTypeLabels(): array
+{
+    return [
+        'corrective' => 'Düzeltici',
+        'preventive' => 'Önleyici',
+    ];
+}
+
+/** @return array<string, string> */
+function qmsCapaTypeI18nKeys(): array
+{
+    return [
+        'corrective' => 'capaTypeCorrectiveLabel',
+        'preventive' => 'capaTypePreventiveLabel',
+    ];
+}
+
 /** @return array<string, string> */
 function qmsCapaStatusLabels(): array
 {

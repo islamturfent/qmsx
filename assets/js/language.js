@@ -322,7 +322,7 @@ const translations = {
         ,actionStatusVerificationLabel: "Doğrulama"
         ,actionStatusCompletedLabel: "Tamamlandı"
         ,actionStatusClosedLabel: "Kapalı"
-        ,actionManagementTitle: "Aksiyon Yönetimi"
+        ,actionManagementTitle: "Düzeltici & Önleyici Faaliyet (CAPA)"
         ,actionManagementText: "Uygunsuzlukları ve düzeltici faaliyetleri tek merkezden izleyin."
         ,activeCorrectiveActionsLabel: "Devam Eden Faaliyetler"
         ,overdueActionsLabel: "Geciken Kayıtlar"
@@ -790,7 +790,7 @@ const translations = {
         ,actionStatusVerificationLabel: "Verification"
         ,actionStatusCompletedLabel: "Completed"
         ,actionStatusClosedLabel: "Closed"
-        ,actionManagementTitle: "Action Management"
+        ,actionManagementTitle: "Corrective & Preventive Action (CAPA)"
         ,actionManagementText: "Track nonconformities and corrective actions from one central workspace."
         ,activeCorrectiveActionsLabel: "Active Actions"
         ,overdueActionsLabel: "Overdue Records"
@@ -1973,6 +1973,14 @@ translations.en.overdueComplaintsLabel = "Complaint";
 translations.en.overdueEmpty = "Great! Nothing is overdue.";
 translations.en.overdueListTitle = "Overdue Records";
 translations.en.overdueListText = "Records past their due date that are still open.";
+
+// --- CAPA faaliyet türü ---
+translations.tr.actionTypeLabel = "Faaliyet Türü";
+translations.tr.capaTypeCorrectiveLabel = "Düzeltici";
+translations.tr.capaTypePreventiveLabel = "Önleyici";
+translations.en.actionTypeLabel = "Action Type";
+translations.en.capaTypeCorrectiveLabel = "Corrective";
+translations.en.capaTypePreventiveLabel = "Preventive";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";

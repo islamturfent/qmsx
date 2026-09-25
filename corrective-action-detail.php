@@ -114,6 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     } elseif ($formType === "update_action") {
     $formData = [
+        "action_type" => (string) ($_POST["action_type"] ?? ($action["action_type"] ?? "corrective")),
         "action_text" => trim($_POST["action_text"] ?? ""),
         "responsible_person" => trim($_POST["responsible_person"] ?? ""),
         "responsible_user_id" => (int) ($_POST["responsible_user_id"] ?? 0),
@@ -127,6 +128,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($formData["responsible_user_id"] > 0 && !in_array($formData["responsible_user_id"], $allowedResponsibleIds, true)) {
         $formData["responsible_user_id"] = 0;
     }
+    if (!in_array($formData["action_type"], QMS_CAPA_TYPES, true)) {
+        $formData["action_type"] = "corrective";
+    }
 
     if ($formData["action_text"] === "") {
         $formError = "Lütfen düzeltici faaliyeti açıklayın.";
@@ -139,7 +143,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $updateStmt = $pdo->prepare(
             "UPDATE corrective_actions
-             SET action_text = :action_text,
+             SET action_type = :action_type,
+                 action_text = :action_text,
                  responsible_person = :responsible_person,
                  responsible_user_id = :responsible_user_id,
                  due_date = :due_date,
@@ -152,6 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
              WHERE id = :id"
         );
         $updateStmt->execute([
+            "action_type" => $formData["action_type"],
             "action_text" => $formData["action_text"],
             "responsible_person" => $formData["responsible_person"] !== "" ? $formData["responsible_person"] : null,
             "responsible_user_id" => $formData["responsible_user_id"] > 0 ? $formData["responsible_user_id"] : null,
@@ -196,6 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 $statusLabels = qmsCapaStatusLabels();
+$capaTypeLabels = qmsCapaTypeLabels();
 $statusI18n = qmsCapaStatusI18nKeys();
 $evidenceFiles = qmsCapaEvidenceList($pdo, $actionId);
 
@@ -249,6 +256,12 @@ $activeNav = "companies";
                     <strong class="dashboard-card-number detail-card-value"><?= htmlspecialchars($action["due_date"] ?: "-", ENT_QUOTES, "UTF-8") ?></strong>
                 </div>
             </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="actionTypeLabel">Faaliyet Türü</span>
+                    <strong class="dashboard-card-number detail-card-value"><?= htmlspecialchars($capaTypeLabels[$action["action_type"] ?? "corrective"] ?? ($action["action_type"] ?? "corrective"), ENT_QUOTES, "UTF-8") ?></strong>
+                </div>
+            </div>
         </section>
         <section class="form-panel">
             <?php if (isset($_GET["updated"]) && $_GET["updated"] === "1"): ?>
@@ -266,6 +279,14 @@ $activeNav = "companies";
                 <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, "UTF-8") ?>">
                 <input type="hidden" name="form_type" value="update_action">
                 <div class="form-grid">
+                    <label class="form-field">
+                        <span data-i18n="actionTypeLabel">Faaliyet Türü</span>
+                        <select name="action_type">
+                            <?php foreach ($capaTypeLabels as $typeKey => $typeLabel): ?>
+                                <option value="<?= $typeKey ?>" <?= ($action["action_type"] ?? "corrective") === $typeKey ? "selected" : "" ?>><?= htmlspecialchars($typeLabel, ENT_QUOTES, "UTF-8") ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
                     <label class="form-field form-field-wide">
                         <span data-i18n="actionTextLabel">Faaliyet Açıklaması</span>
                         <textarea name="action_text" rows="4" required><?= htmlspecialchars($action["action_text"], ENT_QUOTES, "UTF-8") ?></textarea>

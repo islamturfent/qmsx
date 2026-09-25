@@ -561,6 +561,11 @@ body.has-sidebar .page-container.narrow-page {
     color: var(--brand-soft-text);
 }
 
+.type-capa {
+    background: var(--violet-soft);
+    color: var(--violet-soft-text);
+}
+
 .overdue-badge {
     background: var(--error-soft);
     color: var(--error-soft-text);

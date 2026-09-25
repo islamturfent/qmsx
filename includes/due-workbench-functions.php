@@ -203,3 +203,21 @@ function qmsOverdueWorkbench(PDO $pdo, int $userId, string $role): array
 
     return $sections;
 }
+
+/**
+ * Geciken duzeltici faaliyet sayisi (menu rozeti icin tek sorgu).
+ */
+function qmsOverdueActionCount(PDO $pdo, int $userId, string $role): int
+{
+    $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role);
+    $scope = qmsCompanyScope('n.company_id', $companyIds);
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*)
+         FROM corrective_actions ca
+         INNER JOIN nonconformities n ON n.id = ca.nonconformity_id
+         WHERE ca.active = 1 AND ca.due_date IS NOT NULL AND ca.due_date < CURDATE()
+           AND ca.status NOT IN ('completed', 'closed')" . $scope['sql']
+    );
+    $stmt->execute($scope['params']);
+    return (int) $stmt->fetchColumn();
+}

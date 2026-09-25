@@ -13,6 +13,11 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
     $sidebarNotificationStmt->execute(["user_id" => (int) $_SESSION["qms_user_id"]]);
     $sidebarUnreadCount = (int) $sidebarNotificationStmt->fetchColumn();
 }
+$sidebarOverdueCount = 0;
+if (!empty($pdo) && !$isAuditorNav && isset($_SESSION["qms_user_id"])) {
+    require_once __DIR__ . '/due-workbench-functions.php';
+    $sidebarOverdueCount = qmsOverdueActionCount($pdo, (int) $_SESSION["qms_user_id"], qmsCurrentRole());
+}
 
 function sidebarLinkClass(string $key, string $activeNav): string
 {
@@ -107,7 +112,8 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         <?php endif; ?>
         <a class="<?= sidebarLinkClass("actions", $activeNav) ?>" href="actions.php">
             <?= appIcon("check") ?>
-            <span data-i18n="actionManagementTitle">Aksiyon Yönetimi</span>
+            <span data-i18n="actionManagementTitle">Düzeltici & Önleyici Faaliyet (CAPA)</span>
+            <?php if ($sidebarOverdueCount > 0): ?><span class="sidebar-count"><?= $sidebarOverdueCount ?></span><?php endif; ?>
         </a>
         <a class="<?= sidebarLinkClass("risks", $activeNav) ?>" href="risks.php">
             <?= appIcon("warning") ?>

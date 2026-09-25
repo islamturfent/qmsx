@@ -32,11 +32,14 @@ $csrfToken = $_SESSION["corrective_action_csrf"];
 
 $formError = "";
 $formData = [
+    "action_type" => "corrective",
     "action_text" => "",
     "responsible_person" => "",
     "responsible_user_id" => 0,
     "due_date" => ""
 ];
+$capaTypeLabels = qmsCapaTypeLabels();
+$capaTypeI18n = qmsCapaTypeI18nKeys();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!hash_equals($csrfToken, (string) ($_POST["csrf"] ?? ""))) {
@@ -45,11 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $formData = [
+        "action_type" => (string) ($_POST["action_type"] ?? "corrective"),
         "action_text" => trim($_POST["action_text"] ?? ""),
         "responsible_person" => trim($_POST["responsible_person"] ?? ""),
         "responsible_user_id" => (int) ($_POST["responsible_user_id"] ?? 0),
         "due_date" => trim($_POST["due_date"] ?? "")
     ];
+    if (!in_array($formData["action_type"], QMS_CAPA_TYPES, true)) {
+        $formData["action_type"] = "corrective";
+    }
 
     // Yalnizca bu sirkette sorumlu olabilecek kullanicilar kabul edilir.
     if ($formData["responsible_user_id"] > 0 && !in_array($formData["responsible_user_id"], $allowedResponsibleIds, true)) {
@@ -61,12 +68,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         $insertStmt = $pdo->prepare(
             "INSERT INTO corrective_actions
-                (nonconformity_id, action_text, responsible_person, responsible_user_id, due_date, status, active)
+                (nonconformity_id, action_type, action_text, responsible_person, responsible_user_id, due_date, status, active)
              VALUES
-                (:nonconformity_id, :action_text, :responsible_person, :responsible_user_id, :due_date, 'planned', 1)"
+                (:nonconformity_id, :action_type, :action_text, :responsible_person, :responsible_user_id, :due_date, 'planned', 1)"
         );
         $insertStmt->execute([
             "nonconformity_id" => $nonconformityId,
+            "action_type" => $formData["action_type"],
             "action_text" => $formData["action_text"],
             "responsible_person" => $formData["responsible_person"] !== "" ? $formData["responsible_person"] : null,
             "responsible_user_id" => $formData["responsible_user_id"] > 0 ? $formData["responsible_user_id"] : null,
@@ -135,6 +143,14 @@ $activeNav = "companies";
                 <input type="hidden" name="nonconformity_id" value="<?= $nonconformityId ?>">
                 <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, "UTF-8") ?>">
                 <div class="form-grid">
+                    <label class="form-field">
+                        <span data-i18n="actionTypeLabel">Faaliyet Türü</span>
+                        <select name="action_type">
+                            <?php foreach ($capaTypeLabels as $typeKey => $typeLabel): ?>
+                                <option value="<?= $typeKey ?>" <?= $formData["action_type"] === $typeKey ? "selected" : "" ?>><?= htmlspecialchars($typeLabel, ENT_QUOTES, "UTF-8") ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
                     <label class="form-field form-field-wide">
                         <span data-i18n="actionTextLabel">Faaliyet Açıklaması</span>
                         <textarea name="action_text" rows="5" required><?= htmlspecialchars($formData["action_text"], ENT_QUOTES, "UTF-8") ?></textarea>

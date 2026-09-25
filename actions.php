@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/vocabulary.php';
+require_once __DIR__ . '/includes/capa-functions.php';
 
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -189,6 +190,7 @@ $activeNav = "actions";
                             <div class="action-list-main">
                                 <div class="action-list-badges">
                                     <span class="type-badge <?= $record["record_type"] === "nonconformity" ? "type-nonconformity" : "type-corrective" ?>"><?= $record["record_type"] === "nonconformity" ? "Uygunsuzluk" : "Düzeltici Faaliyet" ?></span>
+                                    <?php if ($record["record_type"] === "corrective_action"): ?><span class="type-badge type-capa"><?= htmlspecialchars(qmsCapaTypeLabels()[$record["action_type"] ?? "corrective"] ?? ($record["action_type"] ?? "corrective"), ENT_QUOTES, "UTF-8") ?></span><?php endif; ?>
                                     <span class="status-badge status-<?= htmlspecialchars($record["status"], ENT_QUOTES, "UTF-8") ?>"><?= htmlspecialchars($statusLabels[$record["status"]] ?? $record["status"], ENT_QUOTES, "UTF-8") ?></span>
                                     <?php if ($isOverdue): ?><span class="overdue-badge" data-i18n="overdueLabel">Gecikmiş</span><?php endif; ?>
                                 </div>
