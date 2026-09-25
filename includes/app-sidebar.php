@@ -153,6 +153,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("table") ?>
             <span data-i18n="documentDistributionMenuLabel">Dağıtım Kontrolü</span>
         </a>
+        <a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="document-compare.php">
+            <?= appIcon("documents") ?>
+            <span data-i18n="docCompareMenuLabel">Versiyon Karşılaştırma</span>
+        </a>
         <a class="<?= sidebarLinkClass("equipment", $activeNav) ?>" href="equipment.php">
             <?= appIcon("table") ?>
             <span data-i18n="equipmentMenuLabel">Ekipman ve Kalibrasyon</span>

@@ -1052,6 +1052,110 @@ body.has-sidebar .page-container.narrow-page {
 .legend-red { background: var(--danger-color); }
 .legend-teal { background: var(--success-color); }
 
+/* Dokumen versiyon karsilastirma */
+.compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.compare-panel {
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: var(--surface-color);
+    overflow: hidden;
+}
+
+.compare-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-row);
+    background: var(--surface-muted);
+    padding: 12px 16px;
+}
+
+.compare-panel-head strong {
+    color: var(--text-body);
+    font-size: 13px;
+}
+
+.compare-panel-head span {
+    color: var(--muted-color);
+    font-size: 12px;
+}
+
+.compare-panel-body {
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 16px;
+    color: var(--text-body);
+}
+
+.compare-doc-body p,
+.compare-doc-body ul,
+.compare-doc-body ol,
+.compare-doc-body blockquote,
+.compare-doc-body h1,
+.compare-doc-body h2,
+.compare-doc-body h3 {
+    margin: 0 0 10px;
+}
+
+.compare-doc-body table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.compare-doc-body th,
+.compare-doc-body td {
+    border: 1px solid var(--border-subtle);
+    padding: 6px 8px;
+}
+
+.diff-view {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 480px;
+    overflow-y: auto;
+    background: var(--surface-color);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.diff-line {
+    padding: 3px 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.diff-same {
+    color: var(--text-body);
+    background: transparent;
+}
+
+.diff-add {
+    color: var(--success-soft-text);
+    background: var(--success-soft);
+}
+
+.diff-del {
+    color: var(--error-soft-text);
+    background: var(--error-soft);
+    text-decoration: line-through;
+}
+
+@media (max-width: 768px) {
+    .compare-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .status-chart {
     display: flex;
     flex-direction: column;
