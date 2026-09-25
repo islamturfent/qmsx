@@ -1,7 +1,7 @@
 # QMS continuation note
 
 Recorded: 2026-09-18 (Europe/Istanbul).
-Last updated: 2026-09-25. The state below was re-verified on that date; it is not
+Last updated: 2026-09-30. The state below was re-verified on that date; it is not
 carried over from earlier assumptions.
 
 ## Workspace
@@ -37,8 +37,11 @@ carried over from earlier assumptions.
   | `tests/audit-report.php` | 26 |
   | `tests/audit-log.php` | 16 |
   | `tests/audit-program.php` | 16 |
+  | `tests/equipment.php` | 12 |
+  | `tests/search.php` | 11 |
+  | `tests/permissions.php` | 17 |
 
-  389 checks total. All suites use temporary tables and leave real records
+  429 checks total (17 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -388,6 +391,61 @@ Yearly audit-planning module: groups a company's audits under a program.
 - 16 temp-table checks + an HTTP harness (create, link/unlink, status flow, CSRF,
   exports, cross-tenant isolation).
 
+## Kalibrasyon / Ekipman modulu (2026-09-30)
+
+Eighth product module, from the "başka bir modül/yüzey" follow-up.
+
+- Schema: `equipment` + `calibrations` (migration `20260930-equipment.sql`).
+- Calibration **status is derived**, never stored: `next_calibration_date` drives
+  `not_scheduled / calibrated / due_soon / overdue`. There is no stored status copy,
+  so the two cannot drift.
+- `includes/equipment-functions.php` owns scoped reads, the derived status, and an
+  overdue/upcoming helper used by the notification feed.
+- Pages: `equipment.php` (list), `equipment-create.php`, `equipment-detail.php`
+  (calibration history + add/edit + delete). Sidebar entry for management roles.
+- Notification group `calibration`; a `calibration_failed` reminder joins the
+  existing group map in `includes/notifications.php`.
+- Reporting: an equipment/overdue KPI plus a calibration detail list in
+  `includes/report-export-data.php`, a fourteenth Excel sheet (`Ekipman`) and an
+  eleventh PDF detail table.
+- 12 temp-table checks + an HTTP harness (scoped reads, derived status, history
+  add/edit/delete, CSRF, exports).
+
+## Semantik arama + benzer vaka (2026-09-30)
+
+A search surface across the record chain, from the same follow-up.
+
+- `includes/search-functions.php` owns a **local** keyword matcher: keyword tokens
+  + `LIKE` + a relevance score; no external AI service.
+- `corrective_actions` has no `company_id`, so the type definition uses a join to
+  `nonconformities` plus a `company_col` so every searchable type resolves its
+  tenant.
+- `search.php` scopes results to the caller's company scope; the type filter also
+  drives the "Benzer Vakalar" panel (cross-type by design).
+- 11 temp-table checks + an HTTP harness (tenant isolation, relevance ranking,
+  type filter, empty-query handling). Fixtures cleaned.
+
+## RBAC - izin servisi ve matris (2026-09-30)
+
+A read-only permission-matrix surface plus a single source of truth for role
+checks. Proposed as a *layer*, delivered as a concrete surface (a super-admin
+page) because the layer alone had nothing reviewable.
+
+- `includes/permissions.php` is the single source: `qmsCan`, `qmsCanSession`,
+  `qmsRequirePermission`, `qmsPermissionMatrix` - 15 actions across 4 roles
+  (super_admin / system_admin / auditor / company_user).
+- `permissions.php` is a read-only matrix view (`permissions.view`, super admin
+  only). Sidebar "İzinler" under Sistem Yönetimi; i18n TR/EN; icon from
+  `appIcon()`.
+- **Representative gate moved**: only `audit-trail.php` now checks
+  `qmsCanSession('audit_trail.view')`. The rest of the pages still work as-is;
+  the service is the single source going forward. Full propagation to the other
+  role gates (reports, super-admin-*, my-audits, exports) is an explicit, not-yet
+  approved open item - do not expand it silently.
+- 17 temp-table checks + an HTTP harness (every action resolves to a known role
+  set, unknown action/role denied, matrix covers every action, role-specific
+  scenarios). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -601,9 +659,10 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 13 sheets, the PDF adds
-  ten detail tables (management review and audit programs added the last
-  sheets/tables) and prints "no records this period" when a section is empty.
+  of the existing KPI and summary content. Excel has 14 sheets, the PDF has
+  eleven detail tables (management review, audit programs and equipment added
+  the last sheets/tables) and prints "no records this period" when a section
+  is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
@@ -611,6 +670,11 @@ per-column emphasis, so uniform gray-500 reads washed out.
   able to *create* a nonconformity. That needs `nonconformities.audit_id` to become
   nullable (or a source column) plus a review of the screens that join audits.
   Linked-only is the current, deliberately conservative choice.
+- RBAC propagation is open by design. The permission service
+  (`includes/permissions.php`) is the single source, but only `audit-trail.php`
+  was moved onto it as a representative gate. Do not extend the remaining role
+  gates (reports, super-admin-*, my-audits, exports) onto the service without
+  explicit approval.
 - Migration runner gotcha (hit on 2026-09-25): `explode(';')` splits on semicolons
   inside SQL comments too. `scripts/migrate-suppliers.php` strips `^--` lines first;
   do the same in any new runner.
