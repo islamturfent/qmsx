@@ -1,0 +1,12 @@
+CREATE TABLE document_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    name VARCHAR(160) NOT NULL,
+    document_type VARCHAR(40) NOT NULL DEFAULT 'procedure',
+    category VARCHAR(120) NULL,
+    content_html MEDIUMTEXT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_by INT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
