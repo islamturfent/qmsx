@@ -43,8 +43,9 @@ carried over from earlier assumptions.
   | `tests/complaint-nonconformity.php` | 13 |
   | `tests/checklist-templates.php` | 15 |
   | `tests/document-review.php` | 21 |
+  | `tests/satisfaction.php` | 14 |
 
-  478 checks total (20 suites). All suites use temporary tables and leave real records
+  492 checks total (21 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -534,6 +535,28 @@ A dedicated review work queue on top of the existing `documents.review_date`
   review record + date advance + history + audit log, invalid/cross-tenant
   rejection, flash render). Fixtures and the audit_log rows were cleaned.
 
+## Müşteri memnuniyeti ankette (2026-09-30)
+
+A company-scoped satisfaction survey module: survey templates (question sets),
+ customer responses rated 1-5, and a derived average satisfaction score.
+
+- Schema `satisfaction_surveys`, `satisfaction_questions`, `satisfaction_responses`,
+  `satisfaction_response_answers` (migration `20260930-satisfaction.sql`, idempotent
+  runner `scripts/migrate-satisfaction.php`). All company-scoped.
+- `includes/satisfaction-functions.php` owns scoped list/find/questions/responses
+  and `qmsSatisfactionRecordResponse()`: it accepts only the survey's own question
+  ratings (cross-tenant and unknown question ids are ignored), stores the answers,
+  and derives `overall_score` as the 1-5 average of the valid ratings.
+- Pages: `satisfaction-surveys.php` (list + summary), `satisfaction-survey-create.php`,
+  `satisfaction-survey-detail.php` (edit + question add/remove + customer response
+  entry + response list). Sidebar entry under "Şikayet Yönetimi".
+- Reporting: `satisfaction_count` + `satisfaction_avg` metrics, a satisfaction KPI
+  tile on `reports.php`, a fifteenth Excel sheet (`Memnuniyet`) and a twelfth PDF
+  detail table.
+- 14 temp-table checks + an HTTP harness (create survey, questions, record a
+  response, derived average, response list, cross-tenant rejection, KPI + both
+  exports). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -747,10 +770,10 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 14 sheets, the PDF has
-  eleven detail tables (management review, audit programs and equipment added
-  the last sheets/tables) and prints "no records this period" when a section
-  is empty.
+  of the existing KPI and summary content. Excel has 15 sheets, the PDF has
+  twelve detail tables (management review, audit programs, equipment and
+  satisfaction added the last sheets/tables) and prints "no records this period"
+  when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
