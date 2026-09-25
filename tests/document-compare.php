@@ -44,4 +44,12 @@ unlink($tmpPath);
 $big = array_fill(0, 4000, 'x');
 dcCheck(qmsDiffLines($big, ['a']) === [], 'Oversized input returns empty diff instead of memory blowup');
 
+// ---- Diff ozet sayilari.
+$s = qmsDiffSummary([['type' => 'same', 'text' => 'a'], ['type' => 'add', 'text' => 'x'], ['type' => 'del', 'text' => 'b']]);
+dcCheck($s['same'] === 1 && $s['add'] === 1 && $s['del'] === 1 && $s['changed'] === 2, 'Diff summary counts same/add/del and changed');
+dcCheck(qmsDiffSummary([]) === ['same' => 0, 'add' => 0, 'del' => 0, 'changed' => 0], 'Empty diff summary is all zeros');
+
+// ---- Duz metin karsilastirma kucuk/buyuk harf duyarliligi korunur.
+dcCheck(qmsCompareTextToLines('a' . chr(10) . 'b') === ['a', 'b'], 'Simple two-line text splits correctly');
+
 echo "\nCompleted $checks document-compare checks.\n";
