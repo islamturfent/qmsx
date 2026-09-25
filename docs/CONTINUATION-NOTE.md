@@ -48,8 +48,9 @@ carried over from earlier assumptions.
   | `tests/external-audit.php` | 20 |
   | `tests/quality-cost.php` | 19 |
   | `tests/document-copy.php` | 15 |
+  | `tests/approval-workflow.php` | 21 |
 
-  563 checks total (25 suites). All suites use temporary tables and leave real records
+  584 checks total (26 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -643,6 +644,32 @@ Tracks controlled copies of documents and their distribution/return status.
 - 15 temp-table checks + an HTTP harness (scoping, filter, add, duplicate/cross-tenant
   rejection, return/redo status, KPI + both exports). Fixtures cleaned.
 
+## Onay & imza workflow (2026-09-30)
+
+A multi-step approval/signature workflow attached to records (documents,
+ contracts, etc.). Distinct from the single-step document approval inbox.
+
+- Schema `approval_runs` + `approval_run_steps` (migration
+  `20260930-approval-workflow.sql`, idempotent runner
+  `scripts/migrate-approval-workflow.php`): a run has an ordered set of steps,
+  each assigned to a signer (active system/super admin). Company-scoped.
+- `includes/approval-workflow-functions.php` owns scoped list/find/steps, the
+  current (first pending) step, run creation (up to 5 steps, validated signers
+  and scope), and signing. The run status is derived from the steps: all
+  approved -> approved, any rejected -> rejected, else in_progress. Only the
+  current step's assigned signer can sign; a signer without the company scope
+  cannot access or sign.
+- Pages: `approval-runs.php` (list + summary), `approval-runs-create.php`
+  (subject + optional linked record + up to 5 step rows), `approval-runs-detail.php`
+  (step timeline + sign form for the current signer). Sidebar entry under the
+  management block.
+- Reporting: `approval_run_count` / `approval_run_approved` / `approval_run_pending`
+  metrics, an "Onay Akışı" KPI tile on `reports.php`, a twentieth Excel sheet
+  (`Onay Akışları`) and a seventeenth PDF detail table.
+- 21 temp-table checks + an HTTP harness (two signers complete a run end to end:
+  create -> admin1 signs step1 -> admin2 signs step2 -> approved; non-current/non-
+  assigned signing rejected; rejection path; KPI + both exports). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -856,11 +883,11 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 19 sheets, the PDF has
-  sixteen detail tables (management review, audit programs, equipment,
-  satisfaction, personnel, external audits, quality costs and document
-  distribution added the last sheets/tables) and prints "no records this
-  period" when a section is empty.
+  of the existing KPI and summary content. Excel has 20 sheets, the PDF has
+  seventeen detail tables (management review, audit programs, equipment,
+  satisfaction, personnel, external audits, quality costs, document
+  distribution and approval flows added the last sheets/tables) and prints
+  "no records this period" when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
