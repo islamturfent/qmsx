@@ -52,8 +52,9 @@ carried over from earlier assumptions.
   | `tests/quality-cost-trend.php` | 12 |
   | `tests/document-compare.php` | 14 |
   | `tests/report-export-data.php` | 9 |
+  | `tests/dashboard-cockpit.php` | 10 |
 
-  619 checks total (29 suites). All suites use temporary tables and leave real records
+  629 checks total (30 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -744,6 +745,35 @@ Two follow-ups on top of the surfaces built just before.
   as empty temporary tables plus companies/users/quality_costs, then asserts the
   12-month trend shape, per-month category totals and total, an empty month, and
   that the `quality_cost_total` KPI stays correct.
+
+## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
+
+Executive overview added to `dashboard.php` (the dashboard already had audit /
+nonconformity / complaint / action / training trend strips). Two new panels make
+it a management cockpit:
+
+- **COQ mini trend:** the `qmsDashboardTrend()` buckets now also carry monthly
+  `prevention` / `appraisal` / `internal_failure` / `external_failure` / `cost_total`
+  sums (one grouped `quality_costs` query; all other series untouched). A stacked
+  monthly COQ bar chart + category legend renders from those buckets, linking to
+  `quality-cost-trend.php`.
+- **Hedef vs Gerçekleşen KPI matrisi:** new `qmsCockpitKpiMatrix()` in
+  `includes/dashboard-functions.php` returns, for every scoped company that has at
+  least one `performance_targets` row for the current year, a per-KPI
+  target/actual/on-track comparison. Actuals come from the report engine
+  (`buildReportExportData` per company - the single source of truth per
+  `performance-functions.php`), targets from `qmsPerformanceTargets`, and the
+  higher-better logic from `qmsPerformanceOnTrack`. Companies without targets are
+  omitted. Rendered as one card per company with on-track/off-track badges and a
+  compact table.
+- i18n TR/EN for both panels; new `.cockpit-*` / `.compact-table` /
+  `.secondary-button-sm` CSS (TailAdmin-flavored); cache -> v60.
+- No schema change. The dashboard already computed `$reportMetrics` once; the
+  cockpit KPI matrix runs a per-company report build only for companies that have
+  targets.
+- 10 checks (`tests/dashboard-cockpit.php`): trend buckets now include COQ
+  category sums and the other series are not disturbed, cockpit lists only
+  target-set companies, per-KPI target/on-track, and the all-on-track bookkeeping.
 
 ## Security hardening (2026-09-19)
 
