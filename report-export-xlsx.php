@@ -34,6 +34,7 @@ $metricLabels = [
     'complaint_count' => 'Şikayet Sayısı',
     'complaint_open_count' => 'Açık Şikayet',
     'review_count' => 'Gözden Geçirme Sayısı',
+    'audit_program_count' => 'Denetim Programı',
 ];
 
 $summaryRows = [
@@ -87,6 +88,8 @@ $companyRows = [[
     ['value' => 'Açık Şikayet', 'style' => 2],
     ['value' => 'Gözden Geçirmeler', 'style' => 2],
     ['value' => 'GGR Aksiyonu', 'style' => 2],
+    ['value' => 'Denetim Programları', 'style' => 2],
+    ['value' => 'Aktif Program', 'style' => 2],
 ]];
 foreach ($report['company_performance'] as $row) {
     $rate = $row['actions'] > 0 ? round(($row['completed'] / $row['actions']) * 100, 1) : 0;
@@ -105,6 +108,8 @@ foreach ($report['company_performance'] as $row) {
         ['value' => $row['complaints_open'], 'style' => 3],
         ['value' => $row['reviews'], 'style' => 3],
         ['value' => $row['reviews_actions'], 'style' => 3],
+        ['value' => $row['audit_programs'], 'style' => 3],
+        ['value' => $row['audit_programs_active'], 'style' => 3],
     ];
 }
 
@@ -321,6 +326,25 @@ foreach ($report['review_list'] as $row) {
     ];
 }
 
+$auditProgramRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Program', 'style' => 2],
+    ['value' => 'Yıl', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Bağlı Denetim', 'style' => 2],
+    ['value' => 'Onay', 'style' => 2],
+]];
+foreach ($report['audit_program_list'] as $row) {
+    $auditProgramRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => $row['year'], 'style' => 3],
+        ['value' => $row['status'], 'style' => 3],
+        ['value' => $row['linked_audits'], 'style' => 3],
+        ['value' => $row['approved_date'] ?: '-', 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -340,6 +364,7 @@ try {
         ['name' => 'Şikayetler', 'xml' => xlsxWorksheet($complaintRows, [28, 14, 34, 14, 12, 16, 14, 14, 14, 14])],
         ['name' => 'Hedefler', 'xml' => xlsxWorksheet($performanceRows, [28, 26, 12, 10, 26])],
         ['name' => 'Gözden Geçirmeler', 'xml' => xlsxWorksheet($reviewRows, [28, 34, 14, 24, 14, 10, 10, 14])],
+        ['name' => 'Denetim Programları', 'xml' => xlsxWorksheet($auditProgramRows, [28, 34, 10, 16, 12, 12])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

@@ -40,10 +40,11 @@ foreach ($report['company_performance'] as $row) {
         . $row['trainings'] . '</td><td>' . $row['trainings_completed'] . '</td><td>'
         . $row['suppliers'] . '</td><td>' . $row['suppliers_approved'] . '</td><td>'
         . $row['complaints'] . '</td><td>' . $row['complaints_open'] . '</td><td>'
-        . $row['reviews'] . '</td><td>' . $row['reviews_actions'] . '</td></tr>';
+        . $row['reviews'] . '</td><td>' . $row['reviews_actions'] . '</td><td>'
+        . $row['audit_programs'] . '</td><td>' . $row['audit_programs_active'] . '</td></tr>';
 }
 if ($companyRows === '') {
-    $companyRows = '<tr><td colspan="13">Seçilen dönem için şirket verisi bulunmuyor.</td></tr>';
+    $companyRows = '<tr><td colspan="15">Seçilen dönem için şirket verisi bulunmuyor.</td></tr>';
 }
 
 $statusRows = '';
@@ -139,6 +140,13 @@ foreach ($report['review_list'] as $row) {
         . $escape($row['next_review_date'] ?: '-') . '</td></tr>';
 }
 
+$auditProgramRows = '';
+foreach ($report['audit_program_list'] as $row) {
+    $auditProgramRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape((string) $row['year']) . '</td><td>' . $escape($row['status']) . '</td><td>'
+        . $row['linked_audits'] . '</td><td>' . $escape($row['approved_date'] ?: '-') . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -187,9 +195,12 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Açık Şikayet</span><strong>' . $metrics['complaint_open_count'] . '</strong></td>
       <td class="metric"><span>Gözden Geçirme</span><strong>' . $metrics['review_count'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Denetim Programı</span><strong>' . $metrics['audit_program_count'] . '</strong></td>
+      <td class="metric"><span>Aktif Program</span><strong>' . $metrics['audit_program_active'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
-    <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th></tr></thead><tbody>'
+    <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th></tr></thead><tbody>'
     . $companyRows . '</tbody></table>
     <table class="two-column"><tr><td><h2>Aylık Trend</h2><table class="data"><thead><tr><th>Ay</th><th>Denetim</th><th>Uygunsuzluk</th></tr></thead><tbody>'
     . $trendRows . '</tbody></table></td><td><h2>Doküman Durumları</h2><table class="data"><thead><tr><th>Durum</th><th>Adet</th></tr></thead><tbody>'
@@ -203,6 +214,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Şikayetler', '<th>Şirket</th><th>Numara</th><th>Konu</th><th>Kaynak</th><th>Önem</th><th>Durum</th><th>Alınma</th><th>Termin</th><th>Kapanış</th><th>Uygunsuzluk</th>', $complaintRows)
     . $detailSection('Performans Hedefleri', '<th>Şirket</th><th>KPI</th><th>Hedef</th><th>Yıl</th><th>Not</th>', $performanceRows)
     . $detailSection('Gözden Geçirmeler', '<th>Şirket</th><th>Başlık</th><th>Toplantı</th><th>Dönem</th><th>Durum</th><th>Kalem</th><th>Aksiyon</th><th>Sonraki</th>', $reviewRows)
+    . $detailSection('Denetim Programları', '<th>Şirket</th><th>Program</th><th>Yıl</th><th>Durum</th><th>Bağlı</th><th>Onay</th>', $auditProgramRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

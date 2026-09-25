@@ -84,6 +84,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("users") ?>
             <span data-i18n="auditorsCardLabel">Denetçiler</span>
         </a>
+        <a class="<?= sidebarLinkClass("audit_programs", $activeNav) ?>" href="audit-programs.php">
+            <?= appIcon("approvals") ?>
+            <span data-i18n="auditProgramsMenuLabel">Denetim Programları</span>
+        </a>
         <?php endif; ?>
         <a class="<?= sidebarLinkClass("actions", $activeNav) ?>" href="actions.php">
             <?= appIcon("check") ?>

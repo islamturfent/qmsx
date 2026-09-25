@@ -3126,6 +3126,21 @@ body.modal-open {
     font-weight: 600;
 }
 
+.list-item-main {
+    min-width: 0;
+}
+
+.list-item-side {
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.danger-button-sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
 .audit-trail-details {
     margin: 10px 0 0;
     padding: 10px 12px;

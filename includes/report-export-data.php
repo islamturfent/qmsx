@@ -8,6 +8,7 @@ require_once __DIR__ . '/supplier-functions.php';
 require_once __DIR__ . '/complaint-functions.php';
 require_once __DIR__ . '/performance-functions.php';
 require_once __DIR__ . '/review-functions.php';
+require_once __DIR__ . '/audit-program-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -204,6 +205,17 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $periodParams
     );
 
+    $auditPrograms = $fetchRows(
+        "SELECT audit_programs.id, audit_programs.company_id, audit_programs.title,
+                audit_programs.year, audit_programs.status, audit_programs.approved_date,
+                audit_programs.created_at, companies.company_name,
+                (SELECT COUNT(*) FROM audit_program_audits
+                  WHERE audit_program_audits.program_id = audit_programs.id) AS audit_count
+         FROM audit_programs INNER JOIN companies ON companies.id = audit_programs.company_id
+         WHERE audit_programs.active = 1 AND audit_programs.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+
     $openComplaints = array_filter(
         $complaints,
         static fn(array $item): bool => qmsComplaintIsOpen((string) $item['status'])
@@ -263,6 +275,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'complaint_count' => count($complaints),
         'complaint_open_count' => count($openComplaints),
         'review_count' => count($reviews),
+        'audit_program_count' => count($auditPrograms),
+        'audit_program_active' => count(array_filter($auditPrograms, static fn(array $item): bool => $item['status'] === 'active')),
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -312,6 +326,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'complaints_open' => 0,
             'reviews' => 0,
             'reviews_actions' => 0,
+            'audit_programs' => 0,
+            'audit_programs_active' => 0,
         ];
     }
     foreach ($audits as $item) {
@@ -366,6 +382,15 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         }
         $companyPerformance[(int) $item['company_id']]['reviews']++;
         $companyPerformance[(int) $item['company_id']]['reviews_actions'] += (int) $item['action_count'];
+    }
+    foreach ($auditPrograms as $item) {
+        if (!isset($companyPerformance[(int) $item['company_id']])) {
+            continue;
+        }
+        $companyPerformance[(int) $item['company_id']]['audit_programs']++;
+        if ($item['status'] === 'active') {
+            $companyPerformance[(int) $item['company_id']]['audit_programs_active']++;
+        }
     }
 
     $selectedCompanyName = 'Tüm şirketler';
@@ -512,6 +537,19 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $auditProgramStatusLabels = qmsAuditProgramStatusLabels();
+    $auditProgramList = [];
+    foreach ($auditPrograms as $item) {
+        $auditProgramList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'year' => (int) $item['year'],
+            'status' => $auditProgramStatusLabels[$item['status']] ?? $item['status'],
+            'linked_audits' => (int) $item['audit_count'],
+            'approved_date' => $item['approved_date'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -530,5 +568,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'complaint_list' => $complaintList,
         'performance_target_list' => $performanceTargetList,
         'review_list' => $reviewList,
+        'audit_program_list' => $auditProgramList,
     ];
 }
