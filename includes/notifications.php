@@ -175,6 +175,8 @@ function qmsNotificationTypes(): array
         'overdue_finding' => ['icon' => 'alert', 'group' => 'capa'],
         'overdue_document_review' => ['icon' => 'documents', 'group' => 'document'],
         'overdue_complaint' => ['icon' => 'complaints', 'group' => 'complaint'],
+        'audit_program_reminder' => ['icon' => 'check', 'group' => 'general'],
+        'audit_program_due' => ['icon' => 'check', 'group' => 'general'],
     ];
 }
 
