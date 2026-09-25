@@ -11,6 +11,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/app-ui.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/notifications.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
@@ -29,6 +30,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     qmsCsrfVerify('profile', $_POST["csrf"] ?? null);
 
     $formType = $_POST["form_type"] ?? "update_personal";
+
+    if ($formType === "save_prefs") {
+        $emailEnabled = isset($_POST["email_notifications"]);
+        $categories = isset($_POST["email_categories"]) ? (array) $_POST["email_categories"] : null;
+        $allowedGroups = array_keys(qmsNotificationGroupLabels());
+        if ($categories !== null) {
+            $categories = array_values(array_filter(array_map('strval', $categories), fn($c) => in_array($c, $allowedGroups, true)));
+        }
+        qmsMailPrefsSave($pdo, $userId, $emailEnabled, $categories);
+        header("Location: profile.php?prefs=1");
+        exit;
+    }
 
     if ($formType === "update_personal") {
         $firstName = trim($_POST["first_name"] ?? "");
@@ -172,6 +185,10 @@ $userStmt = $pdo->prepare(
 );
 $userStmt->execute(["id" => $userId]);
 $user = $userStmt->fetch(PDO::FETCH_ASSOC);
+
+$mailPrefs = qmsMailPrefs($pdo, $userId);
+$mailGroups = qmsNotificationGroupLabels();
+$prefsSaved = ($_GET['prefs'] ?? '') === '1';
 
 if (!$user) {
     header("Location: logout.php");
@@ -586,6 +603,29 @@ $activeNav = "";
             </form>
         </div>
     </div>
+
+    <section class="form-panel">
+        <div class="section-heading compact-heading"><div><h3 data-i18n="notificationPrefsTitle">Bildirim Tercihleri</h3><p data-i18n="notificationPrefsText">E-posta bildirimlerini aç/kapat ve hangi kategoriden e-posta alacağını seç.</p></div></div>
+        <?php if ($prefsSaved): ?><div class="form-message success" data-i18n="notificationPrefsSaved">Bildirim tercihleri kaydedildi.</div><?php endif; ?>
+        <form class="auditor-form" method="post" action="profile.php">
+            <?= qmsCsrfField('profile') ?>
+            <input type="hidden" name="form_type" value="save_prefs">
+            <div class="form-grid">
+                <label class="form-field form-field-wide"><span class="switch-label"><input type="checkbox" name="email_notifications" <?= $mailPrefs['email_enabled'] ? 'checked' : '' ?>> <span data-i18n="notificationPrefsEmailEnabled">E-posta bildirimleri al</span></span></label>
+                <label class="form-field form-field-wide">
+                    <span data-i18n="notificationPrefsCategories">E-posta alınacak kategoriler (boş = tümü)</span>
+                    <div class="pref-checks">
+                        <?php foreach ($mailGroups as $gKey => $gLabel): $checked = $mailPrefs['categories'] === null || in_array($gKey, $mailPrefs['categories'], true); ?>
+                            <label class="pref-check"><input type="checkbox" name="email_categories[]" value="<?= htmlspecialchars($gKey, ENT_QUOTES, 'UTF-8') ?>" <?= $checked ? 'checked' : '' ?>> <span><?= htmlspecialchars($gLabel, ENT_QUOTES, 'UTF-8') ?></span></label>
+                        <?php endforeach; ?>
+                    </div>
+                </label>
+            </div>
+            <div class="form-actions">
+                <button class="primary-button" type="submit" data-i18n="notificationPrefsSave">Kaydet</button>
+            </div>
+        </form>
+    </section>
 
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/language.js"></script>

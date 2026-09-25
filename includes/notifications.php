@@ -33,7 +33,7 @@ function qmsNotify(PDO $pdo, int $userId, string $type, string $title, string $m
         'link_url' => $linkUrl
     ]);
 
-    qmsMailNotifyUser($pdo, $userId, $title, $message, $linkUrl);
+    qmsMailNotifyUserPrefsAware($pdo, $userId, $type, $title, $message, $linkUrl);
 }
 
 /**
@@ -73,6 +73,71 @@ function qmsMailNotifyUser(PDO $pdo, int $userId, string $title, string $message
     } catch (Throwable $e) {
         return false;
     }
+}
+
+/**
+ * Bir kullanicinin eposta bildirim tercihleri.
+ *
+ * @return array{email_enabled: bool, categories: ?array<int, string>}
+ */
+function qmsMailPrefs(PDO $pdo, int $userId): array
+{
+    $defaults = ['email_enabled' => true, 'categories' => null];
+    if ($userId <= 0) {
+        return $defaults;
+    }
+    $stmt = $pdo->prepare(
+        'SELECT email_enabled, email_categories FROM notification_preferences WHERE user_id = ? LIMIT 1'
+    );
+    $stmt->execute([$userId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        return $defaults;
+    }
+    $cats = null;
+    if (trim((string) ($row['email_categories'] ?? '')) !== '') {
+        $decoded = json_decode((string) $row['email_categories'], true);
+        if (is_array($decoded)) {
+            $cats = array_values(array_map('strval', $decoded));
+        }
+    }
+    return ['email_enabled' => (bool) ((int) $row['email_enabled']), 'categories' => $cats];
+}
+
+/**
+ * Bir kullanicinin eposta bildirim tercihlerini kaydeder (kategori listesi
+ * null = tumu). $categories null ile cagrilirsa mevcut kategori filtrelemesi
+ * korunur (sadece ac/kapa degisimi).
+ */
+function qmsMailPrefsSave(PDO $pdo, int $userId, bool $emailEnabled, ?array $categories): void
+{
+    if ($userId <= 0) {
+        return;
+    }
+    $json = $categories === null ? null : json_encode(array_values($categories), JSON_UNESCAPED_SLASHES);
+    $stmt = $pdo->prepare(
+        'INSERT INTO notification_preferences (user_id, email_enabled, email_categories)
+         VALUES (:u, :e, :c)
+         ON DUPLICATE KEY UPDATE email_enabled = VALUES(email_enabled), email_categories = VALUES(email_categories)'
+    );
+    $stmt->execute(['u' => $userId, 'e' => (int) $emailEnabled, 'c' => $json]);
+}
+
+/** Kullaniciya e-postayi tercihlerine gore gonderir (mail etkinse). */
+function qmsMailNotifyUserPrefsAware(PDO $pdo, int $userId, string $type, string $title, string $message, ?string $linkUrl): bool
+{
+    if (!qmsMailConfig()['enabled']) {
+        return false;
+    }
+    $prefs = qmsMailPrefs($pdo, $userId);
+    if (!$prefs['email_enabled']) {
+        return false;
+    }
+    $group = qmsNotificationTypes()[$type]['group'] ?? 'general';
+    if ($prefs['categories'] !== null && !in_array($group, $prefs['categories'], true)) {
+        return false;
+    }
+    return qmsMailNotifyUser($pdo, $userId, $title, $message, $linkUrl);
 }
 
 /**
