@@ -50,8 +50,9 @@ carried over from earlier assumptions.
   | `tests/document-copy.php` | 15 |
   | `tests/approval-workflow.php` | 21 |
   | `tests/quality-cost-trend.php` | 12 |
+  | `tests/document-compare.php` | 11 |
 
-  596 checks total (27 suites). All suites use temporary tables and leave real records
+  607 checks total (28 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -690,6 +691,27 @@ New read-only analysis surface built on top of the existing `quality_costs` tabl
   dropdown borders now read on dark surfaces; CSS-only, functions untouched).
 - 12 temp-table checks (`tests/quality-cost-trend.php`): 12-month shape, per-category
   and total sums per month, company scoping, company filter, no year leak, annual total.
+
+## Doküman versiyon karşılaştırma (2026-09-30)
+
+New read-only comparison surface - `document-compare.php` - that picks a document
+(a scoped list) and two of its `document_versions`, then shows them side by side
+plus a line-level text diff.
+
+- `includes/document-compare-functions.php`:
+  - `qmsCompareVersionBody()` reads the stored revision HTML from `storage/documents/`,
+    extracts the `<body>`, and also produces flat plain text (block closing tags ->
+    newline, then `strip_tags`, then whitespace collapse) for diffing.
+  - `qmsDiffLines()` is a bounded line-based LCS diff returning `same`/`add`/`del`
+    ops; inputs above 3000 lines return an empty diff rather than a memory blowup.
+  - `qmsCompareTextToLines()` splits flat text into comparable lines.
+- Page `document-compare.php`: document + two-version selects (defaults to the two
+  latest), summary cards, a side-by-side scrollable HTML view and a colored diff
+  view. Read-only (no POST, no CSRF needed).
+- Sidebar entry "Versiyon Karşılaştırma" under Doküman Yönetimi; TR/EN i18n keys.
+- 11 checks (`tests/document-compare.php`): LCS add/del/same behaviour, empty-edge
+  cases, text splitting, body extraction (temp stored file, cleaned), missing-file
+  handling and the oversized-input guard.
 
 ## Security hardening (2026-09-19)
 
