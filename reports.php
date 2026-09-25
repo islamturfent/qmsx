@@ -294,6 +294,18 @@ foreach ($qualityCostRecords as $item) {
 $qualityCostTotal = round($qualityCostTotal, 2);
 $qualityCostFailure = round($qualityCostFailure, 2);
 
+$copyRecords = fetchReportRows(
+    $pdo,
+    "SELECT c.company_id, c.status
+     FROM document_copies c INNER JOIN companies ON companies.id = c.company_id
+     WHERE c.active = 1 AND c.distributed_on BETWEEN ? AND ?" . $companyScopeSql,
+    $periodParams,
+    $selectedCompanyId
+);
+$copyCount = count($copyRecords);
+$copyReturned = 0;
+foreach ($copyRecords as $item) { if ($item["status"] === "returned") $copyReturned++; }
+
 $documentStatuses = ["draft" => 0, "review" => 0, "approved" => 0, "published" => 0, "archived" => 0];
 foreach ($documents as $document) {
     if (isset($documentStatuses[$document["status"]])) $documentStatuses[$document["status"]]++;
@@ -399,6 +411,7 @@ $exportQuery = http_build_query([
             <div class="dashboard-card metric-blue"><?= appIcon("users", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="personnelCountKpi">Personel</span><strong class="dashboard-card-number"><?= $personnelCount ?> <small data-i18n="personnelExpiredKpi">Geçmiş <?= $personnelExpired ?></small></strong></div></div>
             <div class="dashboard-card metric-orange"><?= appIcon("alert", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="externalAuditCountKpi">Dış Denetim</span><strong class="dashboard-card-number"><?= $externalAuditCount ?> <small data-i18n="externalAuditOpenKpi">Açık Bulgu <?= $externalAuditOpen ?></small></strong></div></div>
             <div class="dashboard-card metric-red"><?= appIcon("table", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="qualityCostTotalKpi">COQ</span><strong class="dashboard-card-number"><?= number_format($qualityCostTotal, 2) ?> <small data-i18n="qualityCostFailureKpi">Hata <?= number_format($qualityCostFailure, 2) ?></small></strong></div></div>
+            <div class="dashboard-card metric-blue"><?= appIcon("documents", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="copyCountKpi">Dağıtılan Kopya</span><strong class="dashboard-card-number"><?= $copyCount ?> <small data-i18n="copyReturnedKpi">İade <?= $copyReturned ?></small></strong></div></div>
         </section>
 
         <section class="report-layout">
