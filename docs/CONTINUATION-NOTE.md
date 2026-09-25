@@ -49,8 +49,9 @@ carried over from earlier assumptions.
   | `tests/quality-cost.php` | 19 |
   | `tests/document-copy.php` | 15 |
   | `tests/approval-workflow.php` | 21 |
+  | `tests/quality-cost-trend.php` | 12 |
 
-  584 checks total (26 suites). All suites use temporary tables and leave real records
+  596 checks total (27 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -669,6 +670,26 @@ A multi-step approval/signature workflow attached to records (documents,
 - 21 temp-table checks + an HTTP harness (two signers complete a run end to end:
   create -> admin1 signs step1 -> admin2 signs step2 -> approved; non-current/non-
   assigned signing rejected; rejection path; KPI + both exports). Fixtures cleaned.
+
+## COQ trendi / Kalite Maliyeti analizi (2026-09-30)
+
+New read-only analysis surface built on top of the existing `quality_costs` table
+(no schema change) - `quality-cost-trend.php`.
+
+- `qmsQualityCostMonthlyTrend()` in `includes/quality-cost-functions.php` returns
+  the 12 months of a selected year with `prevention` / `appraisal` /
+  `internal_failure` / `external_failure` / `total` sums, company-scoped, with an
+  optional per-company filter. Params are ordered scope-then-year (an initial
+  ordering bug put the scope id into the `YEAR()` placeholder and was caught by the
+  temp-table test).
+- Page `quality-cost-trend.php`: year + company filter, four summary cards
+  (annual total, prevention, appraisal, failure), a stacked monthly bar chart,
+  an annual category breakdown bar and a monthly detail table.
+- Sidebar entry "COQ Trendi" under the COQ item; TR/EN i18n keys for the surface.
+- Dark mode CSS fix from the same task (header user-menu text and topbar-button /
+  dropdown borders now read on dark surfaces; CSS-only, functions untouched).
+- 12 temp-table checks (`tests/quality-cost-trend.php`): 12-month shape, per-category
+  and total sums per month, company scoping, company filter, no year leak, annual total.
 
 ## Security hardening (2026-09-19)
 
