@@ -3193,6 +3193,21 @@ body.modal-open {
     font-size: 13px;
 }
 
+/* RBAC izin matrisi */
+.rbac-role-col {
+    text-align: center !important;
+    white-space: nowrap;
+}
+
+.rbac-yes {
+    color: var(--success-600);
+    font-weight: 700;
+}
+
+.rbac-no {
+    color: var(--gray-300);
+}
+
 .audit-trail-details {
     margin: 10px 0 0;
     padding: 10px 12px;

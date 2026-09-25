@@ -159,6 +159,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
                 <?= appIcon("assignments") ?>
                 <span data-i18n="manageAssignmentsButton">Admin Atamaları</span>
             </a>
+            <a class="<?= sidebarLinkClass("permissions", $activeNav) ?>" href="permissions.php">
+                <?= appIcon("checkBadge") ?>
+                <span data-i18n="permissionsMenuLabel">İzinler</span>
+            </a>
         <?php endif; ?>
     </nav>
 

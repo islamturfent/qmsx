@@ -9,13 +9,14 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/permissions.php';
 require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
 
-// Denetim izi yonetim rolleri icindir; denetci ve sirket kullanicisi goremez.
-if (!in_array($role, ['super_admin', 'system_admin'], true)) {
+// Denetim izi yonetim rolleri icindir; izin tek kaynaktan (RBAC servisi) gelir.
+if (!qmsCanSession('audit_trail.view')) {
     header("Location: dashboard.php");
     exit;
 }
