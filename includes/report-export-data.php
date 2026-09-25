@@ -339,6 +339,32 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
          WHERE c.active = 1 AND c.distributed_on BETWEEN ? AND ?" . $scopeSql,
         $periodParams
     );
+    $approvalRuns = $fetchRows(
+        "SELECT r.id, r.company_id, r.subject, r.status, r.created_at, companies.company_name
+         FROM approval_runs r
+         INNER JOIN companies ON companies.id = r.company_id
+         WHERE r.active = 1 AND r.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    $approvalRunCount = count($approvalRuns);
+    $approvalRunApproved = 0;
+    $approvalRunPending = 0;
+    $approvalRunList = [];
+    foreach ($approvalRuns as $item) {
+        if ($item['status'] === 'approved') {
+            $approvalRunApproved++;
+        }
+        if ($item['status'] === 'in_progress') {
+            $approvalRunPending++;
+        }
+        $approvalRunList[] = [
+            'company_name' => $item['company_name'],
+            'subject' => $item['subject'],
+            'status' => $item['status'],
+            'created_at' => $item['created_at'],
+        ];
+    }
+
     $copyCount = count($copies);
     $copyReturned = 0;
     $copyList = [];
@@ -459,6 +485,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'quality_cost_failure' => $qualityCostFailure,
         'copy_count' => $copyCount,
         'copy_returned' => $copyReturned,
+        'approval_run_count' => $approvalRunCount,
+        'approval_run_approved' => $approvalRunApproved,
+        'approval_run_pending' => $approvalRunPending,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -768,5 +797,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'external_audit_list' => $externalAuditList,
         'quality_cost_list' => $qualityCostList,
         'copy_list' => $copyList,
+        'approval_run_list' => $approvalRunList,
     ];
 }

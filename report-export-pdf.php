@@ -196,6 +196,12 @@ foreach ($report['copy_list'] as $row) {
         . $escape($row['status']) . '</td><td>' . $escape($row['distributed_on']) . '</td></tr>';
 }
 
+$approvalRunRows = '';
+foreach ($report['approval_run_list'] as $row) {
+    $approvalRunRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['subject']) . '</td><td>'
+        . $escape($row['status']) . '</td><td>' . $escape($row['created_at']) . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -265,6 +271,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Dağıtılan Kopya Sayısı</span><strong>' . $metrics['copy_count'] . '</strong></td>
       <td class="metric"><span>İade Edilen Kopya</span><strong>' . $metrics['copy_returned'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Onay Akışı Sayısı</span><strong>' . $metrics['approval_run_count'] . '</strong></td>
+      <td class="metric"><span>Onaylanan Akış</span><strong>' . $metrics['approval_run_approved'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -288,6 +297,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Dış Denetimler', '<th>Şirket</th><th>Denetim</th><th>Kaynak</th><th>Kuruluş</th><th>Tarih</th><th>Durum</th><th>Açık Bulgu</th>', $externalAuditRows)
     . $detailSection('Kalite Maliyeti', '<th>Şirket</th><th>Başlık</th><th>Kategori</th><th>Tutar (₺)</th><th>Tarih</th>', $qualityCostRows)
     . $detailSection('Dağıtım', '<th>Şirket</th><th>Doküman</th><th>Kopya No</th><th>Alıcı</th><th>Durum</th><th>Dağıtım</th>', $copyRows)
+    . $detailSection('Onay Akışları', '<th>Şirket</th><th>Konu</th><th>Durum</th><th>Oluşturulma</th>', $approvalRunRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
