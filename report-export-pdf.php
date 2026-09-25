@@ -189,6 +189,16 @@ foreach ($report['quality_cost_list'] as $row) {
         . $escape($row['incurred_on']) . '</td></tr>';
 }
 
+$qualityCostTrendRows = '';
+foreach ($report['quality_cost_trend'] as $row) {
+    $qualityCostTrendRows .= '<tr><td>' . $escape($row['label']) . '</td><td>'
+        . number_format((float) $row['prevention'], 2, ',', '.') . '</td><td>'
+        . number_format((float) $row['appraisal'], 2, ',', '.') . '</td><td>'
+        . number_format((float) $row['internal_failure'], 2, ',', '.') . '</td><td>'
+        . number_format((float) $row['external_failure'], 2, ',', '.') . '</td><td>'
+        . number_format((float) $row['total'], 2, ',', '.') . '</td></tr>';
+}
+
 $copyRows = '';
 foreach ($report['copy_list'] as $row) {
     $copyRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['document_code'] . ' — ' . $row['document_title']) . '</td><td>'
@@ -296,6 +306,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Personel', '<th>Şirket</th><th>Personel</th><th>Kod</th><th>Bölüm</th><th>Pozisyon</th><th>Yetkinlik</th>', $personnelRows)
     . $detailSection('Dış Denetimler', '<th>Şirket</th><th>Denetim</th><th>Kaynak</th><th>Kuruluş</th><th>Tarih</th><th>Durum</th><th>Açık Bulgu</th>', $externalAuditRows)
     . $detailSection('Kalite Maliyeti', '<th>Şirket</th><th>Başlık</th><th>Kategori</th><th>Tutar (₺)</th><th>Tarih</th>', $qualityCostRows)
+    . $detailSection('COQ Trendi', '<th>Ay</th><th>Önleme</th><th>Değerlendirme</th><th>İç Hata</th><th>Dış Hata</th><th>Toplam (₺)</th>', $qualityCostTrendRows)
     . $detailSection('Dağıtım', '<th>Şirket</th><th>Doküman</th><th>Kopya No</th><th>Alıcı</th><th>Durum</th><th>Dağıtım</th>', $copyRows)
     . $detailSection('Onay Akışları', '<th>Şirket</th><th>Konu</th><th>Durum</th><th>Oluşturulma</th>', $approvalRunRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>

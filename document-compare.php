@@ -181,6 +181,11 @@ if ($selectedDoc && $versions) {
                 </section>
             <?php endif; ?>
 
+            <div class="form-actions export-actions">
+                <a class="secondary-button" href="document-compare-export.php?document=<?= (int) $selectedDoc['id'] ?>&amp;a=<?= (int) $versionA['id'] ?>&amp;b=<?= (int) $versionB['id'] ?>&amp;format=csv" data-i18n="exportCsvButton">CSV İndir</a>
+                <a class="primary-button" href="document-compare-export.php?document=<?= (int) $selectedDoc['id'] ?>&amp;a=<?= (int) $versionA['id'] ?>&amp;b=<?= (int) $versionB['id'] ?>&amp;format=pdf" data-i18n="exportPdfButton">PDF İndir</a>
+            </div>
+
             <section class="console-card checklist-section">
                 <div class="section-heading compact-heading">
                     <div>

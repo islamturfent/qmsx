@@ -518,6 +518,36 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         }
     }
 
+    // COQ aylik trend (rapor donemi icinde, kategori bazinda toplamlar).
+    $qualityCostTrend = [];
+    foreach ($months as $key => $m) {
+        $qualityCostTrend[$key] = [
+            'label' => $m['label'],
+            'prevention' => 0.0,
+            'appraisal' => 0.0,
+            'internal_failure' => 0.0,
+            'external_failure' => 0.0,
+            'total' => 0.0,
+        ];
+    }
+    foreach ($qualityCosts as $item) {
+        $key = date('Y-m', strtotime($item['incurred_on']));
+        if (!isset($qualityCostTrend[$key])) {
+            continue;
+        }
+        $amt = (float) $item['amount'];
+        if (isset($qualityCostTrend[$key][$item['cost_type']])) {
+            $qualityCostTrend[$key][$item['cost_type']] += $amt;
+            $qualityCostTrend[$key]['total'] += $amt;
+        }
+    }
+    foreach ($qualityCostTrend as $key => $row) {
+        foreach (['prevention', 'appraisal', 'internal_failure', 'external_failure', 'total'] as $col) {
+            $qualityCostTrend[$key][$col] = round($row[$col], 2);
+        }
+    }
+    $qualityCostTrend = array_values($qualityCostTrend);
+
     $companyPerformance = [];
     foreach ($companies as $company) {
         if ($selectedCompanyId > 0 && (int) $company['id'] !== $selectedCompanyId) {
@@ -796,6 +826,7 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'personnel_list' => $personnelList,
         'external_audit_list' => $externalAuditList,
         'quality_cost_list' => $qualityCostList,
+        'quality_cost_trend' => $qualityCostTrend,
         'copy_list' => $copyList,
         'approval_run_list' => $approvalRunList,
     ];

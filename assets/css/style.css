@@ -1156,6 +1156,10 @@ body.has-sidebar .page-container.narrow-page {
     }
 }
 
+.export-actions {
+    margin: 18px 0 2px;
+}
+
 .status-chart {
     display: flex;
     flex-direction: column;

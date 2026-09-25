@@ -84,6 +84,25 @@ function qmsDiffLines(array $a, array $b): array
 }
 
 /**
+ * Diff sonucunun ozet sayilarini doner.
+ *
+ * @param array<int, array{type: string, text: string}> $ops
+ * @return array{same: int, add: int, del: int, changed: int}
+ */
+function qmsDiffSummary(array $ops): array
+{
+    $same = 0;
+    $add = 0;
+    $del = 0;
+    foreach ($ops as $op) {
+        if ($op['type'] === 'add') $add++;
+        elseif ($op['type'] === 'del') $del++;
+        else $same++;
+    }
+    return ['same' => $same, 'add' => $add, 'del' => $del, 'changed' => $add + $del];
+}
+
+/**
  * Govde HTML'ini duz metin satirlarina cevirir (karsilastirma icin).
  *
  * @return string[]

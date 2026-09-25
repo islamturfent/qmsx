@@ -464,6 +464,25 @@ foreach ($report['quality_cost_list'] as $row) {
     ];
 }
 
+$qualityCostTrendRows = [[
+    ['value' => 'Ay', 'style' => 2],
+    ['value' => 'Önleme', 'style' => 2],
+    ['value' => 'Değerlendirme', 'style' => 2],
+    ['value' => 'İç Hata', 'style' => 2],
+    ['value' => 'Dış Hata', 'style' => 2],
+    ['value' => 'Toplam (₺)', 'style' => 2],
+]];
+foreach ($report['quality_cost_trend'] as $row) {
+    $qualityCostTrendRows[] = [
+        ['value' => $row['label'], 'style' => 3],
+        ['value' => $row['prevention'], 'style' => 3],
+        ['value' => $row['appraisal'], 'style' => 3],
+        ['value' => $row['internal_failure'], 'style' => 3],
+        ['value' => $row['external_failure'], 'style' => 3],
+        ['value' => $row['total'], 'style' => 3],
+    ];
+}
+
 $copyRows = [[
     ['value' => 'Şirket', 'style' => 2],
     ['value' => 'Doküman', 'style' => 2],
@@ -523,6 +542,7 @@ try {
         ['name' => 'Personel', 'xml' => xlsxWorksheet($personnelRows, [28, 26, 14, 20, 24, 12])],
         ['name' => 'Dış Denetimler', 'xml' => xlsxWorksheet($externalAuditRows, [28, 34, 18, 20, 14, 14, 12])],
         ['name' => 'Kalite Maliyeti', 'xml' => xlsxWorksheet($qualityCostRows, [28, 34, 18, 14, 14])],
+        ['name' => 'COQ Trendi', 'xml' => xlsxWorksheet($qualityCostTrendRows, [16, 14, 14, 14, 14, 16])],
         ['name' => 'Dağıtım', 'xml' => xlsxWorksheet($copyRows, [28, 40, 12, 20, 14, 14])],
         ['name' => 'Onay Akışları', 'xml' => xlsxWorksheet($approvalRunRows, [28, 40, 16, 20])],
     ], $temporaryPath);
