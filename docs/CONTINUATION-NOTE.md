@@ -40,8 +40,10 @@ carried over from earlier assumptions.
   | `tests/equipment.php` | 12 |
   | `tests/search.php` | 11 |
   | `tests/permissions.php` | 17 |
+  | `tests/complaint-nonconformity.php` | 13 |
+  | `tests/checklist-templates.php` | 15 |
 
-  429 checks total (17 suites). All suites use temporary tables and leave real records
+  457 checks total (19 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -446,6 +448,70 @@ page) because the layer alone had nothing reviewable.
   set, unknown action/role denied, matrix covers every action, role-specific
   scenarios). Fixtures cleaned.
 
+## RBAC propagation across the role gates (2026-09-30)
+
+Closes the "representative gate only" caveat from the RBAC section: the rest of
+ the page role gates now read through the same service.
+
+- `my-audits.php` (my_audits.view), the three `super-admin-*` pages
+  (admin.admins / admin.assignments / admin.companies), `reports.php`
+  (reports.view) and both report exports (report.export, 403 on denial)
+  were moved onto `qmsCanSession` / `qmsRequirePermission`.
+- `reports.php` had no role gate at all before; an auditor reaching it directly
+  saw an empty scoped report. It now redirects non-permitted roles away.
+- Page gates redirect to `dashboard.php`; download endpoints return 403. All 17
+  role-gate cases verified over HTTP with per-role logins and the fixtures were
+  cleaned. The permission service is now the single source for every role gate.
+
+## Sikayetten uygunsuzluk olusturma (2026-09-30)
+
+Resolves the open product question from the complaint module: a complaint can
+ now *create* its own nonconformity, not only link an existing audit-sourced one.
+
+- Schema change `nonconformities`: `audit_id` is now nullable and a `source`
+  column (`audit` | `complaint`) was added. Migration
+  `20260930-nonconformity-source.sql` + idempotent runner
+  `scripts/migrate-nonconformity-source.php`: the FK is dropped, the column
+  becomes nullable, `source` is added, and the FK is re-applied as CASCADE (so
+  deleting an audit still removes its own NCs; complaint-sourced ones have NULL
+  audit_id and survive).
+- `includes/complaint-functions.php` gained `qmsComplaintCreateNonconformity()`:
+  inserts a complaint-sourced NC (audit_id NULL, source complaint, severity and
+  subject mirrored from the complaint) and links it back in one transaction.
+  Already-linked complaints create nothing (single-link invariant).
+- `complaint-detail.php` shows a "Uygunsuzluk Oluştur" panel when the complaint
+  has no linked NC; on success it links the new NC. It never duplicates.
+- `nonconformity-detail.php` joins audits with LEFT JOIN so complaint-sourced
+  NCs render; for `source = complaint` the sub-header, back button and the
+  "Kaynak" record point at the originating complaint instead of an audit.
+  Auditors stay isolated: their scope is by audit id, and a complaint NC has
+  NULL audit_id, so it is invisible to them.
+- 13 temp-table checks + an HTTP harness (create + link, NULL audit id, source
+  marker, no second record for a linked complaint, complaint-source detail
+  render). Fixtures and the audit_log row were cleaned.
+
+## Denetim kontrol listesi sablonlari (2026-09-30)
+
+A company-scoped template library so auditors reuse standard checklist items
+ instead of typing them per audit.
+
+- Schema `audit_checklist_templates` + `audit_checklist_template_items`
+  (migration `20260930-checklist-templates.sql`, idempotent runner
+  `scripts/migrate-checklist-templates.php`). Both are company-scoped.
+- `includes/checklist-template-functions.php` owns scoped list/find/items and
+  `qmsChecklistTemplateApply()`: copies a template's active items into an audit
+  checklist, skipping item texts already present and rejecting templates whose
+  company differs from the audit's (cross-tenant apply is a no-op).
+- Pages: `checklist-templates.php` (list + summary), `checklist-template-create.php`
+  (company + title + description), `checklist-template-detail.php` (edit + add/
+  remove items). Sidebar entry under "Denetim Programları" (management roles).
+- Integration: `audit-detail.php` gains a "Şablon Uygula" panel (management
+  roles) that lists only templates of the audit's company; `qmsChecklistTemplateApply`
+  copies them in.
+- i18n + appIcon `approvals`; service-worker cache bumped.
+- 15 temp-table checks + an HTTP harness (create, add item, apply to an audit,
+  duplicate-skip, cross-tenant rejection, flash render). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -666,15 +732,13 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
-- Open product question from the complaint module: whether a complaint should be
-  able to *create* a nonconformity. That needs `nonconformities.audit_id` to become
-  nullable (or a source column) plus a review of the screens that join audits.
-  Linked-only is the current, deliberately conservative choice.
-- RBAC propagation is open by design. The permission service
-  (`includes/permissions.php`) is the single source, but only `audit-trail.php`
-  was moved onto it as a representative gate. Do not extend the remaining role
-  gates (reports, super-admin-*, my-audits, exports) onto the service without
-  explicit approval.
+- Complaint-to-nonconformity creation is **resolved** (2026-09-30): a complaint
+  can now create its own nonconformity (`audit_id` NULL, `source = complaint`).
+  See the "Sikayetten uygunsuzluk olusturma" section.
+- RBAC propagation is **resolved** (2026-09-30): every page role gate now reads
+  through the permission service. See the "RBAC propagation across the role
+  gates" section. A new page should call `qmsCanSession` / `qmsRequirePermission`
+  rather than comparing `$_SESSION['qms_role']` directly.
 - Migration runner gotcha (hit on 2026-09-25): `explode(';')` splits on semicolons
   inside SQL comments too. `scripts/migrate-suppliers.php` strips `^--` lines first;
   do the same in any new runner.
