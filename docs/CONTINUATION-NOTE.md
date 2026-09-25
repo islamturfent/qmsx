@@ -58,9 +58,11 @@ carried over from earlier assumptions.
   | `tests/auditor-workload.php` | 7 |
   | `tests/user-overdue.php` | 4 |
   | `tests/notify-overdue.php` | 4 |
-  | `tests/mailer.php` | 9 |
+  | `tests/mailer.php` | 11 |
+  | `tests/notification-preferences.php` | 7 |
+  | `tests/audit-program-reminders.php` | 5 |
 
-  665 checks total (36 suites). All suites use temporary tables and leave real records
+  679 checks total (38 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -867,6 +869,39 @@ e-posta da gonderir (gonderme asla cokmez; bildirim kaydi her zaman yazilir).
 - `tests/mailer.php` (9): defaults, disabled/empty-host gonderim aga girmeden false
   doner, env override, icerik uretici (html/plain/link), ve qmsNotify mail kapaliyken
   bildirim satirini yine yazar.
+
+## E-posta paketi devam: rapor teslimi, tercihler, denetim programi, sablon (2026-09-26)
+
+### A. Periyodik otomatik rapor e-postasi
+- `qmsMailSend()` now accepts `$attachments` (multipart/mixed) so files can ride along.
+- `config/mail.php` gained `base_url` (default `http://localhost/qmsx/`) used to make
+  email links absolute.
+- `scripts/send-daily-report.php`: builds a management PDF (overdue + auditor workload
+  + KPI metrics via `buildReportExportData`) with Dompdf and emails it as attachment to
+  every active system/super admin. If mail is off it just reports the generated PDF.
+
+### B. Kullanici eposta tercihleri
+- New table `notification_preferences` (user_id unique, `email_enabled`,
+  `email_categories` JSON or NULL=all) via `20260926-notification-preferences.sql` +
+  runner. `qmsMailPrefs()` reads, `qmsMailPrefsSave()` upserts.
+- `qmsNotify()` routes through `qmsMailNotifyUserPrefsAware()`: mail off -> early
+  return; prefs off -> skip; category filter applied (
+  `qmsNotificationTypes()[type]['group']`). Per-user UI on `profile.php` (Bildirim
+  Tercihleri) - toggle + category checkboxes. CSRF-scope `profile`.
+
+### C. Denetim programi otomasyonu
+- `scripts/audit-program-reminders.php [--all]`: for active current-year programs with
+  no audits added -> `audit_program_reminder` to company admins; for past-year
+  draft/active programs -> `audit_program_due`. Idempotent (unread dedupe). New
+  notification types added to `qmsNotificationTypes()`.
+
+### D. E-posta sablonu + gercek URL
+- `qmsMailNotificationContent()` upgraded to a branded template: header, optional
+  category pill, CTA "Kaydı Aç", footer with "Uygulamayı Aç" (base_url).
+- Relative notification links are made absolute in `qmsMailNotifyUser()` via
+  `base_url`; `mail-settings.php` has a `base_url` field.
+- Tests: `tests/mailer.php` grew 9 -> 11 (branded template + footer link);
+  `tests/notification-preferences.php` (7); `tests/audit-program-reminders.php` (5).
 - `--all` mode: `php scripts/notify-overdue.php --all` also pushes each overdue item
   to every active user of the owning company (plus super admins) besides the
   responsible/admin recipients. Default mode stays role-aware.
