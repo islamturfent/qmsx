@@ -1788,6 +1788,36 @@ translations.en.costTypePreventionLabel = "Prevention";
 translations.en.costTypeAppraisalLabel = "Appraisal";
 translations.en.costTypeInternalFailureLabel = "Internal Failure";
 translations.en.costTypeExternalFailureLabel = "External Failure";
+
+// --- COQ Trendi ---
+translations.tr.costTrendMenuLabel = "COQ Trendi";
+translations.tr.costTrendTitle = "COQ Trendi";
+translations.tr.costTrendText = "Kalite maliyetlerini aylık ve kategori bazında analiz edin.";
+translations.tr.selectYearLabel = "Yıl";
+translations.tr.monthLabel = "Ay";
+translations.tr.annualTotalCostLabel = "Yıllık Toplam COQ";
+translations.tr.annualTotalLabel = "Yıllık";
+translations.tr.monthlyCostTrendTitle = "Aylık COQ Trendi";
+translations.tr.monthlyCostTrendText = "Seçilen yıl için kategori bazında aylık maliyet dağılımı.";
+translations.tr.annualCategoryTitle = "Yıllık Kategori Dağılımı";
+translations.tr.annualCategoryText = "Seçilen yıldaki toplam maliyet dağılımı.";
+translations.tr.monthlyDetailTitle = "Aylık Detay";
+translations.tr.monthlyDetailText = "Her ay için kategori toplamları (₺).";
+
+translations.en.costTrendMenuLabel = "COQ Trend";
+translations.en.costTrendTitle = "COQ Trend";
+translations.en.costTrendText = "Analyze quality costs by month and category.";
+translations.en.selectYearLabel = "Year";
+translations.en.monthLabel = "Month";
+translations.en.annualTotalCostLabel = "Annual Total COQ";
+translations.en.annualTotalLabel = "Annual";
+translations.en.monthlyCostTrendTitle = "Monthly COQ Trend";
+translations.en.monthlyCostTrendText = "Monthly cost distribution by category for the selected year.";
+translations.en.annualCategoryTitle = "Annual Category Breakdown";
+translations.en.annualCategoryText = "Total cost distribution for the selected year.";
+translations.en.monthlyDetailTitle = "Monthly Detail";
+translations.en.monthlyDetailText = "Category totals per month (₺).";
+
 translations.tr.qualityCostTotalKpi = "COQ";
 translations.tr.qualityCostFailureKpi = "Hata";
 translations.en.qualityCostTotalKpi = "COQ";

@@ -147,6 +147,52 @@ function qmsQualityCostAdd(PDO $pdo, array $data, int $userId, string $role): ?i
 }
 
 /**
+ * Aylik COQ trendi (kategori bazinda toplamlarla).
+ *
+ * Secilen yil icindeki 12 ay icin her kategorinin toplamini ve toplam maliyeti
+ * dondurur. Opsiyonel sirket filtrelesi desteklenir.
+ *
+ * @return array<int, array<string, float>> 1..12 -> {prevention, appraisal,
+ *         internal_failure, external_failure, total}
+ */
+function qmsQualityCostMonthlyTrend(PDO $pdo, int $userId, string $role, int $year, int $companyId = 0): array
+{
+    $scope = qmsCompanyScope('c.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+    $params = $scope['params'];
+    $sql = 'SELECT c.cost_type, c.amount, MONTH(c.incurred_on) AS m
+            FROM quality_costs c
+            WHERE c.active = 1' . $scope['sql'] . '
+              AND YEAR(c.incurred_on) = ?';
+    $params[] = $year;
+
+    if ($companyId > 0) {
+        $sql .= ' AND c.company_id = ?';
+        $params[] = $companyId;
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    $init = array_fill(1, 12, ['prevention' => 0.0, 'appraisal' => 0.0, 'internal_failure' => 0.0, 'external_failure' => 0.0, 'total' => 0.0]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $m = max(1, min(12, (int) $row['m']));
+        $type = (string) $row['cost_type'];
+        if (!isset($init[$m][$type])) {
+            continue;
+        }
+        $v = (float) $row['amount'];
+        $init[$m][$type] += $v;
+        $init[$m]['total'] += $v;
+    }
+    foreach ($init as $m => $values) {
+        foreach (['prevention', 'appraisal', 'internal_failure', 'external_failure', 'total'] as $k) {
+            $init[$m][$k] = round($values[$k], 2);
+        }
+    }
+    return $init;
+}
+
+/**
  * Bir maliyet kaydini siler (aktif = 0), kapsam icinde olmalidir.
  */
 function qmsQualityCostDelete(PDO $pdo, int $costId, int $userId, string $role): bool
