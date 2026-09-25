@@ -70,6 +70,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
                 <span data-i18n="dashboardLinkLabel">Dashboard</span>
             </a>
         <?php endif; ?>
+        <?php if (!$isAuditorNav): ?>
+        <a class="<?= sidebarLinkClass("my_assignments", $activeNav) ?>" href="my-assignments.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="myAssignmentsMenuLabel">Bana Atanmışlar</span>
+        </a>
+        <?php endif; ?>
         <a class="<?= sidebarLinkClass("notifications", $activeNav) ?>" href="notifications.php">
             <?= appIcon("notifications") ?>
             <span data-i18n="notificationCenterTitle">Bildirim Merkezi</span>

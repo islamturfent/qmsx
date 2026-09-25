@@ -2068,6 +2068,27 @@ translations.en.notificationPrefsSave = "Save";
 
 translations.tr.closurePackageButton = "Kapanış Paketi (PDF)";
 translations.en.closurePackageButton = "Closure Package (PDF)";
+
+translations.tr.myAssignmentsMenuLabel = "Bana Atanmışlar";
+translations.tr.myAssignmentsTitle = "Bana Atanmışlar";
+translations.tr.myAssignmentsText = "Size atanmış açık kayıtları tek yerden izleyin.";
+translations.tr.myAssignmentsKicker = "Kişisel İş Akışı";
+translations.tr.myAssignmentsOpenLabel = "Açık Kayıt";
+translations.tr.myAssignmentsOverdueLabel = "Geciken";
+translations.tr.mineActionsLabel = "Düzeltici Faaliyet";
+translations.tr.mineComplaintsLabel = "Şikayet";
+translations.tr.mineEquipmentLabel = "Kalibrasyon";
+translations.tr.myAssignmentsEmpty = "Size atanmış açık kayıt bulunmuyor.";
+translations.en.myAssignmentsMenuLabel = "Assigned to Me";
+translations.en.myAssignmentsTitle = "Assigned to Me";
+translations.en.myAssignmentsText = "Track the open records assigned to you in one place.";
+translations.en.myAssignmentsKicker = "Personal Workflow";
+translations.en.myAssignmentsOpenLabel = "Open Records";
+translations.en.myAssignmentsOverdueLabel = "Overdue";
+translations.en.mineActionsLabel = "Corrective Action";
+translations.en.mineComplaintsLabel = "Complaint";
+translations.en.mineEquipmentLabel = "Calibration";
+translations.en.myAssignmentsEmpty = "You have no open assigned records.";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";

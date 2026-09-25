@@ -282,6 +282,79 @@ function qmsUserOverdueAssignments(PDO $pdo, int $userId): array
 }
 
 /**
+ * Kullaniciya atanmis acik kayitlar (is merkezi).
+ *
+ * @return array<string, array{label_key: string, icon: string, count: int,
+ *         rows: array<int, array{id: int, title: string, company: string,
+ *         due: string, status: string, extra: string, link: string, overdue: bool}>}>
+ */
+function qmsMyAssignments(PDO $pdo, int $userId): array
+{
+    $today = date('Y-m-d');
+    $sections = [
+        'actions' => ['label_key' => 'mineActionsLabel', 'icon' => 'check', 'count' => 0, 'rows' => []],
+        'complaints' => ['label_key' => 'mineComplaintsLabel', 'icon' => 'complaints', 'count' => 0, 'rows' => []],
+        'equipment' => ['label_key' => 'mineEquipmentLabel', 'icon' => 'table', 'count' => 0, 'rows' => []],
+    ];
+
+    $stmt = $pdo->prepare(
+        "SELECT ca.id, ca.action_text, ca.due_date, ca.status, co.company_name
+         FROM corrective_actions ca
+         INNER JOIN nonconformities n ON n.id = ca.nonconformity_id
+         INNER JOIN companies co ON co.id = n.company_id
+         WHERE ca.active = 1 AND ca.responsible_user_id = ? AND ca.status NOT IN ('completed','closed')
+         ORDER BY ca.due_date ASC, ca.id ASC"
+    );
+    $stmt->execute([$userId]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $sections['actions']['rows'][] = [
+            'id' => (int) $r['id'], 'title' => (string) $r['action_text'], 'company' => (string) $r['company_name'],
+            'due' => (string) $r['due_date'], 'status' => (string) $r['status'], 'extra' => '',
+            'link' => 'corrective-action-detail.php?id=' . (int) $r['id'],
+            'overdue' => (string) $r['due_date'] !== '' && (string) $r['due_date'] < $today,
+        ];
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT c.id, c.subject, c.due_date, c.status, c.complaint_code, co.company_name
+         FROM complaints c INNER JOIN companies co ON co.id = c.company_id
+         WHERE c.active = 1 AND c.responsible_user_id = ? AND c.status NOT IN ('closed','rejected')
+         ORDER BY c.due_date ASC, c.id ASC"
+    );
+    $stmt->execute([$userId]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $sections['complaints']['rows'][] = [
+            'id' => (int) $r['id'], 'title' => (string) $r['subject'], 'company' => (string) $r['company_name'],
+            'due' => (string) $r['due_date'], 'status' => (string) $r['status'], 'extra' => (string) $r['complaint_code'],
+            'link' => 'complaint-detail.php?id=' . (int) $r['id'],
+            'overdue' => (string) $r['due_date'] !== '' && (string) $r['due_date'] < $today,
+        ];
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT e.id, e.name, e.asset_code, e.next_calibration_date, e.status, co.company_name
+         FROM equipment e INNER JOIN companies co ON co.id = e.company_id
+         WHERE e.active = 1 AND e.responsible_user_id = ? AND e.status NOT IN ('out_of_service')
+         ORDER BY e.next_calibration_date ASC, e.id ASC"
+    );
+    $stmt->execute([$userId]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $sections['equipment']['rows'][] = [
+            'id' => (int) $r['id'], 'title' => (string) $r['name'], 'company' => (string) $r['company_name'],
+            'due' => (string) $r['next_calibration_date'], 'status' => (string) $r['status'], 'extra' => (string) $r['asset_code'],
+            'link' => 'equipment.php',
+            'overdue' => (string) $r['next_calibration_date'] !== '' && (string) $r['next_calibration_date'] < $today,
+        ];
+    }
+
+    foreach ($sections as $k => &$sec) {
+        $sec['count'] = count($sec['rows']);
+    }
+    unset($sec);
+    return $sections;
+}
+
+/**
  * Denetci is yuku: her denetci icin atanmis aktif denetim, acik uygunsuzluk
  * ve acik duzeltici/onleyici faaliyet sayisi (kapsamli).
  *
