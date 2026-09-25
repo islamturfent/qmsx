@@ -61,8 +61,11 @@ carried over from earlier assumptions.
   | `tests/mailer.php` | 11 |
   | `tests/notification-preferences.php` | 7 |
   | `tests/audit-program-reminders.php` | 5 |
+  | `tests/closure-package.php` | 8 |
+  | `tests/search-enhanced.php` | 6 |
+  | `tests/my-assignments.php` | 5 |
 
-  679 checks total (38 suites). All suites use temporary tables and leave real records
+  698 checks total (41 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -845,6 +848,39 @@ Denied for the auditor role. Verified by a CLI smoke run (valid worksheets / %PD
 on top of the function-level temp-table suites.
 - Test: `tests/notify-overdue.php` (4): first run creates one notification, second
   run is idempotent (no duplicates).
+
+## Uretkenlik / denetim paketi (2026-09-26, bes is)
+
+### 1. Kapanis kaniti / denetim raporu paketi
+- `closure-package-export.php?nonconformity_id=N` -> PDF bundling the NC root cause,
+  corrective/preventive actions (status, timestamps, verifier, verification note) and
+  evidence files. `includes/closure-package-functions.php` (`qmsClosurePackageData`,
+  scoped). Button on `nonconformity-detail.php`. Each export logs an
+  `audit_trail` entry (`closure_package_exported`).
+
+### 2. Global arama + benzer vaka gelistirmesi
+- `qmsSearchTypes()` gained `personnel`, `review` and `finding` (external-audit,
+  joined) record types, so global search and similar-cases now cover them.
+
+### 3. Bana atanmislar merkezi
+- `qmsMyAssignments()` lists the user's open corrective actions, complaints and
+  equipment calibrations (by `responsible_user_id`) with overdue flags.
+  `my-assignments.php` page + sidebar; overdue rows highlighted.
+
+### 4. Dashboard kisisel ozet widget'i
+- `dashboard.php` shows "Kişisel Özet": assigned-open count, my overdue count and
+  pending document approvals (reuses `qmsUserOverdueAssignments`/`qmsMyAssignments`).
+
+### 5. Performans indexlerı
+- `scripts/migrate-performance-indexes.php` (idempotent) added 8 composite indexes
+  for the new overdue/COQ/CAPA queries: corrective_actions(status,due_date) and
+  (nonconformity_id,status), nonconformities(status,due_date),
+  complaints(status,due_date), documents(review_date,status),
+  trainings(planned_date,status), external_audit_findings(status,due_date),
+  quality_costs(company_id,incurred_on). Verified idempotent (second run adds 0).
+
+Tests: `tests/closure-package.php` (8), `tests/search-enhanced.php` (6),
+`tests/my-assignments.php` (5).
 
 ## SMTP e-posta bildirimleri - E-posta Ayarları
 
