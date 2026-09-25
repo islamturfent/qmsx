@@ -2930,6 +2930,50 @@ body.modal-open {
     color: var(--neutral-soft-text) !important;
 }
 
+/* Yonetim kokpiti: hedef-vs-gerceklesen matrisi */
+.cockpit-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 18px;
+    margin-top: 16px;
+}
+
+.cockpit-kpi-card {
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    background: var(--surface-color);
+    box-shadow: var(--shadow-theme-xs);
+    overflow: hidden;
+}
+
+.cockpit-kpi-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-row);
+    background: var(--surface-muted);
+    padding: 14px 16px;
+}
+
+.cockpit-kpi-head strong {
+    color: var(--text-body);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.compact-table th,
+.compact-table td {
+    padding: 8px 10px;
+    font-size: 12.5px;
+}
+
+.secondary-button-sm {
+    min-height: 36px !important;
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+}
+
 .form-message.info {
     background: var(--brand-soft);
     color: var(--brand-soft-text);

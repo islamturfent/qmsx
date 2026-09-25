@@ -31,7 +31,7 @@ function qmsMonthShortLabels(): array
  * Seriler: audits, nonconformities, actions_completed, trainings_completed,
  * complaints. Her hucre ay anahtari ("Y-m") ve kisa ay etiketlidir.
  *
- * @return array<string, array{label: string, audits: int, nonconformities: int, actions_completed: int, trainings_completed: int, complaints: int}>
+ * @return array<string, array{label: string, audits: int, nonconformities: int, actions_completed: int, trainings_completed: int, complaints: int, prevention: float, appraisal: float, internal_failure: float, external_failure: float, cost_total: float}>
  */
 function qmsDashboardTrend(PDO $pdo, int $userId, string $role, int $months = QMS_TREND_MONTHS): array
 {
@@ -55,6 +55,11 @@ function qmsDashboardTrend(PDO $pdo, int $userId, string $role, int $months = QM
             'actions_completed' => 0,
             'trainings_completed' => 0,
             'complaints' => 0,
+            'prevention' => 0.0,
+            'appraisal' => 0.0,
+            'internal_failure' => 0.0,
+            'external_failure' => 0.0,
+            'cost_total' => 0.0,
         ];
         $cursor->modify('+1 month');
     }
@@ -107,6 +112,28 @@ function qmsDashboardTrend(PDO $pdo, int $userId, string $role, int $months = QM
          GROUP BY ym',
         'complaints'
     );
+
+    // COQ: kalite maliyeti aylik kategorileri (para toplamlari).
+    $costStmt = $pdo->prepare(
+        "SELECT DATE_FORMAT(c.incurred_on, '%Y-%m') AS ym, c.cost_type, SUM(c.amount) AS s
+         FROM quality_costs c INNER JOIN companies co ON co.id = c.company_id
+         WHERE c.active = 1 AND c.incurred_on >= ?" . $scope['sql'] . '
+         GROUP BY ym, c.cost_type'
+    );
+    $costStmt->execute(array_merge([$startParam], $scope['params']));
+    foreach ($costStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $key = $row['ym'] ?? '';
+        if (isset($buckets[$key]) && isset($buckets[$key][$row['cost_type']])) {
+            $buckets[$key][$row['cost_type']] += (float) $row['s'];
+            $buckets[$key]['cost_total'] += (float) $row['s'];
+        }
+    }
+    foreach ($buckets as &$b) {
+        foreach (['prevention', 'appraisal', 'internal_failure', 'external_failure', 'cost_total'] as $kk) {
+            $b[$kk] = round($b[$kk], 2);
+        }
+    }
+    unset($b);
 
     return $buckets;
 }
@@ -198,4 +225,92 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
     }
 
     return ['headline' => $headline, 'points' => $points];
+}
+
+/**
+ * Yonetim kokpiti: hedef koyulmus sirketler icin KPI hedef-vs-gerceklesen matrisi.
+ *
+ * Gercek degerler rapor motorundan (buildReportExportData) okunur; hedefler
+ * performance_targets tablosundan. Yalnizca secilen yil icin en az bir hedefi
+ * olan sirketler doner (hedefsiz sirket kokpitte yer almaz).
+ *
+ * @return array<int, array{
+ *     id: int, name: string, on_track_count: int, target_count: int,
+ *     all_on_track: bool,
+ *     rows: array<string, array{kpi_key: string, label_key: string, unit: string,
+ *             higher_better: bool, target: ?float, target_note: ?string,
+ *             actual: ?float, on_track: ?bool}>
+ * }>
+ */
+function qmsCockpitKpiMatrix(PDO $pdo, int $userId, bool $isSuperAdmin, int $year): array
+{
+    require_once __DIR__ . '/performance-functions.php';
+    require_once __DIR__ . '/report-export-data.php';
+
+    $role = $isSuperAdmin ? 'super_admin' : qmsCurrentRole();
+    $scope = qmsCompanyScope('c.id', qmsVisibleCompanyIds($pdo, $userId, $role));
+
+    $stmt = $pdo->prepare(
+        "SELECT c.id, c.company_name
+         FROM companies c
+         INNER JOIN performance_targets t ON t.company_id = c.id AND t.target_year = ?
+         WHERE c.active = 1" . $scope['sql'] . '
+         GROUP BY c.id, c.company_name
+         ORDER BY c.company_name ASC'
+    );
+    $stmt->execute(array_merge([$year], $scope['params']));
+    $targetCompanies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $kpis = qmsPerformanceKpis();
+    $start = sprintf('%04d-01-01', $year);
+    $end = sprintf('%04d-12-31', $year);
+    $companies = [];
+
+    foreach ($targetCompanies as $company) {
+        $cid = (int) $company['id'];
+        $targets = qmsPerformanceTargets($pdo, $cid, $year);
+        $report = buildReportExportData($pdo, $userId, $isSuperAdmin, [
+            'company_id' => $cid,
+            'start_date' => $start,
+            'end_date' => $end,
+        ]);
+        $metrics = $report['metrics'];
+
+        $rows = [];
+        $onTrackCount = 0;
+        $targetCount = 0;
+        foreach ($kpis as $key => $def) {
+            $target = $targets[$key] ?? null;
+            $actualRaw = $metrics[$key] ?? null;
+            $actual = $actualRaw === null ? null : (float) $actualRaw;
+            $onTrack = qmsPerformanceOnTrack($target ? $target['target_value'] : null, $actual, $def['higher_better']);
+            if ($onTrack !== null) {
+                $targetCount++;
+                if ($onTrack) {
+                    $onTrackCount++;
+                }
+            }
+            $rows[$key] = [
+                'kpi_key' => $key,
+                'label_key' => $def['label_key'],
+                'unit' => $def['unit'],
+                'higher_better' => $def['higher_better'],
+                'target' => $target ? $target['target_value'] : null,
+                'target_note' => $target ? $target['note'] : null,
+                'actual' => $actual,
+                'on_track' => $onTrack,
+            ];
+        }
+
+        $companies[] = [
+            'id' => $cid,
+            'name' => $company['company_name'],
+            'rows' => $rows,
+            'on_track_count' => $onTrackCount,
+            'target_count' => $targetCount,
+            'all_on_track' => $targetCount > 0 && $onTrackCount === $targetCount,
+        ];
+    }
+
+    return $companies;
 }

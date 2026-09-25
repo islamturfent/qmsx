@@ -37,6 +37,7 @@ $documentCount = $scopedCount("SELECT COUNT(*) FROM documents WHERE active = 1" 
 
 require_once __DIR__ . '/includes/report-export-data.php';
 require_once __DIR__ . '/includes/dashboard-functions.php';
+require_once __DIR__ . '/includes/performance-functions.php';
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -50,6 +51,14 @@ $reportMetrics = buildReportExportData(
 // Trend ve ozet aggregate sorgulardan gelir; rapor setini tekrar yuklemez.
 $dashboardTrend = qmsDashboardTrend($pdo, $userId, qmsCurrentRole());
 $dashboardSummary = qmsDashboardSummary($pdo, $userId, qmsCurrentRole(), $dashboardTrend);
+
+// Yonetim kokpiti: guncel yil hedef-gerecklesen KPI matrisi + COQ mini trendi.
+$cockpitYear = (int) date('Y');
+$cockpitCompanies = qmsCockpitKpiMatrix($pdo, $userId, $isSuperAdmin, $cockpitYear);
+$cockpitKpiLabels = qmsPerformanceKpiLabels();
+$cockpitCostRows = array_values($dashboardTrend);
+$cockpitMaxCost = 1.0;
+foreach ($cockpitCostRows as $row) { $cockpitMaxCost = max($cockpitMaxCost, (float) $row['cost_total']); }
 
 $activeNav = "dashboard";
 
@@ -191,6 +200,96 @@ $activeNav = "dashboard";
                     </div>
                 <?php endforeach; ?>
             </div>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="cockpitCoqTitle">COQ Trendi</h3>
+                    <p data-i18n="cockpitCoqText">Kalite maliyeti (önleme, değerlendirme, hata) aylık dağılımı.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="quality-cost-trend.php" data-i18n="cockpitCoqDetailLink">Detay</a>
+            </div>
+            <?php if (max(array_column($cockpitCostRows, 'cost_total')) > 0): ?>
+            <div class="trend-chart">
+                <?php foreach ($cockpitCostRows as $row): ?>
+                    <div class="trend-column">
+                        <div class="cost-trend-bars">
+                            <div class="cost-bar-stack" title="Aylık toplam: <?= number_format((float) $row['cost_total'], 2) ?> ₺">
+                                <?php if ((float) $row['prevention'] > 0): ?><span class="cost-stack-seg seg-prevention" style="height: <?= max(2, ((float) $row['prevention'] / $cockpitMaxCost) * 100) ?>%;"></span><?php endif; ?>
+                                <?php if ((float) $row['appraisal'] > 0): ?><span class="cost-stack-seg seg-appraisal" style="height: <?= max(2, ((float) $row['appraisal'] / $cockpitMaxCost) * 100) ?>%;"></span><?php endif; ?>
+                                <?php if ((float) $row['internal_failure'] > 0): ?><span class="cost-stack-seg seg-internal" style="height: <?= max(2, ((float) $row['internal_failure'] / $cockpitMaxCost) * 100) ?>%;"></span><?php endif; ?>
+                                <?php if ((float) $row['external_failure'] > 0): ?><span class="cost-stack-seg seg-external" style="height: <?= max(2, ((float) $row['external_failure'] / $cockpitMaxCost) * 100) ?>%;"></span><?php endif; ?>
+                            </div>
+                        </div>
+                        <small><?= htmlspecialchars($row['label'], ENT_QUOTES, 'UTF-8') ?></small>
+                        <div class="cost-trend-total"><strong><?= number_format((float) $row['cost_total'], 0) ?></strong></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="chart-legend">
+                <span><i class="legend-blue"></i><span data-i18n="costTypePreventionLabel">Önleme</span></span>
+                <span><i class="legend-teal"></i><span data-i18n="costTypeAppraisalLabel">Değerlendirme</span></span>
+                <span><i class="legend-orange"></i><span data-i18n="costTypeInternalFailureLabel">İç Hata</span></span>
+                <span><i class="legend-red"></i><span data-i18n="costTypeExternalFailureLabel">Dış Hata</span></span>
+            </div>
+            <?php else: ?>
+                <div class="empty-state" data-i18n="cockpitCoqEmpty">Seçilen dönemde kalite maliyeti kaydı bulunmuyor.</div>
+            <?php endif; ?>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="cockpitKpiTitle">Hedef vs Gerçekleşen</h3>
+                    <p data-i18n="cockpitKpiText">Güncel yıl (<?= $cockpitYear ?>) KPI hedefleri ve gerçekleşen değerler.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="performance.php" data-i18n="cockpitKpiDetailLink">Performans</a>
+            </div>
+            <?php if (!$cockpitCompanies): ?>
+                <div class="empty-state" data-i18n="cockpitKpiEmpty">Hedef koyulmuş şirket bulunmuyor. Performans sayfasından hedef ekleyin.</div>
+            <?php else: ?>
+                <div class="cockpit-kpi-grid">
+                    <?php foreach ($cockpitCompanies as $company): ?>
+                        <div class="cockpit-kpi-card">
+                            <div class="cockpit-kpi-head">
+                                <strong><?= htmlspecialchars($company['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <span class="status-pill <?= $company['all_on_track'] ? 'on-track' : 'off-track' ?>"><?= $company['on_track_count'] ?>/<?= $company['target_count'] ?> &#x2713;</span>
+                            </div>
+                            <div class="table-scroll">
+                                <table class="data-table compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-i18n="cockpitKpiKpiTh">KPI</th>
+                                            <th data-i18n="cockpitKpiTargetTh">Hedef</th>
+                                            <th data-i18n="cockpitKpiActualTh">Gerçekleşen</th>
+                                            <th data-i18n="cockpitKpiStatusTh">Durum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($company['rows'] as $row): if ($row['target'] === null) { continue; } ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($cockpitKpiLabels[$row['kpi_key']] ?? $row['kpi_key'], ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td><?= htmlspecialchars((string) $row['target'], ENT_QUOTES, 'UTF-8') ?><?= htmlspecialchars($row['unit'], ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td><?= $row['actual'] === null ? '-' : htmlspecialchars((string) $row['actual'], ENT_QUOTES, 'UTF-8') . htmlspecialchars($row['unit'], ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td>
+                                                    <?php if ($row['on_track'] === null): ?>
+                                                        <span class="status-pill no-target" data-i18n="cockpitKpiNa">–</span>
+                                                    <?php elseif ($row['on_track']): ?>
+                                                        <span class="status-pill on-track" data-i18n="cockpitKpiOnTrack">Hedefte</span>
+                                                    <?php else: ?>
+                                                        <span class="status-pill off-track" data-i18n="cockpitKpiOffTrack">Sapma var</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
     </main>
 
