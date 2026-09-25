@@ -11,7 +11,7 @@ function mlCheck(bool $ok, string $name): void { global $checks; if (!$ok) throw
 
 // Varsayilan yapilandirma: e-posta kapali.
 $cfg = qmsMailConfig();
-mlCheck(isset($cfg['enabled'], $cfg['host'], $cfg['port'], $cfg['from_email']), 'Mail config exposes expected keys');
+mlCheck(isset($cfg['enabled'], $cfg['host'], $cfg['port'], $cfg['from_email'], $cfg['base_url']), 'Mail config exposes expected keys');
 mlCheck($cfg['enabled'] === false, 'Mail is disabled by default');
 
 // Kapali / hostsuz durumlarda gonderme asla aga baglanmaz, false doner.

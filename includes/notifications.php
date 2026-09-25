@@ -58,6 +58,10 @@ function qmsMailNotifyUser(PDO $pdo, int $userId, string $title, string $message
         if (!$user || trim((string) ($user['email'] ?? '')) === '') {
             return false;
         }
+        $base = rtrim((string) ($cfg['base_url'] ?? ''), '/');
+        if ($linkUrl && $base !== '' && !preg_match('~^https?://~i', $linkUrl)) {
+            $linkUrl = $base . '/' . ltrim($linkUrl, '/');
+        }
         $content = qmsMailNotificationContent($title, $message, $linkUrl);
         return qmsMailSend(
             (string) $user['email'],

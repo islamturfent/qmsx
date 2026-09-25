@@ -8,6 +8,7 @@ function qmsMailDefaults(): array
         'enabled' => false,
         'from_email' => 'qms@localhost',
         'from_name' => 'QMS',
+        'base_url' => 'http://localhost/qmsx/',
         'host' => '',
         'port' => 587,
         'username' => '',

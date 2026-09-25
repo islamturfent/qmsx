@@ -10,8 +10,12 @@
 
 require_once __DIR__ . '/../config/mail.php';
 
-/** SMTP e-postasi gonderir. Basariliysa true, degilse false (sessiz). */
-function qmsMailSend(string $to, ?string $toName, string $subject, string $htmlBody, string $plainText = ''): bool
+/**
+ * SMTP e-postasi gonderir. Basariliysa true, degilse false (sessiz).
+ *
+ * @param array<int, array{name: string, path: string, mime: string}>|null $attachments
+ */
+function qmsMailSend(string $to, ?string $toName, string $subject, string $htmlBody, string $plainText = '', ?array $attachments = null): bool
 {
     $cfg = qmsMailConfig();
     if (!$cfg['enabled'] || $cfg['host'] === '' || $cfg['from_email'] === '') {
@@ -78,26 +82,50 @@ function qmsMailSend(string $to, ?string $toName, string $subject, string $htmlB
         $write($fp, 'DATA');
         $read($fp);
 
-        $boundary = 'qms_' . bin2hex(random_bytes(10));
         $fromNameEnc = '=?UTF-8?B?' . base64_encode($cfg['from_name']) . '?=';
         $subjectEnc = '=?UTF-8?B?' . base64_encode($subject) . '?=';
         $toDisplay = $toName ? '=?UTF-8?B?' . base64_encode($toName) . '?= <' . $to . '>' : $to;
         $plain = $plainText !== '' ? $plainText : trim((string) preg_replace('/<[^>]+>/', ' ', $htmlBody));
 
+        $altBoundary = 'alt_' . bin2hex(random_bytes(8));
+        $altPart = "--" . $altBoundary . "\r\n"
+            . "Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
+            . chunk_split(base64_encode($plain)) . "\r\n"
+            . "--" . $altBoundary . "\r\n"
+            . "Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
+            . chunk_split(base64_encode($htmlBody)) . "\r\n"
+            . "--" . $altBoundary . "--\r\n";
+
+        $hasAttachments = !empty($attachments);
+        if (!$hasAttachments) {
+            $envelopeBoundary = $altBoundary;
+            $contentType = "multipart/alternative; boundary=\"" . $envelopeBoundary . "\"";
+            $body = $altPart;
+        } else {
+            $envelopeBoundary = 'mix_' . bin2hex(random_bytes(8));
+            $contentType = "multipart/mixed; boundary=\"" . $envelopeBoundary . "\"";
+            $body = "--" . $envelopeBoundary . "\r\n" . "Content-Type: multipart/alternative; boundary=\"" . $altBoundary . "\"\r\n\r\n" . $altPart;
+            foreach ($attachments as $att) {
+                if (!isset($att['path']) || !is_file($att['path'])) {
+                    continue;
+                }
+                $name = isset($att['name']) ? $att['name'] : basename($att['path']);
+                $mime = isset($att['mime']) ? $att['mime'] : 'application/octet-stream';
+                $body .= "--" . $envelopeBoundary . "\r\n"
+                    . "Content-Type: " . $mime . "; name=\"" . $name . "\"\r\n"
+                    . "Content-Transfer-Encoding: base64\r\n"
+                    . "Content-Disposition: attachment; filename=\"" . $name . "\"\r\n\r\n"
+                    . chunk_split(base64_encode((string) file_get_contents($att['path']))) . "\r\n";
+            }
+            $body .= "--" . $envelopeBoundary . "--\r\n";
+        }
+
         $headers = "From: " . $fromNameEnc . " <" . $from . ">\r\n"
             . "To: " . $toDisplay . "\r\n"
             . "Subject: " . $subjectEnc . "\r\n"
             . "MIME-Version: 1.0\r\n"
-            . "Content-Type: multipart/alternative; boundary=\"" . $boundary . "\"\r\n"
+            . "Content-Type: " . $contentType . "\r\n"
             . "Date: " . date('r') . "\r\n";
-
-        $body = "--" . $boundary . "\r\n"
-            . "Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
-            . chunk_split(base64_encode($plain)) . "\r\n"
-            . "--" . $boundary . "\r\n"
-            . "Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
-            . chunk_split(base64_encode($htmlBody)) . "\r\n"
-            . "--" . $boundary . "--\r\n";
 
         @fwrite($fp, $headers . "\r\n" . $body . "\r\n.\r\n");
         $read($fp);
