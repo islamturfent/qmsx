@@ -18,6 +18,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once dirname(__DIR__) . '/config/database.php';
 require_once dirname(__DIR__) . '/includes/notifications.php';
 
+// --all: her geciken kayit icin ilgili sirketin TUM aktif kullanicilarina
+// (sorumlu ve adminler dahil) da bildirim bas; varsayilan mod yalnizca sorumlu
+// kullanici ve/veya sirket adminleridir.
+$allUsers = in_array('--all', $argv ?? [], true);
+
 $today = date('Y-m-d');
 $stats = [
     'overdue_action' => 0,
@@ -62,6 +67,20 @@ $notifyAdmins = static function (PDO $pdo, int $companyId, string $type, string 
     }
 };
 
+/** Sirketin tum aktif kullanicilarina (sorumlu + adminler dahil) dedupli bildirim ekler. */
+$notifyCompanyAll = static function (PDO $pdo, int $companyId, string $type, string $message, string $link) use ($notify): void {
+    if ($companyId <= 0) {
+        return;
+    }
+    $stmt = $pdo->prepare(
+        "SELECT id FROM users WHERE active = 1 AND (company_id = ? OR role = 'super_admin')"
+    );
+    $stmt->execute([$companyId]);
+    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $uid) {
+        $notify($pdo, (int) $uid, $type, $message, $link);
+    }
+};
+
 // --- Geciken duzeltici faaliyet (sorumlu kullaniciya) ---
 $stmt = $pdo->prepare(
     "SELECT ca.id, ca.action_text, ca.due_date, ca.responsible_user_id, n.company_id, co.company_name
@@ -83,6 +102,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     if ($notifyAdminFallback) {
         $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_action', $msg, $link);
     }
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_action', $msg, $link);
+    }
 }
 
 // --- Geciken uygunsuzluk (sirket adminlerine) ---
@@ -97,6 +119,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $link = 'nonconformity-detail.php?id=' . (int) $r['id'];
     $msg = (string) $r['company_name'] . ' · ' . (string) $r['title'] . ' (termin: ' . (string) $r['due_date'] . ')';
     $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_nonconformity', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_nonconformity', $msg, $link);
+    }
 }
 
 // --- Geciken egitim (sirket adminlerine) ---
@@ -111,6 +136,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $link = 'trainings.php';
     $msg = (string) $r['company_name'] . ' · ' . (string) $r['title'] . ' (planlanan: ' . (string) $r['planned_date'] . ')';
     $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_training', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_training', $msg, $link);
+    }
 }
 
 // --- Kalibrasyonu secik ekipman (sorumlu kullaniciya, yoksa adminlere) ---
@@ -130,6 +158,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     } else {
         $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_calibration', $msg, $link);
     }
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_calibration', $msg, $link);
+    }
 }
 
 // --- Acik dis denetim bulgusu (sirket adminlerine) ---
@@ -145,6 +176,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $link = 'external-audits.php';
     $msg = (string) $r['company_name'] . ' · ' . (string) $r['finding_text'] . ' (termin: ' . (string) $r['due_date'] . ')';
     $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_finding', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_finding', $msg, $link);
+    }
 }
 
 // --- Gozden gecirilecek dokuman (sirket adminlerine) ---
@@ -159,6 +193,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $link = 'document-detail.php?id=' . (int) $r['id'];
     $msg = (string) $r['company_name'] . ' · ' . (string) $r['document_code'] . ' ' . (string) $r['title'] . ' (gözden geçirme: ' . (string) $r['review_date'] . ')';
     $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_document_review', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_document_review', $msg, $link);
+    }
 }
 
 // --- Termini gecen sikayet (sorumlu kullaniciya, yoksa adminlere) ---
@@ -177,6 +214,9 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
         $notify($pdo, (int) $r['responsible_user_id'], 'overdue_complaint', $msg, $link);
     } else {
         $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_complaint', $msg, $link);
+    }
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_complaint', $msg, $link);
     }
 }
 
