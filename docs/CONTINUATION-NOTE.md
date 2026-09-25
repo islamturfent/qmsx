@@ -47,8 +47,9 @@ carried over from earlier assumptions.
   | `tests/personnel.php` | 17 |
   | `tests/external-audit.php` | 20 |
   | `tests/quality-cost.php` | 19 |
+  | `tests/document-copy.php` | 15 |
 
-  548 checks total (24 suites). All suites use temporary tables and leave real records
+  563 checks total (25 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -622,6 +623,26 @@ Tracks quality costs by the classic COQ categories (prevention, appraisal,
 - 19 temp-table checks + an HTTP harness (scoping, per-category totals, filters,
   add, validation, soft-delete, KPI + both exports). Fixtures cleaned.
 
+## Doküman dağıtım kontrolü (2026-09-30)
+
+Tracks controlled copies of documents and their distribution/return status.
+
+- Schema `document_copies` (migration `20260930-document-copies.sql`, idempotent
+  runner `scripts/migrate-document-copies.php`): one row per controlled copy with
+  copy number, recipient, location, status (`distributed`/`returned`/`obsolete`).
+  Copy number is unique per document. Company-scoped through the document.
+- `includes/document-copy-functions.php` owns scoped list/find/add and status
+  update (returning sets `returned_on`, re-distributing clears it). Documents
+  must be within scope; duplicate copy numbers are rejected.
+- Page `document-distribution.php`: summary cards, status filter pills, an add
+  form and a list with inline status control. Sidebar entry under "Doküman
+  Yönetimi" ("Dağıtım Kontrolü").
+- Reporting: `copy_count` + `copy_returned` metrics, a "Dağıtılan Kopya" KPI
+  tile on `reports.php`, a nineteenth Excel sheet (`Dağıtım`) and a sixteenth
+  PDF detail table.
+- 15 temp-table checks + an HTTP harness (scoping, filter, add, duplicate/cross-tenant
+  rejection, return/redo status, KPI + both exports). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -835,10 +856,11 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 18 sheets, the PDF has
-  fifteen detail tables (management review, audit programs, equipment,
-  satisfaction, personnel, external audits and quality costs added the last
-  sheets/tables) and prints "no records this period" when a section is empty.
+  of the existing KPI and summary content. Excel has 19 sheets, the PDF has
+  sixteen detail tables (management review, audit programs, equipment,
+  satisfaction, personnel, external audits, quality costs and document
+  distribution added the last sheets/tables) and prints "no records this
+  period" when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
