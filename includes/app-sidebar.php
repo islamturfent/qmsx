@@ -133,6 +133,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("performance") ?>
             <span data-i18n="performanceTitle">Performans Yönetimi</span>
         </a>
+        <a class="<?= sidebarLinkClass("quality_costs", $activeNav) ?>" href="quality-costs.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="qualityCostMenuLabel">Kalite Maliyeti (COQ)</span>
+        </a>
         <a class="<?= sidebarLinkClass("reviews", $activeNav) ?>" href="reviews.php">
             <?= appIcon("reviews") ?>
             <span data-i18n="reviewsTitle">Yönetimin Gözden Geçirmesi</span>

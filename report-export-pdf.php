@@ -182,6 +182,13 @@ foreach ($report['external_audit_list'] as $row) {
         . $row['open_findings'] . '</td></tr>';
 }
 
+$qualityCostRows = '';
+foreach ($report['quality_cost_list'] as $row) {
+    $qualityCostRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['cost_type']) . '</td><td>' . number_format((float) $row['amount'], 2, ',', '.') . '</td><td>'
+        . $escape($row['incurred_on']) . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -245,6 +252,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Dış Denetim Sayısı</span><strong>' . $metrics['external_audit_count'] . '</strong></td>
       <td class="metric"><span>Açık Dış Denetim Bulgusu</span><strong>' . $metrics['external_audit_open'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Toplam COQ (₺)</span><strong>' . number_format((float) $metrics['quality_cost_total'], 2, ',', '.') . '</strong></td>
+      <td class="metric"><span>Hata Maliyeti (₺)</span><strong>' . number_format((float) $metrics['quality_cost_failure'], 2, ',', '.') . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -266,6 +276,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Memnuniyet', '<th>Şirket</th><th>Müşteri</th><th>Tarih</th><th>Puan</th><th>Yorum</th>', $satisfactionRows)
     . $detailSection('Personel', '<th>Şirket</th><th>Personel</th><th>Kod</th><th>Bölüm</th><th>Pozisyon</th><th>Yetkinlik</th>', $personnelRows)
     . $detailSection('Dış Denetimler', '<th>Şirket</th><th>Denetim</th><th>Kaynak</th><th>Kuruluş</th><th>Tarih</th><th>Durum</th><th>Açık Bulgu</th>', $externalAuditRows)
+    . $detailSection('Kalite Maliyeti', '<th>Şirket</th><th>Başlık</th><th>Kategori</th><th>Tutar (₺)</th><th>Tarih</th>', $qualityCostRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

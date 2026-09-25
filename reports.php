@@ -274,6 +274,26 @@ $externalAuditCount = count($externalAuditRecords);
 $externalAuditOpen = 0;
 foreach ($externalAuditRecords as $item) { $externalAuditOpen += (int) $item["open_findings"]; }
 
+$qualityCostRecords = fetchReportRows(
+    $pdo,
+    "SELECT c.company_id, c.cost_type, c.amount
+     FROM quality_costs c INNER JOIN companies ON companies.id = c.company_id
+     WHERE c.active = 1 AND c.incurred_on BETWEEN ? AND ?" . $companyScopeSql,
+    $periodParams,
+    $selectedCompanyId
+);
+$qualityCostTotal = 0.0;
+$qualityCostFailure = 0.0;
+foreach ($qualityCostRecords as $item) {
+    $amt = (float) $item["amount"];
+    $qualityCostTotal += $amt;
+    if (in_array($item["cost_type"], ["internal_failure", "external_failure"], true)) {
+        $qualityCostFailure += $amt;
+    }
+}
+$qualityCostTotal = round($qualityCostTotal, 2);
+$qualityCostFailure = round($qualityCostFailure, 2);
+
 $documentStatuses = ["draft" => 0, "review" => 0, "approved" => 0, "published" => 0, "archived" => 0];
 foreach ($documents as $document) {
     if (isset($documentStatuses[$document["status"]])) $documentStatuses[$document["status"]]++;
@@ -378,6 +398,7 @@ $exportQuery = http_build_query([
             <div class="dashboard-card metric-violet"><?= appIcon("performance", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="satisfactionAvgKpi">Memnuniyet</span><strong class="dashboard-card-number"><?= $satisfactionAvg ?> <small data-i18n="satisfactionCountKpi"><?= $satisfactionCount ?> yanıt</small></strong></div></div>
             <div class="dashboard-card metric-blue"><?= appIcon("users", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="personnelCountKpi">Personel</span><strong class="dashboard-card-number"><?= $personnelCount ?> <small data-i18n="personnelExpiredKpi">Geçmiş <?= $personnelExpired ?></small></strong></div></div>
             <div class="dashboard-card metric-orange"><?= appIcon("alert", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="externalAuditCountKpi">Dış Denetim</span><strong class="dashboard-card-number"><?= $externalAuditCount ?> <small data-i18n="externalAuditOpenKpi">Açık Bulgu <?= $externalAuditOpen ?></small></strong></div></div>
+            <div class="dashboard-card metric-red"><?= appIcon("table", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="qualityCostTotalKpi">COQ</span><strong class="dashboard-card-number"><?= number_format($qualityCostTotal, 2) ?> <small data-i18n="qualityCostFailureKpi">Hata <?= number_format($qualityCostFailure, 2) ?></small></strong></div></div>
         </section>
 
         <section class="report-layout">

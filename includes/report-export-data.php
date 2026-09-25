@@ -302,6 +302,33 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
          WHERE a.active = 1 AND a.created_at BETWEEN ? AND ?" . $scopeSql,
         $periodParams
     );
+    $qualityCosts = $fetchRows(
+        "SELECT c.id, c.company_id, c.cost_type, c.title, c.amount, c.incurred_on, companies.company_name
+         FROM quality_costs c
+         INNER JOIN companies ON companies.id = c.company_id
+         WHERE c.active = 1 AND c.incurred_on BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    $qualityCostTotal = 0.0;
+    $qualityCostFailure = 0.0;
+    $qualityCostList = [];
+    foreach ($qualityCosts as $item) {
+        $amt = (float) $item['amount'];
+        $qualityCostTotal += $amt;
+        if (in_array($item['cost_type'], ['internal_failure', 'external_failure'], true)) {
+            $qualityCostFailure += $amt;
+        }
+        $qualityCostList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'cost_type' => $item['cost_type'],
+            'amount' => $amt,
+            'incurred_on' => $item['incurred_on'],
+        ];
+    }
+    $qualityCostTotal = round($qualityCostTotal, 2);
+    $qualityCostFailure = round($qualityCostFailure, 2);
+
     $externalAuditCount = count($externalAudits);
     $externalAuditOpen = 0;
     $externalAuditList = [];
@@ -400,6 +427,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'personnel_expired' => $personnelExpired,
         'external_audit_count' => $externalAuditCount,
         'external_audit_open' => $externalAuditOpen,
+        'quality_cost_total' => $qualityCostTotal,
+        'quality_cost_failure' => $qualityCostFailure,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -707,5 +736,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'satisfaction_list' => $satisfactionList,
         'personnel_list' => $personnelList,
         'external_audit_list' => $externalAuditList,
+        'quality_cost_list' => $qualityCostList,
     ];
 }
