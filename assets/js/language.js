@@ -2089,6 +2089,17 @@ translations.en.mineActionsLabel = "Corrective Action";
 translations.en.mineComplaintsLabel = "Complaint";
 translations.en.mineEquipmentLabel = "Calibration";
 translations.en.myAssignmentsEmpty = "You have no open assigned records.";
+
+translations.tr.dashboardPersonalTitle = "Kişisel Özet";
+translations.tr.dashboardPersonalText = "Size atanmış kayıtlar, geciken işleriniz ve bekleyen onaylar.";
+translations.tr.dashboardPersonalOpenLabel = "Bana Atananlar";
+translations.tr.dashboardPersonalOverdueLabel = "Geciken İşlerim";
+translations.tr.dashboardPersonalApprovalsLabel = "Bekleyen Onay";
+translations.en.dashboardPersonalTitle = "Personal Summary";
+translations.en.dashboardPersonalText = "Your assigned records, overdue items and pending approvals.";
+translations.en.dashboardPersonalOpenLabel = "Assigned to Me";
+translations.en.dashboardPersonalOverdueLabel = "My Overdue";
+translations.en.dashboardPersonalApprovalsLabel = "Pending Approvals";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";

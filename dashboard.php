@@ -38,6 +38,7 @@ $documentCount = $scopedCount("SELECT COUNT(*) FROM documents WHERE active = 1" 
 require_once __DIR__ . '/includes/report-export-data.php';
 require_once __DIR__ . '/includes/dashboard-functions.php';
 require_once __DIR__ . '/includes/performance-functions.php';
+require_once __DIR__ . '/includes/due-workbench-functions.php';
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -55,6 +56,15 @@ $dashboardSummary = qmsDashboardSummary($pdo, $userId, qmsCurrentRole(), $dashbo
 // Yonetim kokpiti: guncel yil hedef-gerecklesen KPI matrisi + COQ mini trendi.
 $cockpitYear = (int) date('Y');
 $cockpitCompanies = qmsCockpitKpiMatrix($pdo, $userId, $isSuperAdmin, $cockpitYear);
+
+// Kisisel ozet: bana atananlar + gecikenlerim + bekleyen onaylar.
+$myOverdueCount = count(qmsUserOverdueAssignments($pdo, $userId));
+$myOpenSections = qmsMyAssignments($pdo, $userId);
+$myOpenCount = 0;
+foreach ($myOpenSections as $sec) { $myOpenCount += $sec['count']; }
+$pendingStmt = $pdo->prepare("SELECT COUNT(*) FROM document_approvals WHERE approver_user_id = ? AND decision = 'pending'");
+$pendingStmt->execute([$userId]);
+$pendingApprovalsCount = (int) $pendingStmt->fetchColumn();
 $cockpitKpiLabels = qmsPerformanceKpiLabels();
 $cockpitCostRows = array_values($dashboardTrend);
 $cockpitMaxCost = 1.0;
@@ -145,6 +155,29 @@ $activeNav = "dashboard";
                     <strong class="dashboard-card-number"><?= $documentCount ?></strong>
                 </div>
             </a>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardPersonalTitle">Kişisel Özet</h3>
+                    <p data-i18n="dashboardPersonalText">Size atanmış kayıtlar, geciken işleriniz ve bekleyen onaylar.</p>
+                </div>
+            </div>
+            <div class="dashboard-grid compact-dashboard-grid">
+                <a class="dashboard-card metric-blue" href="my-assignments.php">
+                    <?= appIcon("checkBadge", "dashboard-card-icon") ?>
+                    <div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="dashboardPersonalOpenLabel">Bana Atananlar</span><strong class="dashboard-card-number detail-card-value"><?= $myOpenCount ?></strong></div>
+                </a>
+                <a class="dashboard-card <?= $myOverdueCount > 0 ? 'metric-red' : '' ?>" href="my-assignments.php">
+                    <?= appIcon("alert", "dashboard-card-icon") ?>
+                    <div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="dashboardPersonalOverdueLabel">Geciken İşlerim</span><strong class="dashboard-card-number detail-card-value"><?= $myOverdueCount ?></strong></div>
+                </a>
+                <a class="dashboard-card <?= $pendingApprovalsCount > 0 ? 'metric-orange' : '' ?>" href="document-approvals.php">
+                    <?= appIcon("approvals", "dashboard-card-icon") ?>
+                    <div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="dashboardPersonalApprovalsLabel">Bekleyen Onay</span><strong class="dashboard-card-number detail-card-value"><?= $pendingApprovalsCount ?></strong></div>
+                </a>
+            </div>
         </section>
 
         <section class="page-section console-card summary-card">
