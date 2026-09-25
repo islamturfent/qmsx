@@ -45,8 +45,9 @@ carried over from earlier assumptions.
   | `tests/document-review.php` | 21 |
   | `tests/satisfaction.php` | 14 |
   | `tests/personnel.php` | 17 |
+  | `tests/external-audit.php` | 20 |
 
-  509 checks total (22 suites). All suites use temporary tables and leave real records
+  529 checks total (23 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -579,6 +580,26 @@ Adds the personnel concept the codebase previously deliberately omitted. A staff
 - 17 temp-table checks + an HTTP harness (status derivation, scoping, add/remove
   competency, cross-tenant rejection, KPI + both exports). Fixtures cleaned.
 
+## Dış denetim & kapama takibi (2026-09-30)
+
+Tracks audits performed by external bodies (customer, certification, regulatory)
+ and the closure of their findings.
+
+- Schema `external_audits` + `external_audit_findings` (migration
+  `20260930-external-audits.sql`, idempotent runner
+  `scripts/migrate-external-audits.php`). Both company-scoped.
+- `includes/external-audit-functions.php` owns scoped list/find/findings, the
+  derived overdue flag (`status <> closed` and `due_date < today`), finding add
+  and status update (closing sets `closed_date`, reopening clears it).
+- Pages: `external-audits.php` (list + summary), `external-audit-create.php`,
+  `external-audit-detail.php` (edit + status + finding add/closure). Sidebar
+  entry under "Denetim Programları".
+- Reporting: `external_audit_count` + `external_audit_open` metrics, an external
+  audit KPI tile on `reports.php`, a seventeenth Excel sheet (`Dış Denetimler`)
+  and a fourteenth PDF detail table.
+- 20 temp-table checks + an HTTP harness (overdue derivation, scoping, finding
+  add/closure, cross-tenant rejection, KPI + both exports). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -792,10 +813,10 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 16 sheets, the PDF has
-  thirteen detail tables (management review, audit programs, equipment,
-  satisfaction and personnel added the last sheets/tables) and prints "no
-  records this period" when a section is empty.
+  of the existing KPI and summary content. Excel has 17 sheets, the PDF has
+  fourteen detail tables (management review, audit programs, equipment,
+  satisfaction, personnel and external audits added the last sheets/tables) and
+  prints "no records this period" when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
