@@ -55,11 +55,15 @@ $severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'K
         </div>
     </header>
     <main class="page-container">
-        <section class="page-heading">
+        <section class="page-heading page-heading-actions">
             <div>
                 <span class="section-kicker" data-i18n="overdueKicker">Operasyonel Takip</span>
                 <h1 data-i18n="overdueTitle">Vadesi Gelen / Geciken İşler</h1>
                 <p data-i18n="overdueText">Düzeltici faaliyet, uygunsuzluk, eğitim, kalibrasyon, bulgu, doküman ve şikayet terminlerinin özeti.</p>
+            </div>
+            <div class="form-actions">
+                <a class="secondary-button" href="overdue-export.php?format=xlsx" data-i18n="exportExcelButton">Excel İndir</a>
+                <a class="primary-button" href="overdue-export.php?format=pdf" data-i18n="exportPdfButton">PDF İndir</a>
             </div>
         </section>
 

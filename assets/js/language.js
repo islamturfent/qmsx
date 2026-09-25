@@ -2003,6 +2003,9 @@ translations.tr.viewOverdueLink = "Tümünü Gör";
 translations.en.myOverdueTitle = "My Overdue Items";
 translations.en.myOverdueText = "Records assigned to you that are past their due date.";
 translations.en.viewOverdueLink = "View All";
+
+translations.tr.exportExcelButton = "Excel İndir";
+translations.en.exportExcelButton = "Download Excel";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";

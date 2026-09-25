@@ -59,6 +59,13 @@ function qmsNotificationTypes(): array
         'complaint_closed' => ['icon' => 'checkBadge', 'group' => 'complaint'],
         'review_completed' => ['icon' => 'reviews', 'group' => 'review'],
         'calibration_failed' => ['icon' => 'warning', 'group' => 'calibration'],
+        'overdue_action' => ['icon' => 'alert', 'group' => 'capa'],
+        'overdue_nonconformity' => ['icon' => 'alert', 'group' => 'capa'],
+        'overdue_training' => ['icon' => 'training', 'group' => 'training'],
+        'overdue_calibration' => ['icon' => 'warning', 'group' => 'calibration'],
+        'overdue_finding' => ['icon' => 'alert', 'group' => 'capa'],
+        'overdue_document_review' => ['icon' => 'documents', 'group' => 'document'],
+        'overdue_complaint' => ['icon' => 'complaints', 'group' => 'complaint'],
     ];
 }
 
