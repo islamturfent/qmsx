@@ -3231,6 +3231,60 @@ body.modal-open {
     margin-bottom: 12px;
 }
 
+/* Doküman gözden geçirme merkezi */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.filter-pill {
+    display: inline-flex;
+    height: 34px;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-500);
+    background: var(--surface, #fff);
+    transition: all 0.15s ease;
+}
+
+.filter-pill:hover {
+    color: var(--brand-600);
+}
+
+.filter-pill.active {
+    border-color: var(--brand-500);
+    color: var(--brand-700);
+    background: var(--brand-50);
+}
+
+.review-queue-item {
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.list-item-date {
+    color: var(--gray-500);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.review-submit-form {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    background: var(--gray-50);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+}
+
+.review-form-grid .form-actions {
+    margin-top: 12px;
+}
+
 @media (max-width: 720px) {
     .trend-strip {
         gap: 4px;
