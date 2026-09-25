@@ -42,8 +42,9 @@ carried over from earlier assumptions.
   | `tests/permissions.php` | 17 |
   | `tests/complaint-nonconformity.php` | 13 |
   | `tests/checklist-templates.php` | 15 |
+  | `tests/document-review.php` | 21 |
 
-  457 checks total (19 suites). All suites use temporary tables and leave real records
+  478 checks total (20 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -511,6 +512,27 @@ A company-scoped template library so auditors reuse standard checklist items
 - i18n + appIcon `approvals`; service-worker cache bumped.
 - 15 temp-table checks + an HTTP harness (create, add item, apply to an audit,
   duplicate-skip, cross-tenant rejection, flash render). Fixtures cleaned.
+
+## Doküman gözden geçirme merkezi (2026-09-30)
+
+A dedicated review work queue on top of the existing `documents.review_date`
+ (already surfaced as the "review-due documents" KPI). ISO-style periodic
+ document reviews now have a repeatable queue and a recorded history.
+
+- Schema `document_reviews` (migration `20260930-document-reviews.sql`, idempotent
+  runner `scripts/migrate-document-reviews.php`): one row per review action with
+  outcome (`ok` | `needs_revision`), notes, reviewed_at, next_review_date.
+- `includes/document-review-functions.php` owns the derived status
+  (`not_scheduled / overdue / due_soon / on_schedule`, 30-day due-soon window),
+  the scoped queue, the history, and `qmsDocumentReviewRecord()` which inserts
+  the review, advances the document's `review_date`, and writes an audit-log row.
+- `document-reviews.php`: summary cards, filter pills, the review queue with an
+  inline review form (management roles act; others see a read-only queue), and a
+  recent-history list. Sidebar entry under "Doküman Gözden Geçirme".
+- Scoped by company; cross-tenant documents cannot be reviewed (no-op).
+- 21 temp-table checks + an HTTP harness (queue + ordering, status derivation,
+  review record + date advance + history + audit log, invalid/cross-tenant
+  rejection, flash render). Fixtures and the audit_log rows were cleaned.
 
 ## Security hardening (2026-09-19)
 
