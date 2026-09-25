@@ -245,6 +245,29 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    $satisfactionResponses = $fetchRows(
+        "SELECT responses.id, responses.company_id, responses.customer_name, responses.responded_at,
+                responses.overall_score, responses.comment, companies.company_name
+         FROM satisfaction_responses responses
+         INNER JOIN companies ON companies.id = responses.company_id
+         WHERE responses.active = 1 AND responses.responded_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    $satisfactionList = [];
+    $satisfactionScoreSum = 0;
+    foreach ($satisfactionResponses as $item) {
+        $satisfactionScoreSum += (int) $item['overall_score'];
+        $satisfactionList[] = [
+            'company_name' => $item['company_name'],
+            'customer_name' => $item['customer_name'] ?: '-',
+            'responded_at' => $item['responded_at'],
+            'overall_score' => (int) $item['overall_score'],
+            'comment' => $item['comment'] ?: '-',
+        ];
+    }
+    $satisfactionCount = count($satisfactionResponses);
+    $satisfactionAvg = $satisfactionCount > 0 ? round($satisfactionScoreSum / $satisfactionCount, 1) : 0;
+
     $openComplaints = array_filter(
         $complaints,
         static fn(array $item): bool => qmsComplaintIsOpen((string) $item['status'])
@@ -308,6 +331,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'audit_program_active' => count(array_filter($auditPrograms, static fn(array $item): bool => $item['status'] === 'active')),
         'equipment_count' => count($equipment),
         'equipment_overdue' => $equipmentOverdue,
+        'satisfaction_count' => $satisfactionCount,
+        'satisfaction_avg' => $satisfactionAvg,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -612,5 +637,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'review_list' => $reviewList,
         'audit_program_list' => $auditProgramList,
         'equipment_list' => $equipmentList,
+        'satisfaction_list' => $satisfactionList,
     ];
 }

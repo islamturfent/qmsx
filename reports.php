@@ -227,6 +227,17 @@ $auditProgramCount = count($auditPrograms);
 $auditProgramActiveCount = count(array_filter($auditPrograms, static fn($item) => $item["status"] === "active"));
 $equipmentCount = count($equipmentRecords);
 
+$satisfactionRecords = fetchReportRows(
+    $pdo,
+    "SELECT responses.company_id, responses.overall_score, companies.company_name
+     FROM satisfaction_responses responses INNER JOIN companies ON companies.id = responses.company_id
+     WHERE responses.active = 1 AND responses.responded_at BETWEEN ? AND ?" . $companyScopeSql,
+    $periodParams,
+    $selectedCompanyId
+);
+$satisfactionCount = count($satisfactionRecords);
+$satisfactionAvg = $satisfactionCount > 0 ? round((array_sum(array_column($satisfactionRecords, "overall_score"))) / $satisfactionCount, 1) : 0;
+
 $documentStatuses = ["draft" => 0, "review" => 0, "approved" => 0, "published" => 0, "archived" => 0];
 foreach ($documents as $document) {
     if (isset($documentStatuses[$document["status"]])) $documentStatuses[$document["status"]]++;
@@ -328,6 +339,7 @@ $exportQuery = http_build_query([
             <div class="dashboard-card metric-blue"><?= appIcon("reviews", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="reviewCountKpi">Gözden Geçirme</span><strong class="dashboard-card-number"><?= $reviewCount ?></strong></div></div>
             <div class="dashboard-card metric-teal"><?= appIcon("approvals", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="auditProgramCountKpi">Denetim Programı</span><strong class="dashboard-card-number"><?= $auditProgramCount ?> <small data-i18n="auditProgramActiveKpi">Aktif <?= $auditProgramActiveCount ?></small></strong></div></div>
             <div class="dashboard-card metric-orange"><?= appIcon("table", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="equipmentCountKpi">Ekipman</span><strong class="dashboard-card-number"><?= $equipmentCount ?> <small data-i18n="equipmentOverdueKpi">Geçmiş <?= $equipmentOverdueCount ?></small></strong></div></div>
+            <div class="dashboard-card metric-violet"><?= appIcon("performance", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="satisfactionAvgKpi">Memnuniyet</span><strong class="dashboard-card-number"><?= $satisfactionAvg ?> <small data-i18n="satisfactionCountKpi"><?= $satisfactionCount ?> yanıt</small></strong></div></div>
         </section>
 
         <section class="report-layout">
