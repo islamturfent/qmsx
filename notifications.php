@@ -11,6 +11,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/app-ui.php';
 require_once __DIR__ . '/includes/notifications.php';
+require_once __DIR__ . '/includes/due-workbench-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $csrfToken = qmsCsrfToken('notifications');
@@ -55,6 +56,8 @@ $counts = $countStmt->fetch(PDO::FETCH_ASSOC) ?: ["total" => 0, "unread_count" =
 $notificationGroups = qmsNotificationGroupLabels();
 $notificationGroupI18n = qmsNotificationGroupI18nKeys();
 
+$myOverdue = qmsUserOverdueAssignments($pdo, $userId);
+
 $activeNav = "notifications";
 
 ?>
@@ -74,6 +77,28 @@ $activeNav = "notifications";
             <a class="dashboard-card metric-orange" href="notifications.php?filter=unread"><?= appIcon("alert", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="unreadNotificationsLabel">Okunmamış</span><strong class="dashboard-card-number"><?= (int) $counts["unread_count"] ?></strong></div></a>
             <a class="dashboard-card metric-teal" href="notifications.php?filter=read"><?= appIcon("check", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="readNotificationsLabel">Okunmuş</span><strong class="dashboard-card-number"><?= (int) $counts["read_count"] ?></strong></div></a>
         </section>
+        <?php if ($myOverdue): ?>
+        <section class="console-card checklist-section">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="myOverdueTitle">Geciken İşlerim</h3>
+                    <p data-i18n="myOverdueText">Size atanmış ve terminal geçmiş kayıtlar.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="overdue.php" data-i18n="viewOverdueLink">Tümünü Gör</a>
+            </div>
+            <div class="admin-list">
+                <?php foreach ($myOverdue as $od): ?>
+                    <a class="admin-list-item overdue-row" href="<?= htmlspecialchars($od['link'], ENT_QUOTES, 'UTF-8') ?>">
+                        <div class="list-item-main">
+                            <strong><?= htmlspecialchars($od['text'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= htmlspecialchars($od['label'], ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($od['company'], ENT_QUOTES, 'UTF-8') ?><?php if ($od['sub'] !== ''): ?> · <?= htmlspecialchars($od['sub'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?></span>
+                        </div>
+                        <div class="list-item-side"><span class="status-pill off-track"><?= htmlspecialchars($od['due'], ENT_QUOTES, 'UTF-8') ?></span></div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
         <section class="page-section">
             <div class="section-heading"><div><h2 data-i18n="recentNotificationsTitle">Son Bildirimler</h2><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($notifications) ?></strong></p></div></div>
             <?php if (!$notifications): ?><div class="empty-state" data-i18n="noNotificationsText">Gösterilecek bildirim bulunmuyor.</div><?php else: ?>

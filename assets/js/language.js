@@ -1995,6 +1995,14 @@ translations.en.auditorWorkloadCompanyTh = "Company";
 translations.en.auditorWorkloadAuditsTh = "Assigned Audits";
 translations.en.auditorWorkloadNcTh = "Open Nonconformities";
 translations.en.auditorWorkloadActionsTh = "Open Actions";
+
+// --- Bildirim merkezi: geciken islerim ---
+translations.tr.myOverdueTitle = "Geciken İşlerim";
+translations.tr.myOverdueText = "Size atanmış ve terminal geçmiş kayıtlar.";
+translations.tr.viewOverdueLink = "Tümünü Gör";
+translations.en.myOverdueTitle = "My Overdue Items";
+translations.en.myOverdueText = "Records assigned to you that are past their due date.";
+translations.en.viewOverdueLink = "View All";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";

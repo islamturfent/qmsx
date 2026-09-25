@@ -205,6 +205,83 @@ function qmsOverdueWorkbench(PDO $pdo, int $userId, string $role): array
 }
 
 /**
+ * Kullaniciya atanmis geciken kayitlar (bildirim merkezi icin, canli hesaplanir).
+ *
+ * @return array<int, array{label: string, text: string, company: string,
+ *         due: string, link: string, sub: string}>
+ */
+function qmsUserOverdueAssignments(PDO $pdo, int $userId): array
+{
+    $today = date('Y-m-d');
+    $items = [];
+
+    $stmt = $pdo->prepare(
+        "SELECT ca.id, ca.action_text, ca.due_date, ca.action_type, co.company_name
+         FROM corrective_actions ca
+         INNER JOIN nonconformities n ON n.id = ca.nonconformity_id
+         INNER JOIN companies co ON co.id = n.company_id
+         WHERE ca.active = 1 AND ca.responsible_user_id = ?
+           AND ca.due_date IS NOT NULL AND ca.due_date < ?
+           AND ca.status NOT IN ('completed', 'closed')
+         ORDER BY ca.due_date ASC"
+    );
+    $stmt->execute([$userId, $today]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $items[] = [
+            'label' => 'Düzeltici Faaliyet',
+            'text' => (string) $r['action_text'],
+            'company' => (string) $r['company_name'],
+            'due' => (string) $r['due_date'],
+            'link' => 'corrective-action-detail.php?id=' . (int) $r['id'],
+            'sub' => (string) $r['action_type'],
+        ];
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT c.id, c.subject, c.due_date, c.complaint_code, co.company_name
+         FROM complaints c INNER JOIN companies co ON co.id = c.company_id
+         WHERE c.active = 1 AND c.responsible_user_id = ?
+           AND c.due_date IS NOT NULL AND c.due_date < ?
+           AND c.status NOT IN ('closed', 'rejected')
+         ORDER BY c.due_date ASC"
+    );
+    $stmt->execute([$userId, $today]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $items[] = [
+            'label' => 'Şikayet',
+            'text' => (string) $r['subject'],
+            'company' => (string) $r['company_name'],
+            'due' => (string) $r['due_date'],
+            'link' => 'complaint-detail.php?id=' . (int) $r['id'],
+            'sub' => (string) $r['complaint_code'],
+        ];
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT e.id, e.name, e.asset_code, e.next_calibration_date, co.company_name
+         FROM equipment e INNER JOIN companies co ON co.id = e.company_id
+         WHERE e.active = 1 AND e.responsible_user_id = ?
+           AND e.next_calibration_date IS NOT NULL AND e.next_calibration_date < ?
+           AND e.status NOT IN ('out_of_service')
+         ORDER BY e.next_calibration_date ASC"
+    );
+    $stmt->execute([$userId, $today]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $items[] = [
+            'label' => 'Kalibrasyon',
+            'text' => (string) $r['name'],
+            'company' => (string) $r['company_name'],
+            'due' => (string) $r['next_calibration_date'],
+            'link' => 'equipment.php',
+            'sub' => (string) $r['asset_code'],
+        ];
+    }
+
+    usort($items, static fn(array $a, array $b): int => strcmp($a['due'], $b['due']));
+    return $items;
+}
+
+/**
  * Denetci is yuku: her denetci icin atanmis aktif denetim, acik uygunsuzluk
  * ve acik duzeltici/onleyici faaliyet sayisi (kapsamli).
  *
