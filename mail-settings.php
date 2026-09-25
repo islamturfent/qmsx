@@ -35,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $saved['enabled'] = isset($_POST["enabled"]);
         $saved['from_email'] = trim((string) ($_POST["from_email"] ?? ""));
         $saved['from_name'] = trim((string) ($_POST["from_name"] ?? "QMS"));
+        $saved['base_url'] = rtrim(trim((string) ($_POST["base_url"] ?? '')), '/') . '/';
         $saved['host'] = trim((string) ($_POST["host"] ?? ""));
         $saved['port'] = (int) ($_POST["port"] ?? 587);
         $saved['username'] = trim((string) ($_POST["username"] ?? ""));
@@ -109,6 +110,7 @@ $encryptionOptions = ['none' => 'Şifresiz', 'tls' => 'TLS (önerilen)', 'ssl' =
                     <label class="form-field"><span data-i18n="mailFromNameLabel">Gönderen Adı</span><input type="text" name="from_name" value="<?= htmlspecialchars((string) $config['from_name'], ENT_QUOTES, 'UTF-8') ?>"></label>
                     <label class="form-field"><span data-i18n="mailHostLabel">SMTP Sunucu</span><input type="text" name="host" value="<?= htmlspecialchars((string) $config['host'], ENT_QUOTES, 'UTF-8') ?>" placeholder="smtp.example.com"></label>
                     <label class="form-field"><span data-i18n="mailPortLabel">Port</span><input type="number" name="port" min="1" max="65535" value="<?= (int) $config['port'] ?>"></label>
+                    <label class="form-field form-field-wide"><span data-i18n="mailBaseUrlLabel">Uygulama URL'si (mail linkleri için)</span><input type="text" name="base_url" value="<?= htmlspecialchars((string) $config['base_url'], ENT_QUOTES, 'UTF-8') ?>" placeholder="http://localhost/qmsx/"></label>
                     <label class="form-field"><span data-i18n="mailEncryptionLabel">Şifreleme</span><select name="encryption"><?php foreach ($encryptionOptions as $ek => $el): ?><option value="<?= $ek ?>" <?= $config['encryption'] === $ek ? 'selected' : '' ?>><?= htmlspecialchars($el, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                     <label class="form-field"><span data-i18n="mailUsernameLabel">Kullanıcı Adı</span><input type="text" name="username" value="<?= htmlspecialchars((string) $config['username'], ENT_QUOTES, 'UTF-8') ?>" autocomplete="off"></label>
                     <label class="form-field"><span data-i18n="mailPasswordLabel">Şifre</span><input type="password" name="password" placeholder="••••••••" autocomplete="new-password"></label>

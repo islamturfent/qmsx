@@ -42,7 +42,7 @@ function qmsNotify(PDO $pdo, int $userId, string $type, string $title, string $m
  *
  * @return bool Mail etkin degilse veya basarisizsa false.
  */
-function qmsMailNotifyUser(PDO $pdo, int $userId, string $title, string $message, ?string $linkUrl): bool
+function qmsMailNotifyUser(PDO $pdo, int $userId, string $title, string $message, ?string $linkUrl, ?string $category = null): bool
 {
     if ($userId <= 0) {
         return false;
@@ -62,7 +62,7 @@ function qmsMailNotifyUser(PDO $pdo, int $userId, string $title, string $message
         if ($linkUrl && $base !== '' && !preg_match('~^https?://~i', $linkUrl)) {
             $linkUrl = $base . '/' . ltrim($linkUrl, '/');
         }
-        $content = qmsMailNotificationContent($title, $message, $linkUrl);
+        $content = qmsMailNotificationContent($title, $message, $linkUrl, $category);
         return qmsMailSend(
             (string) $user['email'],
             (string) ($user['full_name'] ?? null) !== '' ? (string) $user['full_name'] : null,
@@ -137,7 +137,8 @@ function qmsMailNotifyUserPrefsAware(PDO $pdo, int $userId, string $type, string
     if ($prefs['categories'] !== null && !in_array($group, $prefs['categories'], true)) {
         return false;
     }
-    return qmsMailNotifyUser($pdo, $userId, $title, $message, $linkUrl);
+    $groupLabel = qmsNotificationGroupLabels()[$group] ?? null;
+    return qmsMailNotifyUser($pdo, $userId, $title, $message, $linkUrl, $groupLabel);
 }
 
 /**

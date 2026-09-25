@@ -2050,6 +2050,9 @@ translations.en.mailTestTitle = "Send Test Email";
 translations.en.mailTestText = "Sends a test message to this account's email address using current settings.";
 translations.en.mailTestButton = "Send Test Email";
 
+translations.tr.mailBaseUrlLabel = "Uygulama URL'si (mail linkleri için)";
+translations.en.mailBaseUrlLabel = "App URL (for email links)";
+
 translations.tr.notificationPrefsTitle = "Bildirim Tercihleri";
 translations.tr.notificationPrefsText = "E-posta bildirimlerini aç/kapat ve hangi kategoriden e-posta alacağını seç.";
 translations.tr.notificationPrefsSaved = "Bildirim tercihleri kaydedildi.";
