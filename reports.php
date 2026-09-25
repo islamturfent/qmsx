@@ -260,6 +260,20 @@ if ($pStaffIds !== []) {
     $personnelExpired = (int) $pExpStmt->fetchColumn();
 }
 
+$externalAuditRecords = fetchReportRows(
+    $pdo,
+    "SELECT a.id, a.company_id, a.status, companies.company_name,
+            (SELECT COUNT(*) FROM external_audit_findings f
+              WHERE f.external_audit_id = a.id AND f.active = 1 AND f.status <> 'closed') AS open_findings
+     FROM external_audits a INNER JOIN companies ON companies.id = a.company_id
+     WHERE a.active = 1 AND a.created_at BETWEEN ? AND ?" . $companyScopeSql,
+    $periodParams,
+    $selectedCompanyId
+);
+$externalAuditCount = count($externalAuditRecords);
+$externalAuditOpen = 0;
+foreach ($externalAuditRecords as $item) { $externalAuditOpen += (int) $item["open_findings"]; }
+
 $documentStatuses = ["draft" => 0, "review" => 0, "approved" => 0, "published" => 0, "archived" => 0];
 foreach ($documents as $document) {
     if (isset($documentStatuses[$document["status"]])) $documentStatuses[$document["status"]]++;
@@ -363,6 +377,7 @@ $exportQuery = http_build_query([
             <div class="dashboard-card metric-orange"><?= appIcon("table", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="equipmentCountKpi">Ekipman</span><strong class="dashboard-card-number"><?= $equipmentCount ?> <small data-i18n="equipmentOverdueKpi">Geçmiş <?= $equipmentOverdueCount ?></small></strong></div></div>
             <div class="dashboard-card metric-violet"><?= appIcon("performance", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="satisfactionAvgKpi">Memnuniyet</span><strong class="dashboard-card-number"><?= $satisfactionAvg ?> <small data-i18n="satisfactionCountKpi"><?= $satisfactionCount ?> yanıt</small></strong></div></div>
             <div class="dashboard-card metric-blue"><?= appIcon("users", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="personnelCountKpi">Personel</span><strong class="dashboard-card-number"><?= $personnelCount ?> <small data-i18n="personnelExpiredKpi">Geçmiş <?= $personnelExpired ?></small></strong></div></div>
+            <div class="dashboard-card metric-orange"><?= appIcon("alert", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="externalAuditCountKpi">Dış Denetim</span><strong class="dashboard-card-number"><?= $externalAuditCount ?> <small data-i18n="externalAuditOpenKpi">Açık Bulgu <?= $externalAuditOpen ?></small></strong></div></div>
         </section>
 
         <section class="report-layout">

@@ -174,6 +174,14 @@ foreach ($report['personnel_list'] as $row) {
         . $escape($row['position']) . '</td><td>' . $row['competency_count'] . '</td></tr>';
 }
 
+$externalAuditRows = '';
+foreach ($report['external_audit_list'] as $row) {
+    $externalAuditRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['audit_type']) . '</td><td>' . $escape($row['audited_by']) . '</td><td>'
+        . $escape($row['audit_date']) . '</td><td>' . $escape($row['status']) . '</td><td>'
+        . $row['open_findings'] . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -234,6 +242,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Personel Sayısı</span><strong>' . $metrics['personnel_count'] . '</strong></td>
       <td class="metric"><span>Vadesi Geçmiş Yetkinlik</span><strong>' . $metrics['personnel_expired'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Dış Denetim Sayısı</span><strong>' . $metrics['external_audit_count'] . '</strong></td>
+      <td class="metric"><span>Açık Dış Denetim Bulgusu</span><strong>' . $metrics['external_audit_open'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -254,6 +265,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Ekipman', '<th>Şirket</th><th>Ekipman</th><th>Kod</th><th>Kategori</th><th>Sonraki Kalibrasyon</th><th>Durum</th><th>Kalibrasyon</th>', $equipmentRows)
     . $detailSection('Memnuniyet', '<th>Şirket</th><th>Müşteri</th><th>Tarih</th><th>Puan</th><th>Yorum</th>', $satisfactionRows)
     . $detailSection('Personel', '<th>Şirket</th><th>Personel</th><th>Kod</th><th>Bölüm</th><th>Pozisyon</th><th>Yetkinlik</th>', $personnelRows)
+    . $detailSection('Dış Denetimler', '<th>Şirket</th><th>Denetim</th><th>Kaynak</th><th>Kuruluş</th><th>Tarih</th><th>Durum</th><th>Açık Bulgu</th>', $externalAuditRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

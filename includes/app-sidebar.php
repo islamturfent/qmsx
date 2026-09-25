@@ -96,6 +96,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("approvals") ?>
             <span data-i18n="checklistTemplatesMenuLabel">Kontrol Listesi Şablonları</span>
         </a>
+        <a class="<?= sidebarLinkClass("external_audits", $activeNav) ?>" href="external-audits.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="externalAuditsMenuLabel">Dış Denetim & Kapama</span>
+        </a>
         <?php endif; ?>
         <a class="<?= sidebarLinkClass("actions", $activeNav) ?>" href="actions.php">
             <?= appIcon("check") ?>

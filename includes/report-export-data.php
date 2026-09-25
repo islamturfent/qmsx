@@ -292,6 +292,32 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'competency_count' => (int) $item['competency_count'],
         ];
     }
+    $externalAudits = $fetchRows(
+        "SELECT a.id, a.company_id, a.audit_type, a.title, a.audited_by, a.audit_date, a.status,
+                a.created_at, companies.company_name,
+                (SELECT COUNT(*) FROM external_audit_findings f
+                  WHERE f.external_audit_id = a.id AND f.active = 1 AND f.status <> 'closed') AS open_findings
+         FROM external_audits a
+         INNER JOIN companies ON companies.id = a.company_id
+         WHERE a.active = 1 AND a.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    $externalAuditCount = count($externalAudits);
+    $externalAuditOpen = 0;
+    $externalAuditList = [];
+    foreach ($externalAudits as $item) {
+        $externalAuditOpen += (int) $item['open_findings'];
+        $externalAuditList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'audit_type' => $item['audit_type'],
+            'audited_by' => $item['audited_by'] ?: '-',
+            'audit_date' => $item['audit_date'] ?: '-',
+            'status' => $item['status'],
+            'open_findings' => (int) $item['open_findings'],
+        ];
+    }
+
     $personnelCount = count($staff);
     $personnelExpired = 0;
     if ($staffIds !== []) {
@@ -372,6 +398,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'satisfaction_avg' => $satisfactionAvg,
         'personnel_count' => $personnelCount,
         'personnel_expired' => $personnelExpired,
+        'external_audit_count' => $externalAuditCount,
+        'external_audit_open' => $externalAuditOpen,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -678,5 +706,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'equipment_list' => $equipmentList,
         'satisfaction_list' => $satisfactionList,
         'personnel_list' => $personnelList,
+        'external_audit_list' => $externalAuditList,
     ];
 }
