@@ -1120,6 +1120,13 @@ per-column emphasis, so uniform gray-500 reads washed out.
 
 ## Open items
 
+- **Zamanlayıcı (Task Scheduler) kurulumu — ERTELENDİ (sistem bitince yapılacak):**
+  `scripts/notify-overdue.php` için `QMSOverdueNotify` görevi zaten kuruldu (günlük
+  08:30). Sistem tamamlanınca şunlar da görev olarak eklenmeli (günlük):
+  `scripts/send-daily-report.php` (rapor e-postası), `scripts/audit-program-reminders.php`
+  ve `notify-overdue.php --all` varyantının zamanlayıcıda aç/kapa kararı.
+  Kullanıcı bu kurulumu sistemi bitirdikten sonra yapmayı planlıyor.
+
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
