@@ -842,6 +842,13 @@ Denied for the auditor role. Verified by a CLI smoke run (valid worksheets / %PD
 on top of the function-level temp-table suites.
 - Test: `tests/notify-overdue.php` (4): first run creates one notification, second
   run is idempotent (no duplicates).
+- `--all` mode: `php scripts/notify-overdue.php --all` also pushes each overdue item
+  to every active user of the owning company (plus super admins) besides the
+  responsible/admin recipients. Default mode stays role-aware.
+- Localhost scheduling: a Windows Task Scheduler task `QMSOverdueNotify` (daily
+  08:30) runs `C:\xampp\php\php.exe -f C:\xampp\htdocs\qmsx\scripts\notify-overdue.php`.
+  `schtasks` needs `MSYS_NO_PATHCONV=1` when called from Git Bash (forward-slash
+  args get mangled into paths otherwise). Task runs in interactive logon mode.
 
 ## Security hardening (2026-09-19)
 
