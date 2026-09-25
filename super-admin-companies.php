@@ -7,13 +7,16 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
     exit;
 }
 
-if (($_SESSION["qms_role"] ?? "") !== "super_admin") {
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/permissions.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+// Erisim tek kaynaktan gelir (RBAC servisi).
+if (!qmsCanSession('admin.companies')) {
     header("Location: dashboard.php");
     exit;
 }
-
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/includes/csrf.php';
 
 $csrfToken = qmsCsrfToken('companies');
 

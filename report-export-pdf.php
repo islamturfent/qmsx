@@ -10,11 +10,16 @@ if (!isset($_SESSION['qms_logged_in']) || $_SESSION['qms_logged_in'] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/permissions.php';
 require_once __DIR__ . '/includes/report-export-data.php';
 require_once __DIR__ . '/lib/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+
+// Rapor disa aktarma izni tek kaynaktan gelir (RBAC servisi).
+qmsRequirePermission('report.export');
 
 $report = buildReportExportData(
     $pdo,

@@ -14,6 +14,13 @@ require_once __DIR__ . '/includes/complaint-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/audit-program-functions.php';
 require_once __DIR__ . '/includes/equipment-functions.php';
+require_once __DIR__ . '/includes/permissions.php';
+
+// Raporlama ve KPI erisimi tek kaynaktan gelir (RBAC servisi).
+if (!qmsCanSession('reports.view')) {
+    header("Location: dashboard.php");
+    exit;
+}
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";

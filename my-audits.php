@@ -9,11 +9,12 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/permissions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 
-// Bu ekran denetci rolu icin; digerleri panoya doner.
-if (!qmsIsAuditor()) {
+// Bu ekran denetci rolu icin; izin tek kaynaktan (RBAC servisi) gelir.
+if (!qmsCanSession('my_audits.view')) {
     header("Location: dashboard.php");
     exit;
 }
