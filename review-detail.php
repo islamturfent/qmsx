@@ -12,6 +12,7 @@ require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/report-export-data.php';
 require_once __DIR__ . '/includes/performance-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $reviewId = (int) ($_GET["id"] ?? $_POST["review_id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -119,6 +120,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "new_status" => $formData["status"],
                 "actor_user_id" => $userId
             ]);
+
+            if ($formData["status"] === "completed" && $review["status"] !== "completed") {
+                qmsAuditLog($pdo, $companyId, $userId, 'management_review', $reviewId, 'complete', 'Yönetim gözden geçirmesi tamamlandı: ' . $formData["title"]);
+            }
 
             header("Location: " . $redirect . "&updated=1");
             exit;

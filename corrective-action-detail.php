@@ -9,6 +9,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/capa-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $actionId = (int) ($_GET["id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -175,6 +176,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "responsible_user_id" => (int) $formData["responsible_user_id"],
             "actor_user_id" => $userId
         ]);
+
+        qmsAuditLog(
+            $pdo,
+            (int) ($action["company_id"] ?? 0),
+            $userId,
+            'corrective_action',
+            $actionId,
+            $formData["status"] !== $action["status"] ? 'status_change' : 'update',
+            'Düzeltici faaliyet güncellendi: ' . $formData["action_text"] . " (durum: " . $formData["status"] . ")"
+        );
 
         header("Location: corrective-action-detail.php?id=" . $actionId . "&updated=1");
         exit;

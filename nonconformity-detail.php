@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/vocabulary.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $nonconformityId = (int) ($_GET["id"] ?? 0);
 
@@ -93,6 +94,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && ($_POST["form_type"] ?? "") === "up
             "responsible_person" => $formData["responsible_person"] !== "" ? $formData["responsible_person"] : null,
             "id" => $nonconformityId
         ]);
+
+        $ncAction = $formData["status"] === "closed"
+            ? 'close'
+            : ($formData["status"] !== $nonconformity["status"] ? 'status_change' : 'update');
+        qmsAuditLog($pdo, (int) $nonconformity["company_id"], $userId, 'nonconformity', $nonconformityId, $ncAction, 'Uygunsuzluk güncellendi: ' . $formData["title"] . ' (durum: ' . $formData["status"] . ')');
 
         header("Location: nonconformity-detail.php?id=" . $nonconformityId . "&updated=1");
         exit;

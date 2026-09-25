@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/supplier-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $supplierId = (int) ($_GET["id"] ?? $_POST["supplier_id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -130,6 +131,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     "new_status" => $formData["status"],
                     "actor_user_id" => $userId
                 ]);
+
+                qmsAuditLog($pdo, $companyId, $userId, 'supplier', $supplierId, $formData["status"] !== $supplier["status"] ? 'status_change' : 'update', 'Tedarikçi güncellendi: ' . $formData["name"] . ' (durum: ' . $statusLabels[$formData["status"]] . ')');
 
                 header("Location: " . $redirect . "&updated=1");
                 exit;

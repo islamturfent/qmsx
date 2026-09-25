@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/vocabulary.php';
+require_once __DIR__ . '/audit-log-functions.php';
 
 /** Rapor durumlari. */
 const QMS_AUDIT_REPORT_STATUSES = ['draft', 'final'];
@@ -262,7 +263,8 @@ function qmsSaveAuditReport(PDO $pdo, int $auditId, int $companyId, array $data,
     $existing = $pdo->prepare('SELECT id FROM audit_reports WHERE audit_id = ?');
     $existing->execute([$auditId]);
 
-    if ($reportId = (int) $existing->fetchColumn()) {
+    $reportId = (int) $existing->fetchColumn();
+    if ($reportId) {
         $stmt = $pdo->prepare(
             'UPDATE audit_reports SET title = :title, status = :status, report_date = :report_date,
                 scope_text = :scope_text, methodology_text = :methodology_text, findings_text = :findings_text,
@@ -277,6 +279,7 @@ function qmsSaveAuditReport(PDO $pdo, int $auditId, int $companyId, array $data,
             'updated_by' => $userId ?: null,
             'id' => $reportId,
         ]));
+        qmsAuditLog($pdo, $companyId, $userId, 'audit_report', $auditId, $status === 'final' ? 'finalize' : 'update', 'Denetim raporu güncellendi: ' . $title);
         return $reportId;
     }
 
@@ -301,7 +304,11 @@ function qmsSaveAuditReport(PDO $pdo, int $auditId, int $companyId, array $data,
         'updated_by' => $userId ?: null,
     ]));
 
-    return (int) $pdo->lastInsertId();
+    $newReportId = (int) $pdo->lastInsertId();
+    // lastInsertId'i log yazmadan once al: qmsAuditLog icindeki INSERT onu ezer.
+    qmsAuditLog($pdo, $companyId, $userId, 'audit_report', $auditId, 'create', 'Denetim raporu oluşturuldu: ' . $title);
+
+    return $newReportId;
 }
 
 /**
@@ -309,6 +316,14 @@ function qmsSaveAuditReport(PDO $pdo, int $auditId, int $companyId, array $data,
  */
 function qmsAuditReportFinalize(PDO $pdo, int $reportId, int $userId): void
 {
+    $title = $pdo->prepare('SELECT title FROM audit_reports WHERE id = ?');
+    $title->execute([$reportId]);
+    $reportTitle = (string) $title->fetchColumn();
+
+    $company = $pdo->prepare('SELECT company_id FROM audit_reports WHERE id = ?');
+    $company->execute([$reportId]);
+    $companyId = (int) $company->fetchColumn();
+
     $pdo->prepare(
         'UPDATE audit_reports SET status = \'final\', approved_by = :approved_by, approved_at = NOW(),
             updated_by = :updated_by WHERE id = :id'
@@ -317,4 +332,6 @@ function qmsAuditReportFinalize(PDO $pdo, int $reportId, int $userId): void
         'updated_by' => $userId ?: null,
         'id' => $reportId,
     ]);
+
+    qmsAuditLog($pdo, $companyId, $userId, 'audit_report', (int) $pdo->query('SELECT audit_id FROM audit_reports WHERE id = ' . (int) $reportId)->fetchColumn(), 'finalize', 'Denetim raporu kesinleştirildi (onaylandı): ' . ($reportTitle !== '' ? $reportTitle : 'Denetim Raporu'));
 }

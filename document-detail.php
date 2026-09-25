@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/document-editor.php';
 require_once __DIR__ . '/includes/notifications.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 $_SESSION["document_csrf"] ??= bin2hex(random_bytes(32));
 
 $documentId = (int) ($_GET["id"] ?? 0);
@@ -262,6 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
             $pdo->prepare("UPDATE documents SET status = 'published', effective_date = COALESCE(effective_date, CURDATE()) WHERE id = :id")
                 ->execute(["id" => $documentId]);
+            qmsAuditLog($pdo, (int) $document["company_id"], $userId, 'document', $documentId, 'publish', 'Doküman yayımlandı: ' . $document["title"]);
             $requesterStmt = $pdo->prepare(
                 "SELECT requested_by FROM document_approvals
                  WHERE document_id = :document_id AND decision = 'approved' AND requested_by IS NOT NULL
@@ -289,6 +291,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             $pdo->prepare("UPDATE documents SET status = 'archived' WHERE id = :id")
                 ->execute(["id" => $documentId]);
+            qmsAuditLog($pdo, (int) $document["company_id"], $userId, 'document', $documentId, 'archive', 'Doküman arşivlendi: ' . $document["title"]);
             $pdo->commit();
             header("Location: document-detail.php?id=" . $documentId . "&workflow=archived");
             exit;

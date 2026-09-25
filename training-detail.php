@@ -12,6 +12,7 @@ require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/notifications.php';
 require_once __DIR__ . '/includes/training-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $trainingId = (int) ($_GET["id"] ?? $_POST["training_id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -115,6 +116,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $userId
                 );
             }
+
+            qmsAuditLog(
+                $pdo,
+                $companyId,
+                $userId,
+                'training',
+                $trainingId,
+                $formData["status"] !== $training["status"] ? ($formData["status"] === 'completed' ? 'complete' : 'status_change') : 'update',
+                'Eğitim güncellendi: ' . $formData["title"] . ' (durum: ' . $statusLabels[$formData["status"]] . ')'
+            );
 
             header("Location: " . $redirect . "&updated=1");
             exit;

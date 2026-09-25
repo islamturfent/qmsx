@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/complaint-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
@@ -141,6 +142,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "responsible_user_id" => 0,
                 "actor_user_id" => $userId
             ]);
+
+            qmsAuditLog($pdo, (int) $formData["company_id"], $userId, 'complaint', $complaintId, 'create', 'Şikayet kaydı oluşturuldu: ' . $formData["subject"]);
 
             header("Location: complaint-detail.php?id=" . $complaintId . "&created=1");
             exit;

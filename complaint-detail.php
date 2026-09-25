@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/complaint-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $complaintId = (int) ($_GET["id"] ?? $_POST["complaint_id"] ?? 0);
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
@@ -177,6 +178,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     "responsible_user_id" => $formData["responsible_user_id"],
                     "actor_user_id" => $userId
                 ]);
+
+                qmsAuditLog(
+                    $pdo,
+                    $companyId,
+                    $userId,
+                    'complaint',
+                    $complaintId,
+                    $formData["status"] !== $complaint["status"] ? 'status_change' : 'update',
+                    'Şikayet güncellendi: ' . $formData["subject"] . ' (durum: ' . $statusLabels[$formData["status"]] . ')'
+                );
 
                 header("Location: " . $redirect . "&updated=1");
                 exit;
