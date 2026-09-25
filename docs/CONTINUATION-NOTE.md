@@ -57,8 +57,9 @@ carried over from earlier assumptions.
   | `tests/capa-type.php` | 5 |
   | `tests/auditor-workload.php` | 7 |
   | `tests/user-overdue.php` | 4 |
+  | `tests/notify-overdue.php` | 4 |
 
-  652 checks total (34 suites). All suites use temporary tables and leave real records
+  656 checks total (35 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -817,6 +818,30 @@ preventive type, an auditor-workload panel, and a stronger notification center.
   pushed as stored notifications.
 - New tests: `tests/due-workbench.php` (7), `tests/capa-type.php` (5),
   `tests/auditor-workload.php` (7), `tests/user-overdue.php` (4).
+
+## Gecikme bildirimi cron job + Excel/PDF exportu
+
+### Otomatik gecikme bildirimleri (`scripts/notify-overdue.php`)
+CLI / scheduled-task script that scans all companies' overdue records and inserts
+real `notifications` rows. Called from Windows Task Scheduler / cron:
+`php -f scripts/notify-overdue.php`. Idempotent: a (user, type, link) pair is skipped
+if an unread notification already exists for it, so repeated runs don't flood.
+Recipients: corrective actions / complaints / equipment calibrations go to the
+responsible user when set, otherwise to the company's system admins via
+`qmsNotifyCompanyAdmins`; nonconformities, trainings, findings and document reviews go
+to company admins. New `overdue_*` notification types were added to
+`qmsNotificationTypes()` (icon + group) so the center renders them out of the box.
+Cache bumped v64 -> v66 for the JS/CSS changes in this package.
+
+### Overdue/auditor-workload export (`overdue-export.php`)
+`format=xlsx|pdf` (buttons on `overdue.php`). XLSX: an `Özet` sheet plus one sheet per
+overdue module and a `Denetçi İş Yükü` sheet, built with the shared `xlsx-writer`.
+PDF: Dompdf summary tables (module counts, each module's overdue rows, auditor
+workload). Reuses the scoped `qmsOverdueWorkbench()` + `qmsAuditorWorkload()`.
+Denied for the auditor role. Verified by a CLI smoke run (valid worksheets / %PDF),
+on top of the function-level temp-table suites.
+- Test: `tests/notify-overdue.php` (4): first run creates one notification, second
+  run is idempotent (no duplicates).
 
 ## Security hardening (2026-09-19)
 
