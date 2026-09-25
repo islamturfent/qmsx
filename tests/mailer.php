@@ -28,6 +28,11 @@ mlCheck($content['subject'] === 'Konu', 'Notification subject passes through');
 mlCheck(strpos($content['html'], 'Kaydı Aç') !== false && strpos($content['html'], 'https://example.com/x') !== false, 'HTML body contains message and link button');
 mlCheck(strpos($content['plain'], 'https://example.com/x') !== false, 'Plain text includes the link');
 
+// #4: markali sablon - kategori rozeti + uygulama linki (base_url).
+$branded = qmsMailNotificationContent('Konu', 'Mesaj', 'https://example.com/x', 'Düzeltici Faaliyet');
+mlCheck(strpos($branded['html'], 'Düzeltici Faaliyet') !== false, 'Branded template shows category pill');
+mlCheck(strpos($branded['html'], 'Uygulamayı Aç') !== false && strpos($branded['html'], 'http://localhost/qmsx/') !== false, 'Branded template footer links to the app');
+
 // qmsNotify e-posta kapaliyken bildirimi yine yazar (cokmesin):
 // gercek tabloda temiz test kaydi acar, sonunda sileriz.
 $pdo->exec("DELETE FROM notifications WHERE notification_type = 'test_mailer'");
