@@ -44,8 +44,9 @@ carried over from earlier assumptions.
   | `tests/checklist-templates.php` | 15 |
   | `tests/document-review.php` | 21 |
   | `tests/satisfaction.php` | 14 |
+  | `tests/personnel.php` | 17 |
 
-  492 checks total (21 suites). All suites use temporary tables and leave real records
+  509 checks total (22 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -557,6 +558,27 @@ A company-scoped satisfaction survey module: survey templates (question sets),
   response, derived average, response list, cross-tenant rejection, KPI + both
   exports). Fixtures cleaned.
 
+## Personel & Yetkinlik (2026-09-30)
+
+Adds the personnel concept the codebase previously deliberately omitted. A staff
+ record is company-scoped and carries a competency matrix.
+
+- Schema `staff_members` + `staff_competencies` (migration
+  `20260930-personnel.sql`, idempotent runner `scripts/migrate-personnel.php`).
+  Unique employee code per company.
+- `includes/personnel-functions.php` owns scoped list/find/competencies and
+  competency add/remove. Competency level is 1-5; the competency status
+  (`not_scheduled / ok / due_soon / expired`, 30-day window) is derived from
+  `next_assessment_date` - no stored status copy.
+- Pages: `personnel.php` (list + summary), `personnel-create.php`,
+  `personnel-detail.php` (edit + competency add/remove + matrix). Sidebar entry
+  under "Eğitim Yönetimi".
+- Reporting: `personnel_count` + `personnel_expired` metrics, a personnel KPI
+  tile on `reports.php`, a sixteenth Excel sheet (`Personel`) and a thirteenth
+  PDF detail table.
+- 17 temp-table checks + an HTTP harness (status derivation, scoping, add/remove
+  competency, cross-tenant rejection, KPI + both exports). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -770,10 +792,10 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 15 sheets, the PDF has
-  twelve detail tables (management review, audit programs, equipment and
-  satisfaction added the last sheets/tables) and prints "no records this period"
-  when a section is empty.
+  of the existing KPI and summary content. Excel has 16 sheets, the PDF has
+  thirteen detail tables (management review, audit programs, equipment,
+  satisfaction and personnel added the last sheets/tables) and prints "no
+  records this period" when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
