@@ -197,6 +197,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
                 <?= appIcon("office") ?>
                 <span data-i18n="officeSettingsTitle">Ofis Entegrasyonu</span>
             </a>
+            <a class="<?= sidebarLinkClass("mail_settings", $activeNav) ?>" href="mail-settings.php">
+                <?= appIcon("notifications") ?>
+                <span data-i18n="mailSettingsMenuLabel">E-posta Ayarları</span>
+            </a>
             <a class="<?= sidebarLinkClass("companies", $activeNav) ?>" href="super-admin-companies.php">
                 <?= appIcon("companies") ?>
                 <span data-i18n="manageCompaniesButton">Şirketler</span>

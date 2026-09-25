@@ -9,8 +9,11 @@ declare(strict_types=1);
  * dogrudan INSERT cumlesi yazmaz.
  */
 
-/**
- * Tek bir kullaniciya bildirim yazar. Gecersiz kullanici id'si sessizce atlanir.
+require_once __DIR__ . '/../config/mail.php';
+require_once __DIR__ . '/mailer.php';
+
+/** Tek bir kullaniciya bildirim yazar. Gecersiz kullanici id'si sessizce atlanir.
+ * E-posta etkinse aliciya da mail gonderir (mail gonderimi asla coker, sessiz).
  */
 function qmsNotify(PDO $pdo, int $userId, string $type, string $title, string $message, ?string $linkUrl = null): void
 {
@@ -29,6 +32,43 @@ function qmsNotify(PDO $pdo, int $userId, string $type, string $title, string $m
         'message' => $message,
         'link_url' => $linkUrl
     ]);
+
+    qmsMailNotifyUser($pdo, $userId, $title, $message, $linkUrl);
+}
+
+/**
+ * Bir kullaniciya bildirimi e-posta ile de gonderir (SMTP etkinse).
+ * Mail gonderimi asla istisna firlatmaz; basarisizlik sessizce atlanir.
+ *
+ * @return bool Mail etkin degilse veya basarisizsa false.
+ */
+function qmsMailNotifyUser(PDO $pdo, int $userId, string $title, string $message, ?string $linkUrl): bool
+{
+    if ($userId <= 0) {
+        return false;
+    }
+    $cfg = qmsMailConfig();
+    if (!$cfg['enabled']) {
+        return false;
+    }
+    try {
+        $stmt = $pdo->prepare('SELECT email, full_name FROM users WHERE id = ? AND active = 1 LIMIT 1');
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user || trim((string) ($user['email'] ?? '')) === '') {
+            return false;
+        }
+        $content = qmsMailNotificationContent($title, $message, $linkUrl);
+        return qmsMailSend(
+            (string) $user['email'],
+            (string) ($user['full_name'] ?? null) !== '' ? (string) $user['full_name'] : null,
+            $content['subject'],
+            $content['html'],
+            $content['plain']
+        );
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 /**
