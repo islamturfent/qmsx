@@ -274,3 +274,68 @@ function qmsComplaintNotify(PDO $pdo, array $context): int
 
     return $written;
 }
+
+/**
+ * Sikayete bagli yeni bir uygunsuzluk kaydi olusturur ve sikayete baglar.
+ *
+ * Uygunsuzluk bir denetimden degil sikayetten dogar: audit_id NULL, source
+ * 'complaint'. Denetim baglamadan yeni NC (audit_id NULL) olusturmayi mumkun
+ * kilan sekme icin (migrations/20260930-nonconformity-source.sql) gereklidir.
+ *
+ * @param array<string, mixed> $complaint Kayit (id, company_id, subject,
+ *        description, severity).
+ * @return int|null Yeni uygunsuzluk id'si; sikayet zaten bir uygunsuzluga
+ *         bagliysa null.
+ */
+function qmsComplaintCreateNonconformity(PDO $pdo, array $complaint, int $actorUserId): ?int
+{
+    $companyId = (int) ($complaint['company_id'] ?? 0);
+    $complaintId = (int) ($complaint['id'] ?? 0);
+
+    if ($complaintId <= 0 || $companyId <= 0) {
+        return null;
+    }
+
+    // Zaten bagli bir uygunsuzluk varsa yeni kayit acilamaz (tek baglanti).
+    if ((int) ($complaint['nonconformity_id'] ?? 0) > 0) {
+        return null;
+    }
+
+    $severity = (string) ($complaint['severity'] ?? 'major');
+    if (!in_array($severity, QMS_SEVERITIES, true)) {
+        $severity = 'major';
+    }
+
+    $subject = qmsComplaintText($complaint['subject'] ?? '', 255);
+    $description = qmsComplaintText($complaint['description'] ?? '', 4000);
+    if ($subject === '') {
+        return null;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $insert = $pdo->prepare(
+            'INSERT INTO nonconformities
+                (company_id, audit_id, source, title, description, severity, status, active)
+             VALUES
+                (:company_id, NULL, \'complaint\', :title, :description, :severity, \'open\', 1)'
+        );
+        $insert->execute([
+            'company_id' => $companyId,
+            'title' => $subject,
+            'description' => $description !== '' ? $description : null,
+            'severity' => $severity,
+        ]);
+        $nonconformityId = (int) $pdo->lastInsertId();
+
+        $link = $pdo->prepare('UPDATE complaints SET nonconformity_id = :nid WHERE id = :id');
+        $link->execute(['nid' => $nonconformityId, 'id' => $complaintId]);
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+
+    return $nonconformityId;
+}

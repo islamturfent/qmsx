@@ -43,6 +43,28 @@ $allowedNonconformityIds = array_map('intval', array_column($nonconformityOption
 
 $formError = "";
 
+// Sikayetten uygunsuzluk olusturma: audit_id NULL, source 'complaint'.
+if ($_SERVER["REQUEST_METHOD"] === "POST" && (string) ($_POST["form_type"] ?? "") === "create_nonconformity") {
+    qmsCsrfVerify($csrfScope, $_POST["csrf"] ?? null);
+
+    $newNCId = qmsComplaintCreateNonconformity($pdo, $complaint, $userId);
+    if ($newNCId !== null) {
+        qmsAuditLog(
+            $pdo,
+            $companyId,
+            $userId,
+            'nonconformity',
+            $newNCId,
+            'create',
+            'Şikayet ' . $complaintId . ' üzerinden uygunsuzluk oluşturuldu: ' . ($complaint['subject'] ?? '')
+        );
+        header("Location: complaint-detail.php?id=" . $complaintId . "&nc=created");
+        exit;
+    }
+
+    $formError = "Bu şikayete zaten bir uygunsuzluk bağlı veya oluşturulamadı.";
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     qmsCsrfVerify($csrfScope, $_POST["csrf"] ?? null);
 
@@ -299,6 +321,23 @@ $activeNav = "complaints";
                     </div>
                 </div>
             </section>
+        <?php else: ?>
+            <section class="form-panel">
+                <div class="section-heading compact-heading">
+                    <div>
+                        <h3 data-i18n="complaintCreateRecordTitle">Uygunsuzluk Oluştur</h3>
+                        <p data-i18n="complaintCreateRecordText">Bu şikayetten yeni bir uygunsuzluk kaydı aç ve düzeltici faaliyet akışını uygunsuzluk üzerinden izle.</p>
+                    </div>
+                </div>
+                <form class="auditor-form" method="post" action="complaint-detail.php?id=<?= $complaintId ?>">
+                    <?= qmsCsrfField($csrfScope) ?>
+                    <input type="hidden" name="form_type" value="create_nonconformity">
+                    <p class="form-help-text">Başlık: <?= htmlspecialchars($complaint["subject"], ENT_QUOTES, "UTF-8") ?></p>
+                    <div class="form-actions">
+                        <button class="primary-button" type="submit" data-i18n="createNonconformityFromComplaintButton">Uygunsuzluğu Oluştur ve Bağla</button>
+                    </div>
+                </form>
+            </section>
         <?php endif; ?>
 
         <section class="form-panel">
@@ -307,6 +346,9 @@ $activeNav = "complaints";
             <?php endif; ?>
             <?php if (($_GET["updated"] ?? "") === "1"): ?>
                 <div class="form-message success" data-i18n="complaintUpdatedMessage">Şikayet kaydı güncellendi.</div>
+            <?php endif; ?>
+            <?php if (($_GET["nc"] ?? "") === "created"): ?>
+                <div class="form-message success" data-i18n="complaintNcCreatedMessage">Uygunsuzluk oluşturuldu ve bu şikayete bağlandı.</div>
             <?php endif; ?>
             <?php if ($formError !== ""): ?>
                 <div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div>

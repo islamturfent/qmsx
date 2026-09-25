@@ -27,7 +27,7 @@ $sql = "SELECT nonconformities.*, companies.company_name, audits.title AS audit_
             audit_checklist_items.requirement_ref
      FROM nonconformities
      INNER JOIN companies ON companies.id = nonconformities.company_id
-     INNER JOIN audits ON audits.id = nonconformities.audit_id
+     LEFT JOIN audits ON audits.id = nonconformities.audit_id
      LEFT JOIN audit_checklist_items ON audit_checklist_items.id = nonconformities.checklist_item_id
      WHERE nonconformities.id = ?";
 $params = [$nonconformityId];
@@ -43,6 +43,17 @@ $nonconformity = $nonconformityStmt->fetch(PDO::FETCH_ASSOC);
 if (!$nonconformity) {
     header("Location: dashboard.php");
     exit;
+}
+
+// Uygunsuzluk bir denetimden ya da sikayetten dogar; kaynak gosterimi buna baglidir.
+$ncSource = (string) ($nonconformity["source"] ?? "audit");
+$linkedComplaintId = 0;
+if ($ncSource === 'complaint') {
+    $complaintLinkStmt = $pdo->prepare(
+        "SELECT id FROM complaints WHERE nonconformity_id = ? AND active = 1 LIMIT 1"
+    );
+    $complaintLinkStmt->execute([$nonconformityId]);
+    $linkedComplaintId = (int) ($complaintLinkStmt->fetchColumn() ?: 0);
 }
 
 $formError = "";
@@ -184,10 +195,18 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                     <h1><?= htmlspecialchars($nonconformity["title"], ENT_QUOTES, "UTF-8") ?></h1>
                     <p>
                         <?= htmlspecialchars($nonconformity["company_name"], ENT_QUOTES, "UTF-8") ?>
+                        <?php if ($ncSource === 'complaint'): ?>
+                        · <span data-i18n="ncComplaintSourceLabel">Şikayet Kaynağı</span>
+                        <?php else: ?>
                         · <?= htmlspecialchars($nonconformity["audit_title"], ENT_QUOTES, "UTF-8") ?>
+                        <?php endif; ?>
                     </p>
                 </div>
-                <a class="secondary-button" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>" data-i18n="backToAuditButton">Denetime Dön</a>
+                <?php if ($linkedComplaintId > 0): ?>
+                    <a class="secondary-button" href="complaint-detail.php?id=<?= $linkedComplaintId ?>" data-i18n="backToComplaintButton">Şikayete Dön</a>
+                <?php else: ?>
+                    <a class="secondary-button" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>" data-i18n="backToAuditButton">Denetime Dön</a>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -346,24 +365,33 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                             <span><?= htmlspecialchars($nonconformity["company_name"], ENT_QUOTES, "UTF-8") ?></span>
                         </div>
                     </div>
-                    <a class="admin-list-item" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>">
-                        <div>
-                            <strong data-i18n="auditTitleLabel">Denetim Başlığı</strong>
-                            <span><?= htmlspecialchars($nonconformity["audit_title"], ENT_QUOTES, "UTF-8") ?></span>
+                    <?php if ($ncSource === 'complaint' && $linkedComplaintId > 0): ?>
+                        <a class="admin-list-item" href="complaint-detail.php?id=<?= $linkedComplaintId ?>">
+                            <div>
+                                <strong data-i18n="sourceLabel">Kaynak</strong>
+                                <span data-i18n="ncComplaintSourceValueLabel">Şikayet</span>
+                            </div>
+                        </a>
+                    <?php else: ?>
+                        <a class="admin-list-item" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>">
+                            <div>
+                                <strong data-i18n="auditTitleLabel">Denetim Başlığı</strong>
+                                <span><?= htmlspecialchars($nonconformity["audit_title"], ENT_QUOTES, "UTF-8") ?></span>
+                            </div>
+                        </a>
+                        <div class="admin-list-item">
+                            <div>
+                                <strong data-i18n="checklistItemLabel">Kontrol Maddesi</strong>
+                                <span><?= htmlspecialchars($nonconformity["checklist_item_text"] ?: "-", ENT_QUOTES, "UTF-8") ?></span>
+                            </div>
                         </div>
-                    </a>
-                    <div class="admin-list-item">
-                        <div>
-                            <strong data-i18n="checklistItemLabel">Kontrol Maddesi</strong>
-                            <span><?= htmlspecialchars($nonconformity["checklist_item_text"] ?: "-", ENT_QUOTES, "UTF-8") ?></span>
+                        <div class="admin-list-item">
+                            <div>
+                                <strong data-i18n="requirementRefLabel">Referans / Madde</strong>
+                                <span><?= htmlspecialchars($nonconformity["requirement_ref"] ?: "-", ENT_QUOTES, "UTF-8") ?></span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="admin-list-item">
-                        <div>
-                            <strong data-i18n="requirementRefLabel">Referans / Madde</strong>
-                            <span><?= htmlspecialchars($nonconformity["requirement_ref"] ?: "-", ENT_QUOTES, "UTF-8") ?></span>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>
