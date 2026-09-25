@@ -2065,6 +2065,9 @@ translations.en.notificationPrefsSaved = "Notification preferences saved.";
 translations.en.notificationPrefsEmailEnabled = "Receive email notifications";
 translations.en.notificationPrefsCategories = "Categories to receive by email (empty = all)";
 translations.en.notificationPrefsSave = "Save";
+
+translations.tr.closurePackageButton = "Kapanış Paketi (PDF)";
+translations.en.closurePackageButton = "Closure Package (PDF)";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";

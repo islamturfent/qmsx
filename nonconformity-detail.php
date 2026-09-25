@@ -239,6 +239,7 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                     <p data-i18n="correctiveActionsText">Uygunsuzluğu gidermek ve tekrarını önlemek için planlanan faaliyetler.</p>
                 </div>
                 <a class="primary-button" href="corrective-action-create.php?nonconformity_id=<?= $nonconformityId ?>" data-i18n="createCorrectiveActionButton">Yeni Faaliyet</a>
+                <a class="secondary-button" href="closure-package-export.php?nonconformity_id=<?= $nonconformityId ?>" data-i18n="closurePackageButton">Kapanış Paketi (PDF)</a>
             </div>
 
             <?php if (isset($_GET["action"]) && $_GET["action"] === "created"): ?>
