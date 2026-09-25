@@ -2974,6 +2974,41 @@ body.modal-open {
     font-size: 13px !important;
 }
 
+/* Vadesi Gelen / Geciken Isler workbench */
+.overdue-section {
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    background: var(--surface-color);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-theme-xs);
+}
+
+.overdue-section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.overdue-section-head strong {
+    color: var(--text-body);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.overdue-section-head .status-pill {
+    margin-left: auto;
+}
+
+.overdue-row {
+    text-decoration: none;
+}
+
+.overdue-row:hover {
+    text-decoration: none;
+}
+
 .form-message.info {
     background: var(--brand-soft);
     color: var(--brand-soft-text);

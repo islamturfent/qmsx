@@ -75,6 +75,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("reports") ?>
             <span data-i18n="reportingTitle">Raporlama ve KPI</span>
         </a>
+        <a class="<?= sidebarLinkClass("overdue", $activeNav) ?>" href="overdue.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="overdueMenuLabel">Vadesi Gelen İşler</span>
+        </a>
         <?php endif; ?>
 
         <?php if ($canSeeOperations): ?>
