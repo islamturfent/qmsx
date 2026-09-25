@@ -332,7 +332,7 @@ $activeNav = "complaints";
                 <form class="auditor-form" method="post" action="complaint-detail.php?id=<?= $complaintId ?>">
                     <?= qmsCsrfField($csrfScope) ?>
                     <input type="hidden" name="form_type" value="create_nonconformity">
-                    <p class="form-help-text">Başlık: <?= htmlspecialchars($complaint["subject"], ENT_QUOTES, "UTF-8") ?></p>
+                    <p>Başlık: <?= htmlspecialchars($complaint["subject"], ENT_QUOTES, "UTF-8") ?></p>
                     <div class="form-actions">
                         <button class="primary-button" type="submit" data-i18n="createNonconformityFromComplaintButton">Uygunsuzluğu Oluştur ve Bağla</button>
                     </div>
