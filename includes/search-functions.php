@@ -30,6 +30,9 @@ function qmsSearchTypes(): array
         'supplier' => ['label' => 'Tedarikçi', 'icon' => 'suppliers', 'table' => 'suppliers', 'title_col' => 'name', 'body_cols' => ['category'], 'link' => 'supplier-detail.php?id=', 'link_col' => 'id'],
         'training' => ['label' => 'Eğitim', 'icon' => 'training', 'table' => 'trainings', 'title_col' => 'title', 'body_cols' => ['description'], 'link' => 'training-detail.php?id=', 'link_col' => 'id'],
         'equipment' => ['label' => 'Ekipman', 'icon' => 'table', 'table' => 'equipment', 'title_col' => 'name', 'body_cols' => ['category'], 'link' => 'equipment-detail.php?id=', 'link_col' => 'id'],
+        'personnel' => ['label' => 'Personel', 'icon' => 'users', 'table' => 'staff_members', 'title_col' => 'first_name', 'body_cols' => ['position', 'department', 'employee_code'], 'link' => 'personnel-detail.php?id=', 'link_col' => 'id'],
+        'review' => ['label' => 'Gözden Geçirme', 'icon' => 'reviews', 'table' => 'management_reviews', 'title_col' => 'title', 'body_cols' => ['scope_notes'], 'link' => 'review-detail.php?id=', 'link_col' => 'id'],
+        'finding' => ['label' => 'Dış Denetim Bulgusu', 'icon' => 'alert', 'table' => 'external_audit_findings', 'company_col' => 'ea.company_id', 'join' => 'INNER JOIN external_audits ea ON ea.id = external_audit_findings.external_audit_id', 'title_col' => 'finding_text', 'body_cols' => ['notes'], 'link' => 'external-audits.php?id=', 'link_col' => 'external_audit_id'],
     ];
 }
 
