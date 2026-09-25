@@ -3161,6 +3161,38 @@ body.modal-open {
     color: var(--gray-600) !important;
 }
 
+/* Arama yuzeyi */
+.search-grid {
+    grid-template-columns: minmax(0, 3fr) minmax(180px, 1fr);
+}
+
+@media (max-width: 720px) {
+    .search-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.search-result-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-result-icon {
+    display: inline-flex;
+    color: var(--brand-600);
+}
+
+.search-result-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.search-snippet {
+    color: var(--muted-color) !important;
+    font-size: 13px;
+}
+
 .audit-trail-details {
     margin: 10px 0 0;
     padding: 10px 12px;
