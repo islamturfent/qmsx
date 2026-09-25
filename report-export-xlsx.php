@@ -44,6 +44,8 @@ $metricLabels = [
     'equipment_overdue' => 'Süresi Geçmiş Ekipman',
     'satisfaction_count' => 'Memnuniyet Yanıtı',
     'satisfaction_avg' => 'Ortalama Memnuniyet (1-5)',
+    'personnel_count' => 'Personel Sayısı',
+    'personnel_expired' => 'Vadesi Geçmiş Yetkinlik',
 ];
 
 $summaryRows = [
@@ -396,6 +398,25 @@ foreach ($report['satisfaction_list'] as $row) {
     ];
 }
 
+$personnelRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Personel', 'style' => 2],
+    ['value' => 'Kod', 'style' => 2],
+    ['value' => 'Bölüm', 'style' => 2],
+    ['value' => 'Pozisyon', 'style' => 2],
+    ['value' => 'Yetkinlik', 'style' => 2],
+]];
+foreach ($report['personnel_list'] as $row) {
+    $personnelRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['name'], 'style' => 3],
+        ['value' => $row['employee_code'], 'style' => 3],
+        ['value' => $row['department'], 'style' => 3],
+        ['value' => $row['position'], 'style' => 3],
+        ['value' => $row['competency_count'], 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -418,6 +439,7 @@ try {
         ['name' => 'Denetim Programları', 'xml' => xlsxWorksheet($auditProgramRows, [28, 34, 10, 16, 12, 12])],
         ['name' => 'Ekipman', 'xml' => xlsxWorksheet($equipmentRows, [28, 30, 14, 16, 20, 16, 12])],
         ['name' => 'Memnuniyet', 'xml' => xlsxWorksheet($satisfactionRows, [28, 24, 14, 14, 40])],
+        ['name' => 'Personel', 'xml' => xlsxWorksheet($personnelRows, [28, 26, 14, 20, 24, 12])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

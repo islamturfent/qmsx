@@ -238,6 +238,28 @@ $satisfactionRecords = fetchReportRows(
 $satisfactionCount = count($satisfactionRecords);
 $satisfactionAvg = $satisfactionCount > 0 ? round((array_sum(array_column($satisfactionRecords, "overall_score"))) / $satisfactionCount, 1) : 0;
 
+$personnelRecords = fetchReportRows(
+    $pdo,
+    "SELECT s.id, s.company_id, companies.company_name
+     FROM staff_members s INNER JOIN companies ON companies.id = s.company_id
+     WHERE s.active = 1 AND s.created_at BETWEEN ? AND ?" . $companyScopeSql,
+    $periodParams,
+    $selectedCompanyId
+);
+$personnelCount = count($personnelRecords);
+$personnelExpired = 0;
+$pStaffIds = array_map("intval", array_column($personnelRecords, "id"));
+if ($pStaffIds !== []) {
+    $pMarks = implode(",", array_fill(0, count($pStaffIds), "?"));
+    $pExpStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM staff_competencies
+         WHERE staff_id IN ($pMarks) AND active = 1
+           AND next_assessment_date IS NOT NULL AND next_assessment_date < ?"
+    );
+    $pExpStmt->execute(array_merge($pStaffIds, [date("Y-m-d")]));
+    $personnelExpired = (int) $pExpStmt->fetchColumn();
+}
+
 $documentStatuses = ["draft" => 0, "review" => 0, "approved" => 0, "published" => 0, "archived" => 0];
 foreach ($documents as $document) {
     if (isset($documentStatuses[$document["status"]])) $documentStatuses[$document["status"]]++;
@@ -340,6 +362,7 @@ $exportQuery = http_build_query([
             <div class="dashboard-card metric-teal"><?= appIcon("approvals", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="auditProgramCountKpi">Denetim Programı</span><strong class="dashboard-card-number"><?= $auditProgramCount ?> <small data-i18n="auditProgramActiveKpi">Aktif <?= $auditProgramActiveCount ?></small></strong></div></div>
             <div class="dashboard-card metric-orange"><?= appIcon("table", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="equipmentCountKpi">Ekipman</span><strong class="dashboard-card-number"><?= $equipmentCount ?> <small data-i18n="equipmentOverdueKpi">Geçmiş <?= $equipmentOverdueCount ?></small></strong></div></div>
             <div class="dashboard-card metric-violet"><?= appIcon("performance", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="satisfactionAvgKpi">Memnuniyet</span><strong class="dashboard-card-number"><?= $satisfactionAvg ?> <small data-i18n="satisfactionCountKpi"><?= $satisfactionCount ?> yanıt</small></strong></div></div>
+            <div class="dashboard-card metric-blue"><?= appIcon("users", "dashboard-card-icon") ?><div class="dashboard-card-content"><span class="dashboard-card-label" data-i18n="personnelCountKpi">Personel</span><strong class="dashboard-card-number"><?= $personnelCount ?> <small data-i18n="personnelExpiredKpi">Geçmiş <?= $personnelExpired ?></small></strong></div></div>
         </section>
 
         <section class="report-layout">

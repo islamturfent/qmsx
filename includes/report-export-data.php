@@ -268,6 +268,43 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     $satisfactionCount = count($satisfactionResponses);
     $satisfactionAvg = $satisfactionCount > 0 ? round($satisfactionScoreSum / $satisfactionCount, 1) : 0;
 
+    $today = date('Y-m-d');
+    $staff = $fetchRows(
+        "SELECT s.id, s.company_id, s.first_name, s.last_name, s.employee_code, s.department,
+                s.position, s.created_at, companies.company_name,
+                (SELECT COUNT(*) FROM staff_competencies c
+                  WHERE c.staff_id = s.id AND c.active = 1) AS competency_count
+         FROM staff_members s
+         INNER JOIN companies ON companies.id = s.company_id
+         WHERE s.active = 1 AND s.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    $staffIds = [];
+    $personnelList = [];
+    foreach ($staff as $item) {
+        $staffIds[] = (int) $item['id'];
+        $personnelList[] = [
+            'company_name' => $item['company_name'],
+            'name' => $item['first_name'] . ' ' . $item['last_name'],
+            'employee_code' => $item['employee_code'] ?: '-',
+            'department' => $item['department'] ?: '-',
+            'position' => $item['position'] ?: '-',
+            'competency_count' => (int) $item['competency_count'],
+        ];
+    }
+    $personnelCount = count($staff);
+    $personnelExpired = 0;
+    if ($staffIds !== []) {
+        $marks = implode(',', array_fill(0, count($staffIds), '?'));
+        $expStmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM staff_competencies
+             WHERE staff_id IN ($marks) AND active = 1
+               AND next_assessment_date IS NOT NULL AND next_assessment_date < ?"
+        );
+        $expStmt->execute(array_merge($staffIds, [$today]));
+        $personnelExpired = (int) $expStmt->fetchColumn();
+    }
+
     $openComplaints = array_filter(
         $complaints,
         static fn(array $item): bool => qmsComplaintIsOpen((string) $item['status'])
@@ -333,6 +370,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'equipment_overdue' => $equipmentOverdue,
         'satisfaction_count' => $satisfactionCount,
         'satisfaction_avg' => $satisfactionAvg,
+        'personnel_count' => $personnelCount,
+        'personnel_expired' => $personnelExpired,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -638,5 +677,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'audit_program_list' => $auditProgramList,
         'equipment_list' => $equipmentList,
         'satisfaction_list' => $satisfactionList,
+        'personnel_list' => $personnelList,
     ];
 }

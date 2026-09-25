@@ -167,6 +167,13 @@ foreach ($report['satisfaction_list'] as $row) {
         . $escape($row['responded_at']) . '</td><td>' . $row['overall_score'] . '</td><td>' . $escape($row['comment']) . '</td></tr>';
 }
 
+$personnelRows = '';
+foreach ($report['personnel_list'] as $row) {
+    $personnelRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['name']) . '</td><td>'
+        . $escape($row['employee_code']) . '</td><td>' . $escape($row['department']) . '</td><td>'
+        . $escape($row['position']) . '</td><td>' . $row['competency_count'] . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -224,6 +231,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Ortalama Memnuniyet</span><strong>' . $metrics['satisfaction_avg'] . '</strong></td>
       <td class="metric"><span>Memnuniyet Yanıtı</span><strong>' . $metrics['satisfaction_count'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Personel Sayısı</span><strong>' . $metrics['personnel_count'] . '</strong></td>
+      <td class="metric"><span>Vadesi Geçmiş Yetkinlik</span><strong>' . $metrics['personnel_expired'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -243,6 +253,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Denetim Programları', '<th>Şirket</th><th>Program</th><th>Yıl</th><th>Durum</th><th>Bağlı</th><th>Onay</th>', $auditProgramRows)
     . $detailSection('Ekipman', '<th>Şirket</th><th>Ekipman</th><th>Kod</th><th>Kategori</th><th>Sonraki Kalibrasyon</th><th>Durum</th><th>Kalibrasyon</th>', $equipmentRows)
     . $detailSection('Memnuniyet', '<th>Şirket</th><th>Müşteri</th><th>Tarih</th><th>Puan</th><th>Yorum</th>', $satisfactionRows)
+    . $detailSection('Personel', '<th>Şirket</th><th>Personel</th><th>Kod</th><th>Bölüm</th><th>Pozisyon</th><th>Yetkinlik</th>', $personnelRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
