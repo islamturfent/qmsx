@@ -1513,7 +1513,7 @@ body.dark-mode {
     --button-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 
     /* Component tokens */
-    --border-subtle: var(--gray-800);
+    --border-subtle: var(--gray-700);
     --border-row: var(--gray-800);
     --border-control: var(--gray-700);
     --surface-hover: rgba(255, 255, 255, 0.05);
@@ -2399,7 +2399,7 @@ body {
     border: 0;
     border-radius: 0;
     background: transparent;
-    color: var(--gray-700);
+    color: var(--text-body);
     padding: 0;
     cursor: pointer;
 }
@@ -2465,20 +2465,20 @@ body {
 }
 
 .user-menu-head strong {
-    color: var(--gray-700);
+    color: var(--text-body);
     font-size: 14px;
     font-weight: 500;
 }
 
 .user-menu-head span {
-    color: var(--gray-500);
+    color: var(--muted-color);
     font-size: 12px;
 }
 
 .user-menu-item {
     display: block;
     border-radius: 8px;
-    color: var(--gray-700);
+    color: var(--text-body);
     padding: 8px 12px;
     font-size: 14px;
     font-weight: 500;
