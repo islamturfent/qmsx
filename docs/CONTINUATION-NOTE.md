@@ -53,8 +53,12 @@ carried over from earlier assumptions.
   | `tests/document-compare.php` | 14 |
   | `tests/report-export-data.php` | 9 |
   | `tests/dashboard-cockpit.php` | 10 |
+  | `tests/due-workbench.php` | 7 |
+  | `tests/capa-type.php` | 5 |
+  | `tests/auditor-workload.php` | 7 |
+  | `tests/user-overdue.php` | 4 |
 
-  629 checks total (30 suites). All suites use temporary tables and leave real records
+  652 checks total (34 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -774,6 +778,45 @@ it a management cockpit:
 - 10 checks (`tests/dashboard-cockpit.php`): trend buckets now include COQ
   category sums and the other series are not disturbed, cockpit lists only
   target-set companies, per-KPI target/on-track, and the all-on-track bookkeeping.
+
+## Operasyonel iyilestirme paketi (2026-09-26, dort is)
+
+Four follow-ups requested in sequence: an overdue workbench, CAPA visibility incl. a
+preventive type, an auditor-workload panel, and a stronger notification center.
+
+### 1. Vadesi Gelen / Geciken Isler workbench (`overdue.php`)
+- `includes/due-workbench-functions.php` -> `qmsOverdueWorkbench()` aggregates
+  overdue records across 7 modules (all scoped): corrective actions, nonconformities,
+  trainings, equipment calibration, external-audit findings, documents (review due)
+  and complaints. Each row is overdue = due/planned/review/next-calibration date
+  before today AND still open (closed/cancelled/archived/out_of_service excluded).
+- `overdue.php`: summary cards per module + grouped lists that link to each record's
+  detail page. Sidebar entry "Vadesi Gelen İşler" (non-auditor nav).
+- Also hosts the auditor workload panel (task 3).
+
+### 2. CAPA gorunurlugu + preventive type
+- Sidebar CAPA entry re-labelled to "Düzeltici & Önleyici Faaliyet (CAPA)" and now
+  shows an overdue badge (`qmsOverdueActionCount`, one query, non-auditor nav).
+- Added `action_type` (corrective/preventive) to `corrective_actions` via an
+  idempotent migration (`20260926-capa-action-type.sql` + `migrate-capa-action-type.php`;
+  existing rows stay 'corrective'). CAPA types/labels/i18n in `capa-functions.php`;
+  create + detail forms set/edit it (validated against `QMS_CAPA_TYPES`);
+  `actions.php` shows a type badge. Uses `--violet-soft` token.
+
+### 3. Denetci is yuku
+- `qmsAuditorWorkload()` (scoped per auditor company): assigned active audits, open
+  nonconformities and open actions from those audits. Rendered as a panel on the
+  overdue workbench page (one card per auditor).
+
+### 4. Bildirim merkezi guclendirmesi
+- `qmsUserOverdueAssignments()` returns the logged-in user's own assigned overdue
+  corrective actions, complaints and equipment calibrations (live-computed, no cron
+  or schema change). `notifications.php` shows a "Geciken İşlerim" block above the
+  notification feed, linking each item to its record and to `overdue.php`.
+- No cron/scheduler exists; overdue awareness is computed on page view rather than
+  pushed as stored notifications.
+- New tests: `tests/due-workbench.php` (7), `tests/capa-type.php` (5),
+  `tests/auditor-workload.php` (7), `tests/user-overdue.php` (4).
 
 ## Security hardening (2026-09-19)
 
