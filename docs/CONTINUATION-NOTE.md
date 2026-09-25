@@ -34,8 +34,11 @@ carried over from earlier assumptions.
   | `tests/performance-management.php` | 23 |
   | `tests/review-management.php` | 33 |
   | `tests/dashboard-trend.php` | 17 |
+  | `tests/audit-report.php` | 26 |
+  | `tests/audit-log.php` | 16 |
+  | `tests/audit-program.php` | 16 |
 
-  331 checks total. All suites use temporary tables and leave real records
+  389 checks total. All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -331,6 +334,60 @@ and an auto summary.
   HTTP harness (login, dashboard render, both panels present). Fixtures were
   removed and auto-increment counters restored.
 
+## Denetim raporu taslagi (2026-09-30)
+
+A per-audit reporting surface (knowhow "denetim notlarindan rapor taslagi").
+
+- Schema `audit_reports` (one row per audit, migration `20260929-audit-reports.sql`):
+  status `draft -> final`, editable narrative fields, a stored source snapshot and
+  approval (by/when) metadata.
+- `includes/audit-report-functions.php` derives a snapshot from the audit + checklist
+  + nonconformities (`qmsAuditReportSnapshot`) and composes a rule-based draft
+  (`qmsGenerateAuditReportText`: scope, method, findings, NC summary, conclusion,
+  recommendations) - no external AI service.
+- `audit-report.php?id=<audit>` edits/saves/finalizes; `audit-report-export-pdf.php`
+  streams a single-report PDF. Reached from `audit-detail.php` (Denetim Raporu).
+- Scoped via `qmsAuditRecordScope`; audit reports for other tenants are not disclosed.
+- 26 temp-table checks + an HTTP harness (generation, persistence, PDF, scope).
+
+## Denetim izi (audit trail) - Task 2 (2026-09-30)
+
+Security/compliance surface (knowhow requirement "kim, neyi, ne zaman degistirdi").
+
+- `audit_log` is an **append-only** table; the app never updates or deletes it, and the
+  view is read-only. `qmsAuditLog()` records company, actor, entity type/id, action,
+  a human-readable summary, field-level details (JSON) and the client IP.
+- `audit-trail.php` is a filtered, read-only viewer for management roles (super admin
+  + system admin; auditors and company users are redirected). Filters: company, record
+  type, action, date range. Super admin sees everything; others only their companies.
+- Instrumented hooks (via `qmsAuditLog`): audit report (create/update/finalize),
+  complaint (create/status), document (publish/archive), nonconformity (close/status),
+  corrective action (status), management review (complete), supplier (status),
+  training (complete/status). These are a representative set; the helper is the single
+  entry point for future modules.
+- 16 temp-table checks + an HTTP harness (a real generate wrote a log, viewer, filters,
+  cross-tenant isolation, role gate). Fixtures cleaned and counters restored - including
+  a real bug caught: `lastInsertId()` was read after `qmsAuditLog` inserted, returning the
+  log's id instead of the report's id; the report id is now captured first.
+
+## Ic denetim programi - Task 3 (2026-09-30)
+
+Yearly audit-planning module: groups a company's audits under a program.
+
+- Schema `audit_programs` + `audit_program_audits` (migration
+  `20260930-audit-programs.sql`); flow `draft -> active -> completed` with an approval
+  date written on entering `active`.
+- `includes/audit-program-functions.php` owns scoped reads, status labels, and
+  link/unlink that only accept same-company audits (foreign-company audit links are
+  rejected).
+- Pages: `audit-programs.php`, `audit-program-create.php`, `audit-program-detail.php`
+  (edit + status + link/unlink). Sidebar: Denetim Programlari (management roles).
+- Reporting: a program count/active KPI, company columns, an Excel sheet
+  "Denetim Programlari" (Excel is now 13 sheets) and a PDF detail section (10 detail
+  tables) on the reports surface.
+- 16 temp-table checks + an HTTP harness (create, link/unlink, status flow, CSRF,
+  exports, cross-tenant isolation).
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -544,9 +601,9 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 12 sheets, the PDF adds
-  nine detail tables (the review module added the last sheet/table) and prints
-  "no records this period" when a section is empty.
+  of the existing KPI and summary content. Excel has 13 sheets, the PDF adds
+  ten detail tables (management review and audit programs added the last
+  sheets/tables) and prints "no records this period" when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
