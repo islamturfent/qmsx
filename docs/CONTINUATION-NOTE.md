@@ -58,8 +58,9 @@ carried over from earlier assumptions.
   | `tests/auditor-workload.php` | 7 |
   | `tests/user-overdue.php` | 4 |
   | `tests/notify-overdue.php` | 4 |
+  | `tests/mailer.php` | 9 |
 
-  656 checks total (35 suites). All suites use temporary tables and leave real records
+  665 checks total (36 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -842,6 +843,30 @@ Denied for the auditor role. Verified by a CLI smoke run (valid worksheets / %PD
 on top of the function-level temp-table suites.
 - Test: `tests/notify-overdue.php` (4): first run creates one notification, second
   run is idempotent (no duplicates).
+
+## SMTP e-posta bildirimleri - E-posta Ayarları
+
+E-posta gonderimi uzeri eklendi: her `qmsNotify()` bildirimi, SMTP etkinse aliciya
+e-posta da gonderir (gonderme asla cokmez; bildirim kaydi her zaman yazilir).
+
+- `config/mail.php`: `qmsMailDefaults()` / `qmsMailConfig()` - ayni desenle
+  (`storage/mail/settings.json` + `QMS_MAIL_*` env override).
+- `includes/mailer.php`: bagimliliksiz minimal SMTP istemcisi
+  `qmsMailSend()` (EHLO / STARTTLS / AUTH LOGIN / MAIL FROM / RCPT / DATA) +
+  `qmsMailNotificationContent()` HTML/duz metin sablonu. XAMPP/Windows uyumlu;
+  gercek baglantida basarisizlik false doner, aga gidilmeyen bos/kapali durumlar
+  da aninda false doner.
+- `includes/notifications.php`: `qmsNotify()` sonrasi `qmsMailNotifyUser()` alici
+  e-postasini bulup gonderir; `qmsNotifyCompanyAdmins` otomatik kapsanir.
+- `mail-settings.php`: super/system admin icin SMTP formu (storage'dan okur/yazar)
+  + "Test E-postası Gönder" (giris yapan hesabin kendi adresine). Sidebar > Sistem
+  Yonetimi > E-posta Ayarlari. CSRF korumali. Gmail ipucu formda.
+- `scripts/test-mail.php alici@ornek.com`: CLI test gonderimi (SMTP hazir degilse
+  aciklar).
+- Env override ornek: `QMS_MAIL_ENABLED=1 QMS_MAIL_HOST=smtp.example.com ...`.
+- `tests/mailer.php` (9): defaults, disabled/empty-host gonderim aga girmeden false
+  doner, env override, icerik uretici (html/plain/link), ve qmsNotify mail kapaliyken
+  bildirim satirini yine yazar.
 - `--all` mode: `php scripts/notify-overdue.php --all` also pushes each overdue item
   to every active user of the owning company (plus super admins) besides the
   responsible/admin recipients. Default mode stays role-aware.
