@@ -3220,6 +3220,17 @@ body.modal-open {
     color: var(--gray-700);
 }
 
+/* Kontrol listesi sablonu uygulama bloğu (audit-detail) */
+.template-apply-block {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.template-apply-block .section-heading {
+    margin-bottom: 12px;
+}
+
 @media (max-width: 720px) {
     .trend-strip {
         gap: 4px;

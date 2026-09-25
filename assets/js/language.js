@@ -1305,6 +1305,75 @@ function changeLanguage(language) {
 translations.tr.editorView = "Web Editöründe Görüntüle";
 translations.en.editorView = "View in Web Editor";
 
+// --- Denetim Kontrol Listesi Sablonlari ---
+translations.tr.checklistTemplatesMenuLabel = "Kontrol Listesi Şablonları";
+translations.tr.checklistTemplatesTitle = "Kontrol Listesi Şablonları";
+translations.tr.checklistTemplatesText = "Standart kontrol maddelerini şablonlarda toplayın ve denetimlere uygulayın.";
+translations.tr.checklistTemplateKicker = "Denetim Planlama";
+translations.tr.createChecklistTemplateButton = "Yeni Şablon";
+translations.tr.createChecklistTemplateTitle = "Yeni Kontrol Listesi Şablonu";
+translations.tr.checklistTemplateCreateText = "Standart kontrol maddelerini şablonda toplayın.";
+translations.tr.createChecklistTemplateSubmit = "Şablonu Oluştur";
+translations.tr.checklistTemplateTotalLabel = "Toplam Şablon";
+translations.tr.checklistTemplateItemTotalLabel = "Toplam Madde";
+translations.tr.checklistTemplateListTitle = "Şablonlar";
+translations.tr.checklistTemplateItemsLabel = "madde";
+translations.tr.noChecklistTemplatesText = "Henüz kontrol listesi şablonu oluşturulmadı.";
+translations.tr.backToTemplatesButton = "Şablonlara Dön";
+translations.tr.checklistTemplateNoCompanyText = "Şablon eklemek için önce bir şirket gerekir.";
+translations.tr.checklistTemplateTitleLabel = "Şablon Başlığı";
+translations.tr.checklistTemplateDescriptionLabel = "Açıklama";
+translations.tr.checklistTemplateDetailTitle = "Kontrol Listesi Şablon Detayı";
+translations.tr.checklistTemplateInfoTitle = "Şablon Bilgileri";
+translations.tr.checklistTemplateInfoText = "Şablon adını ve açıklamasını düzenleyin.";
+translations.tr.saveChecklistTemplateButton = "Şablonu Kaydet";
+translations.tr.checklistTemplateItemsTitle = "Kontrol Maddeleri";
+translations.tr.checklistItemTextLabel = "Madde Metni";
+translations.tr.removeChecklistItemButton = "Kaldır";
+translations.tr.noChecklistItemsText = "Bu şablonda henüz kontrol maddesi yok.";
+translations.tr.checklistTemplateItemAddedMessage = "Madde eklendi.";
+translations.tr.checklistTemplateItemRemovedMessage = "Madde kaldırıldı.";
+translations.tr.applyChecklistTemplateTitle = "Şablon Uygula";
+translations.tr.applyChecklistTemplateText = "Aynı şirkete ait bir şablonun maddelerini bu denetime kopyalayın.";
+translations.tr.applyChecklistTemplateSelectLabel = "Şablon";
+translations.tr.selectChecklistTemplateOption = "Şablon seçin";
+translations.tr.applyChecklistTemplateButton = "Şablonu Uygula";
+translations.tr.checklistTemplateAppliedMessage = "Şablondan kontrol maddeleri eklendi.";
+
+translations.en.checklistTemplatesMenuLabel = "Checklist Templates";
+translations.en.checklistTemplatesTitle = "Checklist Templates";
+translations.en.checklistTemplatesText = "Collect standard checklist items in templates and apply them to audits.";
+translations.en.checklistTemplateKicker = "Audit Planning";
+translations.en.createChecklistTemplateButton = "New Template";
+translations.en.createChecklistTemplateTitle = "New Checklist Template";
+translations.en.checklistTemplateCreateText = "Collect standard checklist items in a template.";
+translations.en.createChecklistTemplateSubmit = "Create Template";
+translations.en.checklistTemplateTotalLabel = "Total Templates";
+translations.en.checklistTemplateItemTotalLabel = "Total Items";
+translations.en.checklistTemplateListTitle = "Templates";
+translations.en.checklistTemplateItemsLabel = "items";
+translations.en.noChecklistTemplatesText = "No checklist templates have been created yet.";
+translations.en.backToTemplatesButton = "Back to Templates";
+translations.en.checklistTemplateNoCompanyText = "A company is required before adding a template.";
+translations.en.checklistTemplateTitleLabel = "Template Title";
+translations.en.checklistTemplateDescriptionLabel = "Description";
+translations.en.checklistTemplateDetailTitle = "Checklist Template Detail";
+translations.en.checklistTemplateInfoTitle = "Template Information";
+translations.en.checklistTemplateInfoText = "Edit the template name and description.";
+translations.en.saveChecklistTemplateButton = "Save Template";
+translations.en.checklistTemplateItemsTitle = "Checklist Items";
+translations.en.checklistItemTextLabel = "Item Text";
+translations.en.removeChecklistItemButton = "Remove";
+translations.en.noChecklistItemsText = "This template has no checklist items yet.";
+translations.en.checklistTemplateItemAddedMessage = "Item added.";
+translations.en.checklistTemplateItemRemovedMessage = "Item removed.";
+translations.en.applyChecklistTemplateTitle = "Apply Template";
+translations.en.applyChecklistTemplateText = "Copy the items of a template belonging to the same company into this audit.";
+translations.en.applyChecklistTemplateSelectLabel = "Template";
+translations.en.selectChecklistTemplateOption = "Select template";
+translations.en.applyChecklistTemplateButton = "Apply Template";
+translations.en.checklistTemplateAppliedMessage = "Checklist items added from the template.";
+
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {

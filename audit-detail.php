@@ -9,6 +9,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/checklist-template-functions.php';
 
 $auditId = (int) ($_GET["id"] ?? 0);
 
@@ -42,6 +43,17 @@ if (!$audit) {
 
 $formError = "";
 $allowedResults = ["pending", "compliant", "noncompliant", "not_applicable"];
+
+// Kontrol listesi sablonu uygulamak yonetim rollerine aciktir; sablonlar denetimin sirketine ait olmali.
+$canManageChecklist = in_array($_SESSION["qms_role"] ?? "", ["super_admin", "system_admin"], true);
+$companyTemplates = [];
+if ($canManageChecklist) {
+    foreach (qmsChecklistTemplateList($pdo, $userId, qmsCurrentRole()) as $template) {
+        if ((int) $template["company_id"] === (int) $audit["company_id"]) {
+            $companyTemplates[] = $template;
+        }
+    }
+}
 
 require_once __DIR__ . '/includes/csrf.php';
 
@@ -107,6 +119,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: audit-detail.php?id=" . $auditId . "&checklist=created");
             exit;
         }
+    }
+
+    if ($formType === "apply_checklist_template") {
+        $applyTemplateId = (int) ($_POST["template_id"] ?? 0);
+        if ($applyTemplateId > 0) {
+            $appliedCount = qmsChecklistTemplateApply($pdo, $applyTemplateId, $audit, $userId, qmsCurrentRole());
+            header("Location: audit-detail.php?id=" . $auditId . "&template=applied&count=" . $appliedCount);
+            exit;
+        }
+        $formError = "Şablon seçilmedi.";
     }
 
     if ($formType === "update_checklist_item") {
@@ -343,6 +365,10 @@ $resultLabels = [
                     <div class="form-message success" data-i18n="nonconformityCreatedMessage">Uygunsuzluk kaydı oluşturuldu.</div>
                 <?php endif; ?>
 
+                <?php if (isset($_GET["template"]) && $_GET["template"] === "applied"): ?>
+                    <div class="form-message success" data-i18n="checklistTemplateAppliedMessage">Şablondan kontrol maddeleri eklendi.</div>
+                <?php endif; ?>
+
                 <?php if ($formError !== ""): ?>
                     <div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div>
                 <?php endif; ?>
@@ -368,6 +394,35 @@ $resultLabels = [
                         <button class="primary-button" type="submit" data-i18n="addChecklistItemButton">Madde Ekle</button>
                     </div>
                 </form>
+
+                <?php if ($canManageChecklist && $companyTemplates): ?>
+                <div class="template-apply-block">
+                    <div class="section-heading compact-heading">
+                        <div>
+                            <h3 data-i18n="applyChecklistTemplateTitle">Şablon Uygula</h3>
+                            <p data-i18n="applyChecklistTemplateText">Aynı şirkete ait bir şablonun maddelerini bu denetime kopyalayın.</p>
+                        </div>
+                    </div>
+                    <form class="auditor-form" method="post" action="audit-detail.php?id=<?= $auditId ?>">
+                        <?= qmsCsrfField('audit_detail') ?>
+                        <input type="hidden" name="form_type" value="apply_checklist_template">
+                        <div class="form-grid">
+                            <label class="form-field">
+                                <span data-i18n="applyChecklistTemplateSelectLabel">Şablon</span>
+                                <select name="template_id" required>
+                                    <option value="0" data-i18n="selectChecklistTemplateOption">Şablon seçin</option>
+                                    <?php foreach ($companyTemplates as $template): ?>
+                                        <option value="<?= (int) $template["id"] ?>"><?= htmlspecialchars($template["title"], ENT_QUOTES, "UTF-8") ?> (<?= (int) $template["item_count"] ?> madde)</option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button class="secondary-button" type="submit" data-i18n="applyChecklistTemplateButton">Şablonu Uygula</button>
+                        </div>
+                    </form>
+                </div>
+                <?php endif; ?>
             </div>
 
             <div class="console-card">
