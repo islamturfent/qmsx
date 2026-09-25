@@ -54,7 +54,7 @@ arCheck($norm['conclusion'] === null, 'Empty text becomes null');
 arCheck($norm['findings_text'] === 'x', 'Normalize trims body text');
 
 // ---- Gecici tablolar (tencere verisine dokunmaz).
-$tableSchemas = ['audit_reports'];
+$tableSchemas = ['audit_reports', 'audit_log'];
 foreach ($tableSchemas as $table) {
     $schema = $pdo->query("SHOW CREATE TABLE $table")->fetch(PDO::FETCH_NUM)[1];
     $schema = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $schema);
