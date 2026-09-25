@@ -50,9 +50,10 @@ carried over from earlier assumptions.
   | `tests/document-copy.php` | 15 |
   | `tests/approval-workflow.php` | 21 |
   | `tests/quality-cost-trend.php` | 12 |
-  | `tests/document-compare.php` | 11 |
+  | `tests/document-compare.php` | 14 |
+  | `tests/report-export-data.php` | 9 |
 
-  607 checks total (28 suites). All suites use temporary tables and leave real records
+  619 checks total (29 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -712,6 +713,37 @@ plus a line-level text diff.
 - 11 checks (`tests/document-compare.php`): LCS add/del/same behaviour, empty-edge
   cases, text splitting, body extraction (temp stored file, cleaned), missing-file
   handling and the oversized-input guard.
+
+## Doküman versiyon karşılaştırma export'u (CSV/PDF) + COQ trend rapor entegrasyonu
+
+Two follow-ups on top of the surfaces built just before.
+
+### Doküman karşılaştırma CSV/PDF özeti (`document-compare-export.php`)
+- `document-compare.php` now shows CSV/PDF download buttons that call
+  `document-compare-export.php?document=..&a=..&b=..&format=csv|pdf`. Read-only and
+  scoped (re-fetches the document/versions through `qmsVisibleCompanyIds`).
+- CSV: UTF-8 BOM + a header block (document, company, revisions, diff counts) then
+  `Durum,İçerik` rows for every diff op.
+- PDF (Dompdf): summary lines + a colored `Durum/İçerik` diff table.
+- **Dompdf gotcha:** a small `<table>` placed right after the intro `<h1>`/`<div>`
+  triggered the "Parent table not found for table cell" exception. Isolated table
+  snippets rendered fine, but the combination did not. The summary was rewritten
+  as simple `<p>` rows (cleaner and avoids the parser quirk); the diff data table
+  is unaffected.
+- `qmsDiffSummary()` added to `includes/document-compare-functions.php` (same/add/
+  del/changed counts). `tests/document-compare.php` grew 11 -> 14 checks.
+
+### COQ trend in the report exports
+- `includes/report-export-data.php` now builds `quality_cost_trend`: one row per
+  month of the report period (same labels as the audit trend) with prevention /
+  appraisal / internal_failure / external_failure / total sums, aggregated from the
+  already-fetched scoped `quality_costs`.
+- `report-export-xlsx.php` adds a `COQ Trendi` worksheet; `report-export-pdf.php`
+  adds a matching `COQ Trendi` detail table.
+- `tests/report-export-data.php` (9 checks): seeds all ~27 tables the builder reads
+  as empty temporary tables plus companies/users/quality_costs, then asserts the
+  12-month trend shape, per-month category totals and total, an empty month, and
+  that the `quality_cost_total` KPI stays correct.
 
 ## Security hardening (2026-09-19)
 
