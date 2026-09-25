@@ -3048,6 +3048,96 @@ body.modal-open {
     color: var(--text-color);
 }
 
+/* ----------------------------------------------------------------------------
+   Denetim izi (audit trail) yuzeyi
+   ---------------------------------------------------------------------------- */
+.filter-form {
+    margin-bottom: 0;
+}
+
+.filter-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.audit-trail-row {
+    display: flex;
+    gap: 14px;
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.audit-trail-row:last-child {
+    border-bottom: none;
+}
+
+.audit-trail-icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--brand-50);
+    color: var(--brand-600);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audit-trail-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.audit-trail-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.audit-trail-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.audit-trail-head strong {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.audit-trail-summary {
+    margin: 6px 0 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--gray-700);
+}
+
+.audit-trail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 12px;
+    color: var(--muted-color);
+}
+
+.audit-trail-toggle {
+    cursor: pointer;
+    color: var(--brand-600);
+    font-weight: 600;
+}
+
+.audit-trail-details {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--gray-700);
+}
+
 @media (max-width: 720px) {
     .trend-strip {
         gap: 4px;

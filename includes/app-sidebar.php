@@ -122,6 +122,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("approvals") ?>
             <span data-i18n="approvalInboxTitle">Doküman Onay Kutusu</span>
         </a>
+        <a class="<?= sidebarLinkClass("audit_trail", $activeNav) ?>" href="audit-trail.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="auditTrailMenuLabel">Denetim İzi</span>
+        </a>
         <?php endif; ?>
         <?php endif; /* canSeeOperations */ ?>
 
