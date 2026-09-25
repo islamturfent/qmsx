@@ -9,6 +9,7 @@ require_once __DIR__ . '/complaint-functions.php';
 require_once __DIR__ . '/performance-functions.php';
 require_once __DIR__ . '/review-functions.php';
 require_once __DIR__ . '/audit-program-functions.php';
+require_once __DIR__ . '/equipment-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -216,6 +217,34 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $periodParams
     );
 
+    $equipment = $fetchRows(
+        "SELECT equipment.id, equipment.company_id, equipment.name, equipment.asset_code,
+                equipment.category, equipment.status, equipment.next_calibration_date,
+                equipment.created_at, companies.company_name,
+                (SELECT COUNT(*) FROM calibrations WHERE calibrations.equipment_id = equipment.id AND calibrations.active = 1) AS calibration_count
+         FROM equipment INNER JOIN companies ON companies.id = equipment.company_id
+         WHERE equipment.active = 1 AND equipment.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+
+    $equipmentList = [];
+    $equipmentOverdue = 0;
+    foreach ($equipment as $item) {
+        $calStatus = qmsEquipmentCalibrationStatus($item);
+        if ($calStatus === 'overdue') {
+            $equipmentOverdue++;
+        }
+        $equipmentList[] = [
+            'company_name' => $item['company_name'],
+            'name' => $item['name'],
+            'asset_code' => $item['asset_code'],
+            'category' => $item['category'],
+            'next_calibration_date' => $item['next_calibration_date'],
+            'cal_status' => qmsEquipmentCalibrationStatusLabels()[$calStatus] ?? $calStatus,
+            'calibration_count' => (int) $item['calibration_count'],
+        ];
+    }
+
     $openComplaints = array_filter(
         $complaints,
         static fn(array $item): bool => qmsComplaintIsOpen((string) $item['status'])
@@ -277,6 +306,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'review_count' => count($reviews),
         'audit_program_count' => count($auditPrograms),
         'audit_program_active' => count(array_filter($auditPrograms, static fn(array $item): bool => $item['status'] === 'active')),
+        'equipment_count' => count($equipment),
+        'equipment_overdue' => $equipmentOverdue,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -328,6 +359,8 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'reviews_actions' => 0,
             'audit_programs' => 0,
             'audit_programs_active' => 0,
+            'equipment' => 0,
+            'equipment_overdue' => 0,
         ];
     }
     foreach ($audits as $item) {
@@ -390,6 +423,15 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         $companyPerformance[(int) $item['company_id']]['audit_programs']++;
         if ($item['status'] === 'active') {
             $companyPerformance[(int) $item['company_id']]['audit_programs_active']++;
+        }
+    }
+    foreach ($equipment as $item) {
+        if (!isset($companyPerformance[(int) $item['company_id']])) {
+            continue;
+        }
+        $companyPerformance[(int) $item['company_id']]['equipment']++;
+        if (qmsEquipmentCalibrationStatus($item) === 'overdue') {
+            $companyPerformance[(int) $item['company_id']]['equipment_overdue']++;
         }
     }
 
@@ -569,5 +611,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'performance_target_list' => $performanceTargetList,
         'review_list' => $reviewList,
         'audit_program_list' => $auditProgramList,
+        'equipment_list' => $equipmentList,
     ];
 }

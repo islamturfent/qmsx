@@ -27,6 +27,8 @@ function qmsAuditLogEntityLabels(): array
         'risk' => 'Risk',
         'supplier' => 'Tedarikçi',
         'training' => 'Eğitim',
+        'equipment' => 'Ekipman',
+        'calibration' => 'Kalibrasyon',
         'user' => 'Kullanıcı',
         'company' => 'Şirket',
     ];
@@ -64,6 +66,8 @@ function qmsAuditLogEntityIcons(): array
         'risk' => 'warning',
         'supplier' => 'suppliers',
         'training' => 'training',
+        'equipment' => 'table',
+        'calibration' => 'checkBadge',
         'user' => 'users',
         'company' => 'companies',
     ];

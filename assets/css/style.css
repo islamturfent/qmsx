@@ -3141,6 +3141,26 @@ body.modal-open {
     font-size: 13px;
 }
 
+.cal-pill-overdue {
+    background: var(--error-50) !important;
+    color: var(--error-700) !important;
+}
+
+.cal-pill-due_soon {
+    background: var(--warning-50) !important;
+    color: var(--warning-700) !important;
+}
+
+.cal-pill-calibrated {
+    background: var(--success-50) !important;
+    color: var(--success-700) !important;
+}
+
+.cal-pill-not_scheduled {
+    background: var(--gray-100) !important;
+    color: var(--gray-600) !important;
+}
+
 .audit-trail-details {
     margin: 10px 0 0;
     padding: 10px 12px;

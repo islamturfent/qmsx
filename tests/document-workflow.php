@@ -36,7 +36,7 @@ if (!isset($argv[1])) {
 
 session_start();
 require 'config/database.php';
-foreach (['documents', 'document_versions', 'document_approvals', 'companies', 'company_admin_assignments', 'users', 'notifications'] as $table) {
+foreach (['documents', 'document_versions', 'document_approvals', 'companies', 'company_admin_assignments', 'users', 'notifications', 'audit_log'] as $table) {
     $schema = $pdo->query("SHOW CREATE TABLE $table")->fetch(PDO::FETCH_NUM)[1];
     $schema = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $schema);
     $pdo->exec(str_replace('CREATE TABLE', 'CREATE TEMPORARY TABLE', $schema));

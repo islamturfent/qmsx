@@ -58,6 +58,7 @@ function qmsNotificationTypes(): array
         'complaint_critical' => ['icon' => 'warning', 'group' => 'complaint'],
         'complaint_closed' => ['icon' => 'checkBadge', 'group' => 'complaint'],
         'review_completed' => ['icon' => 'reviews', 'group' => 'review'],
+        'calibration_failed' => ['icon' => 'warning', 'group' => 'calibration'],
     ];
 }
 
@@ -82,6 +83,7 @@ function qmsNotificationGroupLabels(): array
         'supplier' => 'Tedarikçi',
         'complaint' => 'Şikayet',
         'review' => 'Gözden Geçirme',
+        'calibration' => 'Kalibrasyon',
         'general' => 'Genel',
     ];
 }
@@ -96,6 +98,7 @@ function qmsNotificationGroupI18nKeys(): array
         'supplier' => 'notificationGroupSupplierLabel',
         'complaint' => 'notificationGroupComplaintLabel',
         'review' => 'notificationGroupReviewLabel',
+        'calibration' => 'notificationGroupCalibrationLabel',
         'general' => 'notificationGroupGeneralLabel',
     ];
 }

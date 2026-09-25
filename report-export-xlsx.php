@@ -35,6 +35,8 @@ $metricLabels = [
     'complaint_open_count' => 'Açık Şikayet',
     'review_count' => 'Gözden Geçirme Sayısı',
     'audit_program_count' => 'Denetim Programı',
+    'equipment_count' => 'Ekipman Sayısı',
+    'equipment_overdue' => 'Süresi Geçmiş Ekipman',
 ];
 
 $summaryRows = [
@@ -90,6 +92,8 @@ $companyRows = [[
     ['value' => 'GGR Aksiyonu', 'style' => 2],
     ['value' => 'Denetim Programları', 'style' => 2],
     ['value' => 'Aktif Program', 'style' => 2],
+    ['value' => 'Ekipmanlar', 'style' => 2],
+    ['value' => 'Geçmiş', 'style' => 2],
 ]];
 foreach ($report['company_performance'] as $row) {
     $rate = $row['actions'] > 0 ? round(($row['completed'] / $row['actions']) * 100, 1) : 0;
@@ -110,6 +114,8 @@ foreach ($report['company_performance'] as $row) {
         ['value' => $row['reviews_actions'], 'style' => 3],
         ['value' => $row['audit_programs'], 'style' => 3],
         ['value' => $row['audit_programs_active'], 'style' => 3],
+        ['value' => $row['equipment'], 'style' => 3],
+        ['value' => $row['equipment_overdue'], 'style' => 3],
     ];
 }
 
@@ -345,6 +351,27 @@ foreach ($report['audit_program_list'] as $row) {
     ];
 }
 
+$equipmentRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Ekipman', 'style' => 2],
+    ['value' => 'Kod', 'style' => 2],
+    ['value' => 'Kategori', 'style' => 2],
+    ['value' => 'Sonraki Kalibrasyon', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Kalibrasyon', 'style' => 2],
+]];
+foreach ($report['equipment_list'] as $row) {
+    $equipmentRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['name'], 'style' => 3],
+        ['value' => $row['asset_code'] ?: '-', 'style' => 3],
+        ['value' => $row['category'] ?: '-', 'style' => 3],
+        ['value' => $row['next_calibration_date'] ?: '-', 'style' => 3],
+        ['value' => $row['cal_status'], 'style' => 3],
+        ['value' => $row['calibration_count'], 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -365,6 +392,7 @@ try {
         ['name' => 'Hedefler', 'xml' => xlsxWorksheet($performanceRows, [28, 26, 12, 10, 26])],
         ['name' => 'Gözden Geçirmeler', 'xml' => xlsxWorksheet($reviewRows, [28, 34, 14, 24, 14, 10, 10, 14])],
         ['name' => 'Denetim Programları', 'xml' => xlsxWorksheet($auditProgramRows, [28, 34, 10, 16, 12, 12])],
+        ['name' => 'Ekipman', 'xml' => xlsxWorksheet($equipmentRows, [28, 30, 14, 16, 20, 16, 12])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

@@ -121,6 +121,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("documents") ?>
             <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>
         </a>
+        <a class="<?= sidebarLinkClass("equipment", $activeNav) ?>" href="equipment.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="equipmentMenuLabel">Ekipman ve Kalibrasyon</span>
+        </a>
         <?php if ($isManagementNav): ?>
         <a class="<?= sidebarLinkClass("document_approvals", $activeNav) ?>" href="document-approvals.php">
             <?= appIcon("approvals") ?>
