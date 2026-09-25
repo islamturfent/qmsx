@@ -46,8 +46,9 @@ carried over from earlier assumptions.
   | `tests/satisfaction.php` | 14 |
   | `tests/personnel.php` | 17 |
   | `tests/external-audit.php` | 20 |
+  | `tests/quality-cost.php` | 19 |
 
-  529 checks total (23 suites). All suites use temporary tables and leave real records
+  548 checks total (24 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -600,6 +601,27 @@ Tracks audits performed by external bodies (customer, certification, regulatory)
 - 20 temp-table checks + an HTTP harness (overdue derivation, scoping, finding
   add/closure, cross-tenant rejection, KPI + both exports). Fixtures cleaned.
 
+## Kalite maliyeti (COQ) (2026-09-30)
+
+Tracks quality costs by the classic COQ categories (prevention, appraisal,
+ internal/external failure) and reports period totals.
+
+- Schema `quality_costs` (migration `20260930-quality-costs.sql`, idempotent
+  runner `scripts/migrate-quality-costs.php`): one ledger row per cost. Scoped by
+  company; `created_by` recorded.
+- `includes/quality-cost-functions.php` owns the scoped ledger, the per-category
+  summary (with a derived `failure_total` = internal + external), add and
+  soft-delete. Amounts are non-negative decimals.
+- Page `quality-costs.php`: summary cards (total / prevention / appraisal /
+  failure), type + date-range filters, an inline add form and a deletable
+  ledger list (no separate create/detail pages needed for a ledger surface).
+  Sidebar entry under "Performans Yönetimi".
+- Reporting: `quality_cost_total` + `quality_cost_failure` metrics, a COQ KPI
+  tile on `reports.php`, an eighteenth Excel sheet (`Kalite Maliyeti`) and a
+  fifteenth PDF detail table.
+- 19 temp-table checks + an HTTP harness (scoping, per-category totals, filters,
+  add, validation, soft-delete, KPI + both exports). Fixtures cleaned.
+
 ## Security hardening (2026-09-19)
 
 ### CSRF
@@ -813,10 +835,10 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - Excel/PDF export extension was completed on 2026-09-24: the exports carry
   detail sheets/sections for audits, nonconformities, corrective actions, the
   risk register, trainings, suppliers, complaints and performance targets, on top
-  of the existing KPI and summary content. Excel has 17 sheets, the PDF has
-  fourteen detail tables (management review, audit programs, equipment,
-  satisfaction, personnel and external audits added the last sheets/tables) and
-  prints "no records this period" when a section is empty.
+  of the existing KPI and summary content. Excel has 18 sheets, the PDF has
+  fifteen detail tables (management review, audit programs, equipment,
+  satisfaction, personnel, external audits and quality costs added the last
+  sheets/tables) and prints "no records this period" when a section is empty.
 - Faz 3 is complete: all seven product modules (documents, risks, training,
   supplier, complaint, performance, management review) are built, tested and
   committed. See the Faz 3 complete note under the management review section.
