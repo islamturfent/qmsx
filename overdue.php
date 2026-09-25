@@ -23,6 +23,7 @@ $totalOverdue = 0;
 foreach ($sections as $sec) {
     $totalOverdue += $sec['count'];
 }
+$auditorWorkload = qmsAuditorWorkload($pdo, $userId, $role);
 $activeNav = "overdue";
 
 $severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'Kritik'];
@@ -114,6 +115,37 @@ $severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'K
                     </div>
                 <?php endforeach; ?>
             </section>
+        <?php endif; ?>
+
+        <?php if ($auditorWorkload): ?>
+        <section class="console-card checklist-section">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="auditorWorkloadTitle">Denetçi İş Yükü</h3>
+                    <p data-i18n="auditorWorkloadText">Denetçi başına atanmış denetim ve açık uygunsuzluk/faaliyet yükü.</p>
+                </div>
+            </div>
+            <div class="cockpit-kpi-grid">
+                <?php foreach ($auditorWorkload as $aw): ?>
+                    <div class="cockpit-kpi-card">
+                        <div class="cockpit-kpi-head">
+                            <strong><?= htmlspecialchars($aw['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span class="status-pill <?= $aw['total_open'] === 0 ? 'on-track' : 'off-track' ?>"><?= $aw['total_open'] ?></span>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="data-table compact-table">
+                                <tbody>
+                                    <tr><td data-i18n="auditorWorkloadCompanyTh">Şirket</td><td><?= htmlspecialchars($aw['company'], ENT_QUOTES, 'UTF-8') ?></td></tr>
+                                    <tr><td data-i18n="auditorWorkloadAuditsTh">Atanmış Denetim</td><td><?= $aw['assigned_audits'] ?></td></tr>
+                                    <tr><td data-i18n="auditorWorkloadNcTh">Açık Uygunsuzluk</td><td><?= $aw['open_nonconformities'] ?></td></tr>
+                                    <tr><td data-i18n="auditorWorkloadActionsTh">Açık Faaliyet</td><td><?= $aw['open_actions'] ?></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
         <?php endif; ?>
     </main>
     <script src="assets/js/theme.js"></script>

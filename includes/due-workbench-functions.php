@@ -205,6 +205,64 @@ function qmsOverdueWorkbench(PDO $pdo, int $userId, string $role): array
 }
 
 /**
+ * Denetci is yuku: her denetci icin atanmis aktif denetim, acik uygunsuzluk
+ * ve acik duzeltici/onleyici faaliyet sayisi (kapsamli).
+ *
+ * @return array<int, array{id: int, name: string, company: string,
+ *         assigned_audits: int, open_nonconformities: int, open_actions: int,
+ *         total_open: int}>
+ */
+function qmsAuditorWorkload(PDO $pdo, int $userId, string $role): array
+{
+    $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role);
+    $scope = qmsCompanyScope('aud.company_id', $companyIds);
+
+    $stmt = $pdo->prepare(
+        "SELECT aud.id, aud.first_name, aud.last_name, aud.company_id, co.company_name
+         FROM auditors aud INNER JOIN companies co ON co.id = aud.company_id
+         WHERE aud.active = 1" . $scope['sql'] . ' ORDER BY aud.first_name, aud.last_name'
+    );
+    $stmt->execute($scope['params']);
+    $rows = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $aud) {
+        $audId = (int) $aud['id'];
+
+        $asm = $pdo->prepare('SELECT COUNT(*) FROM audit_auditors aa INNER JOIN audits a ON a.id = aa.audit_id WHERE aa.auditor_id = ? AND a.active = 1');
+        $asm->execute([$audId]);
+        $assigned = (int) $asm->fetchColumn();
+
+        $idm = $pdo->prepare('SELECT a.id FROM audit_auditors aa INNER JOIN audits a ON a.id = aa.audit_id WHERE aa.auditor_id = ? AND a.active = 1');
+        $idm->execute([$audId]);
+        $auditIds = array_map('intval', array_column($idm->fetchAll(PDO::FETCH_ASSOC), 'id'));
+
+        $openNc = 0;
+        $openAct = 0;
+        if ($auditIds !== []) {
+            $in = implode(',', $auditIds);
+            $openNc = (int) $pdo->query(
+                "SELECT COUNT(*) FROM nonconformities WHERE active = 1 AND status <> 'closed' AND audit_id IN ($in)"
+            )->fetchColumn();
+            $openAct = (int) $pdo->query(
+                "SELECT COUNT(*) FROM corrective_actions ca
+                 INNER JOIN nonconformities n ON n.id = ca.nonconformity_id
+                 WHERE ca.active = 1 AND ca.status NOT IN ('completed', 'closed') AND n.audit_id IN ($in)"
+            )->fetchColumn();
+        }
+
+        $rows[] = [
+            'id' => $audId,
+            'name' => trim((string) $aud['first_name'] . ' ' . (string) $aud['last_name']),
+            'company' => (string) $aud['company_name'],
+            'assigned_audits' => $assigned,
+            'open_nonconformities' => $openNc,
+            'open_actions' => $openAct,
+            'total_open' => $openNc + $openAct,
+        ];
+    }
+    return $rows;
+}
+
+/**
  * Geciken duzeltici faaliyet sayisi (menu rozeti icin tek sorgu).
  */
 function qmsOverdueActionCount(PDO $pdo, int $userId, string $role): int

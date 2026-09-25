@@ -1981,6 +1981,20 @@ translations.tr.capaTypePreventiveLabel = "Önleyici";
 translations.en.actionTypeLabel = "Action Type";
 translations.en.capaTypeCorrectiveLabel = "Corrective";
 translations.en.capaTypePreventiveLabel = "Preventive";
+
+// --- Denetçi İş Yükü ---
+translations.tr.auditorWorkloadTitle = "Denetçi İş Yükü";
+translations.tr.auditorWorkloadText = "Denetçi başına atanmış denetim ve açık uygunsuzluk/faaliyet yükü.";
+translations.tr.auditorWorkloadCompanyTh = "Şirket";
+translations.tr.auditorWorkloadAuditsTh = "Atanmış Denetim";
+translations.tr.auditorWorkloadNcTh = "Açık Uygunsuzluk";
+translations.tr.auditorWorkloadActionsTh = "Açık Faaliyet";
+translations.en.auditorWorkloadTitle = "Auditor Workload";
+translations.en.auditorWorkloadText = "Assigned audits and open nonconformities/actions per auditor.";
+translations.en.auditorWorkloadCompanyTh = "Company";
+translations.en.auditorWorkloadAuditsTh = "Assigned Audits";
+translations.en.auditorWorkloadNcTh = "Open Nonconformities";
+translations.en.auditorWorkloadActionsTh = "Open Actions";
 translations.en.copyUpdatedMessage = "Copy status updated.";
 translations.en.copyAddTitle = "Add Controlled Copy";
 translations.en.copyAddText = "Record a controlled copy of a document.";
