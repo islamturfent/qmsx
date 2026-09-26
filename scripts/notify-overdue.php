@@ -37,6 +37,7 @@ $stats = [
     'contract_renewal_due' => 0,
     'process_review_overdue' => 0,
     'instrument_calibration_overdue' => 0,
+    'delivery_rejection' => 0,
 ];
 
 /** Belirtilen kullaniciya (tur+link) dedupli bildirim ekler. */
@@ -305,6 +306,44 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $notifyAdmins($pdo, (int) $r['company_id'], 'instrument_calibration_overdue', $msg, $link);
     if ($allUsers) {
         $notifyCompanyAll($pdo, (int) $r['company_id'], 'instrument_calibration_overdue', $msg, $link);
+    }
+}
+
+// --- Teslimat red esigi asilan kayitlar (sirket adminlerine) ---
+// Varsayilan esik %5'tir; QMS_DELIVERY_REJECT_THRESHOLD ortam degiskeni ile
+// ayarlanabilir (0-1 arasi). Teste izin vermek icin ayrica --threshold=<0-1>
+// argumani da kabul edilir (arguman ortam degerinden onceliklidir).
+$deliveryRejectThreshold = 0.05;
+foreach ($argv ?? [] as $arg) {
+    if (preg_match('/^--threshold=([0-9]+(?:\.[0-9]+)?)$/', $arg, $m)) {
+        $deliveryRejectThreshold = max(0.01, min(0.99, (float) $m[1]));
+        break;
+    }
+}
+if ($deliveryRejectThreshold > 0) {
+    $stmt = $pdo->prepare(
+        "SELECT d.id, d.customer_name, d.period, d.quantity_delivered, d.quantity_rejected, d.company_id, co.company_name
+         FROM delivery_performance d INNER JOIN companies co ON co.id = d.company_id
+         WHERE d.active = 1 AND d.quantity_delivered > 0"
+    );
+    $stmt->execute();
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $qtyDelivered = (int) $r['quantity_delivered'];
+        $qtyRejected = (int) $r['quantity_rejected'];
+        if ($qtyDelivered <= 0) {
+            continue;
+        }
+        $rejectRate = $qtyRejected / $qtyDelivered;
+        if ($rejectRate < $deliveryRejectThreshold) {
+            continue;
+        }
+        $link = 'delivery-performance.php?period=' . urlencode((string) $r['period']);
+        $msg = (string) $r['company_name'] . ' · ' . (string) $r['customer_name'] . ' (' . (string) $r['period'] . ') red oranı %'
+            . round($rejectRate * 100, 1) . ' (eşik %' . round($deliveryRejectThreshold * 100, 1) . ')';
+        $notifyAdmins($pdo, (int) $r['company_id'], 'delivery_rejection', $msg, $link);
+        if ($allUsers) {
+            $notifyCompanyAll($pdo, (int) $r['company_id'], 'delivery_rejection', $msg, $link);
+        }
     }
 }
 

@@ -7,7 +7,7 @@ require 'includes/notifications.php';
 $checks = 0;
 function nocCheck(bool $ok, string $name): void { global $checks; if (!$ok) throw new RuntimeException('FAIL: ' . $name); $checks++; echo 'PASS: ' . $name . PHP_EOL; }
 
-$tables = ['companies','users','company_admin_assignments','nonconformities','corrective_actions','trainings','equipment','external_audits','external_audit_findings','documents','complaints','suppliers','supplier_evaluation_schedule','contracts','processes','instruments','notifications'];
+$tables = ['companies','users','company_admin_assignments','nonconformities','corrective_actions','trainings','equipment','external_audits','external_audit_findings','documents','complaints','suppliers','supplier_evaluation_schedule','contracts','processes','instruments','delivery_performance','notifications'];
 foreach ($tables as $t) {
     $s = $pdo->query("SHOW CREATE TABLE $t")->fetch(PDO::FETCH_NUM)[1];
     $s = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $s);
@@ -54,5 +54,29 @@ $noCount = static function (PDO $pdo, int $userId, string $type): int {
 nocCheck($noCount($pdo, 99941, 'contract_expiring') >= 1, 'Expiring contract notifies admin (contract_expiring)');
 nocCheck($noCount($pdo, 99941, 'process_review_overdue') >= 1, 'Overdue process review notifies admin (process_review_overdue)');
 nocCheck($noCount($pdo, 99941, 'instrument_calibration_overdue') >= 1, 'Overdue instrument calibration notifies admin (instrument_calibration_overdue)');
+
+// Teslimat red esigi: yuksek red oranli kayit eklenir ve --threshold ile
+// delivery_rejection bildirimi uretilir; dusuk oranli kayit esigi asmaz.
+$pdo->exec("INSERT INTO delivery_performance(id,company_id,customer_name,period,orders_total,on_time_orders,quantity_delivered,quantity_rejected,notes,active) VALUES (99941,99941,'ACME','2026-10',100,80,1000,250,NULL,1),(99942,99941,'BETA','2026-10',100,99,1000,5,NULL,1)");
+$argv = ['notify-overdue.php', '--threshold=0.05'];
+ob_start();
+include __DIR__ . '/../scripts/notify-overdue.php';
+$out3 = ob_get_clean();
+nocCheck(strpos($out3, 'Overdue notifications generated: 1') !== false, 'Delivery threshold run generates exactly 1 new notification');
+nocCheck($noCount($pdo, 99941, 'delivery_rejection') >= 1, 'High reject-rate delivery notifies admin (delivery_rejection)');
+$nHigh = (int) $pdo->query("SELECT COUNT(*) FROM notifications WHERE user_id=99941 AND notification_type='delivery_rejection' AND link_url LIKE '%2026-10%'")->fetchColumn();
+nocCheck($nHigh >= 1, 'Only the high reject delivery (ACME) is notified');
+
+// Esik %50'ye cikarilirsa ACME %25 oranli kayit esigi asmaz -> yeni bildirim yok.
+$argv = ['notify-overdue.php', '--threshold=0.50'];
+ob_start();
+include __DIR__ . '/../scripts/notify-overdue.php';
+$out4 = ob_get_clean();
+nocCheck(strpos($out4, 'Overdue notifications generated: 0') !== false, 'Higher threshold generates no new delivery notification');
+
+// delivery_rejection turu dogru gruba bagli (eposta tercihi 'delivery' grubu).
+$meta = qmsNotificationTypes()['delivery_rejection'];
+nocCheck(($meta['group'] ?? '') === 'delivery' && $meta['icon'] === 'truck', 'delivery_rejection maps to delivery group with truck icon');
+nocCheck(isset(qmsNotificationGroupLabels()['delivery']), 'delivery notification group label exists');
 
 echo "\nCompleted $checks notify-overdue checks using temporary tables.\n";

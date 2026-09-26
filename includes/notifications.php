@@ -188,6 +188,7 @@ function qmsNotificationTypes(): array
         'process_review_overdue' => ['icon' => 'documents', 'group' => 'process'],
         'instrument_calibration_overdue' => ['icon' => 'warning', 'group' => 'instrument'],
         'incident_reported' => ['icon' => 'alert', 'group' => 'incident'],
+        'delivery_rejection' => ['icon' => 'truck', 'group' => 'delivery'],
     ];
 }
 
@@ -220,6 +221,7 @@ function qmsNotificationGroupLabels(): array
         'process' => 'Süreç',
         'instrument' => 'Metroloji',
         'incident' => 'Olay',
+        'delivery' => 'Teslimat',
         'general' => 'Genel',
     ];
 }
@@ -242,6 +244,7 @@ function qmsNotificationGroupI18nKeys(): array
         'process' => 'notificationGroupProcessLabel',
         'instrument' => 'notificationGroupInstrumentLabel',
         'incident' => 'notificationGroupIncidentLabel',
+        'delivery' => 'notificationGroupDeliveryLabel',
         'general' => 'notificationGroupGeneralLabel',
     ];
 }
