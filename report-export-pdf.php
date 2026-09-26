@@ -248,6 +248,13 @@ foreach ($report['incident_list'] as $row) {
         . $escape($row['reported_at'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
 }
 
+$deliveryRows = '';
+foreach ($report['delivery_list'] as $row) {
+    $deliveryRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['customer_name']) . '</td><td>'
+        . $escape($row['period'] ?? '') . '</td><td>' . $escape((string) $row['orders_total']) . '</td><td>'
+        . $escape((string) $row['on_time_rate']) . '</td><td>' . $escape((string) $row['quantity_rejected']) . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -335,6 +342,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Olay</span><strong>' . $metrics['incident_count'] . '</strong></td>
       <td class="metric"><span>Açık Olay</span><strong>' . $metrics['incident_open'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Teslimat Kaydı</span><strong>' . $metrics['delivery_count'] . '</strong></td>
+      <td class="metric"><span>Zamanında Teslim</span><strong>' . $metrics['delivery_ontime_rate'] . '%</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -365,6 +375,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Sözleşmeler', '<th>Şirket</th><th>Sözleşme</th><th>Tür</th><th>Karşı Taraf</th><th>Bitiş</th><th>Durum</th>', $contractRows)
     . $detailSection('Ölçü Aletleri', '<th>Şirket</th><th>Alet</th><th>Tip</th><th>Konum</th><th>Sonraki Kalib.</th><th>Durum</th>', $instrumentRows)
     . $detailSection('Olay Raporlama', '<th>Şirket</th><th>Olay</th><th>Tür</th><th>Şiddet</th><th>Tarih</th><th>Durum</th>', $incidentRows)
+    . $detailSection('Teslimat Performansı', '<th>Şirket</th><th>Müşteri</th><th>Dönem</th><th>Sipariş</th><th>Zamanında (%)</th><th>Reddedilen</th>', $deliveryRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

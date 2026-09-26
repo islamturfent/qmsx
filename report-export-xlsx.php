@@ -70,6 +70,9 @@ $metricLabels = [
     'incident_count' => 'Olay Sayısı',
     'incident_open' => 'Açık Olay',
     'incident_critical' => 'Kritik Olay',
+    'delivery_count' => 'Teslimat Kaydı',
+    'delivery_ontime_rate' => 'Zamanında Teslim (%)',
+    'delivery_rejected' => 'Reddedilen Miktar',
 ];
 
 $summaryRows = [
@@ -627,6 +630,29 @@ foreach ($report['incident_list'] as $row) {
     ];
 }
 
+$deliveryRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Müşteri', 'style' => 2],
+    ['value' => 'Dönem', 'style' => 2],
+    ['value' => 'Sipariş', 'style' => 2],
+    ['value' => 'Zamanında', 'style' => 2],
+    ['value' => 'Zamanında (%)', 'style' => 2],
+    ['value' => 'Reddedilen', 'style' => 2],
+    ['value' => 'Teslim Edilen', 'style' => 2],
+]];
+foreach ($report['delivery_list'] as $row) {
+    $deliveryRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['customer_name'], 'style' => 3],
+        ['value' => ($row['period'] ?? ''), 'style' => 3],
+        ['value' => $row['orders_total'], 'style' => 3],
+        ['value' => $row['on_time_orders'], 'style' => 3],
+        ['value' => $row['on_time_rate'], 'style' => 3],
+        ['value' => $row['quantity_rejected'], 'style' => 3],
+        ['value' => $row['quantity_delivered'], 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -660,6 +686,7 @@ try {
         ['name' => 'Sözleşmeler', 'xml' => xlsxWorksheet($contractRows, [28, 40, 14, 20, 14, 16])],
         ['name' => 'Ölçü Aletleri', 'xml' => xlsxWorksheet($instrumentRows, [28, 34, 18, 20, 16, 16])],
         ['name' => 'Olaylar', 'xml' => xlsxWorksheet($incidentRows, [28, 40, 16, 14, 14, 16])],
+        ['name' => 'Teslimat', 'xml' => xlsxWorksheet($deliveryRows, [28, 28, 12, 12, 14, 16, 16, 18])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

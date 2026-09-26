@@ -232,6 +232,22 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
          WHERE i.active = 1 AND i.status <> \'closed\'' . $scope['sql']
     );
 
+    $deliveryOrders = 0;
+    $deliveryOnTime = 0;
+    $deliveryRejected = 0;
+    $delStmt = $pdo->prepare(
+        'SELECT COALESCE(SUM(d.orders_total),0) AS o, COALESCE(SUM(d.on_time_orders),0) AS ot,
+                COALESCE(SUM(d.quantity_rejected),0) AS r
+         FROM delivery_performance d INNER JOIN companies co ON co.id = d.company_id
+         WHERE d.active = 1' . $scope['sql']
+    );
+    $delStmt->execute($scope['params']);
+    $delRow = $delStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    $deliveryOrders = (int) ($delRow['o'] ?? 0);
+    $deliveryOnTime = (int) ($delRow['ot'] ?? 0);
+    $deliveryRejected = (int) ($delRow['r'] ?? 0);
+    $deliveryOnTimePct = $deliveryOrders > 0 ? (int) round(($deliveryOnTime / $deliveryOrders) * 100) : null;
+
     // En yogun ay (denetim bazinda).
     $topMonth = null;
     $topAudits = 0;
@@ -298,6 +314,13 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
         $points[] = ['tone' => 'neutral', 'text' => $openIncidents . ' açık olay kaydı var.'];
     } else {
         $points[] = ['tone' => 'positive', 'text' => 'Açık olay kaydı bulunmuyor.'];
+    }
+
+    if ($deliveryOrders > 0) {
+        $tone = $deliveryOnTimePct !== null && $deliveryOnTimePct >= 95 ? 'positive' : 'neutral';
+        $points[] = ['tone' => $tone, 'text' => 'Teslimat performansı: ' . $deliveryOrders . ' siparişin %' . $deliveryOnTimePct . ' zamanında teslim edildi' . ($deliveryRejected > 0 ? ', ' . $deliveryRejected . ' adet reddedildi.' : '.')];
+    } else {
+        $points[] = ['tone' => 'neutral', 'text' => 'Teslimat performansı kaydı bulunmuyor.'];
     }
 
     if ($complaints > 0) {

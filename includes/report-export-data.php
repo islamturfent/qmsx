@@ -631,6 +631,38 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     }
     $incidentCount = count($incidentList);
 
+    $deliveriesRaw = $fetchRows(
+        "SELECT d.id, d.customer_name, d.period, d.orders_total, d.on_time_orders,
+                d.quantity_delivered, d.quantity_rejected, companies.company_name
+         FROM delivery_performance d
+         INNER JOIN companies ON companies.id = d.company_id
+         WHERE d.active = 1" . $scopeSql,
+        $scopeParams
+    );
+    usort($deliveriesRaw, static fn(array $a, array $b): int => strcmp((string) $b['period'], (string) $a['period']) ?: strcmp((string) $a['customer_name'], (string) $b['customer_name']));
+    $deliveryList = [];
+    $deliveryOrders = 0;
+    $deliveryOnTime = 0;
+    $deliveryRejected = 0;
+    foreach ($deliveriesRaw as $item) {
+        $deliveryOrders += (int) $item['orders_total'];
+        $deliveryOnTime += (int) $item['on_time_orders'];
+        $deliveryRejected += (int) $item['quantity_rejected'];
+        $total = (int) $item['orders_total'];
+        $deliveryList[] = [
+            'company_name' => $item['company_name'],
+            'customer_name' => $item['customer_name'],
+            'period' => $item['period'],
+            'orders_total' => $total,
+            'on_time_orders' => (int) $item['on_time_orders'],
+            'quantity_delivered' => (int) $item['quantity_delivered'],
+            'quantity_rejected' => (int) $item['quantity_rejected'],
+            'on_time_rate' => $total > 0 ? round(((int) $item['on_time_orders'] / $total) * 100, 1) : 0.0,
+        ];
+    }
+    $deliveryCount = count($deliveryList);
+    $deliveryOnTimeRate = $deliveryOrders > 0 ? round(($deliveryOnTime / $deliveryOrders) * 100, 1) : 0.0;
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -685,6 +717,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'incident_count' => $incidentCount,
         'incident_open' => $incidentOpen,
         'incident_critical' => $incidentCritical,
+        'delivery_count' => $deliveryCount,
+        'delivery_ontime_rate' => $deliveryOnTimeRate,
+        'delivery_rejected' => $deliveryRejected,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -1031,5 +1066,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'contract_list' => $contractList,
         'instrument_list' => $instrumentList,
         'incident_list' => $incidentList,
+        'delivery_list' => $deliveryList,
     ];
 }
