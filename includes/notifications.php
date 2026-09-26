@@ -178,6 +178,9 @@ function qmsNotificationTypes(): array
         'overdue_complaint' => ['icon' => 'complaints', 'group' => 'complaint'],
         'audit_program_reminder' => ['icon' => 'check', 'group' => 'general'],
         'audit_program_due' => ['icon' => 'check', 'group' => 'general'],
+        'announcement_published' => ['icon' => 'complaints', 'group' => 'announcement'],
+        'internal_survey_published' => ['icon' => 'sparkles', 'group' => 'survey'],
+        'overdue_supplier_eval' => ['icon' => 'warning', 'group' => 'supplier'],
     ];
 }
 
@@ -203,6 +206,8 @@ function qmsNotificationGroupLabels(): array
         'complaint' => 'Şikayet',
         'review' => 'Gözden Geçirme',
         'calibration' => 'Kalibrasyon',
+        'announcement' => 'Duyuru',
+        'survey' => 'Anket',
         'general' => 'Genel',
     ];
 }
@@ -218,6 +223,8 @@ function qmsNotificationGroupI18nKeys(): array
         'complaint' => 'notificationGroupComplaintLabel',
         'review' => 'notificationGroupReviewLabel',
         'calibration' => 'notificationGroupCalibrationLabel',
+        'announcement' => 'notificationGroupAnnouncementLabel',
+        'survey' => 'notificationGroupSurveyLabel',
         'general' => 'notificationGroupGeneralLabel',
     ];
 }

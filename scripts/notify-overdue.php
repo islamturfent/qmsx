@@ -32,6 +32,7 @@ $stats = [
     'overdue_finding' => 0,
     'overdue_document_review' => 0,
     'overdue_complaint' => 0,
+    'overdue_supplier_eval' => 0,
 ];
 
 /** Belirtilen kullaniciya (tur+link) dedupli bildirim ekler. */
@@ -217,6 +218,23 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     }
     if ($allUsers) {
         $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_complaint', $msg, $link);
+    }
+}
+
+// --- Vadesi gecen tedarikci degerlendirme (sirket adminlerine) ---
+$stmt = $pdo->prepare(
+    "SELECT s.id, s.cycle_label, s.due_date, s.company_id, sp.name AS supplier_name
+     FROM supplier_evaluation_schedule s
+     INNER JOIN suppliers sp ON sp.id = s.supplier_id
+     WHERE s.active = 1 AND s.status = 'planned' AND s.due_date IS NOT NULL AND s.due_date < ?"
+);
+$stmt->execute([$today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $link = 'supplier-evaluations.php';
+    $msg = (string) $r['supplier_name'] . ' · ' . (string) $r['cycle_label'] . ' (termin: ' . (string) $r['due_date'] . ')';
+    $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_supplier_eval', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_supplier_eval', $msg, $link);
     }
 }
 

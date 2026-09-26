@@ -76,6 +76,24 @@ function qmsAnnouncementUpdate(PDO $pdo, int $id, array $data, int $userId, stri
     return true;
 }
 
+/**
+ * Yayinda bir duyuru icin sirketin tum aktif kullanicilarina (ve super
+ * adminlere) bildirim + e-posta gonderir. Sessiz; e-posta tercihe bagli.
+ */
+function qmsAnnouncementNotifyCompany(PDO $pdo, int $companyId, int $announcementId, string $title): void
+{
+    if ($companyId <= 0) {
+        return;
+    }
+    require_once __DIR__ . '/notifications.php';
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE active = 1 AND (company_id = ? OR role = 'super_admin')");
+    $stmt->execute([$companyId]);
+    $message = 'Yeni duyuru: ' . $title;
+    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $uid) {
+        qmsNotify($pdo, (int) $uid, 'announcement_published', 'Yeni Duyuru', $message, 'announcements.php');
+    }
+}
+
 /** Duyuruyu siler (aktif=0), kapsam icinde olmali. */
 function qmsAnnouncementDelete(PDO $pdo, int $id, int $userId, string $role): bool
 {

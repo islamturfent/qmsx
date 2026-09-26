@@ -7,7 +7,7 @@ require 'includes/notifications.php';
 $checks = 0;
 function nocCheck(bool $ok, string $name): void { global $checks; if (!$ok) throw new RuntimeException('FAIL: ' . $name); $checks++; echo 'PASS: ' . $name . PHP_EOL; }
 
-$tables = ['companies','users','company_admin_assignments','nonconformities','corrective_actions','trainings','equipment','external_audits','external_audit_findings','documents','complaints','notifications'];
+$tables = ['companies','users','company_admin_assignments','nonconformities','corrective_actions','trainings','equipment','external_audits','external_audit_findings','documents','complaints','suppliers','supplier_evaluation_schedule','notifications'];
 foreach ($tables as $t) {
     $s = $pdo->query("SHOW CREATE TABLE $t")->fetch(PDO::FETCH_NUM)[1];
     $s = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $s);
@@ -19,6 +19,8 @@ $pdo->exec("INSERT INTO company_admin_assignments(company_id,admin_user_id,activ
 // Bu kullanici hem sorumlu hem admin; geciken duzeltici faaliyet sorumlu kullaniciya gider.
 $pdo->exec("INSERT INTO nonconformities(id,company_id,audit_id,source,title,severity,status,due_date,active) VALUES (99941,99941,0,'audit','NC','major','open','2099-01-01',1)");
 $pdo->exec("INSERT INTO corrective_actions(id,nonconformity_id,action_type,action_text,responsible_user_id,due_date,status,active) VALUES (99941,99941,'corrective','Late Fix',99941,'2020-01-01','in_progress',1)");
+$pdo->exec("INSERT INTO suppliers(id,company_id,name,status,active) VALUES (99941,99941,'Sup A','approved',1)");
+$pdo->exec("INSERT INTO supplier_evaluation_schedule(id,supplier_id,company_id,cycle_label,due_date,status,active) VALUES (99941,99941,99941,'Q1 2026','2020-01-01','planned',1)");
 
 // Ilk calistirma: bildirim uretilir.
 ob_start();
@@ -26,7 +28,7 @@ include __DIR__ . '/../scripts/notify-overdue.php';
 $out1 = ob_get_clean();
 $n = (int) $pdo->query("SELECT COUNT(*) FROM notifications WHERE user_id=99941 AND notification_type='overdue_action'")->fetchColumn();
 nocCheck($n === 1, 'First run creates one overdue_action notification');
-nocCheck(strpos($out1, 'Overdue notifications generated: 1') !== false, 'First run reports 1 generated');
+nocCheck(strpos($out1, 'Overdue notifications generated: 2') !== false, 'First run reports 2 generated (action + supplier eval)');
 
 // Ikinci calistirma: idempotent, yeni bildirim uretilmez.
 ob_start();
@@ -35,5 +37,9 @@ $out2 = ob_get_clean();
 $n2 = (int) $pdo->query("SELECT COUNT(*) FROM notifications WHERE user_id=99941 AND notification_type='overdue_action'")->fetchColumn();
 nocCheck($n2 === 1, 'Second run does not duplicate the notification (idempotent)');
 nocCheck(strpos($out2, 'Overdue notifications generated: 0') !== false, 'Second run reports 0 generated');
+
+// Vadesi gecen tedarikci degerlendirme: admin'e overdue_supplier_eval bildirimi.
+$ns = (int) $pdo->query("SELECT COUNT(*) FROM notifications WHERE user_id=99941 AND notification_type='overdue_supplier_eval'")->fetchColumn();
+nocCheck($ns >= 1, 'Overdue supplier schedule notifies admin (overdue_supplier_eval)');
 
 echo "\nCompleted $checks notify-overdue checks using temporary tables.\n";

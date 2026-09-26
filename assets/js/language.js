@@ -1222,6 +1222,11 @@ Object.assign(translations.en, {
     notificationGroupReviewLabel: "Management Review"
 });
 
+translations.tr.notificationGroupAnnouncementLabel = "Duyuru";
+translations.tr.notificationGroupSurveyLabel = "Anket";
+translations.en.notificationGroupAnnouncementLabel = "Announcement";
+translations.en.notificationGroupSurveyLabel = "Survey";
+
 Object.assign(translations.tr, {
     reviewsTitle: "Yönetimin Gözden Geçirmesi", reviewsText: "Gözden geçirme toplantılarını, girdileri ve çıkan aksiyonları izleyin.",
     reviewRegisterKicker: "Gözden Geçirme Kayıtları", newReviewButton: "Yeni Gözden Geçirme",

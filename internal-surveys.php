@@ -54,17 +54,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "published" => isset($_POST["published"]),
             ], $userId, $role);
             if ($newId !== null) {
+                if (isset($_POST["published"])) {
+                    qmsInternalSurveyNotifyCompany($pdo, $companyId, $newId, (string) ($_POST["title"] ?? ""));
+                }
                 header("Location: internal-surveys.php?manage=" . $newId . "&added=1");
                 exit;
             }
             $formError = "Anket eklenemedi. Geçerli bir şirket ve başlık girin.";
         } else {
-            $ok = qmsInternalSurveyUpdate($pdo, (int) ($_POST["id"] ?? 0), [
+            $updateId = (int) ($_POST["id"] ?? 0);
+            $prior = qmsInternalSurveyFind($pdo, $updateId, $userId, $role);
+            $wasPublished = !empty($prior) && (int) $prior['published'] === 1;
+            $ok = qmsInternalSurveyUpdate($pdo, $updateId, [
                 "title" => (string) ($_POST["title"] ?? ""),
                 "description" => (string) ($_POST["description"] ?? ""),
                 "published" => isset($_POST["published"]),
             ], $userId, $role);
             if ($ok) {
+                if (isset($_POST["published"]) && !$wasPublished) {
+                    qmsInternalSurveyNotifyCompany($pdo, (int) ($prior['company_id'] ?? 0), $updateId, (string) ($_POST["title"] ?? ""));
+                }
                 header("Location: internal-surveys.php?updated=1");
                 exit;
             }

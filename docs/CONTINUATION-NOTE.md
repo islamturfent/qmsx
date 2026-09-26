@@ -70,8 +70,10 @@ carried over from earlier assumptions.
   | `tests/quality-plan.php` | 18 |
   | `tests/supplier-evaluations.php` | 15 |
   | `tests/report-export-data.php` | 12 |
+  | `tests/notify-overdue.php` | 5 |
+  | `tests/notify-modules.php` | 4 |
 
-  777 checks total (46 suites). All suites use temporary tables and leave real records
+  782 checks total (47 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -880,6 +882,23 @@ Birinci beşlik (Şablon, Duyuru, İç Anket, Yıllık Plan, Tedarikçi Takvimi)
 - `docTemplateSelect*` i18n; cache v80. (Önceki turda ertelenen madde tamamlandı.)
 
 Beşliyi derinleştirme setinin tamamı (1-5) tamamlandı ve commit'lendi.
+
+### Otomatik e-posta bildirimleri: duyuru / anket / tedarikçi gecikme (2026-09-26)
+- Yeni bildirim türleri + grupları: `announcement_published` (grup `announcement`),
+  `internal_survey_published` (grup `survey`), `overdue_supplier_eval` (grup `supplier`).
+  `notifications.php`'te tür/ikon/grup + grup etiketleri ve i18n eklendi.
+- `qmsAnnouncementNotifyCompany()`: duyuru yayında olunca şirket kullanıcılarına
+  ve super adminlere `announcement_published` (bildirim + tercihe bağlı e-posta).
+  `announcements.php`'te yayınla (publish) ve yayında ekleme akışlarında çağrılır.
+- `qmsInternalSurveyNotifyCompany()`: anket yayında olunca "doldur" daveti
+  (`internal_survey_published`, link `internal-survey-fill.php?fill=ID`).
+  `internal-surveys.php`'te yayında ekleme/yayına geçişte çağrılır.
+- `scripts/notify-overdue.php`'e vadesi geçen tedarikçi değerlendirme bölümü
+  eklendi (`overdue_supplier_eval`, şirket adminlerine; `--all` ile tüm kullanıcılar).
+- E-posta hepsi `qmsNotify` → tercihe bağlı (`notification_preferences`) akışını
+  kullanır; SMTP etkin değilse sessizce atlanır.
+- Testler: `tests/notify-modules.php` (4 kontrol) yeni; `tests/notify-overdue.php`
+  4 → 5 kontrol. Cache v81.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

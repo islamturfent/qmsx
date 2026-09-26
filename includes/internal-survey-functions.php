@@ -151,6 +151,24 @@ function qmsInternalSurveyDeleteQuestion(PDO $pdo, int $questionId, int $userId,
     return true;
 }
 
+/**
+ * Yayinda bir anket icin sirketin kullanicilarina (ve super adminlere)
+ * "doldur" bildirimi + e-posta gonderir. Sessiz; e-posta tercihe bagli.
+ */
+function qmsInternalSurveyNotifyCompany(PDO $pdo, int $companyId, int $surveyId, string $title): void
+{
+    if ($companyId <= 0) {
+        return;
+    }
+    require_once __DIR__ . '/notifications.php';
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE active = 1 AND (company_id = ? OR role = 'super_admin')");
+    $stmt->execute([$companyId]);
+    $message = 'Yeni iç memnuniyet anketi: ' . $title;
+    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $uid) {
+        qmsNotify($pdo, (int) $uid, 'internal_survey_published', 'Yeni Anket', $message, 'internal-survey-fill.php?fill=' . (int) $surveyId);
+    }
+}
+
 /** Bir soruya gelen yanit ozeti (ortalama + sayi). */
 function qmsInternalSurveyResults(PDO $pdo, int $surveyId): array
 {

@@ -49,6 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "published" => isset($_POST["published"]),
             ], $userId, $role);
             if ($newId !== null) {
+                if (isset($_POST["published"])) {
+                    qmsAnnouncementNotifyCompany($pdo, $companyId, $newId, (string) ($_POST["title"] ?? ""));
+                }
                 header("Location: announcements.php?added=1");
                 exit;
             }
@@ -73,11 +76,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $targetId = (int) ($_POST["id"] ?? 0);
         $target = qmsAnnouncementFind($pdo, $targetId, $userId, $role);
         if ($target) {
+            $wasPublished = (int) $target["published"] === 1;
             qmsAnnouncementUpdate($pdo, $targetId, [
                 "title" => (string) $target["title"],
                 "body" => (string) $target["body"],
-                "published" => (int) $target["published"] === 0,
+                "published" => !$wasPublished,
             ], $userId, $role);
+            if (!$wasPublished) {
+                qmsAnnouncementNotifyCompany($pdo, (int) $target["company_id"], $targetId, (string) $target["title"]);
+            }
         }
         header("Location: announcements.php");
         exit;
