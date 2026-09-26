@@ -73,6 +73,25 @@ function qmsAuditLogEntityIcons(): array
     ];
 }
 
+/**
+ * Kayit kumesini kayit turu ve islem bazinda toplar.
+ * @return array{total:int, entity:array<string,int>, action:array<string,int>}
+ */
+function qmsAuditLogAggregate(array $rows): array
+{
+    $entityCounts = array_fill_keys(array_keys(qmsAuditLogEntityLabels()), 0);
+    $actionCounts = array_fill_keys(array_keys(qmsAuditLogActionLabels()), 0);
+    foreach ($rows as $entry) {
+        if (isset($entityCounts[$entry['entity_type']])) {
+            $entityCounts[$entry['entity_type']]++;
+        }
+        if (isset($actionCounts[$entry['action']])) {
+            $actionCounts[$entry['action']]++;
+        }
+    }
+    return ['total' => count($rows), 'entity' => $entityCounts, 'action' => $actionCounts];
+}
+
 /** Bir denetim izi kaydi ekler; salt-ekle tabloya yazar. */
 function qmsAuditLog(
     PDO $pdo,

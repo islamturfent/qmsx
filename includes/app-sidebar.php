@@ -246,6 +246,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("checkBadge") ?>
             <span data-i18n="auditTrailMenuLabel">Denetim İzi</span>
         </a>
+        <a class="<?= sidebarLinkClass("audit_trail_report", $activeNav) ?>" href="audit-trail-report.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="auditTrailReportTitle">Denetim İzi Raporu</span>
+        </a>
         <?php endif; ?>
         <?php endif; /* canSeeOperations */ ?>
 
