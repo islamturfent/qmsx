@@ -201,6 +201,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("alert") ?>
             <span data-i18n="incidentsMenuLabel">Olay Raporlama</span>
         </a>
+        <a class="<?= sidebarLinkClass("instruments", $activeNav) ?>" href="instruments.php">
+            <?= appIcon("clock") ?>
+            <span data-i18n="instrumentsMenuLabel">Kalibrasyon & Metroloji</span>
+        </a>
         <a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="documents.php">
             <?= appIcon("documents") ?>
             <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>

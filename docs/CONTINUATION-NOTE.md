@@ -74,8 +74,9 @@ carried over from earlier assumptions.
   | `tests/dashboard-trend.php` | 22 |
   | `tests/notify-overdue.php` | 7 |
   | `tests/incidents.php` | 12 |
+  | `tests/instruments.php` | 14 |
 
-  847 checks total (50 suites). All suites use temporary tables and leave real records
+  861 checks total (51 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -991,6 +992,18 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 - Menü: Operasyonlar → Olay Raporlama. i18n TR/EN; cache v87.
 - Test: `tests/incidents.php` (12 kontrol). Bundan sonra bildirim + rapor
   export'una bağlanabilmeye hazır.
+
+### Yeni yüzey: Kalibrasyon & Metroloji takvimi (2026-09-26)
+- Schema: `instruments` (migration `20261006-instruments.sql`, idempotent runner
+  `scripts/migrate-instruments.php`). Ölçü aletleri: kod, ad, tip, konum,
+  kalibrasyon aralığı (ay), son/sonraki kalibrasyon tarihi, sorumlu, durum.
+- Sayfa: `instruments.php` - CRUD + KPI kartları (aktif/kalibrasyonu geçen/toplam)
+  + durum & "kalibrasyonu geçen" filtresi + hızlı "Kalibre Et" (son=bugün,
+  sonraki=bugün+aralık). Geç kalibrasyonlar `overdue-badge` ile vurgulanır.
+- Yardımcılar: `includes/instrument-functions.php` (`qmsInstrumentList/Find/Add/
+  Update/Delete/Calibrate` + `qmsInstrumentStatusLabel`). Kapsam: aletin şirketi.
+- Menü: Operasyonlar → Kalibrasyon & Metroloji. i18n TR/EN; cache v88.
+- Test: `tests/instruments.php` (14 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
