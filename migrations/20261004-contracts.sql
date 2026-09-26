@@ -1,0 +1,20 @@
+CREATE TABLE contracts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    contract_code VARCHAR(40) NULL,
+    contract_name VARCHAR(190) NOT NULL,
+    party_name VARCHAR(190) NULL,
+    contract_type VARCHAR(20) NOT NULL DEFAULT 'customer',
+    start_date DATE NULL,
+    end_date DATE NULL,
+    renewal_date DATE NULL,
+    value_amount DECIMAL(14,2) NULL,
+    currency VARCHAR(8) NOT NULL DEFAULT 'TRY',
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    notes TEXT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_by INT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_contracts_company (company_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

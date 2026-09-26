@@ -73,8 +73,9 @@ carried over from earlier assumptions.
   | `tests/improvements.php` | 14 |
   | `tests/report-export-data.php` | 15 |
   | `tests/processes.php` | 11 |
+  | `tests/contracts.php` | 12 |
 
-  816 checks total (48 suites). All suites use temporary tables and leave real records
+  828 checks total (49 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -954,6 +955,18 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
   Delete` + `qmsProcessStatusLabel`).
 - Menü: Operasyonlar → Süreç Envanteri. i18n TR/EN; cache v84.
 - Test: `tests/processes.php` (11 kontrol).
+
+### Yeni yüzey: Sözleşme Yönetimi (2026-09-26)
+- Schema: `contracts` (migration `20261004-contracts.sql`, idempotent runner
+  `scripts/migrate-contracts.php`). Sözleşme kod, ad, taraf, tür (müşteri/
+  tedarikçi/diğer), başlangıç/bitiş/yenileme tarihi, tutar, para birimi, durum.
+- Sayfa: `contracts.php` - CRUD + KPI kartları (aktif/süresi doluyor/toplam) +
+  durum & "süresi doluyor" filtresi; aktif & bitişi ≤60 gün sözleşmelerde
+  `expiring` rozeti (görünüm, manuel duruma dokunmaz).
+- Yardımcılar: `includes/contract-functions.php` (`qmsContractList/Find/Add/Update/
+  Delete` + `qmsContractStatusLabel`). Kapsam: sözleşmenin şirketi.
+- Menü: Operasyonlar → Sözleşme Yönetimi. i18n TR/EN; cache v85.
+- Test: `tests/contracts.php` (12 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
