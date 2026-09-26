@@ -2266,6 +2266,29 @@ body {
     font-weight: 500;
 }
 
+.muted-block {
+    color: var(--muted-color);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 18px;
+}
+
+.rating-bar {
+    display: inline-block;
+    height: 8px;
+    width: 130px;
+    background: var(--neutral-soft);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    display: block;
+    height: 100%;
+    background: var(--success-500);
+    border-radius: 999px;
+}
+
 .empty-state {
     border: 1px dashed var(--border-control);
     border-radius: 12px;

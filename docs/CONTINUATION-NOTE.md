@@ -66,8 +66,9 @@ carried over from earlier assumptions.
   | `tests/my-assignments.php` | 5 |
   | `tests/document-templates.php` | 10 |
   | `tests/announcements.php` | 11 |
+  | `tests/internal-survey.php` | 22 |
 
-  719 checks total (43 suites). All suites use temporary tables and leave real records
+  741 checks total (44 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -792,6 +793,26 @@ dokunulmaz.
   `isset()` yerine `!empty()` ile yorumlar, aksi halde "yayından kaldır"
   (checked kaldırılmış onay kutusu) `published=1` olarak kaydedilirdi. Test bunu
   yakaladı ve düzeltti.
+
+### İç Memnuniyet Anketi (Task 3) - tamamlandı
+
+- Schema: `internal_surveys` + `internal_survey_questions` +
+  `internal_survey_responses` (migration `20261001-internal-survey.sql`, idempotent
+  runner `scripts/migrate-internal-survey.php`). Yanıtlar kullanıcı bazlıdır ve
+  anket+soru+kullanıcı üçlüsünde tektir (UNIQUE).
+- Sayfalar:
+  - `internal-surveys.php` - yönetim: anket CRUD + soru ekle/sil + sonuç
+    ortalamaları (1-5 ölçek, `rating-bar` ile görsel).
+  - `internal-survey-fill.php` - doldurma: yayındaki ve henüz yanıtlanmamış
+    anketleri listeler, 1-5/ metin sorularını kaydeder, tekrar yanıtı reddeder.
+- Yardımcılar: `includes/internal-survey-functions.php`
+  (`qmsInternalSurveyList/Find/Add/Update/Delete`, `AddQuestion/DeleteQuestion`,
+  `Results`, `HasResponded`, `FillableSurveys`, `Submit`).
+- Menü: Operasyonlar → İç Memnuniyet Anketi + Anketi Doldur. i18n TR+EN eklendi.
+- Test: `tests/internal-survey.php` (22 kontrol).
+- CSS: `.muted-block`, `.rating-bar`, `.rating-bar-fill` eklendi (TailAdmin tokenları).
+- Not: müşteri memnuniyet modülünden ayrıdır; bu modül çalışan/İK memnuniyetini
+  ölçer ve yanıt sahibi kullanıcıdır (müşteri değil).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
