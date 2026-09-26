@@ -1143,6 +1143,14 @@ aletler sayfasinda "Gecmis" butonu + menuye "Kalibrasyon Gecmisi".
     hover bg) yeniden boyutlandirildi; `assets/css/style.css`.
 - i18n TR/EN (notificationPanelTitle/Empty/SeeAll); cache v96.
 
+### Header kullanici menusu -> TailAdmin birebir (2026-10-08)
+- `sidebar.js` kullanici menusu yeniden kuruldu: tetik avatar + ad/rol (iki satir)
+  + chevron SVG; dropdown basligi avatar + ad + rol; maddeler ikon + etiket
+  (Profil/user, Hesap Ayarlari/cog, Sifre/key, ayrac, Cikis/logout).
+- `appIcon()`'a `user`,`cog`,`key`,`chevronDown` ikonlari; app-sidebar gizli
+  ikon span'lari + i18n `accountSettingsMenuLabel`.
+- `.user-menu-*` TailAdmin olcultur (iki satir id, ikonlu madde, ayrac). cache v98.
+
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
 Executive overview added to `dashboard.php` (the dashboard already had audit /

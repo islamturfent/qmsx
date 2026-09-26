@@ -124,6 +124,12 @@ if (userMenuState && topbarActions && languageButton) {
     const userInitials = userMenuState.dataset.initials || "";
     const hasAvatar = userMenuState.dataset.avatar === "1";
 
+    const iconUser = (document.getElementById("qmsIconUserMenuUser") || {}).innerHTML || "";
+    const iconCog = (document.getElementById("qmsIconUserMenuCog") || {}).innerHTML || "";
+    const iconKey = (document.getElementById("qmsIconUserMenuKey") || {}).innerHTML || "";
+    const iconChevron = (document.getElementById("qmsIconUserMenuChevron") || {}).innerHTML || "";
+    const iconLogout = (document.getElementById("qmsIconUserMenuLogout") || {}).innerHTML || "";
+
     const wrapper = document.createElement("div");
     wrapper.className = "user-menu";
 
@@ -144,45 +150,72 @@ if (userMenuState && topbarActions && languageButton) {
         avatar.textContent = userInitials;
     }
 
+    // TailAdmin: avatar + ad/rol (iki satir) + chevron SVG.
+    const textBlock = document.createElement("span");
+    textBlock.className = "user-menu-id";
     const nameSpan = document.createElement("span");
     nameSpan.className = "user-menu-name";
     nameSpan.textContent = userName;
+    const roleSpan = document.createElement("span");
+    roleSpan.className = "user-menu-role";
+    roleSpan.textContent = userRole;
+    textBlock.appendChild(nameSpan);
+    textBlock.appendChild(roleSpan);
 
-    const caret = document.createElement("span");
-    caret.setAttribute("aria-hidden", "true");
-    caret.className = "user-menu-caret";
-    caret.textContent = "\u25BE";
+    const chevron = document.createElement("span");
+    chevron.className = "user-menu-caret";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.innerHTML = iconChevron;
 
     toggle.appendChild(avatar);
-    toggle.appendChild(nameSpan);
-    toggle.appendChild(caret);
+    toggle.appendChild(textBlock);
+    toggle.appendChild(chevron);
 
     const dropdown = document.createElement("div");
     dropdown.className = "user-menu-dropdown";
     dropdown.hidden = true;
 
+    // TailAdmin basligi: avatar + ad + rol.
     const head = document.createElement("div");
     head.className = "user-menu-head";
+    const headAvatar = document.createElement("span");
+    headAvatar.className = "user-menu-avatar user-menu-head-avatar";
+    headAvatar.innerHTML = hasAvatar ? '<img src="avatar.php" alt="">' : userInitials;
+    const headText = document.createElement("div");
+    headText.className = "user-menu-head-text";
     const headName = document.createElement("strong");
     headName.textContent = userName;
     const headRole = document.createElement("span");
     headRole.textContent = userRole;
-    head.appendChild(headName);
-    head.appendChild(headRole);
+    headText.appendChild(headName);
+    headText.appendChild(headRole);
+    head.appendChild(headAvatar);
+    head.appendChild(headText);
     dropdown.appendChild(head);
 
-    [
-        { href: "profile.php", key: "profileTitle", fallback: "Profil" },
-        { href: "profile.php#editPassword", key: "profilePasswordTitle", fallback: "Şifre Değiştir" },
-        { href: "logout.php", key: "logoutLabel", fallback: "Çıkış" }
-    ].forEach(function (item) {
-        const link = document.createElement("a");
-        link.className = "user-menu-item";
-        link.href = item.href;
-        link.setAttribute("data-i18n", item.key);
-        link.textContent = item.fallback;
-        dropdown.appendChild(link);
-    });
+    // TailAdmin maddeleri: ikon + etiket.
+    function userMenuItem(href, icon, key, fallback) {
+        const a = document.createElement("a");
+        a.className = "user-menu-item";
+        a.href = href;
+        const ic = document.createElement("span");
+        ic.className = "user-menu-item-icon";
+        ic.innerHTML = icon;
+        const lbl = document.createElement("span");
+        lbl.setAttribute("data-i18n", key);
+        lbl.textContent = fallback;
+        a.appendChild(ic);
+        a.appendChild(lbl);
+        return a;
+    }
+
+    dropdown.appendChild(userMenuItem("profile.php", iconUser, "profileTitle", "Profil"));
+    dropdown.appendChild(userMenuItem("profile.php", iconCog, "accountSettingsMenuLabel", "Hesap Ayarları"));
+    dropdown.appendChild(userMenuItem("profile.php#editPassword", iconKey, "profilePasswordTitle", "Şifre Değiştir"));
+    const divider = document.createElement("div");
+    divider.className = "user-menu-divider";
+    dropdown.appendChild(divider);
+    dropdown.appendChild(userMenuItem("logout.php", iconLogout, "logoutLabel", "Çıkış"));
 
     toggle.addEventListener("click", function (event) {
         event.stopPropagation();

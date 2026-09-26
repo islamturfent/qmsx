@@ -59,6 +59,11 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 <span id="qmsIconSun" hidden><?= appIcon("sun", "") ?></span>
 <span id="qmsIconMoon" hidden><?= appIcon("moon", "") ?></span>
 <span id="qmsIconGlobe" hidden><?= appIcon("globe", "") ?></span>
+<span id="qmsIconUserMenuUser" hidden><?= appIcon("user", "") ?></span>
+<span id="qmsIconUserMenuCog" hidden><?= appIcon("cog", "") ?></span>
+<span id="qmsIconUserMenuKey" hidden><?= appIcon("key", "") ?></span>
+<span id="qmsIconUserMenuChevron" hidden><?= appIcon("chevronDown", "") ?></span>
+<span id="qmsIconUserMenuLogout" hidden><?= appIcon("logout", "") ?></span>
 <script type="application/json" id="qmsNotificationRecent"><?= json_encode($sidebarRecentNotifications, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
 <aside class="app-sidebar" id="appSidebar">

@@ -2863,15 +2863,42 @@ body {
     object-fit: cover;
 }
 
+.user-menu-id {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.25;
+}
+
 .user-menu-name {
     max-width: 150px;
-    /* TailAdmin: text-theme-sm font-medium mr-1 */
-    margin-right: 4px;
     overflow: hidden;
     font-size: 14px;
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.user-menu-role {
+    max-width: 150px;
+    overflow: hidden;
+    color: var(--muted-color);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-menu-caret {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-color);
+}
+
+.user-menu-caret svg {
+    display: block;
+    width: 18px;
+    height: 18px;
 }
 
 .user-menu-dropdown {
@@ -2894,28 +2921,43 @@ body {
 
 .user-menu-head {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    gap: 12px;
     border-bottom: 1px solid var(--border-row);
-    padding: 0 0 10px;
+    padding: 0 0 12px;
+    margin-bottom: 6px;
 }
 
-.user-menu-head strong {
+.user-menu-head-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 13px;
+}
+
+.user-menu-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-menu-head-text strong {
     color: var(--text-body);
     font-size: 14px;
     font-weight: 500;
 }
 
-.user-menu-head span {
+.user-menu-head-text span {
     color: var(--muted-color);
     font-size: 12px;
 }
 
 .user-menu-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     border-radius: 8px;
     color: var(--text-body);
-    padding: 8px 12px;
+    padding: 9px 12px;
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
@@ -2926,12 +2968,34 @@ body {
     text-decoration: none;
 }
 
+.user-menu-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--muted-color);
+}
+
+.user-menu-item-icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+.user-menu-divider {
+    height: 1px;
+    background: var(--border-row);
+    margin: 6px 0;
+}
+
 @media (max-width: 640px) {
-    .user-menu-name {
+    .user-menu-id {
         display: none;
     }
 
     .user-menu-toggle {
+        gap: 6px;
         padding: 0 6px;
     }
 }
