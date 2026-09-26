@@ -3561,6 +3561,12 @@ body.modal-open {
     font-size: 13px;
 }
 
+.primary-button-sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
 .cal-pill-overdue {
     background: var(--error-50) !important;
     color: var(--error-700) !important;

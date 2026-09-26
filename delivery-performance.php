@@ -69,6 +69,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         qmsDeliveryDelete($pdo, (int) ($_POST["id"] ?? 0), $userId, $role);
         header("Location: delivery-performance.php?deleted=1");
         exit;
+    } elseif ($formType === "create_nc") {
+        $nc = qmsDeliveryCreateNonconformity($pdo, (int) ($_POST["id"] ?? 0), $userId, $role);
+        if ($nc !== null) {
+            header("Location: nonconformity-detail.php?id=" . $nc);
+            exit;
+        }
+        $formError = "Uygunsuzluk oluşturulamadı (red miktarı 0 veya kayıt bulunamadı).";
     }
 }
 
@@ -170,6 +177,7 @@ if ($editing) {
                     <?php if (!$rows): ?><div class="empty-state" data-i18n="deliveryEmpty">Henüz teslimat kaydı yok.</div><?php endif; ?>
                     <?php foreach ($rows as $row): ?>
                         <?php $rate = qmsDeliveryOnTimeRate($row); ?>
+                        <?php $rowNc = (int) $row['quantity_rejected'] > 0 ? qmsDeliveryLinkedNonconformity($pdo, (int) $row['id']) : 0; ?>
                         <div class="admin-list-item">
                             <div class="list-item-main">
                                 <strong><?= htmlspecialchars($row['customer_name'], ENT_QUOTES, 'UTF-8') ?></strong>
@@ -178,6 +186,11 @@ if ($editing) {
                             <div class="list-item-side">
                                 <div class="progress-track" style="width:130px"><div class="progress-fill" style="width:<?= min(100, $rate) ?>%"></div></div>
                                 <a class="secondary-button secondary-button-sm" href="delivery-performance.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <?php if ($rowNc > 0): ?>
+                                    <a class="secondary-button secondary-button-sm" href="nonconformity-detail.php?id=<?= $rowNc ?>" data-i18n="deliveryNcOpenButton">Uygunsuzluğu Aç</a>
+                                <?php elseif ((int) $row['quantity_rejected'] > 0): ?>
+                                    <form method="post" action="delivery-performance.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="create_nc"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="primary-button primary-button-sm" type="submit" data-i18n="deliveryNcCreateButton">Uygunsuzluk Oluştur</button></form>
+                                <?php endif; ?>
                                 <form method="post" action="delivery-performance.php" onsubmit="return confirm('Kayıt silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="deliveryDelete">Sil</button></form>
                             </div>
                         </div>

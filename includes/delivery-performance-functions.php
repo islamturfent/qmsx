@@ -117,3 +117,50 @@ function qmsDeliveryOnTimeRate(array $row): float
     }
     return round(((int) $row['on_time_orders'] / $total) * 100, 1);
 }
+
+/**
+ * Teslimat kaydina bagli varsa uygunsuzluk id'si; yoksa 0.
+ * @param int $deliveryId delivery_performance.id
+ */
+function qmsDeliveryLinkedNonconformity(PDO $pdo, int $deliveryId): int
+{
+    $stmt = $pdo->prepare('SELECT id FROM nonconformities WHERE delivery_id = ? AND active = 1 ORDER BY id ASC LIMIT 1');
+    $stmt->execute([$deliveryId]);
+    return (int) ($stmt->fetchColumn() ?: 0);
+}
+
+/**
+ * Red miktari > 0 olan bir teslimat kaydindan uygunsuzluk (ve ardindan CAPA)
+ * olusturur. Kayit kapsam içinde ve red miktari pozitif olmalidir; tekrar
+ * cagirildiginda mevcut uygunsuzlugu dondurur (idempotent).
+ * @return int|null olusturulan uygunsuzluk id'si ya da basarisizlikta null
+ */
+function qmsDeliveryCreateNonconformity(PDO $pdo, int $deliveryId, int $userId, string $role): ?int
+{
+    $delivery = qmsDeliveryFind($pdo, $deliveryId, $userId, $role);
+    if (!$delivery) {
+        return null;
+    }
+    if ((int) $delivery['quantity_rejected'] <= 0) {
+        return null;
+    }
+    $linked = qmsDeliveryLinkedNonconformity($pdo, $deliveryId);
+    if ($linked > 0) {
+        return $linked;
+    }
+    $customer = trim((string) ($delivery['customer_name'] ?? ''));
+    $period = (string) ($delivery['period'] ?? '');
+    $title = 'Teslimat reddi: ' . ($customer !== '' ? $customer : 'Müşteri') . ($period !== '' ? ' (' . $period . ')' : '');
+    $description = 'Teslimat performans kaydında ' . (int) $delivery['quantity_rejected'] . ' adet reddedilen miktar kaydedildi.'
+        . ($customer !== '' ? ' Müşteri: ' . $customer : '');
+    $insert = $pdo->prepare('INSERT INTO nonconformities
+        (company_id, audit_id, source, title, description, severity, status, delivery_id, active)
+        VALUES (?, NULL, \'delivery\', ?, ?, \'major\', \'open\', ?, 1)');
+    $insert->execute([
+        (int) $delivery['company_id'],
+        mb_substr($title, 0, 255),
+        mb_substr($description, 0, 4000),
+        $deliveryId,
+    ]);
+    return (int) $pdo->lastInsertId();
+}

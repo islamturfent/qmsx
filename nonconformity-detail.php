@@ -55,6 +55,8 @@ if ($ncSource === 'complaint') {
     $complaintLinkStmt->execute([$nonconformityId]);
     $linkedComplaintId = (int) ($complaintLinkStmt->fetchColumn() ?: 0);
 }
+$linkedIncidentId = (int) ($nonconformity["incident_id"] ?? 0);
+$linkedDeliveryId = (int) ($nonconformity["delivery_id"] ?? 0);
 
 $formError = "";
 $allowedSeverities = ["minor", "major", "critical"];
@@ -197,6 +199,10 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                         <?= htmlspecialchars($nonconformity["company_name"], ENT_QUOTES, "UTF-8") ?>
                         <?php if ($ncSource === 'complaint'): ?>
                         · <span data-i18n="ncComplaintSourceLabel">Şikayet Kaynağı</span>
+                        <?php elseif ($ncSource === 'incident'): ?>
+                        · <span data-i18n="ncIncidentSourceLabel">Olay Kaynağı</span>
+                        <?php elseif ($ncSource === 'delivery'): ?>
+                        · <span data-i18n="ncDeliverySourceLabel">Teslimat Kaynağı</span>
                         <?php else: ?>
                         · <?= htmlspecialchars($nonconformity["audit_title"], ENT_QUOTES, "UTF-8") ?>
                         <?php endif; ?>
@@ -204,6 +210,10 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                 </div>
                 <?php if ($linkedComplaintId > 0): ?>
                     <a class="secondary-button" href="complaint-detail.php?id=<?= $linkedComplaintId ?>" data-i18n="backToComplaintButton">Şikayete Dön</a>
+                <?php elseif ($linkedIncidentId > 0): ?>
+                    <a class="secondary-button" href="incident-detail.php?id=<?= $linkedIncidentId ?>" data-i18n="backToIncidentButton">Olay Detayına Dön</a>
+                <?php elseif ($linkedDeliveryId > 0): ?>
+                    <a class="secondary-button" href="delivery-performance.php?edit=<?= $linkedDeliveryId ?>" data-i18n="backToDeliveryButton">Teslimata Dön</a>
                 <?php else: ?>
                     <a class="secondary-button" href="audit-detail.php?id=<?= (int) $nonconformity["audit_id"] ?>" data-i18n="backToAuditButton">Denetime Dön</a>
                 <?php endif; ?>
@@ -371,6 +381,20 @@ $closedActionCount = count(array_filter($correctiveActions, static function ($ac
                             <div>
                                 <strong data-i18n="sourceLabel">Kaynak</strong>
                                 <span data-i18n="ncComplaintSourceValueLabel">Şikayet</span>
+                            </div>
+                        </a>
+                    <?php elseif ($ncSource === 'incident' && $linkedIncidentId > 0): ?>
+                        <a class="admin-list-item" href="incident-detail.php?id=<?= $linkedIncidentId ?>">
+                            <div>
+                                <strong data-i18n="sourceLabel">Kaynak</strong>
+                                <span data-i18n="ncIncidentSourceValueLabel">Olay</span>
+                            </div>
+                        </a>
+                    <?php elseif ($ncSource === 'delivery' && $linkedDeliveryId > 0): ?>
+                        <a class="admin-list-item" href="delivery-performance.php?edit=<?= $linkedDeliveryId ?>">
+                            <div>
+                                <strong data-i18n="sourceLabel">Kaynak</strong>
+                                <span data-i18n="ncDeliverySourceValueLabel">Teslimat Performansı</span>
                             </div>
                         </a>
                     <?php else: ?>
