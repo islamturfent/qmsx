@@ -72,8 +72,9 @@ carried over from earlier assumptions.
   | `tests/dashboard-trend.php` | 21 |
   | `tests/improvements.php` | 14 |
   | `tests/report-export-data.php` | 15 |
+  | `tests/processes.php` | 11 |
 
-  805 checks total (47 suites). All suites use temporary tables and leave real records
+  816 checks total (48 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -943,6 +944,16 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 - Dashboard: "İyileştirme" KPI kartı + açık iyileştirme önerileri için özel OFI
   widget'ı (öncelik rozeti: yüksek/normal/düşük). `ofi-*` CSS, i18n; cache v83.
 - `tests/notify-modules.php` 4 → 6 kontrol.
+
+### Yeni modül: Süreç Envanteri / Proses Yönetimi (2026-09-26)
+- Schema: `processes` (migration `20261003-processes.sql`, idempotent runner
+  `scripts/migrate-processes.php`). Şirket süreçleri: kod, ad, departman, sahip,
+  amaç, girdi/çıktı, KPI, gözden geçirme tarihi, durum (active/paused).
+- Sayfa: `processes.php` - CRUD + KPI kartları (aktif/toplam) + durum filtresi.
+- Yardımcılar: `includes/process-functions.php` (`qmsProcessList/Find/Add/Update/
+  Delete` + `qmsProcessStatusLabel`).
+- Menü: Operasyonlar → Süreç Envanteri. i18n TR/EN; cache v84.
+- Test: `tests/processes.php` (11 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
