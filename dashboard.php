@@ -39,6 +39,10 @@ require_once __DIR__ . '/includes/report-export-data.php';
 require_once __DIR__ . '/includes/dashboard-functions.php';
 require_once __DIR__ . '/includes/performance-functions.php';
 require_once __DIR__ . '/includes/due-workbench-functions.php';
+require_once __DIR__ . '/includes/announcement-functions.php';
+
+// Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
+$dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -155,6 +159,13 @@ $activeNav = "dashboard";
                     <strong class="dashboard-card-number"><?= $documentCount ?></strong>
                 </div>
             </a>
+            <a class="dashboard-card metric-teal" href="announcements.php">
+                <?= appIcon("complaints", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="dashboardAnnouncementsCardLabel">Duyurular</span>
+                    <strong class="dashboard-card-number"><?= count($dashboardAnnouncements) ?></strong>
+                </div>
+            </a>
         </section>
 
         <section class="page-section console-card">
@@ -179,6 +190,27 @@ $activeNav = "dashboard";
                 </a>
             </div>
         </section>
+
+        <?php if ($dashboardAnnouncements): ?>
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("complaints", "heading-inline-icon") ?><span data-i18n="dashboardAnnouncementsTitle">Yayındaki Duyurular</span></h3>
+                    <p data-i18n="dashboardAnnouncementsText">Şirketiniz için yayınlanan güncel duyurular.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="announcements.php" data-i18n="dashboardAnnouncementsMoreLink">Tümü</a>
+            </div>
+            <div class="announcement-feed">
+                <?php foreach (array_slice($dashboardAnnouncements, 0, 5) as $ann): ?>
+                    <div class="announcement-item">
+                        <strong><?= htmlspecialchars($ann['title'], ENT_QUOTES, 'UTF-8') ?></strong>
+                        <?php if ($ann['body']): ?><p><?= htmlspecialchars(mb_substr((string) $ann['body'], 0, 220), ENT_QUOTES, 'UTF-8') ?><?= mb_strlen((string) $ann['body']) > 220 ? '…' : '' ?></p><?php endif; ?>
+                        <small><?= htmlspecialchars((string) $ann['created_at'], ENT_QUOTES, 'UTF-8') ?><?= $ann['creator_name'] ? ' · ' . htmlspecialchars($ann['creator_name'], ENT_QUOTES, 'UTF-8') : '' ?></small>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
 
         <section class="page-section console-card summary-card">
             <div class="section-heading compact-heading">

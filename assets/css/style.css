@@ -2295,6 +2295,37 @@ body {
     gap: 8px;
 }
 
+.announcement-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.announcement-item {
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    background: var(--surface-color);
+    padding: 14px 16px;
+}
+
+.announcement-item strong {
+    font-size: 15px;
+}
+
+.announcement-item p {
+    color: var(--muted-color);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 6px 0 0;
+}
+
+.announcement-item small {
+    display: block;
+    color: var(--muted-color);
+    font-size: 12px;
+    margin-top: 6px;
+}
+
 .empty-state {
     border: 1px dashed var(--border-control);
     border-radius: 12px;

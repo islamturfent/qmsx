@@ -2504,6 +2504,16 @@ translations.en.supplierEvalOverdueBadge = "Overdue";
 translations.en.supplierEvalDoneBadge = "Done";
 translations.en.supplierEvalPlannedBadge = "Planned";
 
+// --- Dashboard duyuru yüzeyi ---
+translations.tr.dashboardAnnouncementsCardLabel = "Duyurular";
+translations.tr.dashboardAnnouncementsTitle = "Yayındaki Duyurular";
+translations.tr.dashboardAnnouncementsText = "Şirketiniz için yayınlanan güncel duyurular.";
+translations.tr.dashboardAnnouncementsMoreLink = "Tümü";
+translations.en.dashboardAnnouncementsCardLabel = "Announcements";
+translations.en.dashboardAnnouncementsTitle = "Latest Announcements";
+translations.en.dashboardAnnouncementsText = "Recent announcements published for your company.";
+translations.en.dashboardAnnouncementsMoreLink = "All";
+
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {
