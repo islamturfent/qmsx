@@ -42,6 +42,9 @@ require_once __DIR__ . '/includes/due-workbench-functions.php';
 require_once __DIR__ . '/includes/announcement-functions.php';
 require_once __DIR__ . '/includes/quality-plan-functions.php';
 require_once __DIR__ . '/includes/improvement-functions.php';
+require_once __DIR__ . '/includes/instrument-functions.php';
+require_once __DIR__ . '/includes/incident-functions.php';
+require_once __DIR__ . '/includes/contract-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
@@ -57,6 +60,13 @@ if (!$dashboardCurrentPlans) {
 
 // Acik iyilestirme firsatlari (OFI) widget'i.
 $dashboardImprovements = qmsImprovementList($pdo, $userId, qmsCurrentRole(), 'open');
+
+// Metroloji / olay / sozlesme widget verileri.
+$dashboardOverdueInstruments = qmsInstrumentList($pdo, $userId, qmsCurrentRole(), 'overdue');
+$dashboardOpenIncidents = qmsIncidentList($pdo, $userId, qmsCurrentRole(), 'open');
+$dashboardExpiringContracts = array_values(array_filter(qmsContractList($pdo, $userId, qmsCurrentRole(), ''), static fn($c): bool =>
+    $c['status'] === 'active' && $c['end_date'] !== null && (string) $c['end_date'] <= date('Y-m-d', strtotime('+60 days'))
+));
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -194,6 +204,27 @@ $activeNav = "dashboard";
                     <strong class="dashboard-card-number"><?= count($dashboardImprovements) ?></strong>
                 </div>
             </a>
+            <a class="dashboard-card metric-red" href="instruments.php">
+                <?= appIcon("clock", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="dashboardCalibrationCardLabel">Kalib. Geçen</span>
+                    <strong class="dashboard-card-number"><?= count($dashboardOverdueInstruments) ?></strong>
+                </div>
+            </a>
+            <a class="dashboard-card metric-orange" href="incidents.php">
+                <?= appIcon("alert", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="dashboardIncidentsCardLabel">Açık Olay</span>
+                    <strong class="dashboard-card-number"><?= count($dashboardOpenIncidents) ?></strong>
+                </div>
+            </a>
+            <a class="dashboard-card metric-teal" href="contracts.php">
+                <?= appIcon("approvals", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="dashboardContractsCardLabel">Yaklaşan Sözleşme</span>
+                    <strong class="dashboard-card-number"><?= count($dashboardExpiringContracts) ?></strong>
+                </div>
+            </a>
         </section>
 
         <section class="page-section console-card">
@@ -281,6 +312,75 @@ $activeNav = "dashboard";
                             <span><?= htmlspecialchars(qmsImprovementBenefitLabel($imp['benefit_type']), ENT_QUOTES, 'UTF-8') ?> · etki <?= htmlspecialchars(qmsImprovementLevelLabel($imp['impact']), ENT_QUOTES, 'UTF-8') ?><?= $imp['responsible'] ? ' · ' . htmlspecialchars($imp['responsible'], ENT_QUOTES, 'UTF-8') : '' ?></span>
                         </div>
                         <span class="ofi-priority prio-<?= htmlspecialchars($imp['priority'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars(qmsImprovementLevelLabel($imp['priority']), ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <?php if ($dashboardOverdueInstruments): ?>
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("clock", "heading-inline-icon") ?><span data-i18n="dashboardCalibrationWidgetTitle">Kalibrasyon Takvimi</span></h3>
+                    <p data-i18n="dashboardCalibrationWidgetText">Kalibrasyonu gecikmiş ölçü aletleri.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="instruments.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
+            </div>
+            <div class="ofi-widget-list">
+                <?php foreach (array_slice($dashboardOverdueInstruments, 0, 5) as $ins): ?>
+                    <div class="ofi-widget-item">
+                        <div class="ofi-widget-main">
+                            <strong><?= htmlspecialchars($ins['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= $ins['next_calibration_date'] ? 'sonraki ' . htmlspecialchars((string) $ins['next_calibration_date'], ENT_QUOTES, 'UTF-8') : '' ?><?= $ins['responsible'] ? ' · ' . htmlspecialchars($ins['responsible'], ENT_QUOTES, 'UTF-8') : '' ?></span>
+                        </div>
+                        <span class="ofi-priority prio-high" data-i18n="dashboardCalibrationOverdueBadge">Geçti</span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <?php if ($dashboardOpenIncidents): ?>
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("alert", "heading-inline-icon") ?><span data-i18n="dashboardIncidentsWidgetTitle">Açık Olaylar</span></h3>
+                    <p data-i18n="dashboardIncidentsWidgetText">Açık olay kayıtları; kritik olanlar önce.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="incidents.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
+            </div>
+            <div class="ofi-widget-list">
+                <?php foreach (array_slice($dashboardOpenIncidents, 0, 5) as $inc): ?>
+                    <div class="ofi-widget-item">
+                        <div class="ofi-widget-main">
+                            <strong><?= htmlspecialchars($inc['title'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= htmlspecialchars(qmsIncidentTypeLabel($inc['incident_type']), ENT_QUOTES, 'UTF-8') ?> · şiddet <?= htmlspecialchars(qmsIncidentSeverityLabel($inc['severity']), ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <?php if ($inc['severity'] === 'critical'): ?><span class="ofi-priority prio-high" data-i18n="dashboardIncidentCriticalBadge">Kritik</span><?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <?php if ($dashboardExpiringContracts): ?>
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("approvals", "heading-inline-icon") ?><span data-i18n="dashboardContractsWidgetTitle">Yaklaşan Sözleşmeler</span></h3>
+                    <p data-i18n="dashboardContractsWidgetText">60 gün içinde süresi dolacak aktif sözleşmeler.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="contracts.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
+            </div>
+            <div class="ofi-widget-list">
+                <?php foreach (array_slice($dashboardExpiringContracts, 0, 5) as $con): ?>
+                    <div class="ofi-widget-item">
+                        <div class="ofi-widget-main">
+                            <strong><?= htmlspecialchars($con['contract_name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= $con['end_date'] ? 'bitiş ' . htmlspecialchars((string) $con['end_date'], ENT_QUOTES, 'UTF-8') : '' ?><?= $con['party_name'] ? ' · ' . htmlspecialchars($con['party_name'], ENT_QUOTES, 'UTF-8') : '' ?></span>
+                        </div>
+                        <span class="ofi-priority prio-high" data-i18n="dashboardContractExpiringBadge">Yaklaşıyor</span>
                     </div>
                 <?php endforeach; ?>
             </div>

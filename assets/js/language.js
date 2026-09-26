@@ -2612,6 +2612,33 @@ translations.en.dashboardImprovementsWidgetTitle = "Improvement Opportunities";
 translations.en.dashboardImprovementsWidgetText = "Open improvement suggestions; high priority first.";
 translations.en.dashboardImprovementsMoreLink = "All";
 
+translations.tr.dashboardCalibrationCardLabel = "Kalib. Geçen";
+translations.tr.dashboardIncidentsCardLabel = "Açık Olay";
+translations.tr.dashboardContractsCardLabel = "Yaklaşan Sözleşme";
+translations.tr.dashboardWidgetMoreLink = "Tümü";
+translations.tr.dashboardCalibrationWidgetTitle = "Kalibrasyon Takvimi";
+translations.tr.dashboardCalibrationWidgetText = "Kalibrasyonu gecikmiş ölçü aletleri.";
+translations.tr.dashboardCalibrationOverdueBadge = "Geçti";
+translations.tr.dashboardIncidentsWidgetTitle = "Açık Olaylar";
+translations.tr.dashboardIncidentsWidgetText = "Açık olay kayıtları; kritik olanlar önce.";
+translations.tr.dashboardIncidentCriticalBadge = "Kritik";
+translations.tr.dashboardContractsWidgetTitle = "Yaklaşan Sözleşmeler";
+translations.tr.dashboardContractsWidgetText = "60 gün içinde süresi dolacak aktif sözleşmeler.";
+translations.tr.dashboardContractExpiringBadge = "Yaklaşıyor";
+translations.en.dashboardCalibrationCardLabel = "Overdue Calib.";
+translations.en.dashboardIncidentsCardLabel = "Open Incidents";
+translations.en.dashboardContractsCardLabel = "Upcoming Contracts";
+translations.en.dashboardWidgetMoreLink = "All";
+translations.en.dashboardCalibrationWidgetTitle = "Calibration Schedule";
+translations.en.dashboardCalibrationWidgetText = "Measuring instruments with overdue calibration.";
+translations.en.dashboardCalibrationOverdueBadge = "Overdue";
+translations.en.dashboardIncidentsWidgetTitle = "Open Incidents";
+translations.en.dashboardIncidentsWidgetText = "Open incident records; critical first.";
+translations.en.dashboardIncidentCriticalBadge = "Critical";
+translations.en.dashboardContractsWidgetTitle = "Upcoming Contracts";
+translations.en.dashboardContractsWidgetText = "Active contracts expiring within 60 days.";
+translations.en.dashboardContractExpiringBadge = "Expiring";
+
 // --- Süreç Envanteri ---
 translations.tr.processesMenuLabel = "Süreç Envanteri";
 translations.tr.processesTitle = "Süreç Envanteri";
