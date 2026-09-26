@@ -73,6 +73,9 @@ $metricLabels = [
     'delivery_count' => 'Teslimat Kaydı',
     'delivery_ontime_rate' => 'Zamanında Teslim (%)',
     'delivery_rejected' => 'Reddedilen Miktar',
+    'calibration_count' => 'Kalibrasyon Kaydı',
+    'calibration_fail' => 'Başarısız Kalibrasyon',
+    'audit_trail_count' => 'Denetim İzi Kaydı',
 ];
 
 $summaryRows = [
@@ -653,6 +656,46 @@ foreach ($report['delivery_list'] as $row) {
     ];
 }
 
+$calibrationRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Alet', 'style' => 2],
+    ['value' => 'Sonuç', 'style' => 2],
+    ['value' => 'Tarih', 'style' => 2],
+    ['value' => 'Sonraki', 'style' => 2],
+    ['value' => 'Laboratuvar', 'style' => 2],
+    ['value' => 'Sertifika No', 'style' => 2],
+]];
+foreach ($report['calibration_list'] as $row) {
+    $calibrationRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['instrument_name'], 'style' => 3],
+        ['value' => $row['result_label'], 'style' => 3],
+        ['value' => ($row['calibration_date'] ?? ''), 'style' => 3],
+        ['value' => ($row['due_date'] ?? ''), 'style' => 3],
+        ['value' => ($row['lab_name'] ?? ''), 'style' => 3],
+        ['value' => ($row['cert_number'] ?? ''), 'style' => 3],
+    ];
+}
+
+$auditTrailRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Kişi', 'style' => 2],
+    ['value' => 'Kayıt Türü', 'style' => 2],
+    ['value' => 'İşlem', 'style' => 2],
+    ['value' => 'Özet', 'style' => 2],
+    ['value' => 'Tarih', 'style' => 2],
+]];
+foreach ($report['audit_trail_list'] as $row) {
+    $auditTrailRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['actor_name'], 'style' => 3],
+        ['value' => $row['entity_label'], 'style' => 3],
+        ['value' => $row['action_label'], 'style' => 3],
+        ['value' => ($row['summary'] ?? ''), 'style' => 3],
+        ['value' => ($row['created_at'] ?? ''), 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -687,6 +730,8 @@ try {
         ['name' => 'Ölçü Aletleri', 'xml' => xlsxWorksheet($instrumentRows, [28, 34, 18, 20, 16, 16])],
         ['name' => 'Olaylar', 'xml' => xlsxWorksheet($incidentRows, [28, 40, 16, 14, 14, 16])],
         ['name' => 'Teslimat', 'xml' => xlsxWorksheet($deliveryRows, [28, 28, 12, 12, 14, 16, 16, 18])],
+        ['name' => 'Kalibrasyonlar', 'xml' => xlsxWorksheet($calibrationRows, [28, 28, 18, 14, 14, 14, 24, 18, 20])],
+        ['name' => 'Denetim İzi', 'xml' => xlsxWorksheet($auditTrailRows, [28, 22, 24, 18, 50, 20])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

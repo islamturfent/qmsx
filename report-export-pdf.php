@@ -248,6 +248,20 @@ foreach ($report['incident_list'] as $row) {
         . $escape($row['reported_at'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
 }
 
+$auditTrailRows = '';
+foreach ($report['audit_trail_list'] as $row) {
+    $auditTrailRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['actor_name']) . '</td><td>'
+        . $escape($row['entity_label']) . '</td><td>' . $escape($row['action_label']) . '</td><td>'
+        . $escape($row['summary'] ?? '') . '</td><td>' . $escape($row['created_at'] ?? '') . '</td></tr>';
+}
+
+$calibrationRows = '';
+foreach ($report['calibration_list'] as $row) {
+    $calibrationRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['instrument_name']) . '</td><td>'
+        . $escape($row['result_label']) . '</td><td>' . $escape($row['calibration_date'] ?? '') . '</td><td>'
+        . $escape($row['due_date'] ?? '') . '</td><td>' . $escape($row['cert_number'] ?? '-') . '</td></tr>';
+}
+
 $deliveryRows = '';
 foreach ($report['delivery_list'] as $row) {
     $deliveryRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['customer_name']) . '</td><td>'
@@ -345,6 +359,12 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Teslimat Kaydı</span><strong>' . $metrics['delivery_count'] . '</strong></td>
       <td class="metric"><span>Zamanında Teslim</span><strong>' . $metrics['delivery_ontime_rate'] . '%</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Kalibrasyon Kaydı</span><strong>' . $metrics['calibration_count'] . '</strong></td>
+      <td class="metric"><span>Başarısız Kalib.</span><strong>' . $metrics['calibration_fail'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Denetim İzi</span><strong>' . $metrics['audit_trail_count'] . '</strong></td>
+      <td class="metric"><span></span><strong></strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -376,6 +396,8 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Ölçü Aletleri', '<th>Şirket</th><th>Alet</th><th>Tip</th><th>Konum</th><th>Sonraki Kalib.</th><th>Durum</th>', $instrumentRows)
     . $detailSection('Olay Raporlama', '<th>Şirket</th><th>Olay</th><th>Tür</th><th>Şiddet</th><th>Tarih</th><th>Durum</th>', $incidentRows)
     . $detailSection('Teslimat Performansı', '<th>Şirket</th><th>Müşteri</th><th>Dönem</th><th>Sipariş</th><th>Zamanında (%)</th><th>Reddedilen</th>', $deliveryRows)
+    . $detailSection('Kalibrasyonlar', '<th>Şirket</th><th>Alet</th><th>Sonuç</th><th>Tarih</th><th>Sonraki</th><th>Sertifika No</th>', $calibrationRows)
+    . $detailSection('Denetim İzi', '<th>Şirket</th><th>Kişi</th><th>Kayıt Türü</th><th>İşlem</th><th>Özet</th><th>Tarih</th>', $auditTrailRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

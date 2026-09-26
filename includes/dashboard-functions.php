@@ -248,6 +248,18 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
     $deliveryRejected = (int) ($delRow['r'] ?? 0);
     $deliveryOnTimePct = $deliveryOrders > 0 ? (int) round(($deliveryOnTime / $deliveryOrders) * 100) : null;
 
+    $failedCalibrations = $agg(
+        'SELECT COUNT(*) FROM instrument_calibrations k
+         INNER JOIN instruments i ON i.id = k.instrument_id
+         INNER JOIN companies co ON co.id = k.company_id
+         WHERE k.active = 1 AND k.result = \'fail\'' . $scope['sql']
+    );
+
+    $auditTrailRecords = $agg(
+        'SELECT COUNT(*) FROM audit_log al
+         INNER JOIN companies co ON co.id = al.company_id' . $scope['sql']
+    );
+
     // En yogun ay (denetim bazinda).
     $topMonth = null;
     $topAudits = 0;
@@ -321,6 +333,14 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
         $points[] = ['tone' => $tone, 'text' => 'Teslimat performansı: ' . $deliveryOrders . ' siparişin %' . $deliveryOnTimePct . ' zamanında teslim edildi' . ($deliveryRejected > 0 ? ', ' . $deliveryRejected . ' adet reddedildi.' : '.')];
     } else {
         $points[] = ['tone' => 'neutral', 'text' => 'Teslimat performansı kaydı bulunmuyor.'];
+    }
+
+    if ($failedCalibrations > 0) {
+        $points[] = ['tone' => 'warning', 'text' => $failedCalibrations . ' başarısız kalibrasyon kaydı var.'];
+    }
+
+    if ($auditTrailRecords > 0) {
+        $points[] = ['tone' => 'neutral', 'text' => 'Denetim izinde ' . $auditTrailRecords . ' kayıt birikmiş durumda.'];
     }
 
     if ($complaints > 0) {

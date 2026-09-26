@@ -10,6 +10,7 @@ require_once __DIR__ . '/performance-functions.php';
 require_once __DIR__ . '/review-functions.php';
 require_once __DIR__ . '/audit-program-functions.php';
 require_once __DIR__ . '/equipment-functions.php';
+require_once __DIR__ . '/audit-log-functions.php';
 
 function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array $query): array
 {
@@ -663,6 +664,79 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     $deliveryCount = count($deliveryList);
     $deliveryOnTimeRate = $deliveryOrders > 0 ? round(($deliveryOnTime / $deliveryOrders) * 100, 1) : 0.0;
 
+    $calibrationsRaw = $fetchRows(
+        "SELECT k.id, k.instrument_id, k.calibration_date, k.due_date, k.result, k.cert_number, k.lab_name,
+                i.name AS instrument_name, i.instrument_code, companies.company_name
+         FROM instrument_calibrations k
+         INNER JOIN instruments i ON i.id = k.instrument_id
+         INNER JOIN companies ON companies.id = k.company_id
+         WHERE k.active = 1" . $scopeSql,
+        $scopeParams
+    );
+    usort($calibrationsRaw, static fn(array $a, array $b): int => strcmp((string) $a['instrument_name'], (string) $b['instrument_name']) ?: strcmp((string) $b['calibration_date'], (string) $a['calibration_date']));
+    $calibrationList = [];
+    $calibrationFail = 0;
+    foreach ($calibrationsRaw as $item) {
+        if ($item['result'] === 'fail') {
+            $calibrationFail++;
+        }
+        $calibrationList[] = [
+            'company_name' => $item['company_name'],
+            'instrument_name' => $item['instrument_name'],
+            'instrument_code' => $item['instrument_code'],
+            'calibration_date' => $item['calibration_date'],
+            'due_date' => $item['due_date'],
+            'result' => $item['result'],
+            'result_label' => ['pass' => 'Başarılı', 'fail' => 'Başarısız'][$item['result']] ?? $item['result'],
+            'lab_name' => $item['lab_name'],
+            'cert_number' => $item['cert_number'],
+        ];
+    }
+    $calibrationCount = count($calibrationList);
+
+    // Denetim izi: donemdeki kayitlar (kapsamli) + ozet. $fetchRows kullanilmaz
+    // cunku bu yardimci SQL'in sonuna 'AND companies.id = ?' ekler ve ORDER BY/LIMIT
+    // ile bozulur; burada kapsam + secili sirket filtreleri acikca kurulur.
+    $auditCompanyId = (int) ($query['company_id'] ?? 0);
+    $auditSql = "SELECT audit_log.id, audit_log.entity_type, audit_log.action, audit_log.summary,
+                audit_log.created_at, companies.company_name, users.full_name AS actor_name
+         FROM audit_log
+         LEFT JOIN companies ON companies.id = audit_log.company_id
+         LEFT JOIN users ON users.id = audit_log.actor_user_id
+         WHERE audit_log.created_at BETWEEN ? AND ?" . $scopeSql;
+    $auditP = $periodParams;
+    if ($auditCompanyId > 0) {
+        $auditSql .= ' AND audit_log.company_id = ?';
+        $auditP[] = $auditCompanyId;
+    }
+    $auditSql .= ' ORDER BY audit_log.id DESC LIMIT 300';
+    $auditStmt = $pdo->prepare($auditSql);
+    $auditStmt->execute($auditP);
+    $auditTrailRaw = $auditStmt->fetchAll(PDO::FETCH_ASSOC);
+    $auditAgg = qmsAuditLogAggregate($auditTrailRaw);
+    $entityLabels = qmsAuditLogEntityLabels();
+    $actionLabelsQ = qmsAuditLogActionLabels();
+    $auditTrailList = [];
+    foreach ($auditTrailRaw as $item) {
+        $auditTrailList[] = [
+            'company_name' => $item['company_name'] ?? 'Sistem',
+            'actor_name' => $item['actor_name'] ?? 'Sistem',
+            'entity_label' => $entityLabels[$item['entity_type']] ?? $item['entity_type'],
+            'action_label' => $actionLabelsQ[$item['action']] ?? $item['action'],
+            'summary' => (string) $item['summary'],
+            'created_at' => $item['created_at'],
+        ];
+    }
+    $countSql = 'SELECT COUNT(*) FROM audit_log WHERE audit_log.created_at BETWEEN ? AND ?' . $scopeSql;
+    $countP = $periodParams;
+    if ($auditCompanyId > 0) {
+        $countSql .= ' AND audit_log.company_id = ?';
+        $countP[] = $auditCompanyId;
+    }
+    $auditCountStmt = $pdo->prepare($countSql);
+    $auditCountStmt->execute($countP);
+    $auditTrailTotal = (int) $auditCountStmt->fetchColumn();
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -720,6 +794,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'delivery_count' => $deliveryCount,
         'delivery_ontime_rate' => $deliveryOnTimeRate,
         'delivery_rejected' => $deliveryRejected,
+        'calibration_count' => $calibrationCount,
+        'calibration_fail' => $calibrationFail,
+        'audit_trail_count' => $auditTrailTotal,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -1067,5 +1144,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'instrument_list' => $instrumentList,
         'incident_list' => $incidentList,
         'delivery_list' => $deliveryList,
+        'calibration_list' => $calibrationList,
+        'audit_trail_list' => $auditTrailList,
+        'audit_trail_entity' => $auditAgg['entity'],
+        'audit_trail_action' => $auditAgg['action'],
     ];
 }
