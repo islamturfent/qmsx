@@ -67,8 +67,9 @@ carried over from earlier assumptions.
   | `tests/document-templates.php` | 10 |
   | `tests/announcements.php` | 11 |
   | `tests/internal-survey.php` | 22 |
+  | `tests/quality-plan.php` | 18 |
 
-  741 checks total (44 suites). All suites use temporary tables and leave real records
+  759 checks total (45 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -813,6 +814,19 @@ dokunulmaz.
 - CSS: `.muted-block`, `.rating-bar`, `.rating-bar-fill` eklendi (TailAdmin tokenları).
 - Not: müşteri memnuniyet modülünden ayrıdır; bu modül çalışan/İK memnuniyetini
   ölçer ve yanıt sahibi kullanıcıdır (müşteri değil).
+
+### Yıllık Kalite Planı (Task 4) - tamamlandı
+
+- Schema: `quality_plans` (şirket+yıl tekil) + `quality_plan_items`
+  (migration `20261001-quality-plan.sql`, idempotent runner
+  `scripts/migrate-quality-plan.php`).
+- Sayfa: `quality-plan.php` - plan CRUD + yıl filtresi + kalem ekle/düzenle/sil
+  (kategori, hedef, hedef değer, sorumlu, bitiş tarihi, durum, ilerleme %).
+- Yardımcılar: `includes/quality-plan-functions.php`
+  (`qmsQualityPlanList/Find/Add/Update/Delete`, `Items/AddItem/UpdateItem/DeleteItem`).
+- Durum: `not_started / in_progress / completed / on_hold`; `qmsPlanStatusLabel()`.
+- Menü: Operasyonlar → Yıllık Kalite Planı. i18n TR+EN eklendi; `filter-inline` CSS.
+- Test: `tests/quality-plan.php` (18 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

@@ -2289,6 +2289,12 @@ body {
     border-radius: 999px;
 }
 
+.filter-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .empty-state {
     border: 1px dashed var(--border-control);
     border-radius: 12px;
