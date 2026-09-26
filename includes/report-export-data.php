@@ -449,6 +449,47 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         static fn(array $item): bool => $item['status'] === 'completed'
     );
 
+    $periodPair = [$startDate . ' 00:00:00', $endDate . ' 23:59:59'];
+    $internalParams = array_merge($periodPair, $periodPair, $periodPair, $scopeParams);
+    $internalSurveySql =
+        'SELECT s.id, s.title, companies.company_name AS company_name,
+                (SELECT COUNT(DISTINCT r.user_id) FROM internal_survey_responses r
+                 WHERE r.survey_id = s.id AND r.submitted_at BETWEEN ? AND ?) AS respondents,
+                (SELECT COUNT(r.id) FROM internal_survey_responses r
+                 WHERE r.survey_id = s.id AND r.submitted_at BETWEEN ? AND ?) AS answers,
+                (SELECT AVG(r.rating) FROM internal_survey_responses r
+                 WHERE r.survey_id = s.id AND r.submitted_at BETWEEN ? AND ?) AS avg_rating
+         FROM internal_surveys s
+         INNER JOIN companies ON companies.id = s.company_id
+         WHERE s.active = 1 AND s.published = 1' . $scopeSql;
+    if ($selectedCompanyId > 0) {
+        $internalSurveySql .= ' AND companies.id = ?';
+        $internalParams[] = $selectedCompanyId;
+    }
+    $internalSurveySql .= ' ORDER BY s.id DESC';
+    $internalSurveyStmt = $pdo->prepare($internalSurveySql);
+    $internalSurveyStmt->execute($internalParams);
+    $internalSurveys = $internalSurveyStmt->fetchAll(PDO::FETCH_ASSOC);
+    $internalSurveyList = [];
+    $internalSurveyRespondents = 0;
+    $internalSurveyAnswers = 0;
+    $internalSurveyScoreSum = 0.0;
+    foreach ($internalSurveys as $item) {
+        $internalSurveyRespondents += (int) $item['respondents'];
+        $internalSurveyAnswers += (int) $item['answers'];
+        if ($item['avg_rating'] !== null) {
+            $internalSurveyScoreSum += (float) $item['avg_rating'] * (int) $item['answers'];
+        }
+        $internalSurveyList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'respondents' => (int) $item['respondents'],
+            'answers' => (int) $item['answers'],
+            'avg_rating' => $item['avg_rating'] !== null ? round((float) $item['avg_rating'], 1) : null,
+        ];
+    }
+    $internalSurveyAvg = $internalSurveyAnswers > 0 ? round($internalSurveyScoreSum / $internalSurveyAnswers, 1) : null;
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -488,6 +529,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'approval_run_count' => $approvalRunCount,
         'approval_run_approved' => $approvalRunApproved,
         'approval_run_pending' => $approvalRunPending,
+        'internal_survey_count' => count($internalSurveyList),
+        'internal_survey_respondents' => $internalSurveyRespondents,
+        'internal_survey_avg' => $internalSurveyAvg,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -829,5 +873,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'quality_cost_trend' => $qualityCostTrend,
         'copy_list' => $copyList,
         'approval_run_list' => $approvalRunList,
+        'internal_survey_list' => $internalSurveyList,
     ];
 }

@@ -69,8 +69,9 @@ carried over from earlier assumptions.
   | `tests/internal-survey.php` | 22 |
   | `tests/quality-plan.php` | 18 |
   | `tests/supplier-evaluations.php` | 14 |
+  | `tests/report-export-data.php` | 12 |
 
-  773 checks total (46 suites). All suites use temporary tables and leave real records
+  776 checks total (46 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -844,6 +845,23 @@ dokunulmaz.
 - Test: `tests/supplier-evaluations.php` (14 kontrol).
 
 Birinci beşlik (Şablon, Duyuru, İç Anket, Yıllık Plan, Tedarikçi Takvimi) tamamlandı.
+
+## Beşliyi derinleştirme / mevcut altyapıya bağlama
+
+### 1. Dashboard duyuru yüzeyi (2026-09-26)
+- Dashboard'a yayındaki duyurular için KPI kartı + "Yayındaki Duyurular" liste
+  bölümü (`dashboard.php`) eklendi; kapsam `qmsAnnouncementList(..., publishedOnly=true)`.
+- `announcement-feed`/`announcement-item` CSS ve i18n eklendi; cache v78.
+
+### 2. İç memnuniyet anketi sonuçları rapor export'una (2026-09-26)
+- `report-export-data.php`: `internal_survey_list` bölümü + KPI'ler
+  (`internal_survey_count/respondents/avg`). Sorgu, `$fetchRows` yardımcısının
+  sona eklediği `AND companies.id = ?` ile çakıştığı için GROUP BY yerine
+  ilişkili alt sorgularla (correlated subqueries) yazıldı; tablo alias'sız
+  `companies` olarak kullanıldı (scope `companies.id`'i bu yüzden gerektirir).
+- `report-export-pdf.php`: "İç Memnuniyet Anketi" detay tablosu + 2 KPI metriği.
+- `report-export-xlsx.php`: "İç Anket" çalışma sayfası + 3 KPI etiketi.
+- `tests/report-export-data.php` 9 → 12 kontrol (iç anket bölümü doğrulanır).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

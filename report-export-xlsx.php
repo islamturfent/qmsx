@@ -55,6 +55,9 @@ $metricLabels = [
     'approval_run_count' => 'Onay Akışı Sayısı',
     'approval_run_approved' => 'Onaylanan Akış',
     'approval_run_pending' => 'Devam Eden Akış',
+    'internal_survey_count' => 'İç Anket Sayısı',
+    'internal_survey_respondents' => 'İç Anket Katılımcı',
+    'internal_survey_avg' => 'Ortalama İç Memnuniyet',
 ];
 
 $summaryRows = [
@@ -517,6 +520,23 @@ foreach ($report['approval_run_list'] as $row) {
     ];
 }
 
+$internalSurveyRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Anket', 'style' => 2],
+    ['value' => 'Katılımcı', 'style' => 2],
+    ['value' => 'Yanıt', 'style' => 2],
+    ['value' => 'Ortalama', 'style' => 2],
+]];
+foreach ($report['internal_survey_list'] as $row) {
+    $internalSurveyRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => $row['respondents'], 'style' => 3],
+        ['value' => $row['answers'], 'style' => 3],
+        ['value' => ($row['avg_rating'] !== null ? $row['avg_rating'] . '/5' : '-'), 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -545,6 +565,7 @@ try {
         ['name' => 'COQ Trendi', 'xml' => xlsxWorksheet($qualityCostTrendRows, [16, 14, 14, 14, 14, 16])],
         ['name' => 'Dağıtım', 'xml' => xlsxWorksheet($copyRows, [28, 40, 12, 20, 14, 14])],
         ['name' => 'Onay Akışları', 'xml' => xlsxWorksheet($approvalRunRows, [28, 40, 16, 20])],
+        ['name' => 'İç Anket', 'xml' => xlsxWorksheet($internalSurveyRows, [28, 40, 12, 12, 16])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';
