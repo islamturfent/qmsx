@@ -192,6 +192,17 @@ const translations = {
         clearFilterButton: "Temizle",
         auditTrailEntriesLabel: "Denetim İzi Kayıtları",
         noAuditTrailEntriesText: "Bu filtre için denetim izi kaydı bulunmuyor.",
+        auditTrailReportTitle: "Denetim İzi Raporu",
+        auditTrailReportText: "Değiştirilemeyen kayıtların filtreli özeti; CSV/PDF olarak dışa aktarılabilir.",
+        auditTrailSummaryTitle: "Özet",
+        auditTrailSummaryText: "Özet",
+        auditTrailEntitySummaryLabel: "Kayıt Türü",
+        auditTrailActionSummaryLabel: "İşlem Türü",
+        auditTrailEntitySummaryTitle: "Kayıt Türü Dağılımı",
+        auditTrailActionSummaryTitle: "İşlem Dağılımı",
+        auditTrailDateLabel: "Tarih",
+        auditTrailActorLabel: "Kişi",
+        downloadCsvButton: "CSV İndir",
         showDetailsLabel: "Ayrıntı",
         assignmentsTitle: "Admin Atamaları",
         assignmentsText: "Toplam atama",
@@ -660,6 +671,17 @@ const translations = {
         clearFilterButton: "Clear",
         auditTrailEntriesLabel: "Audit Trail Records",
         noAuditTrailEntriesText: "No audit trail records match this filter.",
+        auditTrailReportTitle: "Audit Trail Report",
+        auditTrailReportText: "Filtered summary of immutable records; exportable as CSV/PDF.",
+        auditTrailSummaryTitle: "Summary",
+        auditTrailSummaryText: "Summary",
+        auditTrailEntitySummaryLabel: "Record Type",
+        auditTrailActionSummaryLabel: "Action Type",
+        auditTrailEntitySummaryTitle: "Record Type Breakdown",
+        auditTrailActionSummaryTitle: "Action Breakdown",
+        auditTrailDateLabel: "Date",
+        auditTrailActorLabel: "Actor",
+        downloadCsvButton: "Download CSV",
         showDetailsLabel: "Details",
         assignmentsTitle: "Admin Assignments",
         assignmentsText: "Total assignments",
@@ -2800,6 +2822,16 @@ translations.tr.deliveryListTitle = "Performans Kartları";
 translations.tr.deliveryAllPeriods = "Tüm Dönemler";
 translations.tr.deliveryEmpty = "Henüz teslimat kaydı yok.";
 translations.tr.deliveryDelete = "Sil";
+translations.tr.deliveryRecordsLegend = "Teslimat";
+translations.tr.deliveryRejectedKpi = "Red";
+translations.tr.deliveryNcCreateButton = "Uygunsuzluk Oluştur";
+translations.tr.deliveryNcOpenButton = "Uygunsuzluğu Aç";
+translations.tr.ncIncidentSourceLabel = "Olay Kaynağı";
+translations.tr.ncIncidentSourceValueLabel = "Olay";
+translations.tr.ncDeliverySourceLabel = "Teslimat Kaynağı";
+translations.tr.ncDeliverySourceValueLabel = "Teslimat Performansı";
+translations.tr.backToIncidentButton = "Olay Detayına Dön";
+translations.tr.backToDeliveryButton = "Teslimata Dön";
 translations.en.deliveryMenuLabel = "Delivery Performance";
 translations.en.deliveryTitle = "Customer Delivery Performance";
 translations.en.deliveryText = "Track delivery and quality indicators.";
@@ -2824,6 +2856,16 @@ translations.en.deliveryListTitle = "Performance Cards";
 translations.en.deliveryAllPeriods = "All Periods";
 translations.en.deliveryEmpty = "No delivery records yet.";
 translations.en.deliveryDelete = "Delete";
+translations.en.deliveryRecordsLegend = "Deliveries";
+translations.en.deliveryRejectedKpi = "Rejected";
+translations.en.deliveryNcCreateButton = "Create Nonconformity";
+translations.en.deliveryNcOpenButton = "Open Nonconformity";
+translations.en.ncIncidentSourceLabel = "Incident Source";
+translations.en.ncIncidentSourceValueLabel = "Incident";
+translations.en.ncDeliverySourceLabel = "Delivery Source";
+translations.en.ncDeliverySourceValueLabel = "Delivery Performance";
+translations.en.backToIncidentButton = "Back to Incident";
+translations.en.backToDeliveryButton = "Back to Delivery";
 
 // --- Olay Raporlama ---
 translations.tr.incidentsMenuLabel = "Olay Raporlama";

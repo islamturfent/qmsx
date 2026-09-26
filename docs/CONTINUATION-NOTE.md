@@ -1054,6 +1054,38 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
   için uygunsuzluk detayına gider); olay listesinde "Detay" butonu.
 - i18n TR/EN; cache v93. Test: `tests/incident-nonconformity.php` (7 kontrol).
 
+### Teslimat Performansı → rapor/özete bağlantı (2026-10-08)
+- `includes/report-export-data.php`: `delivery_list` + metrikler `delivery_count`,
+  `delivery_ontime_rate`, `delivery_rejected` (teslimat redleri toplamı). Zamanında
+  oran ağırlıklı (sipariş üzerinden). Excel'e "Teslimat" sayfası, PDF'e
+  "Teslimat Performansı" detay tablosu + metrik hücreleri.
+- `reports.php`: yerel teslimat sorgusu; KPI kartı (Zamanında Teslim % + red sayısı)
+  ve Şirket Performansı tablosuna Teslimat / Red / Zamanında % sütunları.
+- `includes/dashboard-functions.php` Dönem Özeti'ne teslimat maddesi (ağırlıklı
+  zamanında % + red toplamı).
+- `appIcon()`'a `truck` ikonu. i18n TR/EN; cache v94.
+- Test: `tests/delivery-report.php` (6 kontrol).
+
+### Denetim izi raporlama şablonu (2026-10-08)
+- Yeni yüzey `audit-trail-report.php`: mevcut `audit_log` salt-okunur verisi üzerinde
+  filtreli (şirket/kayıt türü/işlem/tarih) özet raporu; kayıt türü ve işlem
+  dağılımı; CSV ve PDF (dompdf) export. RBAC `audit_trail.view` (mevcut sayfa ile aynı).
+- `includes/audit-log-functions.php` → `qmsAuditLogAggregate()` (toplulaştırma tek
+  kaynağı). Menüye "Denetim İzi Raporu" eklendi; ikon `reports`.
+- i18n TR/EN; cache v94. Test: `tests/audit-trail-report.php` (8 kontrol).
+
+### Teslimat reddinden uygunsuzluk / CAPA oluşturma (2026-10-08)
+- Migration: `nonconformities.delivery_id` sütunu (`20261008-delivery-nonconformity.sql`,
+  runner `scripts/migrate-delivery-nonconformity.php`).
+- `qmsDeliveryCreateNonconformity()`: red miktarı > 0 olan teslimat kaydından
+  uygunsuzluk (source='delivery', severity='major') ve ardından CAPA; idempotent.
+  `qmsDeliveryLinkedNonconformity()`.
+- `delivery-performance.php`: listede red varsa "Uygunsuzluk Oluştur" butonu;
+  bağlıysa "Uygunsuzluğu Aç".
+- `nonconformity-detail.php`: incident/delivery kaynaklarını düzgün işler (NULL
+  audit_id kırık denetim bağlantısı yerine olay/teslimat bağlantısı gösterir).
+- i18n TR/EN; cache v94. Test: `tests/delivery-nonconformity.php` (10 kontrol).
+
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
 Executive overview added to `dashboard.php` (the dashboard already had audit /
