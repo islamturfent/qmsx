@@ -873,6 +873,14 @@ Birinci beşlik (Şablon, Duyuru, İç Anket, Yıllık Plan, Tedarikçi Takvimi)
   "Değerlendirme Takvimi" linkine vadesi geçen randevu rozeti (CAPA'daki gibi).
 - `tests/supplier-evaluations.php` 14 → 15 kontrol.
 
+### 5. Doküman şablon → yeni doküman entegrasyonu (2026-09-26)
+- `document-create.php`'ye "Doküman Şablonu" seçimi eklendi: sirkete göre
+  filtrelenen şablon listesinden seçilince başlık/kategori/açıklama
+  şablondan ön-doldurulur (inline JS, veri şablon/company eşleşmesiyle).
+- `docTemplateSelect*` i18n; cache v80. (Önceki turda ertelenen madde tamamlandı.)
+
+Beşliyi derinleştirme setinin tamamı (1-5) tamamlandı ve commit'lendi.
+
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
 Executive overview added to `dashboard.php` (the dashboard already had audit /
