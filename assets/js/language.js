@@ -2730,6 +2730,25 @@ translations.en.contractNearBadge = "Expiring Soon";
 translations.en.contractEmpty = "No contract records yet.";
 translations.en.contractDelete = "Delete";
 
+translations.tr.contractFilesTitle = "Dosyalar";
+translations.tr.contractBack = "Sözleşmelere Dön";
+translations.tr.contractFileAdded = "Dosya eklendi.";
+translations.tr.contractFileLabel = "Dosya Yükle";
+translations.tr.contractFileHelp = "PDF, Word, Excel veya diğer; en fazla 10 MB.";
+translations.tr.contractUpload = "Yükle";
+translations.tr.contractNoFiles = "Henüz dosya yok.";
+translations.tr.contractDownload = "İndir";
+translations.tr.contractFileDelete = "Sil";
+translations.en.contractFilesTitle = "Files";
+translations.en.contractBack = "Back to Contracts";
+translations.en.contractFileAdded = "File added.";
+translations.en.contractFileLabel = "Upload File";
+translations.en.contractFileHelp = "PDF, Word, Excel or other; max 10 MB.";
+translations.en.contractUpload = "Upload";
+translations.en.contractNoFiles = "No files yet.";
+translations.en.contractDownload = "Download";
+translations.en.contractFileDelete = "Delete";
+
 // --- Olay Raporlama ---
 translations.tr.incidentsMenuLabel = "Olay Raporlama";
 translations.tr.incidentsTitle = "Olay Raporlama";

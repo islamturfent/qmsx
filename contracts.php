@@ -34,6 +34,12 @@ if ($editId > 0) {
         $editId = 0;
     }
 }
+$manageId = (int) ($_GET['manage'] ?? 0);
+$manageContract = $manageId > 0 ? qmsContractFind($pdo, $manageId, $userId, $role) : [];
+if ($manageId > 0 && !$manageContract) {
+    $manageId = 0;
+}
+$manageAttachments = $manageId > 0 ? qmsContractAttachments($pdo, $manageId) : [];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     qmsCsrfVerify($csrfScope, $_POST["csrf"] ?? null);
@@ -72,6 +78,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($formType === "delete") {
         qmsContractDelete($pdo, (int) ($_POST["id"] ?? 0), $userId, $role);
         header("Location: contracts.php?deleted=1");
+        exit;
+    } elseif ($formType === "attachment_add") {
+        $target = (int) ($_POST["contract_id"] ?? 0);
+        qmsContractAddAttachment($pdo, $target, $_FILES["attachment_file"] ?? [], $userId, $role);
+        header("Location: contracts.php?manage=" . $target . "&fileadded=1");
+        exit;
+    } elseif ($formType === "attachment_delete") {
+        $target = (int) ($_POST["contract_id"] ?? 0);
+        qmsContractDeleteAttachment($pdo, (int) ($_POST["attachment_id"] ?? 0), $userId, $role);
+        header("Location: contracts.php?manage=" . $target);
         exit;
     }
 }
@@ -128,6 +144,44 @@ if ($editing) {
         <?php if (($_GET["added"] ?? "") === "1"): ?><div class="form-message success" data-i18n="contractAdded">Sözleşme eklendi.</div><?php endif; ?>
         <?php if (($_GET["updated"] ?? "") === "1"): ?><div class="form-message success" data-i18n="contractUpdated">Sözleşme güncellendi.</div><?php endif; ?>
         <?php if (($_GET["deleted"] ?? "") === "1"): ?><div class="form-message success" data-i18n="contractDeleted">Sözleşme silindi.</div><?php endif; ?>
+        <?php if (($_GET["fileadded"] ?? "") === "1"): ?><div class="form-message success" data-i18n="contractFileAdded">Dosya eklendi.</div><?php endif; ?>
+
+        <?php if ($manageId > 0): ?>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="contractsKicker">Ticari İlişkiler</span>
+                <h1><?= htmlspecialchars($manageContract['contract_name'], ENT_QUOTES, 'UTF-8') ?></h1>
+            </div>
+            <a class="secondary-button" href="contracts.php" data-i18n="contractBack">Sözleşmelere Dön</a>
+        </section>
+        <section class="console-card checklist-section">
+            <div class="section-heading compact-heading"><div><h3 data-i18n="contractFilesTitle">Sözleşme Dosyaları</h3><p>#<?= (int) $manageId ?><?= $manageContract['party_name'] ? ' · ' . htmlspecialchars((string) $manageContract['party_name'], ENT_QUOTES, 'UTF-8') : '' ?><?= $manageContract['end_date'] ? ' · bitiş ' . htmlspecialchars((string) $manageContract['end_date'], ENT_QUOTES, 'UTF-8') : '' ?></p></div></div>
+            <form class="auditor-form" method="post" action="contracts.php?manage=<?= (int) $manageId ?>" enctype="multipart/form-data">
+                <?= qmsCsrfField($csrfScope) ?>
+                <input type="hidden" name="form_type" value="attachment_add">
+                <input type="hidden" name="contract_id" value="<?= (int) $manageId ?>">
+                <div class="form-grid">
+                    <label class="form-field form-field-wide"><span data-i18n="contractFileLabel">Dosya Yükle</span><input type="file" name="attachment_file" required><small data-i18n="contractFileHelp">PDF, Word, Excel veya diğer; en fazla 10 MB.</small></label>
+                </div>
+                <div class="form-actions"><button class="primary-button" type="submit" data-i18n="contractUpload">Yükle</button></div>
+            </form>
+            <div class="admin-list">
+                <?php if (!$manageAttachments): ?><div class="empty-state" data-i18n="contractNoFiles">Henüz dosya yok.</div><?php endif; ?>
+                <?php foreach ($manageAttachments as $att): ?>
+                    <div class="admin-list-item">
+                        <div class="list-item-main">
+                            <strong><?= htmlspecialchars($att['original_name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= number_format((int) $att['file_size'] / 1024, 1, ',', '.') ?> KB · <?= htmlspecialchars((string) $att['created_at'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <div class="list-item-side">
+                            <a class="secondary-button secondary-button-sm" href="contract-attachment-download.php?id=<?= (int) $att['id'] ?>" data-i18n="contractDownload">İndir</a>
+                            <form method="post" action="contracts.php?manage=<?= (int) $manageId ?>" onsubmit="return confirm('Dosya silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="attachment_delete"><input type="hidden" name="contract_id" value="<?= (int) $manageId ?>"><input type="hidden" name="attachment_id" value="<?= (int) $att['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="contractFileDelete">Sil</button></form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php else: ?>
 
         <div class="record-card-grid">
             <div class="dashboard-card"><div class="dashboard-card-content"><div class="dashboard-card-label" data-i18n="contractActiveKpi">Aktif Sözleşme</div><div class="dashboard-card-number"><?= $activeCount ?></div></div></div>
@@ -180,6 +234,7 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
+                                <a class="secondary-button secondary-button-sm" href="contracts.php?manage=<?= (int) $row['id'] ?>" data-i18n="contractFilesTitle">Dosyalar</a>
                                 <a class="secondary-button secondary-button-sm" href="contracts.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="contracts.php" onsubmit="return confirm('Sözleşme silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="contractDelete">Sil</button></form>
                             </div>
@@ -188,6 +243,7 @@ if ($editing) {
                 </div>
             </section>
         </div>
+        <?php endif; ?>
     </main>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
 </body>

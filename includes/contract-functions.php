@@ -143,6 +143,73 @@ function qmsContractDelete(PDO $pdo, int $id, int $userId, string $role): bool
     return $stmt->rowCount() > 0;
 }
 
+/** Sözleşmeye bagli dosyalar (en yeni önce). */
+function qmsContractAttachments(PDO $pdo, int $contractId): array
+{
+    $stmt = $pdo->prepare('SELECT id, contract_id, original_name, mime_type, file_size, created_at
+                           FROM contract_attachments WHERE contract_id = ? ORDER BY id DESC');
+    $stmt->execute([$contractId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/** Kapsam icindeki sözlesmenin tek dosyası; bulunamazsa bos dizi. */
+function qmsContractAttachmentFind(PDO $pdo, int $attId, int $userId, string $role): array
+{
+    $stmt = $pdo->prepare('SELECT a.*, a.contract_id FROM contract_attachments a WHERE a.id = ? LIMIT 1');
+    $stmt->execute([$attId]);
+    $att = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    if (!$att || !qmsContractFind($pdo, (int) $att['contract_id'], $userId, $role)) {
+        return [];
+    }
+    return $att;
+}
+
+/** Sözlesmeye dosya ekler (kapsam icinde olmali). @return bool */
+function qmsContractAddAttachment(PDO $pdo, int $contractId, array $file, int $userId, string $role): bool
+{
+    if (!qmsContractFind($pdo, $contractId, $userId, $role)) {
+        return false;
+    }
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || ($file['size'] ?? 0) <= 0 || ($file['size'] ?? 0) > 10 * 1024 * 1024) {
+        return false;
+    }
+    $ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
+    $stored = bin2hex(random_bytes(20)) . '.' . $ext;
+    $dir = __DIR__ . '/../storage/contracts';
+    if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+        return false;
+    }
+    $target = $dir . '/' . $stored;
+    if (!move_uploaded_file($file['tmp_name'], $target)) {
+        return false;
+    }
+    $ins = $pdo->prepare('INSERT INTO contract_attachments (contract_id, original_name, stored_name, mime_type, file_size, uploaded_by) VALUES (?,?,?,?,?,?)');
+    $ins->execute([
+        $contractId,
+        mb_substr((string) $file['name'], 0, 255),
+        $stored,
+        (string) ($file['type'] ?? null) !== '' ? mb_substr((string) $file['type'], 0, 120) : null,
+        (int) $file['size'],
+        $userId ?: null,
+    ]);
+    return true;
+}
+
+/** Sözlesme dosyasini siler (kapsam icinde olmali). */
+function qmsContractDeleteAttachment(PDO $pdo, int $attId, int $userId, string $role): bool
+{
+    $att = qmsContractAttachmentFind($pdo, $attId, $userId, $role);
+    if (!$att) {
+        return false;
+    }
+    $pdo->prepare('DELETE FROM contract_attachments WHERE id = ?')->execute([$attId]);
+    $p = __DIR__ . '/../storage/contracts/' . $att['stored_name'];
+    if (is_file($p)) {
+        @unlink($p);
+    }
+    return true;
+}
+
 /** Durum etiketi metni (TR). */
 function qmsContractStatusLabel(string $status): string
 {

@@ -75,8 +75,9 @@ carried over from earlier assumptions.
   | `tests/report-export-data.php` | 23 |
   | `tests/dashboard-trend.php` | 24 |
   | `tests/notify-modules.php` | 7 |
+  | `tests/contract-attachments.php` | 7 |
 
-  902 checks total (51 suites). All suites use temporary tables and leave real records
+  909 checks total (52 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -1014,6 +1015,17 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 - `qmsDashboardSummary()`'e geç kalibrasyon ve açık olay maddeleri.
 - Testler: `notify-overdue` 7→8, `report-export-data` 18→23, `dashboard-trend` 22→24,
   `notify-modules` 6→7. i18n grup etiketleri + cache v89.
+
+### Yeni yüzey: Sözleşme dosya eki (2026-09-26)
+- Schema: `contract_attachments` (migration `20261006-contract-attachments.sql`,
+  idempotent runner `scripts/migrate-contract-attachments.php`). Dosyalar
+  `storage/contracts/` altinda rastgele adlarla saklanir.
+- `contracts.php`'e `?manage=ID` detay görünümü: dosya yükleme + liste + silme;
+  liste öğesinde "Dosyalar" butonu. `contract-attachment-download.php` kapsam
+  kontrollü indirme sunar.
+- Yardımcılar: `includes/contract-functions.php` (`qmsContractAttachments/Find/Add/
+  DeleteAttachment`); tümü sözleşmenin şirketine göre kapsamlı.
+- i18n TR/EN; cache v90. Test: `tests/contract-attachments.php` (7 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
