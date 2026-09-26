@@ -351,29 +351,8 @@ textarea {
 }
 
 .notification-panel-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-row);
-}
-
-.notification-panel-action {
-    border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    background: transparent;
-    color: var(--brand-500);
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.12s ease, color 0.12s ease;
-}
-
-.notification-panel-action:hover {
-    background: var(--nav-hover);
-    color: var(--brand-600);
 }
 
 .notification-panel-head strong {
@@ -438,56 +417,6 @@ textarea {
 .notification-panel-footer:hover {
     background: var(--nav-hover);
     text-decoration: none;
-}
-
-/* Dil / tema icin TailAdmin tarzi ikonlu dropdown */
-.topbar-menu {
-    position: relative;
-    display: inline-flex;
-}
-
-.topbar-dropdown {
-    position: absolute;
-    top: calc(100% + 14px);
-    right: 0;
-    z-index: 60;
-    min-width: 170px;
-    border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    background: var(--surface-color);
-    box-shadow: var(--shadow-theme-lg);
-    padding: 6px;
-}
-
-.topbar-dropdown[hidden] {
-    display: none;
-}
-
-.topbar-menu-option {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text-body);
-    padding: 8px 10px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 0.12s ease;
-}
-
-.topbar-menu-option:hover {
-    background: var(--nav-hover);
-}
-
-.topbar-menu-option .topbar-btn-icon svg {
-    width: 20px;
-    height: 20px;
 }
 
 .form-panel {

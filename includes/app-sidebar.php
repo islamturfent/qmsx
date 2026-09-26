@@ -1,10 +1,6 @@
 <?php
 
 $activeNav = $activeNav ?? "";
-if (!function_exists('qmsCsrfToken')) {
-    require_once __DIR__ . '/csrf.php';
-}
-$sidebarNotificationCsrf = function_exists('qmsCsrfToken') ? qmsCsrfToken('notifications') : '';
 $sidebarRole = (string) ($_SESSION["qms_role"] ?? "");
 $isSuperAdminNav = $sidebarRole === "super_admin";
 $isManagementNav = in_array($sidebarRole, ["super_admin", "system_admin"], true);
@@ -63,8 +59,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 <span id="qmsIconSun" hidden><?= appIcon("sun", "") ?></span>
 <span id="qmsIconMoon" hidden><?= appIcon("moon", "") ?></span>
 <span id="qmsIconGlobe" hidden><?= appIcon("globe", "") ?></span>
-<span id="qmsIconMonitor" hidden><?= appIcon("monitor", "") ?></span>
-<input type="hidden" id="qmsMarkAllReadCsrf" value="<?= htmlspecialchars($sidebarNotificationCsrf, ENT_QUOTES, 'UTF-8') ?>">
 <script type="application/json" id="qmsNotificationRecent"><?= json_encode($sidebarRecentNotifications, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
 <aside class="app-sidebar" id="appSidebar">

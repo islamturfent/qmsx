@@ -449,9 +449,6 @@ const translations = {
         ,notificationPanelTitle: "Bildirimler"
         ,notificationPanelEmpty: "Bildirim yok"
         ,notificationPanelSeeAll: "Tümünü Gör"
-        ,themeLightLabel: "Açık"
-        ,themeDarkLabel: "Koyu"
-        ,themeSystemLabel: "Sistem"
         ,notificationCenterText: "Onay, karar ve yayın hareketlerinizi takip edin."
         ,markAllReadButton: "Tümünü Okundu İşaretle"
         ,allNotificationsLabel: "Tüm Bildirimler"
@@ -934,9 +931,6 @@ const translations = {
         ,notificationPanelTitle: "Notifications"
         ,notificationPanelEmpty: "No notifications"
         ,notificationPanelSeeAll: "See All"
-        ,themeLightLabel: "Light"
-        ,themeDarkLabel: "Dark"
-        ,themeSystemLabel: "System"
         ,notificationCenterText: "Track approval, decision and publication activity."
         ,markAllReadButton: "Mark All as Read"
         ,allNotificationsLabel: "All Notifications"
@@ -3079,3 +3073,14 @@ translations.en.instrumentEmpty = "No measuring instruments defined yet.";
 translations.en.instrumentDelete = "Delete";
 
 changeLanguage(currentLanguage);
+
+languageToggle.addEventListener("click", function() {
+
+    if (currentLanguage === "tr") {
+        currentLanguage = "en";
+    } else {
+        currentLanguage = "tr";
+    }
+
+    changeLanguage(currentLanguage);
+});

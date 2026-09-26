@@ -1143,22 +1143,6 @@ aletler sayfasinda "Gecmis" butonu + menuye "Kalibrasyon Gecmisi".
     hover bg) yeniden boyutlandirildi; `assets/css/style.css`.
 - i18n TR/EN (notificationPanelTitle/Empty/SeeAll); cache v96.
 
-### Header bildirim "okundu isaretle" + dil/tema TailAdmin dropdown (2026-10-08)
-- Yeni hafif AJAX uc noktasi `notifications-ajax.php`: POST `mark_all_read` ->
-  tum okunmamis bildirimleri okundu yapar, JSON `{ok, unread}` doner. CSRF
-  'notifications' scope ile dogrulanir; app-sidebar bu token'i gizli alan olarak basar.
-- Bildirim panelinin basligina "Tumunu Okundu Isaretle" butonu eklendi; tiklaninca
-  AJAX calisir, zil sayaci 0'a iner, panel maddeleri okunmus olarak isaretlenir,
-  buton gizlenir - sayfa yenilenmeden canli guncelleme.
-- **Tema dropdown**: gunes/ay ikon buton -> TailAdmin tarzi acilir menuye cevrildi
-  (Acik / Koyu / Sistem). `theme.js` artik light/dark/system modlarini destekler ve
-  `window.qmsSetTheme` acigagini sunar; "Sistem" OS temasini izler.
-- **Dil dropdown**: globe buton -> TailAdmin tarzi acilir menu (Turkce / English),
-  `changeLanguage(lang)` ile secilir. `language.js`'teki dogrudan toggle kaldirildi.
-- Yeni `monitor` ikonu; `.topbar-menu`/.topbar-dropdown`/.topbar-menu-option` stilleri.
-- i18n TR/EN (themeLightLabel/DarkLabel/SystemLabel); cache v97.
-- Test: `tests/notifications-ajax.php` (5 kontrol).
-
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
 Executive overview added to `dashboard.php` (the dashboard already had audit /

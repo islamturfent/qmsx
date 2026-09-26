@@ -34,27 +34,8 @@ const recentScript = document.getElementById("qmsNotificationRecent");
 if (recentScript) {
     try { recentNotifications = JSON.parse(recentScript.textContent || "[]"); } catch (e) { recentNotifications = []; }
 }
-const markAllCsrf = (document.getElementById("qmsMarkAllReadCsrf") || {}).value || "";
 
-// Acilir menuler icin ortak yardimci: tetik + panel.
-function attachMenuDropdown(trigger, panel) {
-    trigger.addEventListener("click", function (event) {
-        event.stopPropagation();
-        panel.hidden = !panel.hidden;
-    });
-    document.addEventListener("click", function (event) {
-        if (!panel.hidden && !trigger.parentElement.contains(event.target)) {
-            panel.hidden = true;
-        }
-    });
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && !panel.hidden) {
-            panel.hidden = true;
-        }
-    });
-}
-
-// Header bildirim zili - TailAdmin tarzi acilir panel + "tumunu okundu isaretle".
+// Header bildirim zili - TailAdmin tarzi acilir panel.
 if (notificationState && topbarActions && languageButton) {
     const unreadCount = Number.parseInt(notificationState.dataset.count || "0", 10);
 
@@ -65,6 +46,7 @@ if (notificationState && topbarActions && languageButton) {
     bellBtn.type = "button";
     bellBtn.className = "notification-bell " + (unreadCount > 0 ? "has-notifications" : "is-empty");
     bellBtn.setAttribute("aria-label", unreadCount > 0 ? unreadCount + " okunmamış bildirim" : "Bildirim yok");
+
     bellBtn.innerHTML = (notificationIcon ? notificationIcon.innerHTML : "")
         + '<span class="notification-bell-count">' + unreadCount + "</span>";
 
@@ -78,14 +60,6 @@ if (notificationState && topbarActions && languageButton) {
     headTitle.setAttribute("data-i18n", "notificationPanelTitle");
     headTitle.textContent = "Bildirimler";
     head.appendChild(headTitle);
-
-    const markAllBtn = document.createElement("button");
-    markAllBtn.type = "button";
-    markAllBtn.className = "notification-panel-action";
-    markAllBtn.setAttribute("data-i18n", "markAllReadButton");
-    markAllBtn.textContent = "Tümünü Okundu İşaretle";
-    if (unreadCount === 0) markAllBtn.hidden = true;
-    head.appendChild(markAllBtn);
     panel.appendChild(head);
 
     const list = document.createElement("div");
@@ -120,26 +94,6 @@ if (notificationState && topbarActions && languageButton) {
     foot.setAttribute("data-i18n", "notificationPanelSeeAll");
     foot.textContent = "Tümünü Gör";
     panel.appendChild(foot);
-
-    // "Tumunu okundu isaretle" -> AJAX + zil sayaci/panel canli guncellenir.
-    markAllBtn.addEventListener("click", function () {
-        if (!markAllCsrf) return;
-        fetch("notifications-ajax.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "csrf=" + encodeURIComponent(markAllCsrf) + "&form_type=mark_all_read"
-        }).then(function (r) { return r.json(); }).then(function (res) {
-            if (res && res.ok) {
-                bellBtn.classList.remove("has-notifications");
-                bellBtn.classList.add("is-empty");
-                const c = bellBtn.querySelector(".notification-bell-count");
-                if (c) c.textContent = "0";
-                bellBtn.setAttribute("aria-label", "Bildirim yok");
-                panel.querySelectorAll(".notification-panel-item").forEach(function (i) { i.classList.add("is-read"); });
-                markAllBtn.hidden = true;
-            }
-        }).catch(function () {});
-    });
 
     bellBtn.addEventListener("click", function (event) {
         event.stopPropagation();
@@ -254,73 +208,9 @@ if (userMenuState && topbarActions && languageButton) {
     wrapper.appendChild(toggle);
     wrapper.appendChild(dropdown);
     topbarActions.insertBefore(wrapper, languageButton);
-}
 
-// Dil ve tema toggleslarini TailAdmin tarzi ikonlu dropdown'a donusturur.
-function wrapTopbarMenu(trigger) {
-    const wrap = document.createElement("div");
-    wrap.className = "topbar-menu";
-    trigger.parentNode.insertBefore(wrap, trigger);
-    wrap.appendChild(trigger);
-    return wrap;
-}
-
-// Tema dropdown: Açık / Koyu / Sistem.
-const themeToggle = document.getElementById("themeToggle");
-const sunIconHtml = (document.getElementById("qmsIconSun") || {}).innerHTML || "☀️";
-const moonIconHtml = (document.getElementById("qmsIconMoon") || {}).innerHTML || "🌙";
-const monitorIconHtml = (document.getElementById("qmsIconMonitor") || {}).innerHTML || "🖥️";
-if (themeToggle) {
-    const wrap = wrapTopbarMenu(themeToggle);
-    wrap.classList.add("theme-menu");
-    const panel = document.createElement("div");
-    panel.className = "topbar-dropdown";
-    panel.hidden = true;
-    [
-        ["light", sunIconHtml, "themeLightLabel", "Açık"],
-        ["dark", moonIconHtml, "themeDarkLabel", "Koyu"],
-        ["system", monitorIconHtml, "themeSystemLabel", "Sistem"]
-    ].forEach(function (o) {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "topbar-menu-option";
-        b.innerHTML = '<span class="topbar-btn-icon">' + o[1] + '</span><span data-i18n="' + o[2] + '">' + o[3] + '</span>';
-        b.addEventListener("click", function () {
-            if (typeof window.qmsSetTheme === "function") window.qmsSetTheme(o[0]);
-            panel.hidden = true;
-        });
-        panel.appendChild(b);
-    });
-    wrap.appendChild(panel);
-    attachMenuDropdown(themeToggle, panel);
-}
-
-// Dil dropdown: Türkçe / English.
-if (languageButton) {
-    const wrap = wrapTopbarMenu(languageButton);
-    wrap.classList.add("language-menu");
-    const panel = document.createElement("div");
-    panel.className = "topbar-dropdown";
-    panel.hidden = true;
-    [
-        ["tr", "Türkçe"],
-        ["en", "English"]
-    ].forEach(function (o) {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "topbar-menu-option";
-        b.innerHTML = '<span class="topbar-btn-label">' + o[1] + '</span>';
-        b.addEventListener("click", function () {
-            if (typeof changeLanguage === "function") changeLanguage(o[0]);
-            panel.hidden = true;
-        });
-        panel.appendChild(b);
-    });
-    wrap.appendChild(panel);
-    attachMenuDropdown(languageButton, panel);
-}
-
-// Enjekte edilen ogeler icin ceviriyi yeniden uygula.
-if (typeof changeLanguage === "function") {
-    changeLanguage(currentLanguage);
+    // Enjekte edilen ogeler icin ceviriyi yeniden uygula.
+    if (typeof changeLanguage === "function") {
+        changeLanguage(currentLanguage);
+    }
 }

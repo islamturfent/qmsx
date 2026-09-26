@@ -4,18 +4,7 @@ const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 const sunIconHtml = (document.getElementById("qmsIconSun") || {}).innerHTML || "☀️";
 const moonIconHtml = (document.getElementById("qmsIconMoon") || {}).innerHTML || "🌙";
 
-// Tema modu: light / dark / system. Varsayilan light (degistirilmemis oturumlar icin). 
-let themeMode = localStorage.getItem("qms-theme");
-if (["light", "dark", "system"].indexOf(themeMode) < 0) {
-    themeMode = "light";
-}
-const darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
-
-function currentDarkMode() {
-    if (themeMode === "dark") return true;
-    if (themeMode === "system" && darkQuery && darkQuery.matches) return true;
-    return false;
-}
+const savedTheme = localStorage.getItem("qms-theme");
 
 function updateThemeColor(darkMode) {
     if (themeColorMeta) {
@@ -26,29 +15,23 @@ function updateThemeColor(darkMode) {
 // Tema butonunu TailAdmin tarzi gunes/ay ikonu olarak cizer.
 function renderThemeButton() {
     if (!themeToggle) return;
-    const dark = currentDarkMode();
+    const dark = document.body.classList.contains("dark-mode");
     themeToggle.innerHTML = '<span class="topbar-btn-icon">' + (dark ? sunIconHtml : moonIconHtml) + "</span>";
 }
 
-function applyThemeClass() {
-    document.body.classList.toggle("dark-mode", currentDarkMode());
+if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+}
+
+renderThemeButton();
+updateThemeColor(document.body.classList.contains("dark-mode"));
+
+themeToggle.addEventListener("click", function () {
+    document.body.classList.toggle("dark-mode");
+
+    const darkMode = document.body.classList.contains("dark-mode");
+    localStorage.setItem("qms-theme", darkMode ? "dark" : "light");
+
     renderThemeButton();
-    updateThemeColor(currentDarkMode());
-}
-
-// Dropdown'dan cagrilir: light / dark / system.
-function qmsSetTheme(mode) {
-    if (["light", "dark", "system"].indexOf(mode) < 0) mode = "light";
-    themeMode = mode;
-    try { localStorage.setItem("qms-theme", mode); } catch (e) {}
-    applyThemeClass();
-}
-window.qmsSetTheme = qmsSetTheme;
-
-if (darkQuery) {
-    darkQuery.addEventListener("change", function () {
-        if (themeMode === "system") applyThemeClass();
-    });
-}
-
-applyThemeClass();
+    updateThemeColor(darkMode);
+});
