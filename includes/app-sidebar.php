@@ -209,6 +209,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("clock") ?>
             <span data-i18n="instrumentsMenuLabel">Kalibrasyon & Metroloji</span>
         </a>
+        <a class="<?= sidebarLinkClass("calibration_history", $activeNav) ?>" href="instrument-calibrations.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="calibrationHistoryMenuLabel">Kalibrasyon Geçmişi</span>
+        </a>
         <a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="documents.php">
             <?= appIcon("documents") ?>
             <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>

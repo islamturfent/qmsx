@@ -183,6 +183,7 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
+                                <a class="secondary-button secondary-button-sm" href="instrument-calibrations.php?instrument_id=<?= (int) $row['id'] ?>" data-i18n="instrumentCalibrationHistoryButton">Geçmiş</a>
                                 <form method="post" action="instruments.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="calibrate"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="secondary-button secondary-button-sm" type="submit" data-i18n="instrumentCalibrateButton">Kalibre Et</button></form>
                                 <a class="secondary-button secondary-button-sm" href="instruments.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="instruments.php" onsubmit="return confirm('Alet silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="instrumentDelete">Sil</button></form>
