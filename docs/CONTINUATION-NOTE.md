@@ -1086,6 +1086,47 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
   audit_id kırık denetim bağlantısı yerine olay/teslimat bağlantısı gösterir).
 - i18n TR/EN; cache v94. Test: `tests/delivery-nonconformity.php` (10 kontrol).
 
+### Profil bildirim tercihleri yerlesim duzeltmesi + TailAdmin checkbox (2026-10-08)
+- `profile.php`'de "Bildirim Tercihleri" bolumu `<main>` disina dusup sol menunun
+altında kalıyordu; bolum sayfa akisinda `<main class="page-container">` icinde,
+profil-layout'tan hemen sonra tasindi.
+- Checkbox'lar TailAdmin tarzina birebir cevrildi: yerel input gorsel olarak
+gizlenir, gorunen 20x20 yuvarlatilmis `.box` kutu marka rengine donup beyaz tik
+cikarir; focus/hover durumlari var. `assets/css/style.css` `.pref-check`.
+
+### Teslimat red esigi → otomatik bildirim (2026-10-08)
+- `scripts/notify-overdue.php`: `delivery_rejection` bolumu. Varsayilan esik %5
+  (QMS_DELIVERY_REJECT_THRESHOLD ortam degiskeni veya `--threshold=0-1` argumani).
+  Teslim edilen miktara gore red orani esigi asan kayitlar sirket adminlerine
+  (ve `--all` ile tum aktif kullanicilara) bildirilir; idempotent.
+- `includes/notifications.php`: `delivery_rejection` türü `delivery` grubuna,
+  yeni `delivery` grup etiketi (Teslimat/Delivery) + i18n anahtari.
+- Test: `tests/notify-overdue.php` 8 ek kontrol ile 14 'e cikti.
+
+### Yeni yuzey: Kalibrasyon & Metroloji sertifika/gecmis (2026-10-08)
+- Migration `20261008-instrument-calibrations.sql` + idempotent runner:
+  `instrument_calibrations` (instrument, company, tarih, sonraki, sonuc pass/fail,
+  sertifika no, laboratuvar, sertifika dosyasi, uygulayan).
+- `includes/instrument-calibration-functions.php` (`qmsInstCalib*` on-ekli;
+  `qmsCalibration*` equipment modulunde zaten vardi — cakisma onlendi). Kayit
+eklenirken aletin son/sonraki kalibrasyon tarihleri guncellenir; sertifika
+`storage/calibrations/` altinda saklanir ve `?download=` ile inilir.
+- `instrument-calibrations.php` (liste + ekleme + filtre + sertifika indirme) ve
+aletler sayfasinda "Gecmis" butonu + menuye "Kalibrasyon Gecmisi".
+- Rapor entegrasyonu: `calibration_list` + `calibration_count`/`calibration_fail`
+  metrikleri; Excel "Kalibrasyonlar" sayfasi, PDF detay tablosu; Dönem Özeti'ne
+  basarisiz kalibrasyon noktasi.
+- i18n TR/EN; cache v95. Test: `tests/instrument-calibration.php` (17 kontrol).
+
+### Denetim izi raporunun ana rapor export'una baglanmasi (2026-10-08)
+- `includes/report-export-data.php`: donemdeki denetim izi kayitlarini kapsamli
+  (secili sirket filtreli) `audit_trail_list` (son 300) + `audit_trail_count`
+  metrik + `audit_trail_entity`/`audit_trail_action` ozetleriyle tasir. NOT:
+  `$fetchRows` kullanilmadi cunku ORDER BY/LIMIT ile bozulur; kapsam acikca kuruldu.
+- Excel "Denetim İzi" sayfasi + PDF "Denetim İzi" detay tablosu + metrik cell.
+- Dönem Özeti'ne denetim izi kayit sayisi noktasi.
+- Test: `tests/audit-trail-export.php` (6 kontrol).
+
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
 Executive overview added to `dashboard.php` (the dashboard already had audit /

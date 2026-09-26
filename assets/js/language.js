@@ -120,7 +120,7 @@ const translations = {
         calibrationNoteLabel: "Not",
         saveCalibrationButton: "Kalibrasyonu Kaydet",
         calibrationHistoryTitle: "Kalibrasyon Geçmişi",
-        calibrationHistoryText: "Ekipmanın kalibrasyon kayıtları.",
+        calibrationHistoryText: "Kalibrasyon kayıtları ve sertifikalar.",
         noCalibrationRecordsText: "Bu ekipman için kalibrasyon kaydı yok.",
         calibrationAddedMessage: "Kalibrasyon kaydı eklendi.",
         calibrationUpdatedMessage: "Kalibrasyon kaydı güncellendi.",
@@ -599,7 +599,7 @@ const translations = {
         calibrationNoteLabel: "Note",
         saveCalibrationButton: "Save Calibration",
         calibrationHistoryTitle: "Calibration History",
-        calibrationHistoryText: "Calibration records for this equipment.",
+        calibrationHistoryText: "Calibration records and certificates.",
         noCalibrationRecordsText: "No calibration records for this equipment.",
         calibrationAddedMessage: "Calibration record added.",
         calibrationUpdatedMessage: "Calibration record updated.",
@@ -1256,8 +1256,10 @@ translations.en.notificationGroupContractLabel = "Contract";
 translations.en.notificationGroupProcessLabel = "Process";
 translations.tr.notificationGroupInstrumentLabel = "Metroloji";
 translations.tr.notificationGroupIncidentLabel = "Olay";
+translations.tr.notificationGroupDeliveryLabel = "Teslimat";
 translations.en.notificationGroupInstrumentLabel = "Metrology";
 translations.en.notificationGroupIncidentLabel = "Incident";
+translations.en.notificationGroupDeliveryLabel = "Delivery";
 
 Object.assign(translations.tr, {
     reviewsTitle: "Yönetimin Gözden Geçirmesi", reviewsText: "Gözden geçirme toplantılarını, girdileri ve çıkan aksiyonları izleyin.",
@@ -2950,6 +2952,29 @@ translations.en.incidentCreateNcButton = "Create Nonconformity";
 
 // --- Kalibrasyon & Metroloji ---
 translations.tr.instrumentsMenuLabel = "Kalibrasyon & Metroloji";
+translations.tr.calibrationHistoryMenuLabel = "Kalibrasyon Geçmişi";
+translations.tr.instrumentCalibrationHistoryButton = "Geçmiş";
+translations.tr.calibrationAdded = "Kalibrasyon kaydı eklendi.";
+translations.tr.calibrationDeleted = "Kalibrasyon kaydı silindi.";
+translations.tr.calibrationNewTitle = "Kalibrasyon Kaydı Ekle";
+translations.tr.calibrationNewText = "Bir alete kalibrasyon tarihi ve sertifika ekleyin.";
+translations.tr.instrumentSelectLabel = "Ölçü Aleti";
+translations.tr.selectInstrumentOption = "Alet seçin";
+translations.tr.allInstrumentsOption = "Tüm aletler";
+translations.tr.allResultsOption = "Tümü";
+translations.tr.calibrationResultPass = "Başarılı";
+translations.tr.calibrationResultFail = "Başarısız";
+translations.tr.calibrationDateLabel = "Kalibrasyon Tarihi";
+translations.tr.calibrationDueLabel = "Sonraki Tarih";
+translations.tr.calibrationCertLabel = "Sertifika No";
+translations.tr.calibrationLabLabel = "Laboratuvar";
+translations.tr.calibrationPerformedLabel = "Uygulayan";
+translations.tr.calibrationCertFileLabel = "Sertifika Dosyası (en fazla 10 MB)";
+translations.tr.calibrationNotesLabel = "Not";
+translations.tr.calibrationSave = "Kaydet";
+translations.tr.calibrationDownload = "Sertifika";
+translations.tr.calibrationDelete = "Sil";
+translations.tr.calibrationEmpty = "Henüz kalibrasyon kaydı yok.";
 translations.tr.instrumentsTitle = "Kalibrasyon & Metroloji";
 translations.tr.instrumentsText = "Ölçü aletlerinin kalibrasyon takvimini izleyin.";
 translations.tr.instrumentsKicker = "Metroloji";
@@ -2981,6 +3006,29 @@ translations.tr.instrumentCalibrateButton = "Kalibre Et";
 translations.tr.instrumentEmpty = "Henüz ölçü aleti tanımlanmadı.";
 translations.tr.instrumentDelete = "Sil";
 translations.en.instrumentsMenuLabel = "Calibration & Metrology";
+translations.en.calibrationHistoryMenuLabel = "Calibration History";
+translations.en.instrumentCalibrationHistoryButton = "History";
+translations.en.calibrationAdded = "Calibration record added.";
+translations.en.calibrationDeleted = "Calibration record deleted.";
+translations.en.calibrationNewTitle = "Add Calibration Record";
+translations.en.calibrationNewText = "Add a calibration date and certificate for an instrument.";
+translations.en.instrumentSelectLabel = "Instrument";
+translations.en.selectInstrumentOption = "Select instrument";
+translations.en.allInstrumentsOption = "All instruments";
+translations.en.allResultsOption = "All";
+translations.en.calibrationResultPass = "Pass";
+translations.en.calibrationResultFail = "Fail";
+translations.en.calibrationDateLabel = "Calibration Date";
+translations.en.calibrationDueLabel = "Next Date";
+translations.en.calibrationCertLabel = "Certificate No";
+translations.en.calibrationLabLabel = "Laboratory";
+translations.en.calibrationPerformedLabel = "Performed By";
+translations.en.calibrationCertFileLabel = "Certificate File (max 10 MB)";
+translations.en.calibrationNotesLabel = "Notes";
+translations.en.calibrationSave = "Save";
+translations.en.calibrationDownload = "Certificate";
+translations.en.calibrationDelete = "Delete";
+translations.en.calibrationEmpty = "No calibration records yet.";
 translations.en.instrumentsTitle = "Calibration & Metrology";
 translations.en.instrumentsText = "Track the calibration schedule of measuring instruments.";
 translations.en.instrumentsKicker = "Metrology";
