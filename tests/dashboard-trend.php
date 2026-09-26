@@ -19,6 +19,7 @@ $pdo->exec('CREATE TEMPORARY TABLE complaints (id int primary key, company_id in
 $pdo->exec('CREATE TEMPORARY TABLE supplier_evaluation_schedule (id int primary key, supplier_id int, company_id int not null, status varchar(24), due_date date, active tinyint not null default 1)');
 $pdo->exec('CREATE TEMPORARY TABLE quality_plans (id int primary key, company_id int not null, plan_year int not null, active tinyint not null default 1)');
 $pdo->exec('CREATE TEMPORARY TABLE quality_plan_items (id int primary key, plan_id int not null, progress int not null default 0, active tinyint not null default 1)');
+$pdo->exec('CREATE TEMPORARY TABLE improvements (id int primary key, company_id int not null, title varchar(190), status varchar(24), benefit_type varchar(30), impact varchar(20), priority varchar(20), active tinyint not null default 1, created_at datetime)');
 
 $now = date('Y-m-d H:i:s');
 $today = date('Y-m-d');
@@ -55,6 +56,10 @@ $pdo->exec("INSERT INTO supplier_evaluation_schedule(id, supplier_id, company_id
 // Kalite plani: A'da cari yil icin 2 kalem (ilerleme 50 + 100 -> %75).
 $pdo->exec("INSERT INTO quality_plans(id, company_id, plan_year, active) VALUES (1,970001," . (int) date('Y') . ",1)");
 $pdo->exec("INSERT INTO quality_plan_items(id, plan_id, progress, active) VALUES (1,1,50,1),(2,1,100,1)");
+// Iyilestirme firsatlari: A'da 1 acik + 1 uygulanan.
+$pdo->exec("INSERT INTO improvements(id, company_id, title, status, benefit_type, impact, priority, active, created_at) VALUES "
+    . "(1,970001,'Oneri A','submitted','quality','high','high',1,'$now'),"
+    . "(2,970001,'Uygulanan A','implemented','efficiency','medium','normal',1,'$now')");
 
 // ---- Super admin: kisitlamasiz (null kapsam).
 $trend = qmsDashboardTrend($pdo, 0, 'super_admin');
@@ -76,6 +81,8 @@ $tones = array_column($summary['points'], 'tone');
 dashCheck(in_array('warning', $tones, true), 'Overdue action yields a warning tone');
 dashCheck(strpos($texts, 'tedarikçi değerlendirmesi gecikmiş') !== false, 'Summary flags overdue supplier evaluation');
 dashCheck(strpos($texts, '%75 ilerlemede') !== false, 'Summary reports 75% quality plan progress');
+dashCheck(strpos($texts, 'açık iyileştirme fırsatı var') !== false, 'Summary flags open improvement');
+dashCheck(strpos($texts, 'iyileştirme fırsatı uygulandı') !== false, 'Summary reports implemented improvement');
 
 // ---- Kapsam: company_user yalnizca kendi sirketini gorur.
 $trendUser = qmsDashboardTrend($pdo, 970101, 'company_user');

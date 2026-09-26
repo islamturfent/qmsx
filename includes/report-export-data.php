@@ -490,6 +490,39 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     }
     $internalSurveyAvg = $internalSurveyAnswers > 0 ? round($internalSurveyScoreSum / $internalSurveyAnswers, 1) : null;
 
+    $improvementsRaw = $fetchRows(
+        "SELECT i.id, i.company_id, i.title, i.category, i.benefit_type, i.impact, i.priority, i.status, i.target_date, companies.company_name
+         FROM improvements i
+         INNER JOIN companies ON companies.id = i.company_id
+         WHERE i.active = 1 AND i.created_at BETWEEN ? AND ?" . $scopeSql,
+        $periodParams
+    );
+    usort($improvementsRaw, static fn(array $a, array $b): int => (int) $b['id'] <=> (int) $a['id']);
+    $improvementStatusLabels = ['submitted' => 'Önerildi', 'under_review' => 'Değerlendirmede', 'approved' => 'Onaylandı', 'rejected' => 'Reddedildi', 'implemented' => 'Uygulandı', 'closed' => 'Kapandı'];
+    $improvementList = [];
+    $improvementOpen = 0;
+    $improvementImplemented = 0;
+    foreach ($improvementsRaw as $item) {
+        $st = (string) $item['status'];
+        if (!in_array($st, ['rejected', 'closed', 'implemented'], true)) {
+            $improvementOpen++;
+        }
+        if ($st === 'implemented') {
+            $improvementImplemented++;
+        }
+        $improvementList[] = [
+            'company_name' => $item['company_name'],
+            'title' => $item['title'],
+            'category' => $item['category'],
+            'benefit_type' => $item['benefit_type'],
+            'impact' => $item['impact'],
+            'priority' => $item['priority'],
+            'status_label' => $improvementStatusLabels[$st] ?? $st,
+            'target_date' => $item['target_date'],
+        ];
+    }
+    $improvementCount = count($improvementList);
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -532,6 +565,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'internal_survey_count' => count($internalSurveyList),
         'internal_survey_respondents' => $internalSurveyRespondents,
         'internal_survey_avg' => $internalSurveyAvg,
+        'improvement_count' => $improvementCount,
+        'improvement_open' => $improvementOpen,
+        'improvement_implemented' => $improvementImplemented,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -874,5 +910,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'copy_list' => $copyList,
         'approval_run_list' => $approvalRunList,
         'internal_survey_list' => $internalSurveyList,
+        'improvement_list' => $improvementList,
     ];
 }

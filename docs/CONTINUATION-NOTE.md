@@ -51,13 +51,11 @@ carried over from earlier assumptions.
   | `tests/approval-workflow.php` | 21 |
   | `tests/quality-cost-trend.php` | 12 |
   | `tests/document-compare.php` | 14 |
-  | `tests/report-export-data.php` | 9 |
   | `tests/dashboard-cockpit.php` | 10 |
   | `tests/due-workbench.php` | 7 |
   | `tests/capa-type.php` | 5 |
   | `tests/auditor-workload.php` | 7 |
   | `tests/user-overdue.php` | 4 |
-  | `tests/notify-overdue.php` | 4 |
   | `tests/mailer.php` | 11 |
   | `tests/notification-preferences.php` | 7 |
   | `tests/audit-program-reminders.php` | 5 |
@@ -69,13 +67,13 @@ carried over from earlier assumptions.
   | `tests/internal-survey.php` | 22 |
   | `tests/quality-plan.php` | 18 |
   | `tests/supplier-evaluations.php` | 15 |
-  | `tests/report-export-data.php` | 12 |
   | `tests/notify-overdue.php` | 5 |
   | `tests/notify-modules.php` | 4 |
-  | `tests/dashboard-trend.php` | 19 |
+  | `tests/dashboard-trend.php` | 21 |
   | `tests/improvements.php` | 14 |
+  | `tests/report-export-data.php` | 15 |
 
-  798 checks total (48 suites). All suites use temporary tables and leave real records
+  803 checks total (47 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -926,6 +924,15 @@ Dashboard Dönem Özeti artık kalite planı ve tedarikçi takvimini de içeriyo
 
 Bu modül, bildirimle bağlanabilir (yeni yüksek etkili öneri / uygulanma bildirimi)
 ve rapor export'una eklenebilir - gelecek adımlar için hazır.
+
+### İyileştirme Fırsatları→ rapor + Dönem Özeti bağlantısı (2026-09-26)
+- `report-export-data.php`: `improvement_list` bölümü + KPI'ler
+  (`improvement_count/open/implemented`). PDF'ye "İyileştirme Fırsatları" detay
+  tablosu + metrik; XLSX'e "İyileştirme" çalışma sayfası + 3 KPI etiketi.
+- `qmsDashboardSummary()`'e açık iyileştirme sayısı ve uygulanan sayısı maddeleri
+  (kapsamlı toplu sorgularla).
+- Testler: `tests/report-export-data.php` 12 → 15, `tests/dashboard-trend.php`
+  19 → 21 kontrol.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

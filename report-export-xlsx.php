@@ -58,6 +58,9 @@ $metricLabels = [
     'internal_survey_count' => 'İç Anket Sayısı',
     'internal_survey_respondents' => 'İç Anket Katılımcı',
     'internal_survey_avg' => 'Ortalama İç Memnuniyet',
+    'improvement_count' => 'İyileştirme Fırsatı',
+    'improvement_open' => 'Açık Fırsat',
+    'improvement_implemented' => 'Uygulanan Fırsat',
 ];
 
 $summaryRows = [
@@ -537,6 +540,27 @@ foreach ($report['internal_survey_list'] as $row) {
     ];
 }
 
+$improvementRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Öneri', 'style' => 2],
+    ['value' => 'Kategori', 'style' => 2],
+    ['value' => 'Fayda', 'style' => 2],
+    ['value' => 'Etki', 'style' => 2],
+    ['value' => 'Durum', 'style' => 2],
+    ['value' => 'Hedef', 'style' => 2],
+]];
+foreach ($report['improvement_list'] as $row) {
+    $improvementRows[] = [
+        ['value' => $row['company_name'], 'style' => 3],
+        ['value' => $row['title'], 'style' => 3],
+        ['value' => ($row['category'] ?? ''), 'style' => 3],
+        ['value' => $row['benefit_type'], 'style' => 3],
+        ['value' => $row['impact'], 'style' => 3],
+        ['value' => $row['status_label'], 'style' => 3],
+        ['value' => ($row['target_date'] ?? ''), 'style' => 3],
+    ];
+}
+
 $temporaryPath = tempnam(sys_get_temp_dir(), 'qms-report-');
 if ($temporaryPath === false) {
     throw new RuntimeException('Geçici dosya oluşturulamadı.');
@@ -566,6 +590,7 @@ try {
         ['name' => 'Dağıtım', 'xml' => xlsxWorksheet($copyRows, [28, 40, 12, 20, 14, 14])],
         ['name' => 'Onay Akışları', 'xml' => xlsxWorksheet($approvalRunRows, [28, 40, 16, 20])],
         ['name' => 'İç Anket', 'xml' => xlsxWorksheet($internalSurveyRows, [28, 40, 12, 12, 16])],
+        ['name' => 'İyileştirme', 'xml' => xlsxWorksheet($improvementRows, [28, 40, 18, 14, 12, 16, 14])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';

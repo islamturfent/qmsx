@@ -219,6 +219,14 @@ foreach ($report['internal_survey_list'] as $row) {
         . ($row['avg_rating'] !== null ? $row['avg_rating'] . '/5' : '-') . '</td></tr>';
 }
 
+$improvementRows = '';
+foreach ($report['improvement_list'] as $row) {
+    $improvementRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['category'] ?? '') . '</td><td>' . $escape($row['benefit_type']) . '</td><td>'
+        . $escape($row['impact']) . '</td><td>' . $escape($row['status_label']) . '</td><td>'
+        . $escape($row['target_date'] ?? '') . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -294,6 +302,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>İç Anket</span><strong>' . $metrics['internal_survey_count'] . '</strong></td>
       <td class="metric"><span>Ort. İç Memnuniyet</span><strong>' . ($metrics['internal_survey_avg'] ?? '-') . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>İyileştirme Fırsatı</span><strong>' . $metrics['improvement_count'] . '</strong></td>
+      <td class="metric"><span>Uygulanan</span><strong>' . $metrics['improvement_implemented'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -320,6 +331,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Dağıtım', '<th>Şirket</th><th>Doküman</th><th>Kopya No</th><th>Alıcı</th><th>Durum</th><th>Dağıtım</th>', $copyRows)
     . $detailSection('Onay Akışları', '<th>Şirket</th><th>Konu</th><th>Durum</th><th>Oluşturulma</th>', $approvalRunRows)
     . $detailSection('İç Memnuniyet Anketi', '<th>Şirket</th><th>Anket</th><th>Katılımcı</th><th>Yanıt</th><th>Ortalama</th>', $internalSurveyRows)
+    . $detailSection('İyileştirme Fırsatları', '<th>Şirket</th><th>Öneri</th><th>Kategori</th><th>Fayda</th><th>Etki</th><th>Durum</th><th>Hedef</th>', $improvementRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

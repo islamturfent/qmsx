@@ -204,6 +204,16 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
     );
     $planProgressAvg = $planItemTotal > 0 ? (int) round($planItemProgress / $planItemTotal) : null;
     $currentYear = (int) date('Y');
+    $openImprovements = $agg(
+        'SELECT COUNT(*) FROM improvements i
+         INNER JOIN companies co ON co.id = i.company_id
+         WHERE i.active = 1 AND i.status NOT IN (\'rejected\', \'closed\', \'implemented\')' . $scope['sql']
+    );
+    $implementedImprovements = $agg(
+        'SELECT COUNT(*) FROM improvements i
+         INNER JOIN companies co ON co.id = i.company_id
+         WHERE i.active = 1 AND i.status = \'implemented\'' . $scope['sql']
+    );
 
     // En yogun ay (denetim bazinda).
     $topMonth = null;
@@ -244,6 +254,15 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
         $points[] = ['tone' => 'neutral', 'text' => $currentYear . ' kalite planı hedefleri ortalama %' . $planProgressAvg . ' ilerlemede.'];
     } else {
         $points[] = ['tone' => 'neutral', 'text' => $currentYear . ' için tanımlı kalite planı hedefi bulunmuyor.'];
+    }
+
+    if ($openImprovements > 0) {
+        $points[] = ['tone' => 'neutral', 'text' => $openImprovements . ' açık iyileştirme fırsatı var.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Açık iyileştirme fırsatı bulunmuyor.'];
+    }
+    if ($implementedImprovements > 0) {
+        $points[] = ['tone' => 'positive', 'text' => $implementedImprovements . ' iyileştirme fırsatı uygulandı.'];
     }
 
     if ($complaints > 0) {
