@@ -1147,6 +1147,8 @@ aletler sayfasinda "Gecmis" butonu + menuye "Kalibrasyon Gecmisi".
 - `sidebar.js` kullanici menusu yeniden kuruldu: tetik avatar + ad/rol (iki satir)
   + chevron SVG; dropdown basligi avatar + ad + rol; maddeler ikon + etiket
   (Profil/user, Hesap Ayarlari/cog, Sifre/key, ayrac, Cikis/logout).
+- Header siralama (CSS order, fonksiyon degismez): sagdan sola kullanici, dil,
+  tema, uyari zili. cache v99.
 - `appIcon()`'a `user`,`cog`,`key`,`chevronDown` ikonlari; app-sidebar gizli
   ikon span'lari + i18n `accountSettingsMenuLabel`.
 - `.user-menu-*` TailAdmin olcultur (iki satir id, ikonlu madde, ayrac). cache v98.

@@ -1693,6 +1693,13 @@ body.has-sidebar {
     gap: 8px;
 }
 
+/* Header elemanlarini istenen sirada gosterir (soldan saga):
+   uyari zili, tema, dil, kullanici (en sagda). Fonksiyonlari degistirmaz. */
+.topbar-actions > .notification-menu { order: 1; }
+.topbar-actions > #themeToggle { order: 2; }
+.topbar-actions > #languageToggle { order: 3; }
+.topbar-actions > .user-menu { order: 4; }
+
 .topbar-button {
     display: inline-flex;
     min-width: 40px;
