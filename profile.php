@@ -453,6 +453,29 @@ $activeNav = "";
                 <?php endif; ?>
             </div>
         </div>
+
+        <section class="form-panel">
+            <div class="section-heading compact-heading"><div><h3 data-i18n="notificationPrefsTitle">Bildirim Tercihleri</h3><p data-i18n="notificationPrefsText">E-posta bildirimlerini aç/kapat ve hangi kategoriden e-posta alacağını seç.</p></div></div>
+            <?php if ($prefsSaved): ?><div class="form-message success" data-i18n="notificationPrefsSaved">Bildirim tercihleri kaydedildi.</div><?php endif; ?>
+            <form class="auditor-form" method="post" action="profile.php">
+                <?= qmsCsrfField('profile') ?>
+                <input type="hidden" name="form_type" value="save_prefs">
+                <div class="form-grid">
+                    <label class="pref-check form-field-wide"><input type="checkbox" name="email_notifications" <?= $mailPrefs['email_enabled'] ? 'checked' : '' ?>><span class="box"></span><span data-i18n="notificationPrefsEmailEnabled">E-posta bildirimleri al</span></label>
+                    <label class="form-field form-field-wide">
+                        <span data-i18n="notificationPrefsCategories">E-posta alınacak kategoriler (boş = tümü)</span>
+                        <div class="pref-checks">
+                            <?php foreach ($mailGroups as $gKey => $gLabel): $checked = $mailPrefs['categories'] === null || in_array($gKey, $mailPrefs['categories'], true); ?>
+                                <label class="pref-check"><input type="checkbox" name="email_categories[]" value="<?= htmlspecialchars($gKey, ENT_QUOTES, 'UTF-8') ?>" <?= $checked ? 'checked' : '' ?>><span class="box"></span><span><?= htmlspecialchars($gLabel, ENT_QUOTES, 'UTF-8') ?></span></label>
+                            <?php endforeach; ?>
+                        </div>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="primary-button" type="submit" data-i18n="notificationPrefsSave">Kaydet</button>
+                </div>
+            </form>
+        </section>
     </main>
 
     <div class="modal-overlay" id="editPersonal" hidden>
@@ -603,29 +626,6 @@ $activeNav = "";
             </form>
         </div>
     </div>
-
-    <section class="form-panel">
-        <div class="section-heading compact-heading"><div><h3 data-i18n="notificationPrefsTitle">Bildirim Tercihleri</h3><p data-i18n="notificationPrefsText">E-posta bildirimlerini aç/kapat ve hangi kategoriden e-posta alacağını seç.</p></div></div>
-        <?php if ($prefsSaved): ?><div class="form-message success" data-i18n="notificationPrefsSaved">Bildirim tercihleri kaydedildi.</div><?php endif; ?>
-        <form class="auditor-form" method="post" action="profile.php">
-            <?= qmsCsrfField('profile') ?>
-            <input type="hidden" name="form_type" value="save_prefs">
-            <div class="form-grid">
-                <label class="form-field form-field-wide"><span class="switch-label"><input type="checkbox" name="email_notifications" <?= $mailPrefs['email_enabled'] ? 'checked' : '' ?>> <span data-i18n="notificationPrefsEmailEnabled">E-posta bildirimleri al</span></span></label>
-                <label class="form-field form-field-wide">
-                    <span data-i18n="notificationPrefsCategories">E-posta alınacak kategoriler (boş = tümü)</span>
-                    <div class="pref-checks">
-                        <?php foreach ($mailGroups as $gKey => $gLabel): $checked = $mailPrefs['categories'] === null || in_array($gKey, $mailPrefs['categories'], true); ?>
-                            <label class="pref-check"><input type="checkbox" name="email_categories[]" value="<?= htmlspecialchars($gKey, ENT_QUOTES, 'UTF-8') ?>" <?= $checked ? 'checked' : '' ?>> <span><?= htmlspecialchars($gLabel, ENT_QUOTES, 'UTF-8') ?></span></label>
-                        <?php endforeach; ?>
-                    </div>
-                </label>
-            </div>
-            <div class="form-actions">
-                <button class="primary-button" type="submit" data-i18n="notificationPrefsSave">Kaydet</button>
-            </div>
-        </form>
-    </section>
 
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/language.js"></script>

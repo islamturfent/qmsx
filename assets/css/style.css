@@ -3186,12 +3186,64 @@ body.modal-open {
 }
 
 .pref-check {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     color: var(--text-body);
     font-size: 13px;
     cursor: pointer;
+    user-select: none;
+}
+
+/* TailAdmin tarzi ozel onay kutusu: yerel input gorsel olarak gizlenir,
+   gorunen kutu .box span olur; tiklaninca marka rengi dolar ve beyaz tik cikar. */
+.pref-check input[type="checkbox"] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.pref-check .box {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 6px;
+    background: var(--surface-color);
+    display: inline-block;
+    position: relative;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.pref-check input:checked + .box {
+    background: var(--brand-500);
+    border-color: var(--brand-500);
+}
+
+.pref-check input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.pref-check input:focus-visible + .box {
+    box-shadow: 0 0 0 3px var(--brand-soft);
+    border-color: var(--brand-500);
+}
+
+.pref-check:hover input:not(:checked) + .box {
+    border-color: var(--brand-500);
 }
 
 .form-message.info {
