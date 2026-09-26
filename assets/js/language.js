@@ -2885,6 +2885,27 @@ translations.en.incidentCriticalBadge = "Critical";
 translations.en.incidentEmpty = "No incident records yet.";
 translations.en.incidentDelete = "Delete";
 
+translations.tr.incidentDetailTitle = "Olay Detayı";
+translations.tr.incidentDetailText = "Olay bilgilerini görüntüleyin ve gerekirse uygunsuzluk oluşturun.";
+translations.tr.incidentBackTo = "Olaylara Dön";
+translations.tr.incidentDetailButton = "Detay";
+translations.tr.incidentInfoTitle = "Olay Bilgileri";
+translations.tr.incidentCapaTitle = "Düzeltici Faaliyet (CAPA) Bağlantısı";
+translations.tr.incidentNcLinkedText = "Bu olay için uygunsuzluk oluşturulmuş durumda.";
+translations.tr.incidentNcCreateText = "Olaydan bir uygunsuzluk (ve ardından CAPA) oluşturabilirsiniz.";
+translations.tr.incidentOpenNcButton = "Uygunsuzluğu Aç";
+translations.tr.incidentCreateNcButton = "Uygunsuzluk Oluştur";
+translations.en.incidentDetailTitle = "Incident Detail";
+translations.en.incidentDetailText = "View incident details and create a nonconformity if needed.";
+translations.en.incidentBackTo = "Back to Incidents";
+translations.en.incidentDetailButton = "Detail";
+translations.en.incidentInfoTitle = "Incident Details";
+translations.en.incidentCapaTitle = "Corrective Action (CAPA) Link";
+translations.en.incidentNcLinkedText = "A nonconformity already exists for this incident.";
+translations.en.incidentNcCreateText = "You can create a nonconformity (and then a CAPA) from this incident.";
+translations.en.incidentOpenNcButton = "Open Nonconformity";
+translations.en.incidentCreateNcButton = "Create Nonconformity";
+
 // --- Kalibrasyon & Metroloji ---
 translations.tr.instrumentsMenuLabel = "Kalibrasyon & Metroloji";
 translations.tr.instrumentsTitle = "Kalibrasyon & Metroloji";

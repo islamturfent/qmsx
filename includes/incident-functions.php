@@ -142,6 +142,46 @@ function qmsIncidentDelete(PDO $pdo, int $id, int $userId, string $role): bool
     return $stmt->rowCount() > 0;
 }
 
+/** Olaya bagli varsa uygunsuzluk id'si; yoksa 0. */
+function qmsIncidentLinkedNonconformity(PDO $pdo, int $incidentId): int
+{
+    $stmt = $pdo->prepare('SELECT id FROM nonconformities WHERE incident_id = ? AND active = 1 LIMIT 1');
+    $stmt->execute([$incidentId]);
+    return (int) $stmt->fetchColumn();
+}
+
+/**
+ * Olaydan bir uygunsuzluk (nonconformity) olusturur ve baglar.
+ * Zaten olusturulduysa mevcut id doner. @return int|null
+ */
+function qmsIncidentCreateNonconformity(PDO $pdo, int $incidentId, int $userId, string $role): ?int
+{
+    $inc = qmsIncidentFind($pdo, $incidentId, $userId, $role);
+    if (!$inc) {
+        return null;
+    }
+    $linked = qmsIncidentLinkedNonconformity($pdo, $incidentId);
+    if ($linked > 0) {
+        return $linked;
+    }
+    $title = mb_substr(trim((string) ($inc['title'] ?? '')), 0, 255);
+    if ($title === '') {
+        $title = 'Olay uygunsuzluğu';
+    }
+    $description = trim((string) ($inc['description'] ?? '')) !== '' ? mb_substr((string) $inc['description'], 0, 4000) : null;
+    $insert = $pdo->prepare('INSERT INTO nonconformities
+        (company_id, audit_id, source, title, description, severity, status, incident_id, active)
+        VALUES (?, NULL, \'incident\', ?, ?, ?, \'open\', ?, 1)');
+    $insert->execute([
+        (int) $inc['company_id'],
+        $title,
+        $description,
+        (string) $inc['severity'],
+        $incidentId,
+    ]);
+    return (int) $pdo->lastInsertId();
+}
+
 /**
  * Sirketin sistem adminlerine yeni olay bildirimi gonderir (tercihe bagli eposta).
  */

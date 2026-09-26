@@ -176,6 +176,7 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
+                                <a class="secondary-button secondary-button-sm" href="incident-detail.php?id=<?= (int) $row['id'] ?>" data-i18n="incidentDetailButton">Detay</a>
                                 <a class="secondary-button secondary-button-sm" href="incidents.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="incidents.php" onsubmit="return confirm('Olay silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="incidentDelete">Sil</button></form>
                             </div>

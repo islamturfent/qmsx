@@ -77,8 +77,9 @@ carried over from earlier assumptions.
   | `tests/notify-modules.php` | 7 |
   | `tests/contract-attachments.php` | 7 |
   | `tests/delivery-performance.php` | 15 |
+  | `tests/incident-nonconformity.php` | 7 |
 
-  924 checks total (53 suites). All suites use temporary tables and leave real records
+  931 checks total (54 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -1042,6 +1043,16 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 - Yardımcılar: `includes/delivery-performance-functions.php`.
 - Menü: Operasyonlar → Teslimat Performansı. i18n TR/EN; cache v92.
 - Test: `tests/delivery-performance.php` (15 kontrol).
+
+### Olay → uygunsuzluk/CAPA bağlantısı (2026-09-27)
+- Migration: `nonconformities.incident_id` sütunu (`20261007-incident-nonconformity.sql`,
+  runner `scripts/migrate-incident-nonconformity.php`).
+- `qmsIncidentCreateNonconformity()`: olaydan uygunsuzluk oluşturur (source='incident',
+  şirket, başlık/açıklama, şiddet) ve `incident_id` ile bağlar; tekrar çağrıda
+  mevcut uygunsuzluğu döner (idempotent). `qmsIncidentLinkedNonconformity()`.
+- Yeni sayfa `incident-detail.php`: olay bilgileri + "Uygunsuzluk Oluştur" (CAPA
+  için uygunsuzluk detayına gider); olay listesinde "Detay" butonu.
+- i18n TR/EN; cache v93. Test: `tests/incident-nonconformity.php` (7 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
