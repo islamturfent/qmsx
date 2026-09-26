@@ -1,0 +1,21 @@
+CREATE TABLE improvements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    title VARCHAR(190) NOT NULL,
+    description TEXT NULL,
+    category VARCHAR(120) NULL,
+    benefit_type VARCHAR(30) NOT NULL DEFAULT 'quality',
+    impact VARCHAR(20) NOT NULL DEFAULT 'medium',
+    priority VARCHAR(20) NOT NULL DEFAULT 'normal',
+    suggested_by INT NULL,
+    responsible VARCHAR(180) NULL,
+    target_date DATE NULL,
+    status VARCHAR(24) NOT NULL DEFAULT 'submitted',
+    eval_score INT NULL,
+    result TEXT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_by INT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_improvements_company (company_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -73,8 +73,9 @@ carried over from earlier assumptions.
   | `tests/notify-overdue.php` | 5 |
   | `tests/notify-modules.php` | 4 |
   | `tests/dashboard-trend.php` | 19 |
+  | `tests/improvements.php` | 14 |
 
-  784 checks total (47 suites). All suites use temporary tables and leave real records
+  798 checks total (48 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -908,6 +909,23 @@ Beşliyi derinleştirme setinin tamamı (1-5) tamamlandı ve commit'lendi.
 - `tests/dashboard-trend.php` 17 → 19 kontrol (yeni maddeler doğrulanır).
 
 Dashboard Dönem Özeti artık kalite planı ve tedarikçi takvimini de içeriyor.
+
+### Yeni modül: İyileştirme Fırsatları / OFI (2026-09-26)
+- Schema: `improvements` (migration `20261002-improvements.sql`, idempotent runner
+  `scripts/migrate-improvements.php`). Sürekli iyileştirme önerileri; CAPA'dan
+  farklı olarak uygunsuzluğa bağlanmaz.
+- Sayfa: `improvements.php` - CRUD + KPI kartları (açık/uygulanan/toplam) + durum
+  filtresi. Alanlar: fayda türü, etki, öncelik, sorumlu, hedef tarih, durum,
+  değerlendirme puanı (1-5), sonuç.
+- Durum akışı: `submitted / under_review / approved / rejected / implemented / closed`.
+- Yardımcılar: `includes/improvement-functions.php` (`qmsImprovementList/Find/Add/
+  Update/Delete` + etiket yardımcıları).
+- Menü: Operasyonlar → İyileştirme Fırsatları. i18n TR/EN; cache v82.
+- Test: `tests/improvements.php` (14 kontrol). Not: 'open' filtresi
+  rejected/closed/implemented dışı → açık fırsat; implement sonrası filtreden çıkar.
+
+Bu modül, bildirimle bağlanabilir (yeni yüksek etkili öneri / uygulanma bildirimi)
+ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
