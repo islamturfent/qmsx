@@ -40,9 +40,19 @@ require_once __DIR__ . '/includes/dashboard-functions.php';
 require_once __DIR__ . '/includes/performance-functions.php';
 require_once __DIR__ . '/includes/due-workbench-functions.php';
 require_once __DIR__ . '/includes/announcement-functions.php';
+require_once __DIR__ . '/includes/quality-plan-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
+
+// Yillik kalite plani ilerlemesi.
+$dashboardPlans = qmsQualityPlanList($pdo, $userId, qmsCurrentRole());
+$dashboardPlanYear = (int) date('Y');
+$dashboardCurrentPlans = array_values(array_filter($dashboardPlans, static fn($p): bool => (int) $p['plan_year'] === $dashboardPlanYear));
+if (!$dashboardCurrentPlans) {
+    usort($dashboardPlans, static fn($a, $b): int => (int) $b['plan_year'] <=> (int) $a['plan_year']);
+    $dashboardCurrentPlans = array_slice($dashboardPlans, 0, 3);
+}
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -166,6 +176,13 @@ $activeNav = "dashboard";
                     <strong class="dashboard-card-number"><?= count($dashboardAnnouncements) ?></strong>
                 </div>
             </a>
+            <a class="dashboard-card metric-violet" href="quality-plan.php">
+                <?= appIcon("table", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="dashboardQualityPlanCardLabel">Yıllık Plan</span>
+                    <strong class="dashboard-card-number"><?= count($dashboardCurrentPlans) ?></strong>
+                </div>
+            </a>
         </section>
 
         <section class="page-section console-card">
@@ -206,6 +223,30 @@ $activeNav = "dashboard";
                         <strong><?= htmlspecialchars($ann['title'], ENT_QUOTES, 'UTF-8') ?></strong>
                         <?php if ($ann['body']): ?><p><?= htmlspecialchars(mb_substr((string) $ann['body'], 0, 220), ENT_QUOTES, 'UTF-8') ?><?= mb_strlen((string) $ann['body']) > 220 ? '…' : '' ?></p><?php endif; ?>
                         <small><?= htmlspecialchars((string) $ann['created_at'], ENT_QUOTES, 'UTF-8') ?><?= $ann['creator_name'] ? ' · ' . htmlspecialchars($ann['creator_name'], ENT_QUOTES, 'UTF-8') : '' ?></small>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <?php if ($dashboardCurrentPlans): ?>
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("table", "heading-inline-icon") ?><span data-i18n="dashboardQualityPlanTitle">Kalite Planı İlerlemesi</span></h3>
+                    <p data-i18n="dashboardQualityPlanText">Yıllık kalite hedeflerinin tamamlanma durumu ve ortalama ilerlemesi.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="quality-plan.php" data-i18n="dashboardQualityPlanMoreLink">Tümü</a>
+            </div>
+            <div class="plan-progress-list">
+                <?php foreach ($dashboardCurrentPlans as $pl): ?>
+                    <?php $planPct = $pl['avg_progress'] !== null ? (int) $pl['avg_progress'] : 0; ?>
+                    <div class="plan-progress-item">
+                        <div class="plan-progress-head">
+                            <strong><?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?> (<?= (int) $pl['plan_year'] ?>)</strong>
+                            <span><?= (int) $pl['item_completed'] ?>/<?= (int) $pl['item_total'] ?> tamamlandı · %<?= $planPct ?></span>
+                        </div>
+                        <div class="progress-track"><div class="progress-fill" style="width:<?= min(100, $planPct) ?>%"></div></div>
                     </div>
                 <?php endforeach; ?>
             </div>

@@ -2326,6 +2326,50 @@ body {
     margin-top: 6px;
 }
 
+.plan-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.plan-progress-item {
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    background: var(--surface-color);
+    padding: 14px 16px;
+}
+
+.plan-progress-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.plan-progress-head strong {
+    font-size: 15px;
+}
+
+.plan-progress-head span {
+    color: var(--muted-color);
+    font-size: 13px;
+}
+
+.progress-track {
+    height: 8px;
+    background: var(--neutral-soft);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    display: block;
+    height: 100%;
+    background: var(--brand-500);
+    border-radius: 999px;
+}
+
 .empty-state {
     border: 1px dashed var(--border-control);
     border-radius: 12px;

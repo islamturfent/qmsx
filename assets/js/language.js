@@ -2514,6 +2514,15 @@ translations.en.dashboardAnnouncementsTitle = "Latest Announcements";
 translations.en.dashboardAnnouncementsText = "Recent announcements published for your company.";
 translations.en.dashboardAnnouncementsMoreLink = "All";
 
+translations.tr.dashboardQualityPlanCardLabel = "Yıllık Plan";
+translations.tr.dashboardQualityPlanTitle = "Kalite Planı İlerlemesi";
+translations.tr.dashboardQualityPlanText = "Yıllık kalite hedeflerinin tamamlanma durumu ve ortalama ilerlemesi.";
+translations.tr.dashboardQualityPlanMoreLink = "Tümü";
+translations.en.dashboardQualityPlanCardLabel = "Annual Plan";
+translations.en.dashboardQualityPlanTitle = "Quality Plan Progress";
+translations.en.dashboardQualityPlanText = "Completion status and average progress of yearly quality objectives.";
+translations.en.dashboardQualityPlanMoreLink = "All";
+
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {
