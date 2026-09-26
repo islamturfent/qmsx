@@ -13,6 +13,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
     $sidebarNotificationStmt->execute(["user_id" => (int) $_SESSION["qms_user_id"]]);
     $sidebarUnreadCount = (int) $sidebarNotificationStmt->fetchColumn();
 }
+$sidebarRecentNotifications = [];
+if (isset($pdo, $_SESSION["qms_user_id"])) {
+    $sidebarRecentStmt = $pdo->prepare("SELECT id, title, message, link_url, is_read, created_at FROM notifications WHERE user_id = :user_id ORDER BY id DESC LIMIT 8");
+    $sidebarRecentStmt->execute(["user_id" => (int) $_SESSION["qms_user_id"]]);
+    $sidebarRecentNotifications = $sidebarRecentStmt->fetchAll(PDO::FETCH_ASSOC);
+}
 $sidebarOverdueCount = 0;
 $sidebarSupplierEvalOverdue = 0;
 if (!empty($pdo) && !$isAuditorNav && isset($_SESSION["qms_user_id"])) {
@@ -50,6 +56,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
       data-role="<?= htmlspecialchars($headerRoleLabel, ENT_QUOTES, "UTF-8") ?>"
       data-initials="<?= htmlspecialchars(appInitials($headerUserName), ENT_QUOTES, "UTF-8") ?>"
       data-avatar="<?= $headerHasAvatar ? "1" : "0" ?>"></span>
+<span id="qmsIconSun" hidden><?= appIcon("sun", "") ?></span>
+<span id="qmsIconMoon" hidden><?= appIcon("moon", "") ?></span>
+<span id="qmsIconGlobe" hidden><?= appIcon("globe", "") ?></span>
+<script type="application/json" id="qmsNotificationRecent"><?= json_encode($sidebarRecentNotifications, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
 <aside class="app-sidebar" id="appSidebar">
     <a class="sidebar-brand" href="dashboard.php">
@@ -285,11 +295,4 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             </a>
         <?php endif; ?>
     </nav>
-
-    <div class="sidebar-footer">
-        <a class="sidebar-link" href="logout.php">
-            <?= appIcon("logout") ?>
-            <span data-i18n="logoutLabel">Çıkış</span>
-        </a>
-    </div>
 </aside>

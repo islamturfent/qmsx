@@ -272,12 +272,14 @@ textarea {
     flex: 0 0 40px;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border: 0;
+    border-radius: 8px;
     background: transparent;
     box-shadow: none;
     color: var(--muted-color);
+    cursor: pointer;
     text-decoration: none;
-    transition: color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .notification-bell.is-empty {
@@ -321,6 +323,100 @@ textarea {
     padding: 0 4px;
     font-size: 10px;
     font-weight: 600;
+}
+
+/* Bildirim zili acilir paneli (TailAdmin tarzi) */
+.notification-menu {
+    position: relative;
+}
+
+.notification-panel {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    max-height: 420px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    background: var(--surface-color);
+    box-shadow: var(--shadow-theme-lg);
+}
+
+.notification-panel[hidden] {
+    display: none;
+}
+
+.notification-panel-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-row);
+}
+
+.notification-panel-head strong {
+    color: var(--text-body);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.notification-panel-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-panel-empty {
+    padding: 20px 16px;
+    color: var(--muted-color);
+    font-size: 13px;
+    text-align: center;
+}
+
+.notification-panel-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-row);
+    color: var(--text-body);
+    text-decoration: none;
+    transition: background-color 0.12s ease;
+}
+
+.notification-panel-item:hover {
+    background: var(--nav-hover);
+    text-decoration: none;
+}
+
+.notification-panel-item.is-read {
+    opacity: 0.62;
+}
+
+.notification-panel-text {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.notification-panel-time {
+    color: var(--muted-color);
+    font-size: 11px;
+}
+
+.notification-panel-footer {
+    display: block;
+    padding: 11px 16px;
+    border-top: 1px solid var(--border-row);
+    color: var(--brand-500);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+}
+
+.notification-panel-footer:hover {
+    background: var(--nav-hover);
+    text-decoration: none;
 }
 
 .form-panel {
@@ -1599,35 +1695,51 @@ body.has-sidebar {
 
 .topbar-button {
     display: inline-flex;
-    min-width: 44px;
-    height: 44px;
+    min-width: 40px;
+    height: 40px;
     align-items: center;
     justify-content: center;
-
-    border: 1px solid var(--border-subtle);
-    background: var(--surface-color);
+    gap: 6px;
+    border: 0;
+    background: transparent;
     color: var(--muted-color);
-
-    border-radius: 50%;
+    border-radius: 8px;
     cursor: pointer;
-
     font-size: 14px;
     font-weight: 500;
     line-height: 1;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    padding: 0 8px;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .topbar-button:hover {
     background: var(--nav-hover);
-    border-color: var(--border-control);
     color: var(--text-body);
     text-decoration: none;
 }
 
 .topbar-button:focus-visible {
     outline: none;
-    border-color: var(--brand-300);
     box-shadow: var(--shadow-focus-ring);
+}
+
+/* TailAdmin ikon buton: dil / tema tutarinda icon + opsiyonel etiket. */
+.topbar-btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.topbar-btn-icon svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+.topbar-btn-label {
+    color: var(--text-body);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .topbar-link {

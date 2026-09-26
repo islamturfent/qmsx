@@ -1127,6 +1127,22 @@ aletler sayfasinda "Gecmis" butonu + menuye "Kalibrasyon Gecmisi".
 - Dönem Özeti'ne denetim izi kayit sayisi noktasi.
 - Test: `tests/audit-trail-export.php` (6 kontrol).
 
+### Sidebar + header TailAdmin uyumluluk paketi (2026-10-08)
+- **Sol menü kaydirma korunur**: `assets/js/sidebar.js` `.sidebar-nav.scrollTop`
+  degerini `sessionStorage`'da tutar ve sayfa yuklenince geri yukler; bir menü
+  maddesine tiklayinca menü baslangica kaymaz, tiklama konumunda kalir.
+- **Sol menuden cikis dugmesi kaldirildi** (`includes/app-sidebar.php` `.sidebar-footer`).
+  Cikis artik yalniz header kullanici menusu dropdown'inda.
+- **Header birebir TailAdmin**:
+  - Zil -> acilir bildirim paneli (son 8 bildirim + "Tumunu Gor") — sidebar.js
+    sunucudan gelen `#qmsNotificationRecent` JSON'dan beslenir.
+  - Kullanici menusu (avatar + ad + ok, dropdown) TailAdmin tarzi (mevcut).
+  - Tema dugmesi gunes/ay SVG ikonuna, dil dugmesi globe + TR/EN etiketine cevrildi
+    (theme.js / language.js / sidebar.js + yeni `sun`,`moon`,`globe` ikonlari).
+  - `.topbar-button` ve `.notification-bell` TailAdmin ikon-butona (kare, cercevesiz,
+    hover bg) yeniden boyutlandirildi; `assets/css/style.css`.
+- i18n TR/EN (notificationPanelTitle/Empty/SeeAll); cache v96.
+
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
 Executive overview added to `dashboard.php` (the dashboard already had audit /

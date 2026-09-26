@@ -6,29 +6,116 @@ if (sidebarToggle) {
     });
 }
 
+// Sol menü kaydirma konumunu sayfalar arasinda koru: bir menü maddesine
+// tiklayinca menü baslangica kaymasin, tiklama konumunda kalsin.
+(function () {
+    const nav = document.querySelector(".sidebar-nav");
+    if (!nav) return;
+    const KEY = "qms-sidebar-scroll";
+    const saved = parseInt(sessionStorage.getItem(KEY) || "0", 10);
+    if (saved > 0) {
+        nav.scrollTop = saved;
+    }
+    const persist = function () {
+        try { sessionStorage.setItem(KEY, String(nav.scrollTop)); } catch (e) {}
+    };
+    nav.addEventListener("scroll", persist, { passive: true });
+    window.addEventListener("pagehide", persist);
+})();
+
 const notificationState = document.getElementById("qmsNotificationState");
 const notificationIcon = document.getElementById("qmsNotificationIcon");
 const topbarActions = document.querySelector(".topbar-actions");
 const languageButton = document.getElementById("languageToggle");
 
+// Son bildirimler (sunucudan JSON olarak gelen <script type=application/json>).
+let recentNotifications = [];
+const recentScript = document.getElementById("qmsNotificationRecent");
+if (recentScript) {
+    try { recentNotifications = JSON.parse(recentScript.textContent || "[]"); } catch (e) { recentNotifications = []; }
+}
+
+// Header bildirim zili - TailAdmin tarzi acilir panel.
 if (notificationState && topbarActions && languageButton) {
     const unreadCount = Number.parseInt(notificationState.dataset.count || "0", 10);
-    const notificationBell = document.createElement("a");
 
-    notificationBell.className = "notification-bell " + (unreadCount > 0 ? "has-notifications" : "is-empty");
-    notificationBell.href = "notifications.php";
-    notificationBell.setAttribute("aria-label", unreadCount > 0 ? unreadCount + " okunmamış bildirim" : "Bildirim yok");
+    const wrapper = document.createElement("div");
+    wrapper.className = "notification-menu";
 
-    // The icon path is rendered server-side by appIcon() so it stays in one place.
-    notificationBell.innerHTML = (notificationIcon ? notificationIcon.innerHTML : "")
+    const bellBtn = document.createElement("button");
+    bellBtn.type = "button";
+    bellBtn.className = "notification-bell " + (unreadCount > 0 ? "has-notifications" : "is-empty");
+    bellBtn.setAttribute("aria-label", unreadCount > 0 ? unreadCount + " okunmamış bildirim" : "Bildirim yok");
+
+    bellBtn.innerHTML = (notificationIcon ? notificationIcon.innerHTML : "")
         + '<span class="notification-bell-count">' + unreadCount + "</span>";
 
-    topbarActions.insertBefore(notificationBell, languageButton);
+    const panel = document.createElement("div");
+    panel.className = "notification-panel";
+    panel.hidden = true;
+
+    const head = document.createElement("div");
+    head.className = "notification-panel-head";
+    const headTitle = document.createElement("strong");
+    headTitle.setAttribute("data-i18n", "notificationPanelTitle");
+    headTitle.textContent = "Bildirimler";
+    head.appendChild(headTitle);
+    panel.appendChild(head);
+
+    const list = document.createElement("div");
+    list.className = "notification-panel-list";
+    if (recentNotifications.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "notification-panel-empty";
+        empty.setAttribute("data-i18n", "notificationPanelEmpty");
+        empty.textContent = "Bildirim yok";
+        list.appendChild(empty);
+    } else {
+        recentNotifications.forEach(function (item) {
+            const a = document.createElement("a");
+            a.className = "notification-panel-item" + (item.is_read ? " is-read" : "");
+            a.href = item.link_url || "notifications.php";
+            const text = document.createElement("span");
+            text.className = "notification-panel-text";
+            text.textContent = item.message || item.title || "";
+            a.appendChild(text);
+            const time = document.createElement("small");
+            time.className = "notification-panel-time";
+            time.textContent = item.created_at || "";
+            a.appendChild(time);
+            list.appendChild(a);
+        });
+    }
+    panel.appendChild(list);
+
+    const foot = document.createElement("a");
+    foot.className = "notification-panel-footer";
+    foot.href = "notifications.php";
+    foot.setAttribute("data-i18n", "notificationPanelSeeAll");
+    foot.textContent = "Tümünü Gör";
+    panel.appendChild(foot);
+
+    bellBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        panel.hidden = !panel.hidden;
+    });
+    document.addEventListener("click", function (event) {
+        if (!panel.hidden && !wrapper.contains(event.target)) {
+            panel.hidden = true;
+        }
+    });
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !panel.hidden) {
+            panel.hidden = true;
+        }
+    });
+
+    wrapper.appendChild(bellBtn);
+    wrapper.appendChild(panel);
+    topbarActions.insertBefore(wrapper, languageButton);
 }
 
 // Header kullanici menusu: TailAdmin'deki profil menusunun karsiligi.
-// Sunucudan gelen durum span'inden beslenir; boylece her sayfayi elle
-// degistirmek gerekmez.
 const userMenuState = document.getElementById("qmsUserMenuState");
 
 if (userMenuState && topbarActions && languageButton) {
@@ -63,6 +150,7 @@ if (userMenuState && topbarActions && languageButton) {
 
     const caret = document.createElement("span");
     caret.setAttribute("aria-hidden", "true");
+    caret.className = "user-menu-caret";
     caret.textContent = "\u25BE";
 
     toggle.appendChild(avatar);

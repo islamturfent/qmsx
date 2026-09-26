@@ -446,6 +446,9 @@ const translations = {
         ,requesterLabel: "Talep Eden"
         ,requestDateLabel: "Talep Tarihi"
         ,notificationCenterTitle: "Bildirim Merkezi"
+        ,notificationPanelTitle: "Bildirimler"
+        ,notificationPanelEmpty: "Bildirim yok"
+        ,notificationPanelSeeAll: "Tümünü Gör"
         ,notificationCenterText: "Onay, karar ve yayın hareketlerinizi takip edin."
         ,markAllReadButton: "Tümünü Okundu İşaretle"
         ,allNotificationsLabel: "Tüm Bildirimler"
@@ -925,6 +928,9 @@ const translations = {
         ,requesterLabel: "Requested By"
         ,requestDateLabel: "Request Date"
         ,notificationCenterTitle: "Notification Center"
+        ,notificationPanelTitle: "Notifications"
+        ,notificationPanelEmpty: "No notifications"
+        ,notificationPanelSeeAll: "See All"
         ,notificationCenterText: "Track approval, decision and publication activity."
         ,markAllReadButton: "Mark All as Read"
         ,allNotificationsLabel: "All Notifications"
@@ -1318,6 +1324,15 @@ const languageToggle = document.getElementById("languageToggle");
 
 let currentLanguage = localStorage.getItem("qms-language") || "tr";
 
+const languageGlobeIcon = (document.getElementById("qmsIconGlobe") || {}).innerHTML || "";
+
+// Dil degistir butonunu TailAdmin tarzi ikon + etiket olarak cizer (globe + TR/EN).
+function renderLanguageButton() {
+    if (!languageToggle) return;
+    const label = currentLanguage === "tr" ? "EN" : "TR";
+    languageToggle.innerHTML = '<span class="topbar-btn-icon">' + languageGlobeIcon + '</span><span class="topbar-btn-label">' + label + '</span>';
+}
+
 function changeLanguage(language) {
 
     document.documentElement.lang = language;
@@ -1332,11 +1347,8 @@ function changeLanguage(language) {
 
     });
 
-    if (language === "tr") {
-        languageToggle.textContent = "EN";
-    } else {
-        languageToggle.textContent = "TR";
-    }
+    currentLanguage = language;
+    renderLanguageButton();
 
     localStorage.setItem("qms-language", language);
 }
