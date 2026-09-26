@@ -68,12 +68,12 @@ carried over from earlier assumptions.
   | `tests/quality-plan.php` | 18 |
   | `tests/supplier-evaluations.php` | 15 |
   | `tests/notify-overdue.php` | 5 |
-  | `tests/notify-modules.php` | 4 |
+  | `tests/notify-modules.php` | 6 |
   | `tests/dashboard-trend.php` | 21 |
   | `tests/improvements.php` | 14 |
   | `tests/report-export-data.php` | 15 |
 
-  803 checks total (47 suites). All suites use temporary tables and leave real records
+  805 checks total (47 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -933,6 +933,16 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
   (kapsamlı toplu sorgularla).
 - Testler: `tests/report-export-data.php` 12 → 15, `tests/dashboard-trend.php`
   19 → 21 kontrol.
+
+### OFI bildirimleri + dashboard widget (2026-09-26)
+- Yeni bildirim türleri: `improvement_submitted`, `improvement_implemented`
+  (grup `improvement` = İyileştirme). `qmsImprovementNotify()` sirket adminlerine
+  (qmsNotifyCompanyAdmins üzerinden) tercihe bağlı e-posta ile bildirir.
+- `improvements.php`: eklemede `improvement_submitted`; durum 'implemented'
+  olunca (öncesi farklıysa) `improvement_implemented` bildirimi.
+- Dashboard: "İyileştirme" KPI kartı + açık iyileştirme önerileri için özel OFI
+  widget'ı (öncelik rozeti: yüksek/normal/düşük). `ofi-*` CSS, i18n; cache v83.
+- `tests/notify-modules.php` 4 → 6 kontrol.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

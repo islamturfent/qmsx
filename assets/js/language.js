@@ -1226,6 +1226,8 @@ translations.tr.notificationGroupAnnouncementLabel = "Duyuru";
 translations.tr.notificationGroupSurveyLabel = "Anket";
 translations.en.notificationGroupAnnouncementLabel = "Announcement";
 translations.en.notificationGroupSurveyLabel = "Survey";
+translations.tr.notificationGroupImprovementLabel = "İyileştirme";
+translations.en.notificationGroupImprovementLabel = "Improvement";
 
 Object.assign(translations.tr, {
     reviewsTitle: "Yönetimin Gözden Geçirmesi", reviewsText: "Gözden geçirme toplantılarını, girdileri ve çıkan aksiyonları izleyin.",
@@ -2592,6 +2594,15 @@ translations.en.improvementListTitle = "Suggestions";
 translations.en.improvementAllStatuses = "All Statuses";
 translations.en.improvementEmpty = "No improvement suggestions yet.";
 translations.en.improvementDelete = "Delete";
+
+translations.tr.dashboardImprovementsCardLabel = "İyileştirme";
+translations.tr.dashboardImprovementsWidgetTitle = "İyileştirme Fırsatları";
+translations.tr.dashboardImprovementsWidgetText = "Açık iyileştirme önerileri; yüksek öncelikliler önce listelenir.";
+translations.tr.dashboardImprovementsMoreLink = "Tümü";
+translations.en.dashboardImprovementsCardLabel = "Improvements";
+translations.en.dashboardImprovementsWidgetTitle = "Improvement Opportunities";
+translations.en.dashboardImprovementsWidgetText = "Open improvement suggestions; high priority first.";
+translations.en.dashboardImprovementsMoreLink = "All";
 
 changeLanguage(currentLanguage);
 

@@ -125,6 +125,19 @@ function qmsImprovementDelete(PDO $pdo, int $id, int $userId, string $role): boo
     return $stmt->rowCount() > 0;
 }
 
+/**
+ * Sirketin sistem adminlerine iyilestirme bildirimi gonderir (tercihe bagli eposta).
+ * @param string $type 'improvement_submitted' | 'improvement_implemented'
+ */
+function qmsImprovementNotify(PDO $pdo, int $companyId, string $type, string $title, string $link): void
+{
+    if ($companyId <= 0) {
+        return;
+    }
+    require_once __DIR__ . '/notifications.php';
+    qmsNotifyCompanyAdmins($pdo, $companyId, $type, 'İyileştirme Fırsatı', $title, $link);
+}
+
 /** Durum etiketi metni (TR). */
 function qmsImprovementStatusLabel(string $status): string
 {

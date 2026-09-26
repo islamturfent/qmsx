@@ -58,14 +58,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $data["suggested_by"] = $userId;
             $newId = qmsImprovementAdd($pdo, $data, $userId, $role);
             if ($newId !== null) {
+                qmsImprovementNotify($pdo, $data["company_id"], 'improvement_submitted', 'Yeni öneri: ' . (string) $data['title'], 'improvements.php');
                 header("Location: improvements.php?added=1");
                 exit;
             }
             $formError = "Öneri eklenemedi. Geçerli bir şirket ve başlık girin.";
         } else {
+            $updateId = (int) ($_POST["id"] ?? 0);
+            $prior = qmsImprovementFind($pdo, $updateId, $userId, $role);
+            $priorStatus = !empty($prior) ? (string) $prior['status'] : '';
             $data["suggested_by"] = 0;
-            $ok = qmsImprovementUpdate($pdo, (int) ($_POST["id"] ?? 0), $data, $userId, $role);
+            $ok = qmsImprovementUpdate($pdo, $updateId, $data, $userId, $role);
             if ($ok) {
+                if ($priorStatus !== 'implemented' && (string) ($data['status'] ?? '') === 'implemented') {
+                    qmsImprovementNotify($pdo, (int) ($prior['company_id'] ?? 0), 'improvement_implemented', 'Uygulandı: ' . (string) $data['title'], 'improvements.php');
+                }
                 header("Location: improvements.php?updated=1");
                 exit;
             }

@@ -41,6 +41,7 @@ require_once __DIR__ . '/includes/performance-functions.php';
 require_once __DIR__ . '/includes/due-workbench-functions.php';
 require_once __DIR__ . '/includes/announcement-functions.php';
 require_once __DIR__ . '/includes/quality-plan-functions.php';
+require_once __DIR__ . '/includes/improvement-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
@@ -53,6 +54,9 @@ if (!$dashboardCurrentPlans) {
     usort($dashboardPlans, static fn($a, $b): int => (int) $b['plan_year'] <=> (int) $a['plan_year']);
     $dashboardCurrentPlans = array_slice($dashboardPlans, 0, 3);
 }
+
+// Acik iyilestirme firsatlari (OFI) widget'i.
+$dashboardImprovements = qmsImprovementList($pdo, $userId, qmsCurrentRole(), 'open');
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
 // paneldeki deger raporlarla tutarli kalir (varsayilan donem: son 12 ay).
@@ -183,6 +187,13 @@ $activeNav = "dashboard";
                     <strong class="dashboard-card-number"><?= count($dashboardCurrentPlans) ?></strong>
                 </div>
             </a>
+            <a class="dashboard-card metric-orange" href="improvements.php">
+                <?= appIcon("sparkles", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="dashboardImprovementsCardLabel">İyileştirme</span>
+                    <strong class="dashboard-card-number"><?= count($dashboardImprovements) ?></strong>
+                </div>
+            </a>
         </section>
 
         <section class="page-section console-card">
@@ -247,6 +258,29 @@ $activeNav = "dashboard";
                             <span><?= (int) $pl['item_completed'] ?>/<?= (int) $pl['item_total'] ?> tamamlandı · %<?= $planPct ?></span>
                         </div>
                         <div class="progress-track"><div class="progress-fill" style="width:<?= min(100, $planPct) ?>%"></div></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <?php if ($dashboardImprovements): ?>
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3><?= appIcon("sparkles", "heading-inline-icon") ?><span data-i18n="dashboardImprovementsWidgetTitle">İyileştirme Fırsatları</span></h3>
+                    <p data-i18n="dashboardImprovementsWidgetText">Açık iyileştirme önerileri; yüksek öncelikliler önce listelenir.</p>
+                </div>
+                <a class="secondary-button secondary-button-sm" href="improvements.php" data-i18n="dashboardImprovementsMoreLink">Tümü</a>
+            </div>
+            <div class="ofi-widget-list">
+                <?php foreach (array_slice($dashboardImprovements, 0, 5) as $imp): ?>
+                    <div class="ofi-widget-item">
+                        <div class="ofi-widget-main">
+                            <strong><?= htmlspecialchars($imp['title'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= htmlspecialchars(qmsImprovementBenefitLabel($imp['benefit_type']), ENT_QUOTES, 'UTF-8') ?> · etki <?= htmlspecialchars(qmsImprovementLevelLabel($imp['impact']), ENT_QUOTES, 'UTF-8') ?><?= $imp['responsible'] ? ' · ' . htmlspecialchars($imp['responsible'], ENT_QUOTES, 'UTF-8') : '' ?></span>
+                        </div>
+                        <span class="ofi-priority prio-<?= htmlspecialchars($imp['priority'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars(qmsImprovementLevelLabel($imp['priority']), ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
