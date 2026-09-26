@@ -186,6 +186,8 @@ function qmsNotificationTypes(): array
         'contract_expiring' => ['icon' => 'warning', 'group' => 'contract'],
         'contract_renewal_due' => ['icon' => 'approvals', 'group' => 'contract'],
         'process_review_overdue' => ['icon' => 'documents', 'group' => 'process'],
+        'instrument_calibration_overdue' => ['icon' => 'warning', 'group' => 'instrument'],
+        'incident_reported' => ['icon' => 'alert', 'group' => 'incident'],
     ];
 }
 
@@ -216,6 +218,8 @@ function qmsNotificationGroupLabels(): array
         'improvement' => 'İyileştirme',
         'contract' => 'Sözleşme',
         'process' => 'Süreç',
+        'instrument' => 'Metroloji',
+        'incident' => 'Olay',
         'general' => 'Genel',
     ];
 }
@@ -236,6 +240,8 @@ function qmsNotificationGroupI18nKeys(): array
         'improvement' => 'notificationGroupImprovementLabel',
         'contract' => 'notificationGroupContractLabel',
         'process' => 'notificationGroupProcessLabel',
+        'instrument' => 'notificationGroupInstrumentLabel',
+        'incident' => 'notificationGroupIncidentLabel',
         'general' => 'notificationGroupGeneralLabel',
     ];
 }

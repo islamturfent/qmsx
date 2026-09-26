@@ -54,8 +54,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ];
         if ($formType === "add") {
             $data["company_id"] = (int) ($_POST["company_id"] ?? 0);
+            $companyData = ($_POST["company_id"] ?? 0);
             $newId = qmsIncidentAdd($pdo, $data, $userId, $role);
             if ($newId !== null) {
+                qmsIncidentNotify($pdo, (int) $companyData, (string) $data['title'], (string) $data['severity'], 'incidents.php');
                 header("Location: incidents.php?added=1");
                 exit;
             }

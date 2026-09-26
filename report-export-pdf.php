@@ -234,6 +234,20 @@ foreach ($report['contract_list'] as $row) {
         . $escape($row['end_date'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
 }
 
+$instrumentRows = '';
+foreach ($report['instrument_list'] as $row) {
+    $instrumentRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['name']) . '</td><td>'
+        . $escape($row['instrument_type'] ?? '') . '</td><td>' . $escape($row['location'] ?? '') . '</td><td>'
+        . $escape($row['next_calibration_date'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
+}
+
+$incidentRows = '';
+foreach ($report['incident_list'] as $row) {
+    $incidentRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['title']) . '</td><td>'
+        . $escape($row['type_label']) . '</td><td>' . $escape($row['severity_label']) . '</td><td>'
+        . $escape($row['reported_at'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -315,6 +329,12 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>Sözleşme</span><strong>' . $metrics['contract_count'] . '</strong></td>
       <td class="metric"><span>Süresi Doluyor</span><strong>' . $metrics['contract_expiring'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Ölçü Aleti</span><strong>' . $metrics['instrument_count'] . '</strong></td>
+      <td class="metric"><span>Kalib. Geçen</span><strong>' . $metrics['instrument_overdue'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Olay</span><strong>' . $metrics['incident_count'] . '</strong></td>
+      <td class="metric"><span>Açık Olay</span><strong>' . $metrics['incident_open'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -343,6 +363,8 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('İç Memnuniyet Anketi', '<th>Şirket</th><th>Anket</th><th>Katılımcı</th><th>Yanıt</th><th>Ortalama</th>', $internalSurveyRows)
     . $detailSection('İyileştirme Fırsatları', '<th>Şirket</th><th>Öneri</th><th>Kategori</th><th>Fayda</th><th>Etki</th><th>Durum</th><th>Hedef</th>', $improvementRows)
     . $detailSection('Sözleşmeler', '<th>Şirket</th><th>Sözleşme</th><th>Tür</th><th>Karşı Taraf</th><th>Bitiş</th><th>Durum</th>', $contractRows)
+    . $detailSection('Ölçü Aletleri', '<th>Şirket</th><th>Alet</th><th>Tip</th><th>Konum</th><th>Sonraki Kalib.</th><th>Durum</th>', $instrumentRows)
+    . $detailSection('Olay Raporlama', '<th>Şirket</th><th>Olay</th><th>Tür</th><th>Şiddet</th><th>Tarih</th><th>Durum</th>', $incidentRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

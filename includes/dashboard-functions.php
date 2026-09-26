@@ -220,6 +220,17 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
          WHERE c.active = 1 AND c.status = \'active\' AND c.end_date IS NOT NULL
            AND c.end_date <= DATE_ADD(CURDATE(), INTERVAL 60 DAY)' . $scope['sql']
     );
+    $overdueInstruments = $agg(
+        'SELECT COUNT(*) FROM instruments i
+         INNER JOIN companies co ON co.id = i.company_id
+         WHERE i.active = 1 AND i.status = \'active\' AND i.next_calibration_date IS NOT NULL
+           AND i.next_calibration_date < CURDATE()' . $scope['sql']
+    );
+    $openIncidents = $agg(
+        'SELECT COUNT(*) FROM incidents i
+         INNER JOIN companies co ON co.id = i.company_id
+         WHERE i.active = 1 AND i.status <> \'closed\'' . $scope['sql']
+    );
 
     // En yogun ay (denetim bazinda).
     $topMonth = null;
@@ -275,6 +286,18 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
         $points[] = ['tone' => 'warning', 'text' => $expiringContracts . ' sözleşmenin süresi yaklaşıyor, yenilemeyi planlayın.'];
     } else {
         $points[] = ['tone' => 'positive', 'text' => 'Süresi yaklaşan sözleşme bulunmuyor.'];
+    }
+
+    if ($overdueInstruments > 0) {
+        $points[] = ['tone' => 'warning', 'text' => $overdueInstruments . ' ölçü aletinin kalibrasyonu gecikmiş.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Geç kalibrasyon bulunmuyor.'];
+    }
+
+    if ($openIncidents > 0) {
+        $points[] = ['tone' => 'neutral', 'text' => $openIncidents . ' açık olay kaydı var.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Açık olay kaydı bulunmuyor.'];
     }
 
     if ($complaints > 0) {

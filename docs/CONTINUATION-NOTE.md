@@ -66,17 +66,17 @@ carried over from earlier assumptions.
   | `tests/internal-survey.php` | 22 |
   | `tests/quality-plan.php` | 18 |
   | `tests/supplier-evaluations.php` | 15 |
-  | `tests/notify-modules.php` | 6 |
   | `tests/improvements.php` | 14 |
-  | `tests/report-export-data.php` | 18 |
   | `tests/processes.php` | 11 |
   | `tests/contracts.php` | 12 |
-  | `tests/dashboard-trend.php` | 22 |
-  | `tests/notify-overdue.php` | 7 |
+  | `tests/notify-overdue.php` | 8 |
   | `tests/incidents.php` | 12 |
   | `tests/instruments.php` | 14 |
+  | `tests/report-export-data.php` | 23 |
+  | `tests/dashboard-trend.php` | 24 |
+  | `tests/notify-modules.php` | 7 |
 
-  861 checks total (51 suites). All suites use temporary tables and leave real records
+  902 checks total (51 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -1004,6 +1004,16 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
   Update/Delete/Calibrate` + `qmsInstrumentStatusLabel`). Kapsam: aletin şirketi.
 - Menü: Operasyonlar → Kalibrasyon & Metroloji. i18n TR/EN; cache v88.
 - Test: `tests/instruments.php` (14 kontrol).
+
+### Metroloji/Olay bildirim + rapor + Dönem Özeti bağlantısı (2026-09-26)
+- Yeni bildirim türleri: `instrument_calibration_overdue` (grup `instrument`),
+  `incident_reported` (grup `incident`). `notify-overdue.php`'e kalibrasyonu geçen
+  aletler bölümü; `qmsIncidentNotify()` + `incidents.php`'te yeni olayda admin bildirimi.
+- `report-export-data.php`: `instrument_list` + `incident_list` ve KPI'ler. PDF/XLSX'e
+  "Ölçü Aletleri" ve "Olaylar" detay tabloları/sayfaları + metrikler.
+- `qmsDashboardSummary()`'e geç kalibrasyon ve açık olay maddeleri.
+- Testler: `notify-overdue` 7→8, `report-export-data` 18→23, `dashboard-trend` 22→24,
+  `notify-modules` 6→7. i18n grup etiketleri + cache v89.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

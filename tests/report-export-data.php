@@ -9,7 +9,7 @@ function rdcCheck(bool $ok, string $name): void { global $checks; if (!$ok) thro
 
 // Rapor ureticisinin dokundugu tablolarin semasi gecici tablolara kopyalanir;
 // FK'lar cikarilir. Sadece gercek kayitlar (companies/users/quality_costs) eklenir.
-$tables = ['approval_runs','audit_program_audits','audit_programs','audits','calibrations','companies','complaints','contracts','corrective_actions','document_copies','documents','equipment','external_audit_findings','external_audits','improvements','internal_survey_responses','internal_surveys','management_review_items','management_reviews','nonconformities','performance_targets','quality_costs','risks','satisfaction_responses','staff_competencies','staff_members','supplier_evaluations','suppliers','training_participants','trainings','users'];
+$tables = ['approval_runs','audit_program_audits','audit_programs','audits','calibrations','companies','complaints','contracts','corrective_actions','document_copies','documents','equipment','external_audit_findings','external_audits','improvements','incidents','instruments','internal_survey_responses','internal_surveys','management_review_items','management_reviews','nonconformities','performance_targets','quality_costs','risks','satisfaction_responses','staff_competencies','staff_members','supplier_evaluations','suppliers','training_participants','trainings','users'];
 foreach ($tables as $table) {
     $schema = $pdo->query("SHOW CREATE TABLE $table")->fetch(PDO::FETCH_NUM)[1];
     $schema = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $schema);
@@ -31,6 +31,12 @@ $pdo->exec("INSERT INTO improvements(id, company_id, title, benefit_type, impact
 // Suresi yaklasan aktif sozlesme (gercek buguun +40 gun).
 $pdo->exec("INSERT INTO contracts(id, company_id, contract_name, contract_type, start_date, end_date, renewal_date, status, active) VALUES "
     . "(99101,99101,'Bakım','supplier','2026-01-01','" . date('Y-m-d', strtotime('+40 days')) . "','2026-06-01','active',1)");
+// Kalibrasyonu gecen aktif olcu aleti + kritik acik olay + kapali olay.
+$pdo->exec("INSERT INTO instruments(id, company_id, name, status, next_calibration_date, active) VALUES "
+    . "(99101,99101,'Kumpas','active','2020-01-01',1)");
+$pdo->exec("INSERT INTO incidents(id, company_id, title, incident_type, severity, status, active) VALUES "
+    . "(99101,99101,'Ramak Kala','near_miss','critical','open',1),"
+    . "(99102,99101,'Önemsiz','quality','low','closed',1)");
 
 $_SESSION['qms_role'] = 'super_admin';
 $_SESSION['qms_user_id'] = 99101;
@@ -61,5 +67,10 @@ rdcCheck((int) $report['metrics']['improvement_implemented'] === 1, 'One improve
 rdcCheck(count($report['contract_list']) === 1, 'Contract list has one row');
 rdcCheck((int) $report['metrics']['contract_active'] === 1, 'One active contract');
 rdcCheck((int) $report['metrics']['contract_expiring'] === 1, 'One expiring contract');
+rdcCheck(count($report['instrument_list']) === 1, 'Instrument list has one row');
+rdcCheck((int) $report['metrics']['instrument_overdue'] === 1, 'One overdue instrument calibration');
+rdcCheck(count($report['incident_list']) === 2, 'Incident list has two rows');
+rdcCheck((int) $report['metrics']['incident_open'] === 1, 'One open incident');
+rdcCheck((int) $report['metrics']['incident_critical'] === 1, 'One critical incident');
 
 echo "\nCompleted $checks report-export checks using temporary tables.\n";

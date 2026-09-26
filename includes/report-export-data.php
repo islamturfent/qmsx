@@ -564,6 +564,73 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     }
     $contractCount = count($contractList);
 
+    $instrumentsRaw = $fetchRows(
+        "SELECT i.id, i.instrument_code, i.name, i.instrument_type, i.location, i.interval_months,
+                i.last_calibration_date, i.next_calibration_date, i.status, companies.company_name
+         FROM instruments i
+         INNER JOIN companies ON companies.id = i.company_id
+         WHERE i.active = 1" . $scopeSql,
+        $scopeParams
+    );
+    usort($instrumentsRaw, static fn(array $a, array $b): int => strcmp((string) $a['name'], (string) $b['name']));
+    $instrumentList = [];
+    $instrumentActive = 0;
+    $instrumentOverdue = 0;
+    $todayDateI = date('Y-m-d');
+    foreach ($instrumentsRaw as $item) {
+        $isActive = (string) $item['status'] === 'active';
+        $overdue = $isActive && $item['next_calibration_date'] !== null && (string) $item['next_calibration_date'] < $todayDateI;
+        if ($isActive) {
+            $instrumentActive++;
+        }
+        if ($overdue) {
+            $instrumentOverdue++;
+        }
+        $instrumentList[] = [
+            'company_name' => $item['company_name'],
+            'instrument_code' => $item['instrument_code'],
+            'name' => $item['name'],
+            'instrument_type' => $item['instrument_type'],
+            'location' => $item['location'],
+            'next_calibration_date' => $item['next_calibration_date'],
+            'status_label' => $item['status'] === 'active' ? 'Aktif' : 'Hizmet Dışı',
+        ];
+    }
+    $instrumentCount = count($instrumentList);
+
+    $incidentsRaw = $fetchRows(
+        "SELECT i.id, i.incident_code, i.title, i.incident_type, i.severity, i.status, i.reported_at, i.responsible, companies.company_name
+         FROM incidents i
+         INNER JOIN companies ON companies.id = i.company_id
+         WHERE i.active = 1" . $scopeSql,
+        $scopeParams
+    );
+    usort($incidentsRaw, static fn(array $a, array $b): int => (int) $b['id'] <=> (int) $a['id']);
+    $incidentTypeLabels = ['accident' => 'Kaza', 'near_miss' => 'Ramak Kala', 'quality' => 'Kalite', 'security' => 'Güvenlik', 'other' => 'Diğer'];
+    $incidentStatusLabels = ['open' => 'Açık', 'under_review' => 'İnceleniyor', 'investigation' => 'Soruşturuluyor', 'closed' => 'Kapandı'];
+    $incidentList = [];
+    $incidentOpen = 0;
+    $incidentCritical = 0;
+    foreach ($incidentsRaw as $item) {
+        if ($item['status'] !== 'closed') {
+            $incidentOpen++;
+        }
+        if ($item['severity'] === 'critical') {
+            $incidentCritical++;
+        }
+        $incidentList[] = [
+            'company_name' => $item['company_name'],
+            'incident_code' => $item['incident_code'],
+            'title' => $item['title'],
+            'type_label' => $incidentTypeLabels[$item['incident_type']] ?? $item['incident_type'],
+            'severity_label' => ['low' => 'Düşük', 'medium' => 'Orta', 'high' => 'Yüksek', 'critical' => 'Kritik'][$item['severity']] ?? $item['severity'],
+            'status_label' => $incidentStatusLabels[$item['status']] ?? $item['status'],
+            'reported_at' => $item['reported_at'],
+            'responsible' => $item['responsible'],
+        ];
+    }
+    $incidentCount = count($incidentList);
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -612,6 +679,12 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'contract_count' => $contractCount,
         'contract_active' => $contractActive,
         'contract_expiring' => $contractExpiring,
+        'instrument_count' => $instrumentCount,
+        'instrument_active' => $instrumentActive,
+        'instrument_overdue' => $instrumentOverdue,
+        'incident_count' => $incidentCount,
+        'incident_open' => $incidentOpen,
+        'incident_critical' => $incidentCritical,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -956,5 +1029,7 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'internal_survey_list' => $internalSurveyList,
         'improvement_list' => $improvementList,
         'contract_list' => $contractList,
+        'instrument_list' => $instrumentList,
+        'incident_list' => $incidentList,
     ];
 }

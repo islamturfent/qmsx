@@ -6,6 +6,7 @@ require 'config/database.php';
 require 'includes/announcement-functions.php';
 require 'includes/internal-survey-functions.php';
 require 'includes/improvement-functions.php';
+require 'includes/incident-functions.php';
 $checks = 0;
 function nmCheck(bool $ok, string $name): void { global $checks; if (!$ok) throw new RuntimeException('FAIL: ' . $name); $checks++; echo 'PASS: ' . $name . PHP_EOL; }
 
@@ -43,5 +44,9 @@ qmsImprovementNotify($pdo, 99951, 'improvement_submitted', 'Yeni öneri: X', 'im
 qmsImprovementNotify($pdo, 99951, 'improvement_implemented', 'Uygulandı: X', 'improvements.php');
 nmCheck($countFor($pdo, 99953, 'improvement_submitted') === 1, 'Improvement submitted notifies company admin');
 nmCheck($countFor($pdo, 99953, 'improvement_implemented') === 1, 'Improvement implemented notifies company admin');
+
+// Yeni olay bildirimi sirket adminine gider.
+qmsIncidentNotify($pdo, 99951, 'Ramak kala', 'critical', 'incidents.php');
+nmCheck($countFor($pdo, 99953, 'incident_reported') === 1, 'Incident reported notifies company admin');
 
 echo "\nCompleted $checks notify-modules checks using temporary tables.\n";

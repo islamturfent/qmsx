@@ -142,6 +142,19 @@ function qmsIncidentDelete(PDO $pdo, int $id, int $userId, string $role): bool
     return $stmt->rowCount() > 0;
 }
 
+/**
+ * Sirketin sistem adminlerine yeni olay bildirimi gonderir (tercihe bagli eposta).
+ */
+function qmsIncidentNotify(PDO $pdo, int $companyId, string $title, string $severity, string $link): void
+{
+    if ($companyId <= 0) {
+        return;
+    }
+    require_once __DIR__ . '/notifications.php';
+    $suffix = $severity === 'critical' ? ' (Kritik)' : '';
+    qmsNotifyCompanyAdmins($pdo, $companyId, 'incident_reported', 'Yeni Olay', 'Yeni olay: ' . $title . $suffix, $link);
+}
+
 /** Tür etiketi (TR). */
 function qmsIncidentTypeLabel(string $type): string
 {

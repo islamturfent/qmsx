@@ -36,6 +36,7 @@ $stats = [
     'contract_expiring' => 0,
     'contract_renewal_due' => 0,
     'process_review_overdue' => 0,
+    'instrument_calibration_overdue' => 0,
 ];
 
 /** Belirtilen kullaniciya (tur+link) dedupli bildirim ekler. */
@@ -288,6 +289,22 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $notifyAdmins($pdo, (int) $r['company_id'], 'process_review_overdue', $msg, $link);
     if ($allUsers) {
         $notifyCompanyAll($pdo, (int) $r['company_id'], 'process_review_overdue', $msg, $link);
+    }
+}
+
+// --- Kalibrasyonu gecen olcu aletleri (sirket adminlerine) ---
+$stmt = $pdo->prepare(
+    "SELECT i.id, i.name, i.next_calibration_date, i.company_id
+     FROM instruments i
+     WHERE i.active = 1 AND i.status = 'active' AND i.next_calibration_date IS NOT NULL AND i.next_calibration_date < ?"
+);
+$stmt->execute([$today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $link = 'instruments.php';
+    $msg = (string) $r['name'] . ' (kalibrasyon: ' . (string) $r['next_calibration_date'] . ')';
+    $notifyAdmins($pdo, (int) $r['company_id'], 'instrument_calibration_overdue', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'instrument_calibration_overdue', $msg, $link);
     }
 }
 
