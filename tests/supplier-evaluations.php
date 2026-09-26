@@ -23,6 +23,7 @@ seCheck($id !== null && $id > 0, 'Schedule added');
 $list = qmsSupplierEvalScheduleList($pdo, 99888, 'super_admin');
 seCheck(count($list) === 1, 'Schedule listed');
 seCheck($list[0]['eff_status'] === 'overdue', 'Overdue computed for past planned date');
+seCheck(qmsSupplierEvalScheduleOverdueCount($pdo, 99888, 'super_admin') === 1, 'Overdue count function = 1');
 seCheck((int) $list[0]['company_id'] === 99888, 'Company id inherited from supplier');
 seCheck(qmsSupplierEvalScheduleFind($pdo, (int)$id, 99888, 'super_admin')['cycle_label'] === 'Q1 2026', 'Schedule fetched by id');
 

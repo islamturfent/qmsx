@@ -132,6 +132,16 @@ function qmsSupplierEvalScheduleDelete(PDO $pdo, int $id, int $userId, string $r
     return $stmt->rowCount() > 0;
 }
 
+/** Kapsam içindeki vadesi gecti (planli + gecmis tarihli) randevu sayisi. */
+function qmsSupplierEvalScheduleOverdueCount(PDO $pdo, int $userId, string $role): int
+{
+    $scope = qmsCompanyScope('company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM supplier_evaluation_schedule
+                           WHERE active = 1 AND status = "planned" AND due_date IS NOT NULL AND due_date < CURDATE()' . $scope['sql']);
+    $stmt->execute($scope['params']);
+    return (int) $stmt->fetchColumn();
+}
+
 /** Durum etiketi metni (TR); eff durumu da kabul eder. */
 function qmsSupplierEvalStatusLabel(string $status): string
 {

@@ -14,9 +14,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
     $sidebarUnreadCount = (int) $sidebarNotificationStmt->fetchColumn();
 }
 $sidebarOverdueCount = 0;
+$sidebarSupplierEvalOverdue = 0;
 if (!empty($pdo) && !$isAuditorNav && isset($_SESSION["qms_user_id"])) {
     require_once __DIR__ . '/due-workbench-functions.php';
+    require_once __DIR__ . '/supplier-eval-schedule-functions.php';
     $sidebarOverdueCount = qmsOverdueActionCount($pdo, (int) $_SESSION["qms_user_id"], qmsCurrentRole());
+    $sidebarSupplierEvalOverdue = qmsSupplierEvalScheduleOverdueCount($pdo, (int) $_SESSION["qms_user_id"], qmsCurrentRole());
 }
 
 function sidebarLinkClass(string $key, string $activeNav): string
@@ -144,6 +147,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         <a class="<?= sidebarLinkClass("supplier_evaluations", $activeNav) ?>" href="supplier-evaluations.php">
             <?= appIcon("checkBadge") ?>
             <span data-i18n="supplierEvalMenuLabel">Değerlendirme Takvimi</span>
+            <?php if ($sidebarSupplierEvalOverdue > 0): ?><span class="sidebar-count"><?= $sidebarSupplierEvalOverdue ?></span><?php endif; ?>
         </a>
         <a class="<?= sidebarLinkClass("complaints", $activeNav) ?>" href="complaints.php">
             <?= appIcon("complaints") ?>

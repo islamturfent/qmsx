@@ -68,10 +68,10 @@ carried over from earlier assumptions.
   | `tests/announcements.php` | 11 |
   | `tests/internal-survey.php` | 22 |
   | `tests/quality-plan.php` | 18 |
-  | `tests/supplier-evaluations.php` | 14 |
+  | `tests/supplier-evaluations.php` | 15 |
   | `tests/report-export-data.php` | 12 |
 
-  776 checks total (46 suites). All suites use temporary tables and leave real records
+  777 checks total (46 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -862,6 +862,16 @@ Birinci beşlik (Şablon, Duyuru, İç Anket, Yıllık Plan, Tedarikçi Takvimi)
 - `report-export-pdf.php`: "İç Memnuniyet Anketi" detay tablosu + 2 KPI metriği.
 - `report-export-xlsx.php`: "İç Anket" çalışma sayfası + 3 KPI etiketi.
 - `tests/report-export-data.php` 9 → 12 kontrol (iç anket bölümü doğrulanır).
+
+### 3. Yıllık kalite planı ilerlemesi dashboard'a (2026-09-26)
+- Dashboard'a "Yıllık Plan" KPI kartı + "Kalite Planı İlerlemesi" widget'ı (cari yıl
+  planları, tamamlanan kalem ve ortalama ilerleme çubuğu) eklendi.
+- `plan-progress-*`/`progress-track`/`progress-fill` CSS + i18n; cache v79.
+
+### 4. Tedarikçi takvimi gecikme sayacı (2026-09-26)
+- `qmsSupplierEvalScheduleOverdueCount()` eklendi; sidebar'daki
+  "Değerlendirme Takvimi" linkine vadesi geçen randevu rozeti (CAPA'daki gibi).
+- `tests/supplier-evaluations.php` 14 → 15 kontrol.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
