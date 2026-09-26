@@ -2250,6 +2250,44 @@ translations.en.approvalRunCountKpi = "Approval Flows";
 translations.en.approvalRunApprovedKpi = "Approved";
 translations.en.approvalRunPendingKpi = "In Progress";
 
+// --- Duyuru Merkezi ---
+translations.tr.announcementsMenuLabel = "Duyuru Merkezi";
+translations.tr.announcementsTitle = "Duyuru Merkezi";
+translations.tr.announcementsText = "Önemli duyuruları tek yerden yayınlayın.";
+translations.tr.announcementsKicker = "İletişim";
+translations.tr.announcementAdded = "Duyuru eklendi.";
+translations.tr.announcementUpdated = "Duyuru güncellendi.";
+translations.tr.announcementDeleted = "Duyuru silindi.";
+translations.tr.announcementNoCompany = "Duyuru eklemek için önce bir şirket gerekir.";
+translations.tr.announcementTitleLabel = "Başlık";
+translations.tr.announcementBodyLabel = "İçerik";
+translations.tr.announcementPublishLabel = "Yayında (kullanıcılar görebilir)";
+translations.tr.announcementSave = "Kaydet";
+translations.tr.announcementCancel = "İptal";
+translations.tr.announcementListTitle = "Duyurular";
+translations.tr.announcementEmpty = "Henüz duyuru yok.";
+translations.tr.announcementDelete = "Sil";
+translations.tr.announcementPublishedBadge = "Yayında";
+translations.tr.announcementDraftBadge = "Taslak";
+translations.en.announcementsMenuLabel = "Announcement Center";
+translations.en.announcementsTitle = "Announcement Center";
+translations.en.announcementsText = "Publish important announcements from one place.";
+translations.en.announcementsKicker = "Communication";
+translations.en.announcementAdded = "Announcement added.";
+translations.en.announcementUpdated = "Announcement updated.";
+translations.en.announcementDeleted = "Announcement deleted.";
+translations.en.announcementNoCompany = "A company is required before adding an announcement.";
+translations.en.announcementTitleLabel = "Title";
+translations.en.announcementBodyLabel = "Content";
+translations.en.announcementPublishLabel = "Published (visible to users)";
+translations.en.announcementSave = "Save";
+translations.en.announcementCancel = "Cancel";
+translations.en.announcementListTitle = "Announcements";
+translations.en.announcementEmpty = "No announcements yet.";
+translations.en.announcementDelete = "Delete";
+translations.en.announcementPublishedBadge = "Published";
+translations.en.announcementDraftBadge = "Draft";
+
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {

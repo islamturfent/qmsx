@@ -98,6 +98,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("search") ?>
             <span data-i18n="searchMenuLabel">Arama</span>
         </a>
+        <a class="<?= sidebarLinkClass("announcements", $activeNav) ?>" href="announcements.php">
+            <?= appIcon("complaints") ?>
+            <span data-i18n="announcementsMenuLabel">Duyuru Merkezi</span>
+        </a>
         <?php if ($isManagementNav): ?>
         <a class="<?= sidebarLinkClass("auditors", $activeNav) ?>" href="auditors.php">
             <?= appIcon("users") ?>

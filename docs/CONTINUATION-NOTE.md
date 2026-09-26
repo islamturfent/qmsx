@@ -64,8 +64,10 @@ carried over from earlier assumptions.
   | `tests/closure-package.php` | 8 |
   | `tests/search-enhanced.php` | 6 |
   | `tests/my-assignments.php` | 5 |
+  | `tests/document-templates.php` | 10 |
+  | `tests/announcements.php` | 11 |
 
-  698 checks total (41 suites). All suites use temporary tables and leave real records
+  719 checks total (43 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -756,6 +758,40 @@ Two follow-ups on top of the surfaces built just before.
   as empty temporary tables plus companies/users/quality_costs, then asserts the
   12-month trend shape, per-month category totals and total, an empty month, and
   that the `quality_cost_total` KPI stays correct.
+
+## Beş yeni modül (2026-09-26): Şablon Kütüphanesi + Duyuru Merkezi
+
+Kullanıcı onayıyla beş yeni şirket kapsamlı modül sırayla ekleniyor:
+Doküman Şablon Kütüphanesi, Duyuru Merkezi, İç Memnuniyet Anketi, Yıllık Kalite
+Planı ve Tedarikçi Değerlendirme Takvimi. Her modül migration + include + yönetim
+sayfası + sidebar + i18n + temp-tablo testi deseniyle yapılır. Collabora/office'e
+dokunulmaz.
+
+### Doküman Şablon Kütüphanesi (Task 1) - tamamlandı
+
+- Schema: `document_templates` (migration `20260926-document-templates.sql`,
+  idempotent runner `scripts/migrate-document-templates.php`).
+- Sayfa: `document-templates.php`; yardımcılar
+  `includes/document-template-functions.php` (`qmsDocumentTemplateList/Find/Add/
+  Update/Delete`). CRUD + şirket kapsamlı; auditor yönlendirilir (`my-audits.php`).
+- Menü: Operasyonlar → Doküman Şablonları. i18n TR+EN eklendi.
+- Test: `tests/document-templates.php` (10 kontrol).
+- Kapsam sınırlı tutuldu: yalnız şablon kütüphanesi (ekle/düzenle/sil); "yeni
+  doküman oluştururken şablon seçme" entegrasyonu bu turda yapılmadı.
+
+### Duyuru Merkezi (Task 2) - tamamlandı
+
+- Schema: `announcements` (migration `20260926-announcements.sql`, idempotent
+  runner `scripts/migrate-announcements.php`).
+- Sayfa: `announcements.php`; yardımcılar
+  `includes/announcement-functions.php` (`qmsAnnouncementList/Find/Add/Update/
+  Delete`). CRUD + yayın/taslak toggle; şirket kapsamlı; auditor yönlendirilir.
+- Menü: Operasyonlar → Duyuru Merkezi. i18n TR+EN eklendi.
+- Test: `tests/announcements.php` (11 kontrol).
+- Doğrulama notu: `published` alanı boolean olarak geçilir; include fonksiyonları
+  `isset()` yerine `!empty()` ile yorumlar, aksi halde "yayından kaldır"
+  (checked kaldırılmış onay kutusu) `published=1` olarak kaydedilirdi. Test bunu
+  yakaladı ve düzeltti.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
