@@ -9,7 +9,7 @@ function rdcCheck(bool $ok, string $name): void { global $checks; if (!$ok) thro
 
 // Rapor ureticisinin dokundugu tablolarin semasi gecici tablolara kopyalanir;
 // FK'lar cikarilir. Sadece gercek kayitlar (companies/users/quality_costs) eklenir.
-$tables = ['approval_runs','audit_program_audits','audit_programs','audits','calibrations','companies','complaints','corrective_actions','document_copies','documents','equipment','external_audit_findings','external_audits','improvements','internal_survey_responses','internal_surveys','management_review_items','management_reviews','nonconformities','performance_targets','quality_costs','risks','satisfaction_responses','staff_competencies','staff_members','supplier_evaluations','suppliers','training_participants','trainings','users'];
+$tables = ['approval_runs','audit_program_audits','audit_programs','audits','calibrations','companies','complaints','contracts','corrective_actions','document_copies','documents','equipment','external_audit_findings','external_audits','improvements','internal_survey_responses','internal_surveys','management_review_items','management_reviews','nonconformities','performance_targets','quality_costs','risks','satisfaction_responses','staff_competencies','staff_members','supplier_evaluations','suppliers','training_participants','trainings','users'];
 foreach ($tables as $table) {
     $schema = $pdo->query("SHOW CREATE TABLE $table")->fetch(PDO::FETCH_NUM)[1];
     $schema = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $schema);
@@ -28,6 +28,9 @@ $pdo->exec("INSERT INTO internal_survey_responses(id, survey_id, question_id, us
 $pdo->exec("INSERT INTO improvements(id, company_id, title, benefit_type, impact, priority, status, active, created_at) VALUES
     (99101,99101,'Arıza oranını azalt','quality','high','high','implemented',1,'2026-06-05 10:00:00'),
     (99102,99101,'Doküman şablonu','efficiency','medium','normal','submitted',1,'2026-07-01 10:00:00')");
+// Suresi yaklasan aktif sozlesme (gercek buguun +40 gun).
+$pdo->exec("INSERT INTO contracts(id, company_id, contract_name, contract_type, start_date, end_date, renewal_date, status, active) VALUES "
+    . "(99101,99101,'Bakım','supplier','2026-01-01','" . date('Y-m-d', strtotime('+40 days')) . "','2026-06-01','active',1)");
 
 $_SESSION['qms_role'] = 'super_admin';
 $_SESSION['qms_user_id'] = 99101;
@@ -55,5 +58,8 @@ rdcCheck(round((float) $report['metrics']['internal_survey_avg'], 1) === 4.0, 'I
 rdcCheck(count($report['improvement_list']) === 2, 'Improvement list has two rows');
 rdcCheck((int) $report['metrics']['improvement_open'] === 1, 'One improvement open');
 rdcCheck((int) $report['metrics']['improvement_implemented'] === 1, 'One improvement implemented');
+rdcCheck(count($report['contract_list']) === 1, 'Contract list has one row');
+rdcCheck((int) $report['metrics']['contract_active'] === 1, 'One active contract');
+rdcCheck((int) $report['metrics']['contract_expiring'] === 1, 'One expiring contract');
 
 echo "\nCompleted $checks report-export checks using temporary tables.\n";

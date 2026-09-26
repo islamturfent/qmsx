@@ -7,7 +7,7 @@ require 'includes/notifications.php';
 $checks = 0;
 function nocCheck(bool $ok, string $name): void { global $checks; if (!$ok) throw new RuntimeException('FAIL: ' . $name); $checks++; echo 'PASS: ' . $name . PHP_EOL; }
 
-$tables = ['companies','users','company_admin_assignments','nonconformities','corrective_actions','trainings','equipment','external_audits','external_audit_findings','documents','complaints','suppliers','supplier_evaluation_schedule','notifications'];
+$tables = ['companies','users','company_admin_assignments','nonconformities','corrective_actions','trainings','equipment','external_audits','external_audit_findings','documents','complaints','suppliers','supplier_evaluation_schedule','contracts','processes','notifications'];
 foreach ($tables as $t) {
     $s = $pdo->query("SHOW CREATE TABLE $t")->fetch(PDO::FETCH_NUM)[1];
     $s = preg_replace('/(,\n)?\s*CONSTRAINT[^\n]+/', '', $s);
@@ -21,6 +21,10 @@ $pdo->exec("INSERT INTO nonconformities(id,company_id,audit_id,source,title,seve
 $pdo->exec("INSERT INTO corrective_actions(id,nonconformity_id,action_type,action_text,responsible_user_id,due_date,status,active) VALUES (99941,99941,'corrective','Late Fix',99941,'2020-01-01','in_progress',1)");
 $pdo->exec("INSERT INTO suppliers(id,company_id,name,status,active) VALUES (99941,99941,'Sup A','approved',1)");
 $pdo->exec("INSERT INTO supplier_evaluation_schedule(id,supplier_id,company_id,cycle_label,due_date,status,active) VALUES (99941,99941,99941,'Q1 2026','2020-01-01','planned',1)");
+// Suresi yaklasan aktif sozlesme + gozden gecirilmesi gecen proses.
+$pdo->exec("INSERT INTO contracts(id,company_id,contract_name,contract_type,start_date,end_date,renewal_date,status,active) VALUES "
+    . "(99941,99941,'Bakım Soz','supplier','2020-01-01','" . date('Y-m-d', strtotime('+30 days')) . "','2020-01-01','active',1)");
+$pdo->exec("INSERT INTO processes(id,company_id,process_name,status,review_date,active) VALUES (99941,99941,'Satınalma','active','2020-01-01',1)");
 
 // Ilk calistirma: bildirim uretilir.
 ob_start();
@@ -28,7 +32,7 @@ include __DIR__ . '/../scripts/notify-overdue.php';
 $out1 = ob_get_clean();
 $n = (int) $pdo->query("SELECT COUNT(*) FROM notifications WHERE user_id=99941 AND notification_type='overdue_action'")->fetchColumn();
 nocCheck($n === 1, 'First run creates one overdue_action notification');
-nocCheck(strpos($out1, 'Overdue notifications generated: 2') !== false, 'First run reports 2 generated (action + supplier eval)');
+nocCheck(strpos($out1, 'Overdue notifications generated: 4') !== false, 'First run reports 4 generated (action + supplier + contract + process)');
 
 // Ikinci calistirma: idempotent, yeni bildirim uretilmez.
 ob_start();
@@ -41,5 +45,12 @@ nocCheck(strpos($out2, 'Overdue notifications generated: 0') !== false, 'Second 
 // Vadesi gecen tedarikci degerlendirme: admin'e overdue_supplier_eval bildirimi.
 $ns = (int) $pdo->query("SELECT COUNT(*) FROM notifications WHERE user_id=99941 AND notification_type='overdue_supplier_eval'")->fetchColumn();
 nocCheck($ns >= 1, 'Overdue supplier schedule notifies admin (overdue_supplier_eval)');
+$noCount = static function (PDO $pdo, int $userId, string $type): int {
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND notification_type = ?');
+    $stmt->execute([$userId, $type]);
+    return (int) $stmt->fetchColumn();
+};
+nocCheck($noCount($pdo, 99941, 'contract_expiring') >= 1, 'Expiring contract notifies admin (contract_expiring)');
+nocCheck($noCount($pdo, 99941, 'process_review_overdue') >= 1, 'Overdue process review notifies admin (process_review_overdue)');
 
 echo "\nCompleted $checks notify-overdue checks using temporary tables.\n";

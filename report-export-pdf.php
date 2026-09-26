@@ -227,6 +227,13 @@ foreach ($report['improvement_list'] as $row) {
         . $escape($row['target_date'] ?? '') . '</td></tr>';
 }
 
+$contractRows = '';
+foreach ($report['contract_list'] as $row) {
+    $contractRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['contract_name']) . '</td><td>'
+        . $escape($row['type_label']) . '</td><td>' . $escape($row['party_name'] ?? '') . '</td><td>'
+        . $escape($row['end_date'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
+}
+
 $detailSection = static function (string $title, string $headers, string $rows): string {
     if ($rows === '') {
         return '<h2>' . $title . '</h2><p class="meta">Bu dönemde kayıt bulunmuyor.</p>';
@@ -305,6 +312,9 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     </tr><tr>
       <td class="metric"><span>İyileştirme Fırsatı</span><strong>' . $metrics['improvement_count'] . '</strong></td>
       <td class="metric"><span>Uygulanan</span><strong>' . $metrics['improvement_implemented'] . '</strong></td>
+    </tr><tr>
+      <td class="metric"><span>Sözleşme</span><strong>' . $metrics['contract_count'] . '</strong></td>
+      <td class="metric"><span>Süresi Doluyor</span><strong>' . $metrics['contract_expiring'] . '</strong></td>
     </tr></table>
     <h2>Şirket Performansı</h2>
     <table class="data"><thead><tr><th>Şirket</th><th>Denetimler</th><th>Uygunsuzluklar</th><th>Faaliyetler</th><th>Tamamlama</th><th>Eğitimler</th><th>Tamamlanan Eğitim</th><th>Tedarikçiler</th><th>Onaylı Tedarikçi</th><th>Şikayetler</th><th>Açık Şikayet</th><th>Gözden Geçirmeler</th><th>GGR Aksiyonu</th><th>Denetim Programı</th><th>Aktif</th><th>Ekipman</th><th>Geçmiş</th></tr></thead><tbody>'
@@ -332,6 +342,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Onay Akışları', '<th>Şirket</th><th>Konu</th><th>Durum</th><th>Oluşturulma</th>', $approvalRunRows)
     . $detailSection('İç Memnuniyet Anketi', '<th>Şirket</th><th>Anket</th><th>Katılımcı</th><th>Yanıt</th><th>Ortalama</th>', $internalSurveyRows)
     . $detailSection('İyileştirme Fırsatları', '<th>Şirket</th><th>Öneri</th><th>Kategori</th><th>Fayda</th><th>Etki</th><th>Durum</th><th>Hedef</th>', $improvementRows)
+    . $detailSection('Sözleşmeler', '<th>Şirket</th><th>Sözleşme</th><th>Tür</th><th>Karşı Taraf</th><th>Bitiş</th><th>Durum</th>', $contractRows)
     . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 

@@ -183,6 +183,9 @@ function qmsNotificationTypes(): array
         'overdue_supplier_eval' => ['icon' => 'warning', 'group' => 'supplier'],
         'improvement_submitted' => ['icon' => 'sparkles', 'group' => 'improvement'],
         'improvement_implemented' => ['icon' => 'checkBadge', 'group' => 'improvement'],
+        'contract_expiring' => ['icon' => 'warning', 'group' => 'contract'],
+        'contract_renewal_due' => ['icon' => 'approvals', 'group' => 'contract'],
+        'process_review_overdue' => ['icon' => 'documents', 'group' => 'process'],
     ];
 }
 
@@ -211,6 +214,8 @@ function qmsNotificationGroupLabels(): array
         'announcement' => 'Duyuru',
         'survey' => 'Anket',
         'improvement' => 'İyileştirme',
+        'contract' => 'Sözleşme',
+        'process' => 'Süreç',
         'general' => 'Genel',
     ];
 }
@@ -229,6 +234,8 @@ function qmsNotificationGroupI18nKeys(): array
         'announcement' => 'notificationGroupAnnouncementLabel',
         'survey' => 'notificationGroupSurveyLabel',
         'improvement' => 'notificationGroupImprovementLabel',
+        'contract' => 'notificationGroupContractLabel',
+        'process' => 'notificationGroupProcessLabel',
         'general' => 'notificationGroupGeneralLabel',
     ];
 }

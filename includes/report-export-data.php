@@ -523,6 +523,47 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     }
     $improvementCount = count($improvementList);
 
+    $contractsRaw = $fetchRows(
+        "SELECT c.id, c.contract_code, c.contract_name, c.party_name, c.contract_type, c.start_date, c.end_date,
+                c.renewal_date, c.value_amount, c.currency, c.status, companies.company_name
+         FROM contracts c
+         INNER JOIN companies ON companies.id = c.company_id
+         WHERE c.active = 1" . $scopeSql,
+        $scopeParams
+    );
+    usort($contractsRaw, static fn(array $a, array $b): int => strcmp((string) $a['contract_name'], (string) $b['contract_name']));
+    $contractStatusLabels = ['active' => 'Aktif', 'expiring' => 'Süresi Doluyor', 'expired' => 'Süresi Doldu', 'terminated' => 'Feshedildi'];
+    $contractTypeLabels = ['customer' => 'Müşteri', 'supplier' => 'Tedarikçi', 'other' => 'Diğer'];
+    $contractList = [];
+    $contractActive = 0;
+    $contractExpiring = 0;
+    $expiringCut = date('Y-m-d', strtotime('+60 days'));
+    $todayDate = date('Y-m-d');
+    foreach ($contractsRaw as $item) {
+        $isActive = (string) $item['status'] === 'active';
+        $near = $isActive && $item['end_date'] !== null && (string) $item['end_date'] <= $expiringCut && (string) $item['end_date'] >= $todayDate;
+        if ($isActive) {
+            $contractActive++;
+        }
+        if ($near) {
+            $contractExpiring++;
+        }
+        $contractList[] = [
+            'company_name' => $item['company_name'],
+            'contract_code' => $item['contract_code'],
+            'contract_name' => $item['contract_name'],
+            'party_name' => $item['party_name'],
+            'type_label' => $contractTypeLabels[$item['contract_type']] ?? $item['contract_type'],
+            'start_date' => $item['start_date'],
+            'end_date' => $item['end_date'],
+            'renewal_date' => $item['renewal_date'],
+            'value_amount' => $item['value_amount'] !== null ? (float) $item['value_amount'] : null,
+            'currency' => $item['currency'],
+            'status_label' => $contractStatusLabels[$item['status']] ?? $item['status'],
+        ];
+    }
+    $contractCount = count($contractList);
+
     $auditCount = count($audits);
     $nonconformityCount = count($nonconformities);
     $metrics = [
@@ -568,6 +609,9 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'improvement_count' => $improvementCount,
         'improvement_open' => $improvementOpen,
         'improvement_implemented' => $improvementImplemented,
+        'contract_count' => $contractCount,
+        'contract_active' => $contractActive,
+        'contract_expiring' => $contractExpiring,
     ];
 
     $documentStatuses = ['draft' => 0, 'review' => 0, 'approved' => 0, 'published' => 0, 'archived' => 0];
@@ -911,5 +955,6 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'approval_run_list' => $approvalRunList,
         'internal_survey_list' => $internalSurveyList,
         'improvement_list' => $improvementList,
+        'contract_list' => $contractList,
     ];
 }

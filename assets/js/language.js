@@ -1228,6 +1228,10 @@ translations.en.notificationGroupAnnouncementLabel = "Announcement";
 translations.en.notificationGroupSurveyLabel = "Survey";
 translations.tr.notificationGroupImprovementLabel = "İyileştirme";
 translations.en.notificationGroupImprovementLabel = "Improvement";
+translations.tr.notificationGroupContractLabel = "Sözleşme";
+translations.tr.notificationGroupProcessLabel = "Süreç";
+translations.en.notificationGroupContractLabel = "Contract";
+translations.en.notificationGroupProcessLabel = "Process";
 
 Object.assign(translations.tr, {
     reviewsTitle: "Yönetimin Gözden Geçirmesi", reviewsText: "Gözden geçirme toplantılarını, girdileri ve çıkan aksiyonları izleyin.",

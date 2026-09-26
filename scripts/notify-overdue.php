@@ -33,6 +33,9 @@ $stats = [
     'overdue_document_review' => 0,
     'overdue_complaint' => 0,
     'overdue_supplier_eval' => 0,
+    'contract_expiring' => 0,
+    'contract_renewal_due' => 0,
+    'process_review_overdue' => 0,
 ];
 
 /** Belirtilen kullaniciya (tur+link) dedupli bildirim ekler. */
@@ -235,6 +238,56 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_supplier_eval', $msg, $link);
     if ($allUsers) {
         $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_supplier_eval', $msg, $link);
+    }
+}
+
+// --- Suresi yaklasan aktif sozlesmeler (sirket adminlerine) ---
+$stmt = $pdo->prepare(
+    "SELECT c.id, c.contract_name, c.end_date, c.company_id
+     FROM contracts c
+     WHERE c.active = 1 AND c.status = 'active' AND c.end_date IS NOT NULL
+       AND c.end_date BETWEEN ? AND DATE_ADD(?, INTERVAL 60 DAY)"
+);
+$stmt->execute([$today, $today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $link = 'contracts.php';
+    $msg = (string) $r['contract_name'] . ' (bitiş: ' . (string) $r['end_date'] . ')';
+    $notifyAdmins($pdo, (int) $r['company_id'], 'contract_expiring', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'contract_expiring', $msg, $link);
+    }
+}
+
+// --- Yenileme tarihi yaklasan sozlesmeler (sirket adminlerine) ---
+$stmt = $pdo->prepare(
+    "SELECT c.id, c.contract_name, c.renewal_date, c.company_id
+     FROM contracts c
+     WHERE c.active = 1 AND c.status = 'active' AND c.renewal_date IS NOT NULL
+       AND c.renewal_date BETWEEN ? AND DATE_ADD(?, INTERVAL 30 DAY)"
+);
+$stmt->execute([$today, $today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $link = 'contracts.php';
+    $msg = (string) $r['contract_name'] . ' (yenileme: ' . (string) $r['renewal_date'] . ')';
+    $notifyAdmins($pdo, (int) $r['company_id'], 'contract_renewal_due', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'contract_renewal_due', $msg, $link);
+    }
+}
+
+// --- Gözden gecirilmesi gecen prosesler (sirket adminlerine) ---
+$stmt = $pdo->prepare(
+    "SELECT p.id, p.process_name, p.review_date, p.company_id
+     FROM processes p
+     WHERE p.active = 1 AND p.review_date IS NOT NULL AND p.review_date < ?"
+);
+$stmt->execute([$today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $link = 'processes.php';
+    $msg = (string) $r['process_name'] . ' (gözden geçirme: ' . (string) $r['review_date'] . ')';
+    $notifyAdmins($pdo, (int) $r['company_id'], 'process_review_overdue', $msg, $link);
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'process_review_overdue', $msg, $link);
     }
 }
 

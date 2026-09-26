@@ -214,6 +214,12 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
          INNER JOIN companies co ON co.id = i.company_id
          WHERE i.active = 1 AND i.status = \'implemented\'' . $scope['sql']
     );
+    $expiringContracts = $agg(
+        'SELECT COUNT(*) FROM contracts c
+         INNER JOIN companies co ON co.id = c.company_id
+         WHERE c.active = 1 AND c.status = \'active\' AND c.end_date IS NOT NULL
+           AND c.end_date <= DATE_ADD(CURDATE(), INTERVAL 60 DAY)' . $scope['sql']
+    );
 
     // En yogun ay (denetim bazinda).
     $topMonth = null;
@@ -263,6 +269,12 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
     }
     if ($implementedImprovements > 0) {
         $points[] = ['tone' => 'positive', 'text' => $implementedImprovements . ' iyileştirme fırsatı uygulandı.'];
+    }
+
+    if ($expiringContracts > 0) {
+        $points[] = ['tone' => 'warning', 'text' => $expiringContracts . ' sözleşmenin süresi yaklaşıyor, yenilemeyi planlayın.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Süresi yaklaşan sözleşme bulunmuyor.'];
     }
 
     if ($complaints > 0) {

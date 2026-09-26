@@ -20,6 +20,7 @@ $pdo->exec('CREATE TEMPORARY TABLE supplier_evaluation_schedule (id int primary 
 $pdo->exec('CREATE TEMPORARY TABLE quality_plans (id int primary key, company_id int not null, plan_year int not null, active tinyint not null default 1)');
 $pdo->exec('CREATE TEMPORARY TABLE quality_plan_items (id int primary key, plan_id int not null, progress int not null default 0, active tinyint not null default 1)');
 $pdo->exec('CREATE TEMPORARY TABLE improvements (id int primary key, company_id int not null, title varchar(190), status varchar(24), benefit_type varchar(30), impact varchar(20), priority varchar(20), active tinyint not null default 1, created_at datetime)');
+$pdo->exec('CREATE TEMPORARY TABLE contracts (id int primary key, company_id int not null, contract_name varchar(190), contract_type varchar(20), start_date date, end_date date, renewal_date date, status varchar(20), active tinyint not null default 1)');
 
 $now = date('Y-m-d H:i:s');
 $today = date('Y-m-d');
@@ -60,6 +61,10 @@ $pdo->exec("INSERT INTO quality_plan_items(id, plan_id, progress, active) VALUES
 $pdo->exec("INSERT INTO improvements(id, company_id, title, status, benefit_type, impact, priority, active, created_at) VALUES "
     . "(1,970001,'Oneri A','submitted','quality','high','high',1,'$now'),"
     . "(2,970001,'Uygulanan A','implemented','efficiency','medium','normal',1,'$now')");
+// Suresi yaklasan aktif sozlesme (60 gun icinde).
+$endIn60 = date('Y-m-d', strtotime('+40 days'));
+$pdo->exec("INSERT INTO contracts(id, company_id, contract_name, contract_type, start_date, end_date, renewal_date, status, active) VALUES "
+    . "(1,970001,'Bakım','supplier','2020-01-01','$endIn60',NULL,'active',1)");
 
 // ---- Super admin: kisitlamasiz (null kapsam).
 $trend = qmsDashboardTrend($pdo, 0, 'super_admin');
@@ -83,6 +88,7 @@ dashCheck(strpos($texts, 'tedarikçi değerlendirmesi gecikmiş') !== false, 'Su
 dashCheck(strpos($texts, '%75 ilerlemede') !== false, 'Summary reports 75% quality plan progress');
 dashCheck(strpos($texts, 'açık iyileştirme fırsatı var') !== false, 'Summary flags open improvement');
 dashCheck(strpos($texts, 'iyileştirme fırsatı uygulandı') !== false, 'Summary reports implemented improvement');
+dashCheck(strpos($texts, 'sözleşmenin süresi yaklaşıyor') !== false, 'Summary flags expiring contract');
 
 // ---- Kapsam: company_user yalnizca kendi sirketini gorur.
 $trendUser = qmsDashboardTrend($pdo, 970101, 'company_user');

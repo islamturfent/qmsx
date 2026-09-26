@@ -33,7 +33,6 @@ carried over from earlier assumptions.
   | `tests/complaint-management.php` | 47 |
   | `tests/performance-management.php` | 23 |
   | `tests/review-management.php` | 33 |
-  | `tests/dashboard-trend.php` | 17 |
   | `tests/audit-report.php` | 26 |
   | `tests/audit-log.php` | 16 |
   | `tests/audit-program.php` | 16 |
@@ -67,15 +66,15 @@ carried over from earlier assumptions.
   | `tests/internal-survey.php` | 22 |
   | `tests/quality-plan.php` | 18 |
   | `tests/supplier-evaluations.php` | 15 |
-  | `tests/notify-overdue.php` | 5 |
   | `tests/notify-modules.php` | 6 |
-  | `tests/dashboard-trend.php` | 21 |
   | `tests/improvements.php` | 14 |
-  | `tests/report-export-data.php` | 15 |
+  | `tests/report-export-data.php` | 18 |
   | `tests/processes.php` | 11 |
   | `tests/contracts.php` | 12 |
+  | `tests/dashboard-trend.php` | 22 |
+  | `tests/notify-overdue.php` | 7 |
 
-  828 checks total (49 suites). All suites use temporary tables and leave real records
+  835 checks total (49 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -967,6 +966,17 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
   Delete` + `qmsContractStatusLabel`). Kapsam: sözleşmenin şirketi.
 - Menü: Operasyonlar → Sözleşme Yönetimi. i18n TR/EN; cache v85.
 - Test: `tests/contracts.php` (12 kontrol).
+
+### Sözleşme/Proses bildirimleri + sözleşme rapor & Dönem Özeti (2026-09-26)
+- Yeni bildirim türleri: `contract_expiring`, `contract_renewal_due` (grup
+  `contract`), `process_review_overdue` (grup `process`). `notify-overdue.php`'e
+  üç bölüm: süresi yaklaşan (≤60 gün) aktif sözleşmeler, yenileme tarihi yaklaşan
+  (≤30 gün) sözleşmeler, gözden geçirme tarihi geçen süreçler.
+- `report-export-data.php`: `contract_list` + KPI'ler (`contract_count/active/expiring`).
+  PDF'ye "Sözleşmeler" detay tablosu + metrik; XLSX'e "Sözleşmeler" sayfası + 3 KPI.
+- `qmsDashboardSummary()`'e süresi yaklaşan sözleşme sayısı maddesi.
+- Testler: `notify-overdue.php` 5→7, `report-export-data.php` 15→18,
+  `dashboard-trend.php` 21→22 kontrol. i18n grup etiketleri + cache v86.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
