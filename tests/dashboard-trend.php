@@ -16,6 +16,9 @@ $pdo->exec('CREATE TEMPORARY TABLE nonconformities (id int primary key, company_
 $pdo->exec('CREATE TEMPORARY TABLE corrective_actions (id int primary key, nonconformity_id int not null, status varchar(50), due_date date, created_at datetime, completed_at datetime, active tinyint not null default 1)');
 $pdo->exec('CREATE TEMPORARY TABLE trainings (id int primary key, company_id int not null, title varchar(255), status varchar(30), active tinyint not null default 1, completed_date date, created_at datetime)');
 $pdo->exec('CREATE TEMPORARY TABLE complaints (id int primary key, company_id int not null, status varchar(30), active tinyint not null default 1, created_at datetime)');
+$pdo->exec('CREATE TEMPORARY TABLE supplier_evaluation_schedule (id int primary key, supplier_id int, company_id int not null, status varchar(24), due_date date, active tinyint not null default 1)');
+$pdo->exec('CREATE TEMPORARY TABLE quality_plans (id int primary key, company_id int not null, plan_year int not null, active tinyint not null default 1)');
+$pdo->exec('CREATE TEMPORARY TABLE quality_plan_items (id int primary key, plan_id int not null, progress int not null default 0, active tinyint not null default 1)');
 
 $now = date('Y-m-d H:i:s');
 $today = date('Y-m-d');
@@ -46,6 +49,13 @@ $pdo->exec("INSERT INTO trainings(id, company_id, title, status, active, complet
 $pdo->exec("INSERT INTO complaints(id, company_id, status, active, created_at) VALUES "
     . "(1,970001,'new',1,'$now'),(2,970002,'new',1,'$now')");
 
+// Tedarikci degerlendirme: A'da gecikmis bir planli randevu.
+$pdo->exec("INSERT INTO supplier_evaluation_schedule(id, supplier_id, company_id, status, due_date, active) VALUES "
+    . "(1,1,970001,'planned','2020-01-01',1)");
+// Kalite plani: A'da cari yil icin 2 kalem (ilerleme 50 + 100 -> %75).
+$pdo->exec("INSERT INTO quality_plans(id, company_id, plan_year, active) VALUES (1,970001," . (int) date('Y') . ",1)");
+$pdo->exec("INSERT INTO quality_plan_items(id, plan_id, progress, active) VALUES (1,1,50,1),(2,1,100,1)");
+
 // ---- Super admin: kisitlamasiz (null kapsam).
 $trend = qmsDashboardTrend($pdo, 0, 'super_admin');
 dashCheck(count($trend) === 12, 'Trend returns 12 monthly buckets');
@@ -64,6 +74,8 @@ dashCheck(strpos($texts, '3 denetim') !== false, 'Summary reports three audits')
 dashCheck(strpos($texts, '1 gecikmiş aksiyon') !== false, 'Summary flags the overdue action');
 $tones = array_column($summary['points'], 'tone');
 dashCheck(in_array('warning', $tones, true), 'Overdue action yields a warning tone');
+dashCheck(strpos($texts, 'tedarikçi değerlendirmesi gecikmiş') !== false, 'Summary flags overdue supplier evaluation');
+dashCheck(strpos($texts, '%75 ilerlemede') !== false, 'Summary reports 75% quality plan progress');
 
 // ---- Kapsam: company_user yalnizca kendi sirketini gorur.
 $trendUser = qmsDashboardTrend($pdo, 970101, 'company_user');

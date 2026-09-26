@@ -72,8 +72,9 @@ carried over from earlier assumptions.
   | `tests/report-export-data.php` | 12 |
   | `tests/notify-overdue.php` | 5 |
   | `tests/notify-modules.php` | 4 |
+  | `tests/dashboard-trend.php` | 19 |
 
-  782 checks total (47 suites). All suites use temporary tables and leave real records
+  784 checks total (47 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -899,6 +900,14 @@ Beşliyi derinleştirme setinin tamamı (1-5) tamamlandı ve commit'lendi.
   kullanır; SMTP etkin değilse sessizce atlanır.
 - Testler: `tests/notify-modules.php` (4 kontrol) yeni; `tests/notify-overdue.php`
   4 → 5 kontrol. Cache v81.
+
+### Kalite planı + tedarikçi takvimi Dönem Özeti'ne (2026-09-26)
+- `qmsDashboardSummary()`'e yeni özet maddeleri: cari yıl kalite planı hedefleri
+  ortalama ilerleme (%) ve gecikmiş tedarikçi değerlendirme sayısı (kapsamlı
+  toplu sorgularla; plan ilerlemesi kalem ağırlıklı ortalamadan türetilir).
+- `tests/dashboard-trend.php` 17 → 19 kontrol (yeni maddeler doğrulanır).
+
+Dashboard Dönem Özeti artık kalite planı ve tedarikçi takvimini de içeriyor.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

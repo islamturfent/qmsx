@@ -184,6 +184,26 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
          WHERE ca.active = 1 AND ca.status NOT IN (\'completed\', \'closed\')
            AND ca.due_date IS NOT NULL AND ca.due_date < CURDATE()' . $scope['sql']
     );
+    $overdueSupplierEval = $agg(
+        'SELECT COUNT(*) FROM supplier_evaluation_schedule se
+         INNER JOIN companies co ON co.id = se.company_id
+         WHERE se.active = 1 AND se.status = \'planned\' AND se.due_date IS NOT NULL
+           AND se.due_date < CURDATE()' . $scope['sql']
+    );
+    $planItemProgress = $agg(
+        'SELECT COALESCE(SUM(i.progress),0) FROM quality_plan_items i
+         INNER JOIN quality_plans pl ON pl.id = i.plan_id
+         INNER JOIN companies co ON co.id = pl.company_id
+         WHERE i.active = 1 AND pl.active = 1 AND pl.plan_year = YEAR(CURDATE())' . $scope['sql']
+    );
+    $planItemTotal = $agg(
+        'SELECT COUNT(*) FROM quality_plan_items i
+         INNER JOIN quality_plans pl ON pl.id = i.plan_id
+         INNER JOIN companies co ON co.id = pl.company_id
+         WHERE i.active = 1 AND pl.active = 1 AND pl.plan_year = YEAR(CURDATE())' . $scope['sql']
+    );
+    $planProgressAvg = $planItemTotal > 0 ? (int) round($planItemProgress / $planItemTotal) : null;
+    $currentYear = (int) date('Y');
 
     // En yogun ay (denetim bazinda).
     $topMonth = null;
@@ -212,6 +232,18 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
         $points[] = ['tone' => 'warning', 'text' => $overdueActions . ' gecikmiş aksiyon var, dikkat gerektiriyor.'];
     } else {
         $points[] = ['tone' => 'positive', 'text' => 'Gecikmiş aksiyon bulunmuyor.'];
+    }
+
+    if ($overdueSupplierEval > 0) {
+        $points[] = ['tone' => 'warning', 'text' => $overdueSupplierEval . ' tedarikçi değerlendirmesi gecikmiş.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Gecikmiş tedarikçi değerlendirmesi bulunmuyor.'];
+    }
+
+    if ($planProgressAvg !== null) {
+        $points[] = ['tone' => 'neutral', 'text' => $currentYear . ' kalite planı hedefleri ortalama %' . $planProgressAvg . ' ilerlemede.'];
+    } else {
+        $points[] = ['tone' => 'neutral', 'text' => $currentYear . ' için tanımlı kalite planı hedefi bulunmuyor.'];
     }
 
     if ($complaints > 0) {
