@@ -73,8 +73,9 @@ carried over from earlier assumptions.
   | `tests/contracts.php` | 12 |
   | `tests/dashboard-trend.php` | 22 |
   | `tests/notify-overdue.php` | 7 |
+  | `tests/incidents.php` | 12 |
 
-  835 checks total (49 suites). All suites use temporary tables and leave real records
+  847 checks total (50 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -977,6 +978,19 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 - `qmsDashboardSummary()`'e süresi yaklaşan sözleşme sayısı maddesi.
 - Testler: `notify-overdue.php` 5→7, `report-export-data.php` 15→18,
   `dashboard-trend.php` 21→22 kontrol. i18n grup etiketleri + cache v86.
+
+### Yeni yüzey: Olay Raporlama (Incident Management) (2026-09-26)
+- Schema: `incidents` (migration `20261005-incidents.sql`, idempotent runner
+  `scripts/migrate-incidents.php`). Kaza/ramak kala/kalite/güvenlik olayları;
+  tür, şiddet, durum akışı (açık/inceleniyor/soruşturuluyor/kapandı), konum,
+  sorumlu, olay tarihi.
+- Sayfa: `incidents.php` - CRUD + KPI kartları (açık/kritik/toplam) + durum
+  filtresi; kritik olaylar `overdue-badge` ile vurgulanır.
+- Yardımcılar: `includes/incident-functions.php` (`qmsIncidentList/Find/Add/
+  Update/Delete` + tür/şiddet/durum etiketleri). Kapsam: olayın şirketi.
+- Menü: Operasyonlar → Olay Raporlama. i18n TR/EN; cache v87.
+- Test: `tests/incidents.php` (12 kontrol). Bundan sonra bildirim + rapor
+  export'una bağlanabilmeye hazır.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
