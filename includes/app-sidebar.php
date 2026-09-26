@@ -141,6 +141,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("suppliers") ?>
             <span data-i18n="suppliersTitle">Tedarikçi Yönetimi</span>
         </a>
+        <a class="<?= sidebarLinkClass("supplier_evaluations", $activeNav) ?>" href="supplier-evaluations.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="supplierEvalMenuLabel">Değerlendirme Takvimi</span>
+        </a>
         <a class="<?= sidebarLinkClass("complaints", $activeNav) ?>" href="complaints.php">
             <?= appIcon("complaints") ?>
             <span data-i18n="complaintsTitle">Şikayet Yönetimi</span>

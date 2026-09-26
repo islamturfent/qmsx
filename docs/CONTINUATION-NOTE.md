@@ -68,8 +68,9 @@ carried over from earlier assumptions.
   | `tests/announcements.php` | 11 |
   | `tests/internal-survey.php` | 22 |
   | `tests/quality-plan.php` | 18 |
+  | `tests/supplier-evaluations.php` | 14 |
 
-  759 checks total (45 suites). All suites use temporary tables and leave real records
+  773 checks total (46 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -827,6 +828,22 @@ dokunulmaz.
 - Durum: `not_started / in_progress / completed / on_hold`; `qmsPlanStatusLabel()`.
 - Menü: Operasyonlar → Yıllık Kalite Planı. i18n TR+EN eklendi; `filter-inline` CSS.
 - Test: `tests/quality-plan.php` (18 kontrol).
+
+### Tedarikçi Değerlendirme Takvimi (Task 5) - tamamlandı
+
+- Schema: `supplier_evaluation_schedule` (migration
+  `20261001-supplier-eval-schedule.sql`, idempotent runner
+  `scripts/migrate-supplier-eval-schedule.php`). Tek seferlik puanların
+  (`supplier_evaluations`) yanında periyodik randevuları izler.
+- Sayfa: `supplier-evaluations.php` - randevu CRUD + durum filtresi
+  (planlı/yapıldı/atlandı/vadesi geçti) + KPI kartları + hızlı "Yapıldı" işareti.
+- Yardımcılar: `includes/supplier-eval-schedule-functions.php`
+  (`qmsSupplierEvalScheduleList/Find/Add/Update/Delete`). `eff_status` goreli
+  durumu yansıtır (geçmiş planlı -> overdue); company_id tedarikçiden türetilir.
+- Menü: Operasyonlar → Değerlendirme Takvimi. i18n TR+EN eklendi; cache v77.
+- Test: `tests/supplier-evaluations.php` (14 kontrol).
+
+Birinci beşlik (Şablon, Duyuru, İç Anket, Yıllık Plan, Tedarikçi Takvimi) tamamlandı.
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 
