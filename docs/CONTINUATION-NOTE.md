@@ -76,8 +76,9 @@ carried over from earlier assumptions.
   | `tests/dashboard-trend.php` | 24 |
   | `tests/notify-modules.php` | 7 |
   | `tests/contract-attachments.php` | 7 |
+  | `tests/delivery-performance.php` | 15 |
 
-  909 checks total (52 suites). All suites use temporary tables and leave real records
+  924 checks total (53 suites). All suites use temporary tables and leave real records
   untouched (verified: `risks`, `risk_history`, `office_audit`, `trainings`,
   `training_participants`, `corrective_actions`, `suppliers`, `complaints`,
   `performance_targets`, `notifications` remain empty).
@@ -1026,6 +1027,21 @@ ve rapor export'una eklenebilir - gelecek adımlar için hazır.
 - Yardımcılar: `includes/contract-functions.php` (`qmsContractAttachments/Find/Add/
   DeleteAttachment`); tümü sözleşmenin şirketine göre kapsamlı.
 - i18n TR/EN; cache v90. Test: `tests/contract-attachments.php` (7 kontrol).
+
+### Dashboard metroloji/olay/sözleşme widget'ları (2026-09-27)
+- Dashboard'a üç KPI kartı (Kalib. Geçen / Açık Olay / Yaklaşan Sözleşme) ve üç
+  özel widget bölümü: Kalibrasyon Takvimi, Açık Olaylar (kritik vurgulu),
+  Yaklaşan Sözleşmeler. i18n + cache v91.
+
+### Yeni yüzey: Müşteri Teslimat Performans Kartı (2026-09-27)
+- Schema: `delivery_performance` (migration `20261007-delivery-performance.sql`,
+  idempotent runner `scripts/migrate-delivery-performance.php`). Müşteri+dönem
+  (YYYY-MM) başına toplam/zamanında sipariş, teslim edilen/reddedilen miktar.
+- Sayfa: `delivery-performance.php` - CRUD + KPI (zamanında teslim %, sipariş,
+  red %) + dönem filtresi + ilerleme çubuğu. `qmsDeliveryOnTimeRate()` türetilir.
+- Yardımcılar: `includes/delivery-performance-functions.php`.
+- Menü: Operasyonlar → Teslimat Performansı. i18n TR/EN; cache v92.
+- Test: `tests/delivery-performance.php` (15 kontrol).
 
 ## Yönetim kokpiti / Genel Bakış (dashboard eklentisi)
 

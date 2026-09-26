@@ -157,6 +157,10 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?= appIcon("complaints") ?>
             <span data-i18n="satisfactionMenuLabel">Müşteri Memnuniyeti</span>
         </a>
+        <a class="<?= sidebarLinkClass("delivery_performance", $activeNav) ?>" href="delivery-performance.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="deliveryMenuLabel">Teslimat Performansı</span>
+        </a>
         <a class="<?= sidebarLinkClass("internal_surveys", $activeNav) ?>" href="internal-surveys.php">
             <?= appIcon("sparkles") ?>
             <span data-i18n="internalSurveyMenuLabel">İç Memnuniyet Anketi</span>
