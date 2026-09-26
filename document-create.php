@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/document-template-functions.php';
 
 $csrfToken = qmsCsrfToken('document_create');
 
@@ -25,6 +26,9 @@ $companyStmt = $pdo->prepare("SELECT companies.id, companies.company_name FROM c
 $companyStmt->execute($scopeParams);
 $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 $allowedCompanyIds = array_map('intval', array_column($companies, 'id'));
+
+// Doküman sablonlari: yeni dokuman icerigi icin baslangic noktasi.
+$documentTemplates = qmsDocumentTemplateList($pdo, $userId, qmsCurrentRole());
 
 $formError = "";
 $formData = [
@@ -198,11 +202,55 @@ $activeNav = "documents";
                     <label class="form-field form-field-wide"><span data-i18n="descriptionLabel">Açıklama</span><textarea name="description" rows="4"><?= htmlspecialchars($formData["description"], ENT_QUOTES, "UTF-8") ?></textarea></label>
                     <label class="form-field form-field-wide"><span data-i18n="documentFileLabel">İlk Revizyon Dosyası</span><input type="file" name="document_file" accept=".pdf,.doc,.docx,.xls,.xlsx"><small data-i18n="documentFileHelp">PDF, Word veya Excel; en fazla 10 MB.</small></label>
                     <label class="form-field form-field-wide"><span data-i18n="changeNoteLabel">Revizyon Notu</span><textarea name="change_note" rows="3"><?= htmlspecialchars($formData["change_note"], ENT_QUOTES, "UTF-8") ?></textarea></label>
+                    <label class="form-field form-field-wide"><span data-i18n="docTemplateSelectLabel">Doküman Şablonu (isteğe bağlı)</span>
+                        <select name="template_id" id="templateSelect">
+                            <option value="0" data-i18n="docTemplateNoTemplate">— şablon seçin —</option>
+                            <?php foreach ($documentTemplates as $tpl): ?>
+                                <option value="<?= (int) $tpl['id'] ?>" data-company="<?= (int) $tpl['company_id'] ?>" data-title="<?= htmlspecialchars($tpl['name'], ENT_QUOTES, 'UTF-8') ?>" data-category="<?= htmlspecialchars((string) ($tpl['category'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-desc="<?= htmlspecialchars(mb_substr(trim((string) strip_tags((string) ($tpl['content_html'] ?? ''))), 0, 300), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($tpl['name'], ENT_QUOTES, 'UTF-8') ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small data-i18n="docTemplateSelectHelp">Şablon seçerseniz başlık, kategori ve açıklama önceden doldurulur.</small>
+                    </label>
                 </div>
                 <div class="form-actions"><button class="primary-button" type="submit" data-i18n="saveDocumentButton">Dokümanı Kaydet</button></div>
             </form>
         </section>
     </main>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
+    <script>
+    (function () {
+        'use strict';
+        var companySelect = document.querySelector('select[name="company_id"]');
+        var templateSelect = document.getElementById('templateSelect');
+        if (!companySelect || !templateSelect) return;
+        var allOptions = Array.prototype.slice.call(templateSelect.querySelectorAll('option[data-company]'));
+
+        function applyCompanyFilter() {
+            var companyId = companySelect.value;
+            allOptions.forEach(function (opt) {
+                opt.style.display = (String(opt.getAttribute('data-company')) === String(companyId)) ? '' : 'none';
+            });
+            var selected = templateSelect.options[templateSelect.selectedIndex];
+            if (selected && selected.getAttribute('data-company') && String(selected.getAttribute('data-company')) !== String(companyId)) {
+                templateSelect.value = '0';
+            }
+        }
+
+        function applyTemplatePrefill() {
+            var opt = templateSelect.options[templateSelect.selectedIndex];
+            if (!opt || !opt.getAttribute('data-company')) return;
+            var title = document.querySelector('input[name="title"]');
+            var category = document.querySelector('input[name="category"]');
+            var desc = document.querySelector('textarea[name="description"]');
+            if (title && !title.value) title.value = opt.getAttribute('data-title') || '';
+            if (category && !category.value) category.value = opt.getAttribute('data-category') || '';
+            if (desc && !desc.value) desc.value = opt.getAttribute('data-desc') || '';
+        }
+
+        companySelect.addEventListener('change', applyCompanyFilter);
+        templateSelect.addEventListener('change', applyTemplatePrefill);
+        applyCompanyFilter();
+    })();
+    </script>
 </body>
 </html>

@@ -2523,6 +2523,13 @@ translations.en.dashboardQualityPlanTitle = "Quality Plan Progress";
 translations.en.dashboardQualityPlanText = "Completion status and average progress of yearly quality objectives.";
 translations.en.dashboardQualityPlanMoreLink = "All";
 
+translations.tr.docTemplateSelectLabel = "Doküman Şablonu (isteğe bağlı)";
+translations.tr.docTemplateNoTemplate = "— şablon seçin —";
+translations.tr.docTemplateSelectHelp = "Şablon seçerseniz başlık, kategori ve açıklama önceden doldurulur.";
+translations.en.docTemplateSelectLabel = "Document Template (optional)";
+translations.en.docTemplateNoTemplate = "— select template —";
+translations.en.docTemplateSelectHelp = "Selecting a template pre-fills title, category and description.";
+
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {
