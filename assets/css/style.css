@@ -3543,6 +3543,66 @@ input[type="checkbox"]:focus-visible {
     gap: 10px;
 }
 
+/* Bildirim tercihleri anahtari: TailAdmin tarzi toggle switch.
+   input gorunmez; .toggle-slider ac/kapa. name/checked korunur. */
+.toggle-field {
+    position: relative;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-body);
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-field input[type="checkbox"] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.toggle-slider {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    background: var(--gray-300);
+    border-radius: 9999px;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.toggle-field input:checked + .toggle-slider {
+    background: var(--brand-500);
+}
+
+.toggle-field input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.toggle-field input:focus-visible + .toggle-slider {
+    box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
 /* Bildirim tercihleri: kategori secimi */
 .pref-checks {
     display: grid;

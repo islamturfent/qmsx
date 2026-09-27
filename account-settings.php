@@ -95,7 +95,7 @@ $activeNav = "profile";
                         <?= qmsCsrfField('profile') ?>
                         <input type="hidden" name="form_type" value="save_prefs">
                         <div class="form-grid">
-                            <label class="pref-check form-field-wide"><input type="checkbox" name="email_notifications" <?= $mailPrefs['email_enabled'] ? 'checked' : '' ?>><span class="box"></span><span data-i18n="notificationPrefsEmailEnabled">E-posta bildirimleri al</span></label>
+                            <label class="toggle-field form-field-wide"><input type="checkbox" name="email_notifications" <?= $mailPrefs['email_enabled'] ? 'checked' : '' ?>><span class="toggle-slider"></span><span data-i18n="notificationPrefsEmailEnabled">E-posta bildirimleri al</span></label>
                             <label class="form-field form-field-wide">
                                 <span data-i18n="notificationPrefsCategories">E-posta alınacak kategoriler (boş = tümü)</span>
                                 <div class="pref-checks">
