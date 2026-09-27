@@ -2331,6 +2331,11 @@ form + .admin-list {
     padding: 20px;
 }
 
+/* Ardısık konsol kartları birbirine değmesin (uzt boşluk). */
+.console-card + .console-card {
+    margin-top: 16px;
+}
+
 .compact-heading {
     margin-bottom: 16px;
 }

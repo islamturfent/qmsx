@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Dokuman Gozden Gecirme Gecmisi bosluk duzeltmesi (2026-10-08)
+- `.console-card + .console-card { margin-top: 16px; }` eklendi; Dokuman Gozden
+  Gecirme Merkezi'nde "Gozden Gecirme Gecmisi" kutusu artik ustteki kutuya
+  degmiyor. Ardısık konsol kartlarini hedefler; fonksiyonlara dokunulmadi.
+  cache v111.
+
 ### Yillik Kalite Plani filtre dropdown TailAdmin uyumlu (2026-10-08)
 - `.filter-inline select` TailAdmin stilinde yapildi: `appearance:none` + ozel
   chevron (SVG data-uri) ile dogal ok kaldirildi; yuvarlak kose, hover border ve
