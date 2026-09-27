@@ -2081,6 +2081,7 @@ body {
     font-weight: 500;
     line-height: 1.25;
     cursor: pointer;
+    text-decoration: none;
     box-shadow: var(--shadow-theme-xs);
     transition: background-color 0.15s ease, border-color 0.15s ease;
 }
@@ -2088,6 +2089,7 @@ body {
 .secondary-button:hover {
     background: var(--surface-hover);
     border-color: var(--border-control);
+    text-decoration: none;
 }
 
 .secondary-button:focus-visible {
