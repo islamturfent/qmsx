@@ -1181,6 +1181,17 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### RBAC izinleri toggle ile düzenlenebilir (2026-10-08)
+- Izinler (RBAC) sayfasi salt-okunurdu; super admin artik her eylem x rol
+  hucreisini TailAdmin toggle switch ile ac/kapa yapabiliyor.
+- Yeni tablo `permission_overrides` (action, role, allowed).
+- `includes/permissions.php`: `qmsPermissionOverrides()` (DB override yukler),
+  `qmsCan()` override'i uygular (statik cache; tablo yoksa varsayilanlar),
+  `qmsPermissionSaveOverrides()` toplu yazar.
+- Super admin rolu override edilmez (hep varsayilan) -> kendini kilitleyemez;
+  sayfada super admin sutunu kilitli/checked gorunur. CSRF + yetki (super admin)
+  korunur. cache v123.
+
 ### Sirket kullanicisi rapor export audit count hatasi (2026-10-08)
 - `report-export-data.php` satir 737'deki `SELECT COUNT(*) FROM audit_log`
   sorgusu `companies.id IN (...)` scope'u kullaniyordu ama `companies` tablosunu

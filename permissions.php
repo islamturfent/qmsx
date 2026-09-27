@@ -10,6 +10,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/permissions.php';
+require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/app-ui.php';
 
 // Izin kaydı yalniz super admin icindir.
@@ -17,8 +18,38 @@ qmsRequirePermission('permissions.view');
 
 $labels = qmsPermissionActionLabels();
 $roleLabels = qmsPermissionRoleLabels();
-$matrix = qmsPermissionMatrix();
 $roles = array_keys($roleLabels);
+
+$formMessage = '';
+
+// POST: super admin, toggle'larin yeni durumunu kaydeder.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    qmsRequirePermission('permissions.view');
+    qmsCsrfVerify('permissions', $_POST['csrf'] ?? null);
+
+    $posted = $_POST['perm'] ?? [];
+    $sets = [];
+    foreach (array_keys(qmsPermissions()) as $action) {
+        foreach ($roles as $role) {
+            // Super admin rolu override edilmez: kendini kitleyemez.
+            if ($role === 'super_admin') {
+                continue;
+            }
+            $sets[$action][$role] = isset($posted[$action][$role]) && (string) $posted[$action][$role] === '1';
+        }
+    }
+
+    qmsPermissionSaveOverrides($pdo, $sets);
+    $_SESSION['qmsCsrfPermissions'] = null; // token'i yenile
+    header('Location: permissions.php?saved=1');
+    exit;
+}
+
+if (($_GET['saved'] ?? '') === '1') {
+    $formMessage = 'İzinler güncellendi.';
+}
+
+$matrix = qmsPermissionMatrix();
 
 $activeNav = "permissions";
 
@@ -40,7 +71,7 @@ $activeNav = "permissions";
         <div class="topbar-inner">
             <div class="page-title-block">
                 <strong data-i18n="permissionsTitle">İzinler (RBAC)</strong>
-                <span data-i18n="permissionsText">Rol bazlı erişim matrisi — salt-okunur.</span>
+                <span data-i18n="permissionsText">Rol bazlı erişim matrisi.</span>
             </div>
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
@@ -52,39 +83,55 @@ $activeNav = "permissions";
         <section class="page-heading">
             <span class="section-kicker" data-i18n="permissionsKicker">Sistem Yönetimi</span>
             <h1 data-i18n="permissionsTitle">İzinler (RBAC)</h1>
-            <p data-i18n="permissionsText">Uygulamanın tek izin kaynağından türetilen rol bazlı erişim matrisi. Bu kayıt salt-okunurdur ve eylem bazlı izinleri gösterir.</p>
+            <p data-i18n="permissionsText">Rol bazlı erişim matrisi. Süper Admin sütunu kilitlidir (her zaman yetkili); diğer roller her eylem için toggle ile açılıp kapatılabilir.</p>
         </section>
 
-        <section class="page-section console-card">
-            <div class="report-table-wrap">
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th data-i18n="permissionActionLabel">Eylem</th>
-                            <?php foreach ($roles as $role): ?>
-                                <th class="rbac-role-col"><?= htmlspecialchars($roleLabels[$role], ENT_QUOTES, "UTF-8") ?></th>
-                            <?php endforeach; ?>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($matrix as $action => $permits): ?>
+        <?php if ($formMessage !== ''): ?>
+            <div class="form-message success"><?= htmlspecialchars($formMessage, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endif; ?>
+
+        <form method="post" action="permissions.php">
+            <?= qmsCsrfField('permissions') ?>
+            <section class="page-section console-card">
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
                             <tr>
-                                <td><?= htmlspecialchars($labels[$action] ?? $action, ENT_QUOTES, "UTF-8") ?></td>
+                                <th data-i18n="permissionActionLabel">Eylem</th>
                                 <?php foreach ($roles as $role): ?>
-                                    <td class="rbac-role-col">
-                                        <?php if ($permits[$role]): ?>
-                                            <span class="rbac-yes" data-i18n="permissionYes">✓</span>
-                                        <?php else: ?>
-                                            <span class="rbac-no">—</span>
-                                        <?php endif; ?>
-                                    </td>
+                                    <th class="rbac-role-col"><?= htmlspecialchars($roleLabels[$role], ENT_QUOTES, "UTF-8") ?></th>
                                 <?php endforeach; ?>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($matrix as $action => $permits): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($labels[$action] ?? $action, ENT_QUOTES, "UTF-8") ?></td>
+                                    <?php foreach ($roles as $role): ?>
+                                        <td class="rbac-role-col">
+                                            <?php if ($role === 'super_admin'): ?>
+                                                <span class="toggle-field rbac-toggle">
+                                                    <input type="checkbox" checked disabled>
+                                                    <span class="toggle-slider"></span>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="toggle-field rbac-toggle">
+                                                    <input type="checkbox" name="perm[<?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>][<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>]" value="1" <?= $permits[$role] ? 'checked' : '' ?>>
+                                                    <span class="toggle-slider"></span>
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-actions">
+                    <button class="primary-button" type="submit" data-i18n="permissionsSaveButton">İzinleri Kaydet</button>
+                </div>
+            </section>
+        </form>
     </main>
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/language.js"></script>

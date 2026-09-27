@@ -3603,6 +3603,44 @@ input[type="checkbox"]:focus-visible {
     box-shadow: 0 0 0 3px var(--brand-soft);
 }
 
+/* RBAC matrisinde tablo hucrelerine sigacak dar toggle switch */
+.rbac-toggle {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.rbac-toggle input[type="checkbox"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.rbac-toggle .toggle-slider {
+    width: 36px;
+    height: 20px;
+}
+
+.rbac-toggle .toggle-slider::before {
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    top: 3px;
+}
+
+.rbac-toggle input:checked + .toggle-slider::before {
+    transform: translateX(16px);
+}
+
+.rbac-toggle input:disabled + .toggle-slider {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 /* Bildirim tercihleri: kategori secimi */
 .pref-checks {
     display: grid;
