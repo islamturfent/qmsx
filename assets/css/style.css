@@ -2616,6 +2616,10 @@ form + .admin-list {
     margin-top: 20px;
 }
 
+main > .form-message {
+    margin-top: 16px;
+}
+
 .form-message {
     margin-bottom: 18px;
     border-radius: var(--radius-control);

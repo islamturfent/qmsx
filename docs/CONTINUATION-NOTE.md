@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Personel Detayi form.message bosluk duzeltmesi (2026-10-08)
+- `main > .form-message { margin-top: 16px; }` eklendi; Personel Detayi
+  sayfasinda form-message (basari/hata bildirimi) ustteki KPI kutularina
+  degmiyor. `<main>`'in dogrudan cocugu olan form-message'lari hedefler;
+  form icindekileri etkilemez. Fonksiyonlara dokunulmadi. cache v114.
+
 ### Vadesi Gelen Isler export dugmeleri bosluk duzeltmesi (2026-10-08)
 - `.form-actions` icin `gap: 10px` eklendi; Vadesi Gelen Isler sayfasinda
   "Excel Indir" ve "PDF Indir" dugmeleri artik birbirine degmiyor. Tüm dugme
