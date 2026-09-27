@@ -1163,6 +1163,11 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
 ### Marka: QMS -> QuAmi (2026-10-08)
 - Kullanici gorur marka/yazi "QMS" -> "QuAmi" uygulama genelinde degistirildi
   (sidebar brand, login, tum sayfa <title>...>, manifest, PDF/Excel basliklari).
+
+### Bana Atanmislar bos durum kutusu duzeltmesi (2026-10-08)
+- `.page-container > .empty-state` ust bosluk (margin-top 20px) eklendi;
+  "Size atanmış açık kayıt bulunmuyor." kutusu ustteki kartlara degmiyor.
+  Fonksiyonlara dokunulmadi. cache v105.
 - Kod kimlikleri KORUNDU: `qms*` on-ekleri ve `QMS_*` PHP sabitleri + lower-case
   `qms` dosya/cache adlari ve storage/documents icerigi degismedi. cache v104.
 

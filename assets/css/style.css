@@ -2558,6 +2558,11 @@ body {
     text-align: center;
 }
 
+/* Sayfa seviyesindeki bos durum kutusu ust kartlara degmesin. */
+.page-container > .empty-state {
+    margin-top: 20px;
+}
+
 .form-message {
     margin-bottom: 18px;
     border-radius: var(--radius-control);
