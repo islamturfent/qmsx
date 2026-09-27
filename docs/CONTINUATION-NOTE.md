@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Checkbox satir hizasi duzeltmesi (2026-10-08)
+- `.form-field` `flex-direction: column` kullandigindan checkbox ve span alt alta
+  diziliyordu; checkbox span'in solunda degil. `inline-flex` kulalrina
+  `flex-direction: row` eklendi -> checkbox kutu ayni label icindeki metnin
+  solunda, ayi hizada duruyor. Fonksiyonlara dokunulmadi. cache v119.
+
 ### Checkbox boyutu/hizasi duzeltmesi (2026-10-08)
 - `.form-field input` kurali checkbox'i da kapsadigindan onlara `width:100%`,
   `min-height:44px`, padding ve border uyguluyordu; bu yuzden onay kutulari
