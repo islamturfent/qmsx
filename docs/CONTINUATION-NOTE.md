@@ -1166,6 +1166,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   yerine dark moda uyan `--brand-soft`/`--brand-soft-text`.
 - `.review-submit-form` arka plani sabit `--gray-50` idi -> `--surface-strong-color`.
 - cache v101.
+
+### Profil page dark mod foto/cover + Sistem Ozeti kompakt (2026-10-08)
+- `.profile-avatar` arka plani `--brand-50`/rengi `--brand-500` -> dark moda uyan
+  `--brand-soft`/`--brand-soft-text`; `.profile-cover` dark override
+  (`--brand-700` -> `--gray-900` gradyan) eklendi. Fonksiyonlara dokunulmadi.
+- `.profile-card .record-card-grid` Sistem Ozeti kartlari kompakt (min 140px,
+  min-height 118px, kucuk ikon) hale getirildi. cache v102.
 - `appIcon()`'a `user`,`cog`,`key`,`chevronDown` ikonlari; app-sidebar gizli
   ikon span'lari + i18n `accountSettingsMenuLabel`.
 - `.user-menu-*` TailAdmin olcultur (iki satir id, ikonlu madde, ayrac). cache v98.
