@@ -1181,6 +1181,11 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Vadesi Gelen Isler export dugmeleri bosluk duzeltmesi (2026-10-08)
+- `.form-actions` icin `gap: 10px` eklendi; Vadesi Gelen Isler sayfasinda
+  "Excel Indir" ve "PDF Indir" dugmeleri artik birbirine degmiyor. Tüm dugme
+  gruplarinda tutarli bosluk saglar. Fonksiyonlara dokunulmadi. cache v113.
+
 ### Denetim izi/reporu sol menu aktif duzeltmesi (2026-10-08)
 - `audit-trail.php` `$activeNav = "audit-trail"` (tire) idi; sidebar anahtari
   `audit_trail` (alt cizgi) oldugundan eslesmiyor, aktif gorunmuyordu.

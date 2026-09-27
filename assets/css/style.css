@@ -2310,6 +2310,7 @@ body {
 .form-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
 }
 
 /* Form bitip hemen altinda liste basladiginda bosluk birak. */
