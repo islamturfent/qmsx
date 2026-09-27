@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### COQ trendi bosluk duzeltmesi (2026-10-08)
+- `main > .report-panel { margin-top: 22px; margin-bottom: 22px; }` eklendi;
+  "Aylik COQ Trendi" kutusu artik ustteki KPI kartlarina ve alttaki kutulara
+  degmiyor. `<main>`'in dogrudan cocugu olan tek basina rapor kutularini hedefler;
+  grid icindeki `.report-layout` / `.two-col` panellerini etkilemez.
+  Fonksiyonlara dokunulmadi. cache v109.
+
 ### Ic anket "Soru Ekle" bosluk duzeltmesi (2026-10-08)
 - `form + .admin-list` ust bosluk (margin-top 16px) eklendi; Soru Ekle dugmesi
   artik alttaki soru kutusuna degmiyor. Fonksiyonlara dokunulmadi. cache v108.

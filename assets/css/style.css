@@ -1028,6 +1028,13 @@ body.has-sidebar .page-container.narrow-page {
     box-shadow: var(--shadow-theme-xs);
 }
 
+/* Sayfa akisinda tek basina duran (grid icinde olmayan) rapor kutulari
+   ustteki kartlara ve alttaki kutuya degmesin. */
+main > .report-panel {
+    margin-top: 22px;
+    margin-bottom: 22px;
+}
+
 .trend-chart {
     display: flex;
     min-height: 250px;
