@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Sol menu RBAC'e gore gizleniyor (2026-10-08)
+- `app-sidebar.php`'de helper `qmsSidebarVisible($action)` eklendi (qmsCanSession'a
+  dayali) ve `access.php` require edildi.
+- Sol menudeki 50 sidebar-link, ilgili RBAC eylemine gore `<?php if
+  (qmsSidebarVisible('...')): ?>` ile sarildi; pasif yapilan yuzeyin menü dugmesi
+  artik gorunmuyor, aktif yapilinca gorünüyor. Marka linki haric tutuldu.
+- Render testi: system_admin icin operations.view kapaliyken risk/dokuman/CAPA
+  baglantilari gizleniyor, notifications/reports gorunuyor (PASS). cache v126.
+
 ### Sol menu yuzeyleri RBAC'e baglandi (Secenek A) (2026-10-08)
 - Matristeki tum eylemler ilgili sayfalara baglandi; sol menudeki her yuzey
   artik bir izinle kontrol ediliyor (Secenek A: operasyon modulleri operations.view
