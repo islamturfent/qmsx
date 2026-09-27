@@ -3406,6 +3406,57 @@ body.dark-mode .profile-cover {
     text-decoration: none;
 }
 
+/* TailAdmin tarzi global onay kutusu: tum dogal checkbox'lar bu stili kullanir.
+   .pref-check (bildirim tercihleri) kendi .box gorseline sahip oldugu icin
+   yerel input zaten gizli ve bu kurallar oraya karismaz. */
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 6px;
+    background: var(--surface-color);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="checkbox"]:hover {
+    border-color: var(--brand-500);
+}
+
+input[type="checkbox"]:checked {
+    border-color: var(--brand-500);
+    background: var(--brand-500);
+}
+
+input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+input[type="checkbox"]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
 /* Bildirim tercihleri: kategori secimi */
 .pref-checks {
     display: grid;

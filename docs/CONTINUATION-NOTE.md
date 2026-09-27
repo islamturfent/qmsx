@@ -1168,6 +1168,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
 - `.page-container > .empty-state` ust bosluk (margin-top 20px) eklendi;
   "Size atanmış açık kayıt bulunmuyor." kutusu ustteki kartlara degmiyor.
   Fonksiyonlara dokunulmadi. cache v105.
+
+### TailAdmin birebir checkbox (2026-10-08)
+- Tüm dogal `input[type=checkbox]` icin global TailAdmin stili (appearance:none,
+  20px yuvarlatilmis kutu, marka rengi + beyaz tik, hover/focus/disabled).
+  Duyuru Merkezi "Yayinda", ic anket, e-posta ayarlari ve ofis ayarlari
+  checkbox'lari artik birebir ayni. `.pref-check` .box yapisi korunur. cache v106.
 - Kod kimlikleri KORUNDU: `qms*` on-ekleri ve `QMS_*` PHP sabitleri + lower-case
   `qms` dosya/cache adlari ve storage/documents icerigi degismedi. cache v104.
 
