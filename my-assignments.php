@@ -9,6 +9,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+qmsRequirePermission('my_assignments.view');
 require_once __DIR__ . '/includes/due-workbench-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);

@@ -9,6 +9,7 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+qmsRequirePermission('document_reviews.manage');
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/document-review-functions.php';
 

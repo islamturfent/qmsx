@@ -8,6 +8,8 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 }
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
+qmsRequirePermission('operations.view');
 require_once __DIR__ . '/includes/supplier-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);

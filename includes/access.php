@@ -218,3 +218,8 @@ function qmsCanAccessCompany(?array $companyIds, int $companyId): bool
 
     return in_array($companyId, $companyIds, true);
 }
+
+// RBAC servisi: bu dosyayi yukleyen sayfalar qmsRequirePermission()/qmsCan()
+// kullanabilir. (permissions.php de access.php'yi yukler; require_once sayesinde
+// dongu guvenlidir.)
+require_once __DIR__ . '/permissions.php';

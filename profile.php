@@ -11,6 +11,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/app-ui.php';
 require_once __DIR__ . '/includes/access.php';
+qmsRequirePermission('profile.edit');
 require_once __DIR__ . '/includes/notifications.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);

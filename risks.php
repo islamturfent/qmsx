@@ -2,6 +2,8 @@
 session_start();
 if (empty($_SESSION['qms_logged_in'])) { header('Location: login.php'); exit; }
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/access.php';
+qmsRequirePermission('operations.view');
 require_once __DIR__ . '/includes/risk-functions.php';
 $userId = (int) ($_SESSION['qms_user_id'] ?? 0);
 $super = ($_SESSION['qms_role'] ?? '') === 'super_admin';

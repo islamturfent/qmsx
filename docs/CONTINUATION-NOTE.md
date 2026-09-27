@@ -1181,6 +1181,21 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Sol menu yuzeyleri RBAC'e baglandi (Secenek A) (2026-10-08)
+- Matristeki tum eylemler ilgili sayfalara baglandi; sol menudeki her yuzey
+  artik bir izinle kontrol ediliyor (Secenek A: operasyon modulleri operations.view
+  grubunda).
+- `includes/access.php` sonuna `require permissions.php` eklendi (guard her
+  sayfada hazir; circular guvenli).
+- Yeni matris eylemleri: `my_assignments.view`, `overdue.view`,
+  `checklist_templates.view`, `external_audits.view`, `approvals.manage`,
+  `document_reviews.manage`, `document_approvals.manage`, `admin.office`,
+  `admin.mail`; `search.view` kaldirildi (search.php operations.view'a baglandi).
+- 48 sayfaya `qmsRequirePermission(<eylem>)` eklendi (script ile; 9 sayfaya
+  ayrica access.php require). Varsayilan roller sidebar mantigiyla eslesir;
+  super admin kendini kilitleyemez. Tum degerislen dosyalar lint gecti, RBAC
+  testi 17/17, login'siz sayfalar login.php'ye yonleniyor. cache v125.
+
 ### RBAC toggle tiklanma duzeltmesi (2026-10-08)
 - RBAC toggle'lari `<span>` idi; span label olmadigindan tiklaninca input
   tetiklenmiyordu (input gizli oldugundan). `<label>` yapildi -> implicit label
