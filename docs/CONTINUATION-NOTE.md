@@ -1181,6 +1181,11 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### RBAC toggle tiklanma duzeltmesi (2026-10-08)
+- RBAC toggle'lari `<span>` idi; span label olmadigindan tiklaninca input
+  tetiklenmiyordu (input gizli oldugundan). `<label>` yapildi -> implicit label
+  ile tiklamalar input'u ac/kapa yapabiliyor. cache v124.
+
 ### RBAC izinleri toggle ile düzenlenebilir (2026-10-08)
 - Izinler (RBAC) sayfasi salt-okunurdu; super admin artik her eylem x rol
   hucreisini TailAdmin toggle switch ile ac/kapa yapabiliyor.

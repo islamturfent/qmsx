@@ -110,15 +110,15 @@ $activeNav = "permissions";
                                     <?php foreach ($roles as $role): ?>
                                         <td class="rbac-role-col">
                                             <?php if ($role === 'super_admin'): ?>
-                                                <span class="toggle-field rbac-toggle">
+                                                <label class="toggle-field rbac-toggle">
                                                     <input type="checkbox" checked disabled>
                                                     <span class="toggle-slider"></span>
-                                                </span>
+                                                </label>
                                             <?php else: ?>
-                                                <span class="toggle-field rbac-toggle">
+                                                <label class="toggle-field rbac-toggle">
                                                     <input type="checkbox" name="perm[<?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>][<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>]" value="1" <?= $permits[$role] ? 'checked' : '' ?>>
                                                     <span class="toggle-slider"></span>
-                                                </span>
+                                                </label>
                                             <?php endif; ?>
                                         </td>
                                     <?php endforeach; ?>
