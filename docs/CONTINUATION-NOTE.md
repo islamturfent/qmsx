@@ -1180,6 +1180,10 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   yoktu (Warning). Sayfada bu degerler artik yanit tablosundan hesaplaniyor
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
+
+### Ic anket "Soru Ekle" bosluk duzeltmesi (2026-10-08)
+- `form + .admin-list` ust bosluk (margin-top 16px) eklendi; Soru Ekle dugmesi
+  artik alttaki soru kutusuna degmiyor. Fonksiyonlara dokunulmadi. cache v108.
 - Kod kimlikleri KORUNDU: `qms*` on-ekleri ve `QMS_*` PHP sabitleri + lower-case
   `qms` dosya/cache adlari ve storage/documents icerigi degismedi. cache v104.
 
