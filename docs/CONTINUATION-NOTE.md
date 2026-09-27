@@ -1149,6 +1149,16 @@ aletler sayfasinda "Gecmis" butonu + menuye "Kalibrasyon Gecmisi".
   (Profil/user, Hesap Ayarlari/cog, Sifre/key, ayrac, Cikis/logout).
 - Header siralama (CSS order, fonksiyon degismez): sagdan sola kullanici, dil,
   tema, uyari zili. cache v99.
+
+### Bildirim Tercihleri profil'den ayrildi -> Hesap Ayarlari (2026-10-08)
+- Yeni `account-settings.php`: e-posta bildirim tercihleri formu buraya tasindi
+  (ayni POST save_prefs mantigi, ayni qmsMailPrefs/qmsMailPrefsSave - fonksiyon
+degismez). Tek kolonlu TailAdmin kart (`settings-layout`).
+- `profile.php`'den Bildirim Tercihleri bolumu, save_prefs POST kolu ve ilgili
+degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
+- Kullanici menusu "Hesap Ayarlari" artik `account-settings.php`'e gider; profil
+  basligina da Hesap Ayarlari kisa yolu eklendi. i18n accountSettingsTitle/Text.
+- cache v100.
 - `appIcon()`'a `user`,`cog`,`key`,`chevronDown` ikonlari; app-sidebar gizli
   ikon span'lari + i18n `accountSettingsMenuLabel`.
 - `.user-menu-*` TailAdmin olcultur (iki satir id, ikonlu madde, ayrac). cache v98.

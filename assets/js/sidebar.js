@@ -210,7 +210,7 @@ if (userMenuState && topbarActions && languageButton) {
     }
 
     dropdown.appendChild(userMenuItem("profile.php", iconUser, "profileTitle", "Profil"));
-    dropdown.appendChild(userMenuItem("profile.php", iconCog, "accountSettingsMenuLabel", "Hesap Ayarları"));
+    dropdown.appendChild(userMenuItem("account-settings.php", iconCog, "accountSettingsMenuLabel", "Hesap Ayarları"));
     dropdown.appendChild(userMenuItem("profile.php#editPassword", iconKey, "profilePasswordTitle", "Şifre Değiştir"));
     const divider = document.createElement("div");
     divider.className = "user-menu-divider";
