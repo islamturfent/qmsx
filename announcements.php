@@ -159,8 +159,8 @@ if ($editing) {
                                 <?php if ($ann['body']): ?><p><?= htmlspecialchars(mb_substr((string) $ann['body'], 0, 180), ENT_QUOTES, 'UTF-8') ?><?= mb_strlen((string) $ann['body']) > 180 ? '…' : '' ?></p><?php endif; ?>
                             </div>
                             <div class="list-item-side">
-                                <form method="post" action="announcements.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="publish"><input type="hidden" name="id" value="<?= (int) $ann['id'] ?>"><button class="secondary-button secondary-button-sm" type="submit"><?= (int) $ann['published'] === 1 ? 'Yayından Kaldır' : 'Yayınla' ?></button></form>
-                                <a class="secondary-button secondary-button-sm" href="announcements.php?edit=<?= (int) $ann['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <form method="post" action="announcements.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="publish"><input type="hidden" name="id" value="<?= (int) $ann['id'] ?>"><button class="secondary-button" type="submit"><?= (int) $ann['published'] === 1 ? 'Yayından Kaldır' : 'Yayınla' ?></button></form>
+                                <a class="secondary-button" href="announcements.php?edit=<?= (int) $ann['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="announcements.php" onsubmit="return confirm('Duyuru silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $ann['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="announcementDelete">Sil</button></form>
                             </div>
                         </div>

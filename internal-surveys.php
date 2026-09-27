@@ -250,8 +250,8 @@ if ($manageId > 0) {
                                 </span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="internal-surveys.php?manage=<?= (int) $s['id'] ?>" data-i18n="internalSurveyManage">Yönet</a>
-                                <a class="secondary-button secondary-button-sm" href="internal-surveys.php?edit=<?= (int) $s['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="internal-surveys.php?manage=<?= (int) $s['id'] ?>" data-i18n="internalSurveyManage">Yönet</a>
+                                <a class="secondary-button" href="internal-surveys.php?edit=<?= (int) $s['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="internal-surveys.php" onsubmit="return confirm('Anket silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $s['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="internalSurveyDelete">Sil</button></form>
                             </div>
                         </div>

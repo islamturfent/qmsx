@@ -84,7 +84,7 @@ $activeNav = "notifications";
                     <h3 data-i18n="myOverdueTitle">Geciken İşlerim</h3>
                     <p data-i18n="myOverdueText">Size atanmış ve terminal geçmiş kayıtlar.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="overdue.php" data-i18n="viewOverdueLink">Tümünü Gör</a>
+                <a class="secondary-button" href="overdue.php" data-i18n="viewOverdueLink">Tümünü Gör</a>
             </div>
             <div class="admin-list">
                 <?php foreach ($myOverdue as $od): ?>

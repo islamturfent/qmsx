@@ -122,7 +122,7 @@ $activeNav = "internal_surveys";
                                 <span><?= (int) $s['question_count'] ?> soru<?php if ($s['description']): ?> · <?= htmlspecialchars(mb_substr((string) $s['description'], 0, 120), ENT_QUOTES, 'UTF-8') ?><?php endif; ?></span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="internal-survey-fill.php?fill=<?= (int) $s['id'] ?>" data-i18n="internalSurveyStartFill">Doldur</a>
+                                <a class="secondary-button" href="internal-survey-fill.php?fill=<?= (int) $s['id'] ?>" data-i18n="internalSurveyStartFill">Doldur</a>
                             </div>
                         </div>
                     <?php endforeach; ?>

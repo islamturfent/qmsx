@@ -172,7 +172,7 @@ if ($editing) {
             </section>
 
             <section class="console-card checklist-section">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="improvementListTitle">Öneriler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="improvements.php"><select name="status"><option value="" data-i18n="improvementAllStatuses">Tüm Durumlar</option><?php foreach (QMS_IMPROVEMENT_FILTERS as $sf): ?><option value="<?= $sf ?>" <?= $statusFilter === $sf ? 'selected' : '' ?>><?= qmsImprovementStatusLabel(['open'=>'Açık','implemented'=>'Uygulanan','closed'=>'Kapandı'][$sf]) ?></option><?php endforeach; ?></select><button class="secondary-button secondary-button-sm" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
+                <div class="section-heading compact-heading"><div><h3 data-i18n="improvementListTitle">Öneriler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="improvements.php"><select name="status"><option value="" data-i18n="improvementAllStatuses">Tüm Durumlar</option><?php foreach (QMS_IMPROVEMENT_FILTERS as $sf): ?><option value="<?= $sf ?>" <?= $statusFilter === $sf ? 'selected' : '' ?>><?= qmsImprovementStatusLabel(['open'=>'Açık','implemented'=>'Uygulanan','closed'=>'Kapandı'][$sf]) ?></option><?php endforeach; ?></select><button class="secondary-button" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
                 <div class="admin-list">
                     <?php if (!$rows): ?><div class="empty-state" data-i18n="improvementEmpty">Henüz iyileştirme önerisi yok.</div><?php endif; ?>
                     <?php foreach ($rows as $row): ?>
@@ -186,7 +186,7 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="improvements.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="improvements.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="improvements.php" onsubmit="return confirm('Öneri silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="improvementDelete">Sil</button></form>
                             </div>
                         </div>

@@ -145,7 +145,7 @@ $activeNav = "calibration_history";
                             </div>
                             <div class="list-item-side">
                                 <?php if ($row['certificate_file']): ?>
-                                    <a class="secondary-button secondary-button-sm" href="instrument-calibrations.php?download=<?= (int) $row['id'] ?>" data-i18n="calibrationDownload">Sertifika</a>
+                                    <a class="secondary-button" href="instrument-calibrations.php?download=<?= (int) $row['id'] ?>" data-i18n="calibrationDownload">Sertifika</a>
                                 <?php endif; ?>
                                 <form method="post" action="instrument-calibrations.php" onsubmit="return confirm('Kayıt silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="calibrationDelete">Sil</button></form>
                             </div>

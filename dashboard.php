@@ -257,7 +257,7 @@ $activeNav = "dashboard";
                     <h3><?= appIcon("complaints", "heading-inline-icon") ?><span data-i18n="dashboardAnnouncementsTitle">Yayındaki Duyurular</span></h3>
                     <p data-i18n="dashboardAnnouncementsText">Şirketiniz için yayınlanan güncel duyurular.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="announcements.php" data-i18n="dashboardAnnouncementsMoreLink">Tümü</a>
+                <a class="secondary-button" href="announcements.php" data-i18n="dashboardAnnouncementsMoreLink">Tümü</a>
             </div>
             <div class="announcement-feed">
                 <?php foreach (array_slice($dashboardAnnouncements, 0, 5) as $ann): ?>
@@ -278,7 +278,7 @@ $activeNav = "dashboard";
                     <h3><?= appIcon("table", "heading-inline-icon") ?><span data-i18n="dashboardQualityPlanTitle">Kalite Planı İlerlemesi</span></h3>
                     <p data-i18n="dashboardQualityPlanText">Yıllık kalite hedeflerinin tamamlanma durumu ve ortalama ilerlemesi.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="quality-plan.php" data-i18n="dashboardQualityPlanMoreLink">Tümü</a>
+                <a class="secondary-button" href="quality-plan.php" data-i18n="dashboardQualityPlanMoreLink">Tümü</a>
             </div>
             <div class="plan-progress-list">
                 <?php foreach ($dashboardCurrentPlans as $pl): ?>
@@ -302,7 +302,7 @@ $activeNav = "dashboard";
                     <h3><?= appIcon("sparkles", "heading-inline-icon") ?><span data-i18n="dashboardImprovementsWidgetTitle">İyileştirme Fırsatları</span></h3>
                     <p data-i18n="dashboardImprovementsWidgetText">Açık iyileştirme önerileri; yüksek öncelikliler önce listelenir.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="improvements.php" data-i18n="dashboardImprovementsMoreLink">Tümü</a>
+                <a class="secondary-button" href="improvements.php" data-i18n="dashboardImprovementsMoreLink">Tümü</a>
             </div>
             <div class="ofi-widget-list">
                 <?php foreach (array_slice($dashboardImprovements, 0, 5) as $imp): ?>
@@ -325,7 +325,7 @@ $activeNav = "dashboard";
                     <h3><?= appIcon("clock", "heading-inline-icon") ?><span data-i18n="dashboardCalibrationWidgetTitle">Kalibrasyon Takvimi</span></h3>
                     <p data-i18n="dashboardCalibrationWidgetText">Kalibrasyonu gecikmiş ölçü aletleri.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="instruments.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
+                <a class="secondary-button" href="instruments.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
             </div>
             <div class="ofi-widget-list">
                 <?php foreach (array_slice($dashboardOverdueInstruments, 0, 5) as $ins): ?>
@@ -348,7 +348,7 @@ $activeNav = "dashboard";
                     <h3><?= appIcon("alert", "heading-inline-icon") ?><span data-i18n="dashboardIncidentsWidgetTitle">Açık Olaylar</span></h3>
                     <p data-i18n="dashboardIncidentsWidgetText">Açık olay kayıtları; kritik olanlar önce.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="incidents.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
+                <a class="secondary-button" href="incidents.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
             </div>
             <div class="ofi-widget-list">
                 <?php foreach (array_slice($dashboardOpenIncidents, 0, 5) as $inc): ?>
@@ -371,7 +371,7 @@ $activeNav = "dashboard";
                     <h3><?= appIcon("approvals", "heading-inline-icon") ?><span data-i18n="dashboardContractsWidgetTitle">Yaklaşan Sözleşmeler</span></h3>
                     <p data-i18n="dashboardContractsWidgetText">60 gün içinde süresi dolacak aktif sözleşmeler.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="contracts.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
+                <a class="secondary-button" href="contracts.php" data-i18n="dashboardWidgetMoreLink">Tümü</a>
             </div>
             <div class="ofi-widget-list">
                 <?php foreach (array_slice($dashboardExpiringContracts, 0, 5) as $con): ?>
@@ -448,7 +448,7 @@ $activeNav = "dashboard";
                     <h3 data-i18n="cockpitCoqTitle">COQ Trendi</h3>
                     <p data-i18n="cockpitCoqText">Kalite maliyeti (önleme, değerlendirme, hata) aylık dağılımı.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="quality-cost-trend.php" data-i18n="cockpitCoqDetailLink">Detay</a>
+                <a class="secondary-button" href="quality-cost-trend.php" data-i18n="cockpitCoqDetailLink">Detay</a>
             </div>
             <?php if (max(array_column($cockpitCostRows, 'cost_total')) > 0): ?>
             <div class="trend-chart">
@@ -484,7 +484,7 @@ $activeNav = "dashboard";
                     <h3 data-i18n="cockpitKpiTitle">Hedef vs Gerçekleşen</h3>
                     <p data-i18n="cockpitKpiText">Güncel yıl (<?= $cockpitYear ?>) KPI hedefleri ve gerçekleşen değerler.</p>
                 </div>
-                <a class="secondary-button secondary-button-sm" href="performance.php" data-i18n="cockpitKpiDetailLink">Performans</a>
+                <a class="secondary-button" href="performance.php" data-i18n="cockpitKpiDetailLink">Performans</a>
             </div>
             <?php if (!$cockpitCompanies): ?>
                 <div class="empty-state" data-i18n="cockpitKpiEmpty">Hedef koyulmuş şirket bulunmuyor. Performans sayfasından hedef ekleyin.</div>

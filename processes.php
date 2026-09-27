@@ -155,7 +155,7 @@ if ($editing) {
             </section>
 
             <section class="console-card checklist-section">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="processListTitle">Süreçler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="processes.php"><select name="status"><option value="" data-i18n="processAllStatuses">Tüm Durumlar</option><?php foreach (QMS_PROCESS_STATUSES as $st): ?><option value="<?= $st ?>" <?= $statusFilter === $st ? 'selected' : '' ?>><?= htmlspecialchars(qmsProcessStatusLabel($st), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button secondary-button-sm" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
+                <div class="section-heading compact-heading"><div><h3 data-i18n="processListTitle">Süreçler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="processes.php"><select name="status"><option value="" data-i18n="processAllStatuses">Tüm Durumlar</option><?php foreach (QMS_PROCESS_STATUSES as $st): ?><option value="<?= $st ?>" <?= $statusFilter === $st ? 'selected' : '' ?>><?= htmlspecialchars(qmsProcessStatusLabel($st), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
                 <div class="admin-list">
                     <?php if (!$rows): ?><div class="empty-state" data-i18n="processEmpty">Henüz süreç tanımlanmadı.</div><?php endif; ?>
                     <?php foreach ($rows as $row): ?>
@@ -168,7 +168,7 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="processes.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="processes.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="processes.php" onsubmit="return confirm('Süreç silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="processDelete">Sil</button></form>
                             </div>
                         </div>

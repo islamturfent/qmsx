@@ -140,7 +140,7 @@ if ($editing) {
                                 <span><?= htmlspecialchars($typeLabels[$tpl['document_type']] ?? $tpl['document_type'], ENT_QUOTES, 'UTF-8') ?><?php if ($tpl['category']): ?> · <?= htmlspecialchars($tpl['category'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?></span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="document-templates.php?edit=<?= (int) $tpl['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="document-templates.php?edit=<?= (int) $tpl['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="document-templates.php" onsubmit="return confirm('Şablonu silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $tpl['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="docTemplateDelete">Sil</button></form>
                             </div>
                         </div>

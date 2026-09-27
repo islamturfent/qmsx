@@ -207,7 +207,7 @@ if ($manageId > 0) {
                                     <span><?= htmlspecialchars(qmsPlanStatusLabel($it['status']), ENT_QUOTES, 'UTF-8') ?> · %<?= (int) $it['progress'] ?><?php if ($it['category']): ?> · <?= htmlspecialchars($it['category'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?><?php if ($it['responsible']): ?> · <?= htmlspecialchars($it['responsible'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?></span>
                                 </div>
                                 <div class="list-item-side">
-                                    <a class="secondary-button secondary-button-sm" href="quality-plan.php?manage=<?= (int) $manageId ?>&edititem=<?= (int) $it['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                    <a class="secondary-button" href="quality-plan.php?manage=<?= (int) $manageId ?>&edititem=<?= (int) $it['id'] ?>" data-i18n="editButton">Düzenle</a>
                                     <form method="post" action="quality-plan.php?manage=<?= (int) $manageId ?>" onsubmit="return confirm('Kalem silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="item_delete"><input type="hidden" name="plan_id" value="<?= (int) $manageId ?>"><input type="hidden" name="item_id" value="<?= (int) $it['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="qualityPlanDeleteItem">Sil</button></form>
                                 </div>
                             </div>
@@ -238,7 +238,7 @@ if ($manageId > 0) {
             </section>
 
             <section class="console-card checklist-section">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="qualityPlanListTitle">Planlar</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($plans) ?></strong></p></div><div><form class="filter-inline" method="get" action="quality-plan.php"><select name="year"><option value="0" data-i18n="qualityPlanAllYears">Tüm Yıllar</option><?php foreach ($planYears as $py): ?><option value="<?= (int) $py ?>" <?= $yearFilter === (int) $py ? 'selected' : '' ?>><?= (int) $py ?></option><?php endforeach; ?></select><button class="secondary-button secondary-button-sm" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
+                <div class="section-heading compact-heading"><div><h3 data-i18n="qualityPlanListTitle">Planlar</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($plans) ?></strong></p></div><div><form class="filter-inline" method="get" action="quality-plan.php"><select name="year"><option value="0" data-i18n="qualityPlanAllYears">Tüm Yıllar</option><?php foreach ($planYears as $py): ?><option value="<?= (int) $py ?>" <?= $yearFilter === (int) $py ? 'selected' : '' ?>><?= (int) $py ?></option><?php endforeach; ?></select><button class="secondary-button" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
                 <div class="admin-list">
                     <?php if (!$plans): ?><div class="empty-state" data-i18n="qualityPlanEmpty">Henüz plan yok.</div><?php endif; ?>
                     <?php foreach ($plans as $pl): ?>
@@ -248,8 +248,8 @@ if ($manageId > 0) {
                                 <span><?= (int) $pl['item_completed'] ?>/<?= (int) $pl['item_total'] ?> tamamlandı<?= $pl['avg_progress'] !== null ? ' · ilerleme %' . (int) $pl['avg_progress'] : '' ?></span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="quality-plan.php?manage=<?= (int) $pl['id'] ?>" data-i18n="qualityPlanManage">Yönet</a>
-                                <a class="secondary-button secondary-button-sm" href="quality-plan.php?edit=<?= (int) $pl['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="quality-plan.php?manage=<?= (int) $pl['id'] ?>" data-i18n="qualityPlanManage">Yönet</a>
+                                <a class="secondary-button" href="quality-plan.php?edit=<?= (int) $pl['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="quality-plan.php" onsubmit="return confirm('Plan silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $pl['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="qualityPlanDelete">Sil</button></form>
                             </div>
                         </div>

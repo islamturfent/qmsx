@@ -160,7 +160,7 @@ $prefill = $editing;
             </section>
 
             <section class="console-card checklist-section">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="supplierEvalListTitle">Değerlendirmeler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="supplier-evaluations.php"><select name="status"><option value="" data-i18n="supplierEvalAllStatuses">Tüm Durumlar</option><?php foreach (QMS_SUPPLIER_EVAL_FILTERS as $sf): ?><option value="<?= $sf ?>" <?= $statusFilter === $sf ? 'selected' : '' ?>><?= htmlspecialchars(qmsSupplierEvalStatusLabel($sf), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button secondary-button-sm" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
+                <div class="section-heading compact-heading"><div><h3 data-i18n="supplierEvalListTitle">Değerlendirmeler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="supplier-evaluations.php"><select name="status"><option value="" data-i18n="supplierEvalAllStatuses">Tüm Durumlar</option><?php foreach (QMS_SUPPLIER_EVAL_FILTERS as $sf): ?><option value="<?= $sf ?>" <?= $statusFilter === $sf ? 'selected' : '' ?>><?= htmlspecialchars(qmsSupplierEvalStatusLabel($sf), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
                 <div class="admin-list">
                     <?php if (!$rows): ?><div class="empty-state" data-i18n="supplierEvalEmpty">Henüz değerlendirme kaydı yok.</div><?php endif; ?>
                     <?php foreach ($rows as $row): ?>
@@ -177,9 +177,9 @@ $prefill = $editing;
                             </div>
                             <div class="list-item-side">
                                 <?php if ($row['eff_status'] !== 'done'): ?>
-                                <form method="post" action="supplier-evaluations.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="set_status"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><input type="hidden" name="status" value="done"><button class="secondary-button secondary-button-sm" type="submit" data-i18n="supplierEvalMarkDone">Yapıldı</button></form>
+                                <form method="post" action="supplier-evaluations.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="set_status"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><input type="hidden" name="status" value="done"><button class="secondary-button" type="submit" data-i18n="supplierEvalMarkDone">Yapıldı</button></form>
                                 <?php endif; ?>
-                                <a class="secondary-button secondary-button-sm" href="supplier-evaluations.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="supplier-evaluations.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="supplier-evaluations.php" onsubmit="return confirm('Kayıt silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="supplierEvalDelete">Sil</button></form>
                             </div>
                         </div>

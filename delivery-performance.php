@@ -172,7 +172,7 @@ if ($editing) {
             </section>
 
             <section class="console-card checklist-section">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="deliveryListTitle">Performans Kartları</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="delivery-performance.php"><select name="period"><option value="" data-i18n="deliveryAllPeriods">Tüm Dönemler</option><?php foreach ($periods as $pd): ?><option value="<?= htmlspecialchars($pd, ENT_QUOTES, 'UTF-8') ?>" <?= $periodFilter === $pd ? 'selected' : '' ?>><?= htmlspecialchars($pd, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button secondary-button-sm" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
+                <div class="section-heading compact-heading"><div><h3 data-i18n="deliveryListTitle">Performans Kartları</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="delivery-performance.php"><select name="period"><option value="" data-i18n="deliveryAllPeriods">Tüm Dönemler</option><?php foreach ($periods as $pd): ?><option value="<?= htmlspecialchars($pd, ENT_QUOTES, 'UTF-8') ?>" <?= $periodFilter === $pd ? 'selected' : '' ?>><?= htmlspecialchars($pd, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
                 <div class="admin-list">
                     <?php if (!$rows): ?><div class="empty-state" data-i18n="deliveryEmpty">Henüz teslimat kaydı yok.</div><?php endif; ?>
                     <?php foreach ($rows as $row): ?>
@@ -185,9 +185,9 @@ if ($editing) {
                             </div>
                             <div class="list-item-side">
                                 <div class="progress-track" style="width:130px"><div class="progress-fill" style="width:<?= min(100, $rate) ?>%"></div></div>
-                                <a class="secondary-button secondary-button-sm" href="delivery-performance.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="delivery-performance.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <?php if ($rowNc > 0): ?>
-                                    <a class="secondary-button secondary-button-sm" href="nonconformity-detail.php?id=<?= $rowNc ?>" data-i18n="deliveryNcOpenButton">Uygunsuzluğu Aç</a>
+                                    <a class="secondary-button" href="nonconformity-detail.php?id=<?= $rowNc ?>" data-i18n="deliveryNcOpenButton">Uygunsuzluğu Aç</a>
                                 <?php elseif ((int) $row['quantity_rejected'] > 0): ?>
                                     <form method="post" action="delivery-performance.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="create_nc"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="primary-button primary-button-sm" type="submit" data-i18n="deliveryNcCreateButton">Uygunsuzluk Oluştur</button></form>
                                 <?php endif; ?>

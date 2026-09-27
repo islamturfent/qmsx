@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### secondary-button-sm sinifi kaldirildi (2026-10-08)
+- `secondary-button secondary-button-sm` kalibindaki `secondary-button-sm` sinifi
+  15 dosyada (41 yerde) kaldirildi; dugmeler normal secondary-button boyutuna
+  dondu. `.secondary-button-sm` CSS kurali da artik kullanilmiyor. Fonksiyonlara
+  dokunulmadi. cache v115.
+
 ### Personel Detayi form.message bosluk duzeltmesi (2026-10-08)
 - `main > .form-message { margin-top: 16px; }` eklendi; Personel Detayi
   sayfasinda form-message (basari/hata bildirimi) ustteki KPI kutularina

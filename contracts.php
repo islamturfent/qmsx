@@ -174,7 +174,7 @@ if ($editing) {
                             <span><?= number_format((int) $att['file_size'] / 1024, 1, ',', '.') ?> KB · <?= htmlspecialchars((string) $att['created_at'], ENT_QUOTES, 'UTF-8') ?></span>
                         </div>
                         <div class="list-item-side">
-                            <a class="secondary-button secondary-button-sm" href="contract-attachment-download.php?id=<?= (int) $att['id'] ?>" data-i18n="contractDownload">İndir</a>
+                            <a class="secondary-button" href="contract-attachment-download.php?id=<?= (int) $att['id'] ?>" data-i18n="contractDownload">İndir</a>
                             <form method="post" action="contracts.php?manage=<?= (int) $manageId ?>" onsubmit="return confirm('Dosya silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="attachment_delete"><input type="hidden" name="contract_id" value="<?= (int) $manageId ?>"><input type="hidden" name="attachment_id" value="<?= (int) $att['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="contractFileDelete">Sil</button></form>
                         </div>
                     </div>
@@ -218,7 +218,7 @@ if ($editing) {
             </section>
 
             <section class="console-card checklist-section">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="contractListTitle">Sözleşmeler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="contracts.php"><select name="status"><option value="" data-i18n="contractAllStatuses">Tüm Durumlar</option><option value="expiring" data-i18n="contractFilterExpiring">Süresi Doluyor</option><option value="expired_auto" data-i18n="contractFilterExpired">Süresi Doldu (Otomatik)</option><?php foreach (QMS_CONTRACT_STATUSES as $st): ?><option value="<?= $st ?>" <?= $statusFilter === $st ? 'selected' : '' ?>><?= htmlspecialchars(qmsContractStatusLabel($st), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button secondary-button-sm" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
+                <div class="section-heading compact-heading"><div><h3 data-i18n="contractListTitle">Sözleşmeler</h3><p><span data-i18n="filteredRecordsLabel">Gösterilen kayıt</span>: <strong><?= count($rows) ?></strong></p></div><div><form class="filter-inline" method="get" action="contracts.php"><select name="status"><option value="" data-i18n="contractAllStatuses">Tüm Durumlar</option><option value="expiring" data-i18n="contractFilterExpiring">Süresi Doluyor</option><option value="expired_auto" data-i18n="contractFilterExpired">Süresi Doldu (Otomatik)</option><?php foreach (QMS_CONTRACT_STATUSES as $st): ?><option value="<?= $st ?>" <?= $statusFilter === $st ? 'selected' : '' ?>><?= htmlspecialchars(qmsContractStatusLabel($st), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select><button class="secondary-button" type="submit" data-i18n="applyButton">Uygula</button></form></div></div>
                 <div class="admin-list">
                     <?php if (!$rows): ?><div class="empty-state" data-i18n="contractEmpty">Henüz sözleşme kaydı yok.</div><?php endif; ?>
                     <?php foreach ($rows as $row): ?>
@@ -234,8 +234,8 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
-                                <a class="secondary-button secondary-button-sm" href="contracts.php?manage=<?= (int) $row['id'] ?>" data-i18n="contractFilesTitle">Dosyalar</a>
-                                <a class="secondary-button secondary-button-sm" href="contracts.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
+                                <a class="secondary-button" href="contracts.php?manage=<?= (int) $row['id'] ?>" data-i18n="contractFilesTitle">Dosyalar</a>
+                                <a class="secondary-button" href="contracts.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="contracts.php" onsubmit="return confirm('Sözleşme silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="contractDelete">Sil</button></form>
                             </div>
                         </div>
