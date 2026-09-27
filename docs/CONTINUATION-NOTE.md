@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Sirket kullanicisi rapor export audit count hatasi (2026-10-08)
+- `report-export-data.php` satir 737'deki `SELECT COUNT(*) FROM audit_log`
+  sorgusu `companies.id IN (...)` scope'u kullaniyordu ama `companies` tablosunu
+  JOIN etmiyordu; sirket kullanicisinda scope doluyken `Unknown column
+  'companies.id'` fatal hatasi veriyordu. Sorguya `LEFT JOIN companies ON
+  companies.id = audit_log.company_id` eklendi. Diger tum sorgular zaten
+  companies JOIN iceriyordu (sadece bu count eksikti). Test: sirket scope'u ile
+  count sorgusu dogrulandi, 23/23 regresyon gecti. cache v122.
+
 ### Hesap Ayarlari kategori secimleri toggle switch (2026-10-08)
 - "E-posta alinacak kategoriler" (`email_categories[]`) checkbox'lari da
   TailAdmin toggle switch'e cevirildi (toggle-field + toggle-slider). input

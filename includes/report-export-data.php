@@ -727,7 +727,7 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
             'created_at' => $item['created_at'],
         ];
     }
-    $countSql = 'SELECT COUNT(*) FROM audit_log WHERE audit_log.created_at BETWEEN ? AND ?' . $scopeSql;
+    $countSql = 'SELECT COUNT(*) FROM audit_log LEFT JOIN companies ON companies.id = audit_log.company_id WHERE audit_log.created_at BETWEEN ? AND ?' . $scopeSql;
     $countP = $periodParams;
     if ($auditCompanyId > 0) {
         $countSql .= ' AND audit_log.company_id = ?';
