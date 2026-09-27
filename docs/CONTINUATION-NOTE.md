@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Hesap Ayarlari kategori secimleri toggle switch (2026-10-08)
+- "E-posta alinacak kategoriler" (`email_categories[]`) checkbox'lari da
+  TailAdmin toggle switch'e cevirildi (toggle-field + toggle-slider). input
+  name/value/checked korundu -> backend fonksiyonu aynai. Kullanici onayladigi
+  icin coklu secimler de toggle olarak gorunuyor. cache v121.
+
 ### Hesap Ayarlari ana anahtar toggle switch (2026-10-08)
 - "E-posta bildirimleri al" (`email_notifications`) checkbox'i TailAdmin tarzi
   toggle switch'e cevrilirldi (.toggle-field + .toggle-slider). input name/checked

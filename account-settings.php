@@ -100,7 +100,7 @@ $activeNav = "profile";
                                 <span data-i18n="notificationPrefsCategories">E-posta alınacak kategoriler (boş = tümü)</span>
                                 <div class="pref-checks">
                                     <?php foreach ($mailGroups as $gKey => $gLabel): $checked = $mailPrefs['categories'] === null || in_array($gKey, $mailPrefs['categories'], true); ?>
-                                        <label class="pref-check"><input type="checkbox" name="email_categories[]" value="<?= htmlspecialchars($gKey, ENT_QUOTES, 'UTF-8') ?>" <?= $checked ? 'checked' : '' ?>><span class="box"></span><span><?= htmlspecialchars($gLabel, ENT_QUOTES, 'UTF-8') ?></span></label>
+                                        <label class="toggle-field"><input type="checkbox" name="email_categories[]" value="<?= htmlspecialchars($gKey, ENT_QUOTES, 'UTF-8') ?>" <?= $checked ? 'checked' : '' ?>><span class="toggle-slider"></span><span><?= htmlspecialchars($gLabel, ENT_QUOTES, 'UTF-8') ?></span></label>
                                     <?php endforeach; ?>
                                 </div>
                             </label>
