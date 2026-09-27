@@ -2006,6 +2006,21 @@ body {
     color: var(--muted-color);
 }
 
+/* Onay kutusu metin input'u degil: form-field'in genis input stili
+   (width:100%, min-height:44px, padding, border) checkbox'a dokunmamali.
+   Global 20x20 TailAdmin kutucuguna don. */
+.form-field input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 6px;
+    background: var(--surface-color);
+    box-shadow: none;
+}
+
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {

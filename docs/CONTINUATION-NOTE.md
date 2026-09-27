@@ -1181,6 +1181,14 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Checkbox boyutu/hizasi duzeltmesi (2026-10-08)
+- `.form-field input` kurali checkbox'i da kapsadigindan onlara `width:100%`,
+  `min-height:44px`, padding ve border uyguluyordu; bu yuzden onay kutulari
+  devasa ve metinle dugunsuz gorunuyordu.
+- `.form-field input[type="checkbox"]` reset kurali eklendi -> 20x20 TailAdmin
+  kutucuguna doner; metnin solunda (inline-flex) durur. Fonksiyonlara
+  dokunulmadi. cache v118.
+
 ### Tum checkbox'lar Bildirim Tercihleri ile ayni stil (2026-10-08)
 - Global `input[type=checkbox]` zaten TailAdmin (pref-check .box ile ayni)
   idi; eksik olan `focus-visible` border-color ve etiket hizalamasi eklendi.
