@@ -86,14 +86,14 @@ h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 18px 0 8p
 .data td { border: 1px solid #e4e7ec; padding: 5px 8px; font-size: 11px; }
 .metrics td { padding: 6px 8px; font-size: 11px; } .muted { color: #667085; } .footer { margin-top: 24px; color: #98a2b3; font-size: 10px; }
 </style></head><body>
-<h1>QMS Günlük Yönetim Raporu</h1>
+<h1>QuAmi Günlük Yönetim Raporu</h1>
 <div class="meta">' . $dateStamp . ' · Toplam geciken: ' . $totalOverdue . '</div>
 <table class="metrics"><tr>' . $kpiCells . '</tr></table>
 <h2>Geciken İşler Özeti</h2>
 <table class="data"><thead><tr><th>Modül</th><th>Geciken</th></tr></thead><tbody>' . $summaryCounts . '</tbody></table>'
 . $moduleTables
 . '<h2>Denetçi İş Yükü</h2><table class="data"><thead><tr><th>Denetçi</th><th>Şirket</th><th>Atanmış Denetim</th><th>Açık Uygunsuzluk</th><th>Açık Faaliyet</th><th>Toplam</th></tr></thead><tbody>' . $wlRows . '</tbody></table>'
-. '<div class="footer">Detay: ' . $esc($overdueLink) . ' · QMS otomatik raporu</div></body></html>';
+. '<div class="footer">Detay: ' . $esc($overdueLink) . ' · QuAmi otomatik raporu</div></body></html>';
 
 // Dompdf ile PDF uret (temp dosyaya yazmadan once bellekten de alabiliriz; dosya ek olarak gonderilecek).
 require_once dirname(__DIR__) . '/lib/dompdf/autoload.inc.php';
@@ -129,7 +129,7 @@ try {
             $ok = qmsMailSend(
                 (string) $r['email'],
                 (string) ($r['full_name'] ?? '') !== '' ? (string) $r['full_name'] : null,
-                'QMS Günlük Yönetim Raporu (' . date('d.m.Y') . ')',
+                'QuAmi Günlük Yönetim Raporu (' . date('d.m.Y') . ')',
                 '<p>Günlük rapor ektedir. Geciken işler ve denetçi iş yükü özeti.</p><p><a href="' . $esc($overdueLink) . '">Tümünü gör</a></p>',
                 'Günlük rapor ektedir. Tümünü gör: ' . $overdueLink,
                 [$attachment]

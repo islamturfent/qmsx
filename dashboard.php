@@ -109,9 +109,9 @@ $activeNav = "dashboard";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f9fafb">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="QMS">
+    <meta name="apple-mobile-web-app-title" content="QuAmi">
 
-    <title>QMS Dashboard</title>
+    <title>QuAmi Dashboard</title>
 
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml">
@@ -139,7 +139,7 @@ $activeNav = "dashboard";
     <main class="page-container">
         <section class="page-heading">
             <span class="section-kicker" data-i18n="superAdminKicker">Sistem Üst Yönetimi</span>
-            <h1 data-i18n="welcomeTitle">QMS Yönetim Sistemi</h1>
+            <h1 data-i18n="welcomeTitle">QuAmi Yönetim Sistemi</h1>
             <p data-i18n="welcomeText">Kalite, denetim ve belgelendirme süreçlerini tek platformdan yönetin.</p>
         </section>
 

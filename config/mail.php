@@ -7,7 +7,7 @@ function qmsMailDefaults(): array
     return [
         'enabled' => false,
         'from_email' => 'qms@localhost',
-        'from_name' => 'QMS',
+        'from_name' => 'QuAmi',
         'base_url' => 'http://localhost/qmsx/',
         'host' => '',
         'port' => 587,

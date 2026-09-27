@@ -58,7 +58,7 @@ if ($format === 'xlsx') {
     ];
 
     $summaryRows = [
-        [['value' => 'QMS Vadesi Gelen / Geciken isler raporu', 'style' => 1]],
+        [['value' => 'QuAmi Vadesi Gelen / Geciken isler raporu', 'style' => 1]],
         ['Oluşturulma', $dateStamp],
         ['Toplam geciken', $totalOverdue],
         ['Denetçi sayısı', count($auditorWorkload)],
@@ -173,13 +173,13 @@ h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 20px 0 8p
 .data td { border: 1px solid #e4e7ec; padding: 6px 8px; font-size: 11px; }
 .summary td { padding: 4px 10px; } .muted { color: #667085; } .footer { margin-top: 24px; color: #98a2b3; font-size: 10px; }
 </style></head><body>
-<h1>QMS Vadesi Gelen / Geciken İşler</h1>
+<h1>QuAmi Vadesi Gelen / Geciken İşler</h1>
 <div class="meta">Oluşturulma: ' . $dateStamp . ' · Toplam geciken: ' . $totalOverdue . '</div>
 <h2>Modül Özeti</h2>
 <table class="summary"><tr><th style="text-align:left">Modül</th><th style="text-align:right">Geciken</th></tr>' . $summaryCounts . '</table>'
 . $moduleTables
 . '<h2>Denetçi İş Yükü</h2><table class="data"><thead><tr><th>Denetçi</th><th>Şirket</th><th>Atanmış Denetim</th><th>Açık Uygunsuzluk</th><th>Açık Faaliyet</th><th>Toplam</th></tr></thead><tbody>' . $workloadRowsHtml . '</tbody></table>'
-. '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div></body></html>';
+. '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div></body></html>';
 
 $options = new Options();
 $options->set('defaultFont', 'DejaVu Sans');

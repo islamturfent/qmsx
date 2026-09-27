@@ -1,4 +1,4 @@
-# QMS continuation note
+# QuAmi continuation note
 
 Recorded: 2026-09-18 (Europe/Istanbul).
 Last updated: 2026-09-30. The state below was re-verified on that date; it is not
@@ -1160,6 +1160,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   basligina da Hesap Ayarlari kisa yolu eklendi. i18n accountSettingsTitle/Text.
 - cache v100.
 
+### Marka: QMS -> QuAmi (2026-10-08)
+- Kullanici gorur marka/yazi "QMS" -> "QuAmi" uygulama genelinde degistirildi
+  (sidebar brand, login, tum sayfa <title>...>, manifest, PDF/Excel basliklari).
+- Kod kimlikleri KORUNDU: `qms*` on-ekleri ve `QMS_*` PHP sabitleri + lower-case
+  `qms` dosya/cache adlari ve storage/documents icerigi degismedi. cache v104.
+
 ### Dokuman gozden gecirme dark mod duzeltmesi (2026-10-08)
 - `.filter-pill` arka plani tanimsiz `var(--surface, #fff)` idi -> hep beyaz
   kaliyordu; `--surface-color` yapildi. `.filter-pill.active` `brand-50`/`brand-700`
@@ -1366,7 +1372,7 @@ e-posta da gonderir (gonderme asla cokmez; bildirim kaydi her zaman yazilir).
 - `--all` mode: `php scripts/notify-overdue.php --all` also pushes each overdue item
   to every active user of the owning company (plus super admins) besides the
   responsible/admin recipients. Default mode stays role-aware.
-- Localhost scheduling: a Windows Task Scheduler task `QMSOverdueNotify` (daily
+- Localhost scheduling: a Windows Task Scheduler task `QuAmiOverdueNotify` (daily
   08:30) runs `C:\xampp\php\php.exe -f C:\xampp\htdocs\qmsx\scripts\notify-overdue.php`.
   `schtasks` needs `MSYS_NO_PATHCONV=1` when called from Git Bash (forward-slash
   args get mangled into paths otherwise). Task runs in interactive logon mode.
@@ -1582,7 +1588,7 @@ per-column emphasis, so uniform gray-500 reads washed out.
 ## Open items
 
 - **Zamanlayıcı (Task Scheduler) kurulumu — ERTELENDİ (sistem bitince yapılacak):**
-  `scripts/notify-overdue.php` için `QMSOverdueNotify` görevi zaten kuruldu (günlük
+  `scripts/notify-overdue.php` için `QuAmiOverdueNotify` görevi zaten kuruldu (günlük
   08:30). Sistem tamamlanınca şunlar da görev olarak eklenmeli (günlük):
   `scripts/send-daily-report.php` (rapor e-postası), `scripts/audit-program-reminders.php`
   ve `notify-overdue.php --all` varyantının zamanlayıcıda aç/kapa kararı.
@@ -1639,4 +1645,4 @@ per-column emphasis, so uniform gray-500 reads washed out.
 
 ## Owning task
 
-Continue on the QMS codebase rooted at `C:\xampp\htdocs\qmsx`.
+Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.

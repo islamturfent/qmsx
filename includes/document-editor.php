@@ -87,7 +87,7 @@ function qmsSaveEditorRevision(PDO $pdo, int $id, int $userId, bool $super, int 
         if ($pending->fetchColumn()) throw new RuntimeException('Bekleyen onay tamamlanmadan düzenleme yapılamaz.');
         $name = bin2hex(random_bytes(20)) . '.html';
         $path = dirname(__DIR__) . '/storage/documents/' . $name;
-        $file = '<!doctype html><html lang="tr"><head><meta charset="UTF-8"><title>QMS</title></head><body>' . $html . '</body></html>';
+        $file = '<!doctype html><html lang="tr"><head><meta charset="UTF-8"><title>QuAmi</title></head><body>' . $html . '</body></html>';
         if (file_put_contents($path, $file, LOCK_EX) !== strlen($file)) throw new RuntimeException('Doküman dosyası kaydedilemedi.');
         $stmt = $pdo->prepare('INSERT INTO document_versions (document_id, revision_number, original_file_name, stored_file_name, mime_type, file_size, change_note, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
         $stmt->execute([$id, $revision, 'document-' . $id . '.html', $name, 'text/html', strlen($file), trim($note) ?: null, $userId]);

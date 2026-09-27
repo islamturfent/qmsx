@@ -1,6 +1,6 @@
 {
-    "name": "QMS Yönetim Sistemi",
-    "short_name": "QMS",
+    "name": "QuAmi Yönetim Sistemi",
+    "short_name": "QuAmi",
     "description": "Kalite, denetim, performans ve raporlama süreçleri için SaaS kalite yönetim sistemi.",
     "start_url": "./",
     "scope": "./",

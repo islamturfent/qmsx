@@ -175,7 +175,7 @@ function qmsOfficeDispatch(PDO $pdo, array $config, array $discovery, string $fi
     } catch (Throwable $error) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         if ($newPath && is_file($newPath)) unlink($newPath);
-        try { qmsOfficeAudit($pdo, 'callback_rejected', 'denied', $context, $ip, 'status=' . ($error instanceof QmsOfficeError ? $error->status : 500)); } catch (Throwable $ignored) { error_log('QMS office audit write failed'); }
+        try { qmsOfficeAudit($pdo, 'callback_rejected', 'denied', $context, $ip, 'status=' . ($error instanceof QmsOfficeError ? $error->status : 500)); } catch (Throwable $ignored) { error_log('QuAmi office audit write failed'); }
         throw $error;
     }
 }

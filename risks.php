@@ -45,7 +45,7 @@ $statusLabels = ['open'=>'Açık','monitoring'=>'İzlemede','treated'=>'Önlem U
 $activeNav = 'risks';
 function riskEsc($v): string { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 ?>
-<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QMS Risk Yönetimi</title><link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/risks.css"></head><body class="has-sidebar">
+<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QuAmi Risk Yönetimi</title><link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/risks.css"></head><body class="has-sidebar">
 <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
 <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong data-i18n="riskManagementTitle">Risk Yönetimi</strong><span data-i18n="riskManagementText">Şirket risklerini değerlendirin ve izleyin.</span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle">EN</button><button class="topbar-button" id="themeToggle" aria-label="Tema değiştir">🌙</button></div></div></header>
 <main class="page-container"><section class="page-heading page-heading-actions"><div><span class="section-kicker" data-i18n="riskRegisterKicker">Risk Kayıtları</span><h1 data-i18n="riskManagementTitle">Risk Yönetimi</h1><p data-i18n="riskScaleNotice">Puan = Olasılık × Etki. Eşikler proje varsayımıdır.</p></div><a class="primary-button" href="risk-create.php" data-i18n="newRiskButton">Yeni Risk</a></section>

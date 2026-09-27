@@ -45,7 +45,7 @@ try {
     http_response_code($status);
     if ($error instanceof QmsOfficeError) foreach ($error->headers as $name => $value) header($name . ': ' . $value);
     // Also covers requests rejected during preflight, without recording tokens or request URLs.
-    try { qmsOfficeAudit($pdo, 'endpoint_error', 'denied', [], $_SERVER['REMOTE_ADDR'] ?? '', 'status=' . $status); } catch (Throwable $ignored) { error_log('QMS office endpoint/audit unavailable'); }
+    try { qmsOfficeAudit($pdo, 'endpoint_error', 'denied', [], $_SERVER['REMOTE_ADDR'] ?? '', 'status=' . $status); } catch (Throwable $ignored) { error_log('QuAmi office endpoint/audit unavailable'); }
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['error' => $error instanceof QmsOfficeError ? $error->getMessage() : 'Ofis hizmeti şu anda kullanılamıyor.']);
 } finally { if (is_resource($input)) fclose($input); }

@@ -274,9 +274,9 @@ $resultLabels = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f9fafb">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="QMS">
+    <meta name="apple-mobile-web-app-title" content="QuAmi">
 
-    <title>QMS Denetim Detayı</title>
+    <title>QuAmi Denetim Detayı</title>
 
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml">
@@ -289,9 +289,9 @@ $resultLabels = [
     <header class="topbar">
         <div class="topbar-inner">
             <a class="brand" href="dashboard.php">
-                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QMS"></div>
+                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QuAmi"></div>
                 <div class="brand-text">
-                    <strong>QMS</strong>
+                    <strong>QuAmi</strong>
                     <span>Quality Management System</span>
                 </div>
             </a>

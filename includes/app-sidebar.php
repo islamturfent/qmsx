@@ -68,9 +68,9 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 
 <aside class="app-sidebar" id="appSidebar">
     <a class="sidebar-brand" href="dashboard.php">
-        <span class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QMS"></span>
+        <span class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QuAmi"></span>
         <span>
-            <strong>QMS</strong>
+            <strong>QuAmi</strong>
             <small>Quality Management</small>
         </span>
     </a>

@@ -79,7 +79,7 @@ $metricLabels = [
 ];
 
 $summaryRows = [
-    [['value' => 'QMS Yönetim Raporu', 'style' => 1]],
+    [['value' => 'QuAmi Yönetim Raporu', 'style' => 1]],
     ['Şirket', $report['company_name']],
     ['Rapor dönemi', $report['start_date'] . ' - ' . $report['end_date']],
     ['Oluşturulma', date('d.m.Y H:i')],

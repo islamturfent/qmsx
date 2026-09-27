@@ -37,7 +37,7 @@ try {
 function officeEscape($v): string { return htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 $activeNav = 'documents';
 ?>
-<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QMS Ofis Editörü</title><link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/office.css"></head><body class="has-sidebar">
+<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QuAmi Ofis Editörü</title><link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/office.css"></head><body class="has-sidebar">
 <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
 <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong><?= officeEscape($doc['document_code']) ?></strong><span><?= officeEscape($doc['company_name']) ?></span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle">EN</button><button class="topbar-button" id="themeToggle" aria-label="Tema değiştir">🌙</button></div></div></header>
 <main class="page-container"><section class="page-heading page-heading-actions"><div><span class="section-kicker">Gömülü Ofis</span><h1><?= officeEscape($doc['title']) ?></h1><p><?= officeEscape($version['original_file_name'] ?? '') ?> · Rev. <?= officeEscape($version['revision_number'] ?? '') ?></p></div><a class="secondary-button" href="document-detail.php?id=<?= $id ?>" data-i18n="editorBack">Dokümana Dön</a></section>

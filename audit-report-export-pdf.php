@@ -80,7 +80,7 @@ $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
     . $section('Uygunsuzluk Özeti', (string) $report['nonconformity_summary'])
     . $section('Sonuç', (string) $report['conclusion'])
     . $section('Öneriler', (string) $report['recommendations'])
-    . '<div class="footer">QMS · ' . $escape($report['company_name']) . ' · Yetkili kullanıcı için oluşturulmuştur.</div>'
+    . '<div class="footer">QuAmi · ' . $escape($report['company_name']) . ' · Yetkili kullanıcı için oluşturulmuştur.</div>'
     . '</body></html>';
 
 $options = new Options();

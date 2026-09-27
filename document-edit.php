@@ -55,7 +55,7 @@ function editorEscape($value): string { return htmlspecialchars((string) $value,
 $activeNav = 'documents';
 ?>
 <!doctype html>
-<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QMS Web Doküman Editörü</title><link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/document-editor.css"></head>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QuAmi Web Doküman Editörü</title><link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/document-editor.css"></head>
 <body class="has-sidebar">
 <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
 <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong><?= editorEscape($document['document_code']) ?></strong><span><?= editorEscape($document['company_name']) ?></span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle" type="button">EN</button><button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button></div></div></header>

@@ -13,9 +13,9 @@ $isLoggedIn = isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] ==
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f9fafb">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="QMS">
+    <meta name="apple-mobile-web-app-title" content="QuAmi">
 
-    <title>QMS Yönetim Sistemi</title>
+    <title>QuAmi Yönetim Sistemi</title>
 
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml">
@@ -29,10 +29,10 @@ $isLoggedIn = isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] ==
         <div class="topbar-inner">
 
             <div class="brand">
-                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QMS"></div>
+                <div class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QuAmi"></div>
 
                 <div class="brand-text">
-                    <strong>QMS</strong>
+                    <strong>QuAmi</strong>
                     <span>Quality Management System</span>
                 </div>
             </div>
@@ -64,7 +64,7 @@ $isLoggedIn = isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] ==
             <div class="landing-hero-content">
                 <span class="landing-kicker" data-i18n="landingKicker">Kalite süreçleri için merkezi platform</span>
 
-                <h1 data-i18n="landingTitle">QMS Yönetim Sistemi</h1>
+                <h1 data-i18n="landingTitle">QuAmi Yönetim Sistemi</h1>
 
                 <p data-i18n="landingText">
                     Denetim, belgelendirme, uygunsuzluk ve performans süreçlerini tek ekranda takip etmek için tasarlanmış modern yönetim alanı.
@@ -81,7 +81,7 @@ $isLoggedIn = isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] ==
                 </div>
             </div>
 
-            <div class="landing-panel" aria-label="QMS özet paneli">
+            <div class="landing-panel" aria-label="QuAmi özet paneli">
                 <div class="landing-panel-row">
                     <span data-i18n="landingPanelAudits">Denetim Takibi</span>
                     <strong>7/24</strong>

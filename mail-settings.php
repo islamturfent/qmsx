@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $saved = qmsMailDefaults();
         $saved['enabled'] = isset($_POST["enabled"]);
         $saved['from_email'] = trim((string) ($_POST["from_email"] ?? ""));
-        $saved['from_name'] = trim((string) ($_POST["from_name"] ?? "QMS"));
+        $saved['from_name'] = trim((string) ($_POST["from_name"] ?? "QuAmi"));
         $saved['base_url'] = rtrim(trim((string) ($_POST["base_url"] ?? '')), '/') . '/';
         $saved['host'] = trim((string) ($_POST["host"] ?? ""));
         $saved['port'] = (int) ($_POST["port"] ?? 587);
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $message = "Bu hesapta e-posta adresi tanımlı değil. Önce kullanıcı profiline e-posta ekleyin.";
             $messageType = "error";
         } else {
-            $content = qmsMailNotificationContent("QMS Test E-postası", "Bu bir e-posta bildirim testidir. Sistem SMTP üzerinden e-posta gönderebiliyor.", $_GET['_test_url'] ?? null);
+            $content = qmsMailNotificationContent("QuAmi Test E-postası", "Bu bir e-posta bildirim testidir. Sistem SMTP üzerinden e-posta gönderebiliyor.", $_GET['_test_url'] ?? null);
             $sent = qmsMailSend((string) $me["email"], (string) ($me["full_name"] ?? '') !== '' ? (string) $me["full_name"] : null, $content['subject'], $content['html'], $content['plain']);
             $message = $sent ? "Test e-postası gönderildi: " . htmlspecialchars((string) $me["email"], ENT_QUOTES, "UTF-8") : "Test e-postası gönderilemedi (SMTP yapılandırmasını kontrol edin).";
             $messageType = $sent ? "success" : "error";
@@ -82,7 +82,7 @@ $encryptionOptions = ['none' => 'Şifresiz', 'tls' => 'TLS (önerilen)', 'ssl' =
 <html lang="tr">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#f9fafb">
-    <title>QMS E-posta Ayarları</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/style.css">
+    <title>QuAmi E-posta Ayarları</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="has-sidebar">
     <?php require __DIR__ . '/includes/app-sidebar.php'; ?>

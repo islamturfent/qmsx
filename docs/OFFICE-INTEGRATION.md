@@ -1,6 +1,6 @@
-# QMS ofis entegrasyonu — mimari karar ve işletim rehberi
+# QuAmi ofis entegrasyonu — mimari karar ve işletim rehberi
 
-Karar tarihi: 17 Eylül 2026. Durum: QMS deneme entegrasyonu uygulanmıştır; gerçek ofis sunucusuyla kabul testi ayrıca gereklidir.
+Karar tarihi: 17 Eylül 2026. Durum: QuAmi deneme entegrasyonu uygulanmıştır; gerçek ofis sunucusuyla kabul testi ayrıca gereklidir.
 
 ## Bu geliştirme makinesindeki kurulum durumu
 
@@ -16,9 +16,9 @@ Mevcut HTML web editörü her zaman alternatif olarak kalır. PDF/Word/Excel iç
 
 ## Kullanıcı akışı ve dosya desteği
 
-Doküman Detayı → **Ofis Editörü** → **Ofis Editöründe Aç** veya **Salt Okunur Aç**. Dosya QMS sayfasındaki iframe içinde açılır. Dosyanın kullanıcı tarafından önce indirilmesi gerekmez; ofis sunucusu yetkili WOPI isteğiyle içeriği alır. Bu nedenle sağlayıcı sunucusu doküman verisini işler.
+Doküman Detayı → **Ofis Editörü** → **Ofis Editöründe Aç** veya **Salt Okunur Aç**. Dosya QuAmi sayfasındaki iframe içinde açılır. Dosyanın kullanıcı tarafından önce indirilmesi gerekmez; ofis sunucusu yetkili WOPI isteğiyle içeriği alır. Bu nedenle sağlayıcı sunucusu doküman verisini işler.
 
-İlk kabul önceliği **DOCX Word akışıdır**: DOCX'i QMS içinde açma, düzenleme ve yeni revizyon olarak geri kaydetme. DOCX için discovery'de `edit` varsa düzenleme açılır. Eski `.doc` desteği de discovery yeteneğine bağlıdır; sağlayıcı `.doc` dosyasını doğrudan düzenleyebilir veya kendi içinde dönüştürme isteyebilir. QMS bu aşamada DOC→DOCX dönüşümü ve `PutRelativeFile` uygulamaz, dolayısıyla `.doc` desteği canlı sunucuyla ayrıca kabul edilmeden garanti edilmez.
+İlk kabul önceliği **DOCX Word akışıdır**: DOCX'i QuAmi içinde açma, düzenleme ve yeni revizyon olarak geri kaydetme. DOCX için discovery'de `edit` varsa düzenleme açılır. Eski `.doc` desteği de discovery yeteneğine bağlıdır; sağlayıcı `.doc` dosyasını doğrudan düzenleyebilir veya kendi içinde dönüştürme isteyebilir. QuAmi bu aşamada DOC→DOCX dönüşümü ve `PutRelativeFile` uygulamaz, dolayısıyla `.doc` desteği canlı sunucuyla ayrıca kabul edilmeden garanti edilmez.
 
 XLS/XLSX ve PDF altyapıda discovery'ye göre yönlendirilir ancak Word kabulü tamamlanmadan bunlar canlı olarak doğrulanmış sayılmaz. PDF için CODE discovery tanımı `view_comment` sunar; bu denemede PDF **salt okunur** açılır. Tam PDF düzenleme ya da biçimler arası kayıpsız dönüşüm taahhüt edilmez. Yüklü sağlayıcının discovery yanıtı esas alınır. [Collabora discovery tanımı](https://github.com/CollaboraOnline/online.mirror/blob/main/discovery.xml).
 
@@ -33,7 +33,7 @@ Her **değişmiş içerikli başarılı PutFile** yeni `document_versions` satı
 - Tarayıcıdan ofis oturumu açma ve ayar değiştirme POST + oturum CSRF doğrulaması ister. Ofis sunucusunun callback'leri tarayıcı çerezleriyle yetkilendirilmez; belirteç, tam IP izin listesi ve varsayılan olarak WOPI RSA/SHA-256 proof doğrulaması gerektirir. İmzaya token, dış WOPI URL'si ve zaman damgası dahildir; eski zaman damgası reddedilir. Güncel/eski anahtar geçiş kombinasyonları desteklenir. [WOPI proof doğrulaması](https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/scenarios/proofkeys).
 - `REMOTE_ADDR` kullanılır; istemcinin `X-Forwarded-For` veya `Host` başlığına güvenilmez. Proxy kullanılıyorsa yalnız ofis sunucusunun geçebildiği ayrı proxy kuralı oluşturun. Genel amaçlı reverse proxy IP'sini tek güvenlik sınırı olarak kullanmayın; proof doğrulaması açık kalmalıdır.
 - Yalnız açıkça seçilmiş yerel HTTP denemesinde proof kapatılabilir. Bu istisna localhost/özel IP/host.docker.internal adresleriyle sınırlandırılmıştır. Üretimde HTTPS, proof ve IP listesi birlikte zorunlu işletim gereksinimidir. TLS sertifika doğrulaması uygulamada kapatılmaz.
-- Discovery yalnız adminin yapılandırdığı adresten, zaman/boyut sınırıyla, yönlendirme izlemeden alınır. XML dış varlıkları/DOCTYPE reddedilir. Başlatma adresleri yapılandırılmış sağlayıcı origin'iyle sınırlandırılır. QMS doküman içeriğini kullanıcıdan gelen bir callback URL'sine göndermez.
+- Discovery yalnız adminin yapılandırdığı adresten, zaman/boyut sınırıyla, yönlendirme izlemeden alınır. XML dış varlıkları/DOCTYPE reddedilir. Başlatma adresleri yapılandırılmış sağlayıcı origin'iyle sınırlandırılır. QuAmi doküman içeriğini kullanıcıdan gelen bir callback URL'sine göndermez.
 - WOPI lock, refresh, unlock ve unlock/relock işlemleri desteklenir. Kilit doküman başınadır; ilk aşama **tek yazarlı oturumdur**, çoklu eşzamanlı ortak yazarlık değildir. Aynı dokümana başka ofis oturumu kayıt yapamaz. Web editörü, dosya yükleme ve onay/yayın işlemleri de aktif ofis kilidini kontrol eder. Çakışmalar 409 ve WOPI kilit başlığıyla dönülür. Kilit 30 dakika veya token süresi kadar yaşar; refresh uzatır, token ömrünü uzatmaz.
 - Doküman satır kilidi + beklenen revizyon kontrolü, eski ekranın yeni revizyonun üzerine kayıt yapmasını engeller. Ofis açıkken dışarıdan yapılan bir revizyon değişikliği de sessizce ezilmez.
 - Boyut sınırı, ZIP yapısı/sıkıştırılmamış boyut sınırı ve dosya imzası kontrol edilir. Makro temizleyici/antivirüs bu kodun parçası değildir; SaaS dosya güvenliği katmanında ayrıca uygulanmalıdır.
@@ -57,18 +57,18 @@ Migration mevcut tablo/sürümleri değiştirmez. Uygulamak için proje kökünd
 
 ## Yerel CODE kurulumu — kullanıcı tarafından çalıştırılır
 
-Bu çalışma Docker veya başka yazılım kurmaz ve container başlatmaz. Windows'ta kullanıcı tarafından kurulmuş Docker Desktop/Linux container altyapısı gerekir. PHP 8.2+, PDO MySQL, cURL, OpenSSL, DOM, mbstring ve ZipArchive gerekir. Apache PHP PATH_INFO'yu (`wopi.php/files/...`) kabul etmeli; QMS ve ofis sunucusu birbirine erişebilmelidir.
+Bu çalışma Docker veya başka yazılım kurmaz ve container başlatmaz. Windows'ta kullanıcı tarafından kurulmuş Docker Desktop/Linux container altyapısı gerekir. PHP 8.2+, PDO MySQL, cURL, OpenSSL, DOM, mbstring ve ZipArchive gerekir. Apache PHP PATH_INFO'yu (`wopi.php/files/...`) kabul etmeli; QuAmi ve ofis sunucusu birbirine erişebilmelidir.
 
 1. `deploy/office/.env.example` dosyasını aynı dizinde `.env` olarak kopyalayın. Örnek `latest` etiketi yalnız geliştirme içindir; doğruladığınız image digest/tag'ini kaydedin. Ticari ortamda desteklenen sürüm kullanın.
-2. Kullanıcı kararıyla `docker compose --env-file .env -f compose.yaml up -d` çalıştırın. Örnek yalnız `127.0.0.1:9980` portunu açar, otomatik yeniden başlatma yapmaz. QMS WOPI host izin listesi `aliasgroup1` ile sınırlıdır.
+2. Kullanıcı kararıyla `docker compose --env-file .env -f compose.yaml up -d` çalıştırın. Örnek yalnız `127.0.0.1:9980` portunu açar, otomatik yeniden başlatma yapmaz. QuAmi WOPI host izin listesi `aliasgroup1` ile sınırlıdır.
 3. CODE discovery'de proof-key bulunmuyorsa container içinde uygun kullanıcıyla `coolconfig generate-proof-key` çalıştırıp servisi yeniden başlatın; anahtarın coolwsd tarafından okunabildiğini ve yeniden oluşturma sonrası kalıcılığını sağlayın. Anahtar yolu/sürüm ayrıntıları için [Collabora resmî entegrasyon örneği](https://github.com/CollaboraOnline/collabora-drupal/blob/main/docker-compose.yml) ve [SDK](https://sdk.collaboraonline.com/CO-SDK-manual.pdf) esas alınmalıdır. Örnek compose anahtarları otomatik üretmez.
-4. QMS → Sistem Yönetimi → **Ofis Entegrasyonu** ekranında adresleri girin. Örnek `.env` Docker Compose içindir; **PHP bunu kendiliğinden okumaz**. QMS ayarlarını ekrandan kaydedin veya Apache/PHP çalışma ortamına `QMS_OFFICE_*` değişkenlerini aktarın. Ortam değişkenleri ekrandaki ayarlardan üstündür; bu alanlar ekranda kilitlenir.
-5. Windows örneği: tarayıcı ofis adresi `http://localhost:9980`, discovery `http://localhost:9980/hosting/discovery`, ofisten QMS adresi `http://host.docker.internal/qms`, tarayıcı QMS adresi `http://localhost/qms`. Container içindeki `localhost`, Windows makinesi değildir. `QMS_OFFICE_ALLOW_HTTP=true` yalnız bu yerel deneme içindir; proof açık kalır.
+4. QuAmi → Sistem Yönetimi → **Ofis Entegrasyonu** ekranında adresleri girin. Örnek `.env` Docker Compose içindir; **PHP bunu kendiliğinden okumaz**. QuAmi ayarlarını ekrandan kaydedin veya Apache/PHP çalışma ortamına `QMS_OFFICE_*` değişkenlerini aktarın. Ortam değişkenleri ekrandaki ayarlardan üstündür; bu alanlar ekranda kilitlenir.
+5. Windows örneği: tarayıcı ofis adresi `http://localhost:9980`, discovery `http://localhost:9980/hosting/discovery`, ofisten QuAmi adresi `http://host.docker.internal/qms`, tarayıcı QuAmi adresi `http://localhost/qms`. Container içindeki `localhost`, Windows makinesi değildir. `QMS_OFFICE_ALLOW_HTTP=true` yalnız bu yerel deneme içindir; proof açık kalır.
 6. Callback IP listesine PHP'nin gerçekten gördüğü Docker/host adresini girin. Örnekteki loopback adresleri her Docker kurulumunda doğru olmayabilir. Wildcard kullanmayın. Firewall'u tüm ağa açmak yerine yalnız gerekli bağlantıyı tanımlayın.
-7. **Kaydedilmiş Ayarlarla Bağlantıyı Test Et** discovery erişimini ve biçimleri denetler. Başarılı sonuç, container→QMS geri bağlantısının, WebSocket'in veya dosya kaydının test edildiği anlamına gelmez.
-8. Entegrasyonu etkinleştirin. Ayrı deneme dokümanında DOCX/XLSX açma → düzenleme → kayıt → QMS yeni revizyon kontrolü yapın; sonra DOC/XLS ve PDF görüntülemeyi doğrulayın. İncelemede/eskide düzenleme kapalı olmalıdır. Test kayıtlarını uygulamanın veri saklama politikasına göre yönetin.
+7. **Kaydedilmiş Ayarlarla Bağlantıyı Test Et** discovery erişimini ve biçimleri denetler. Başarılı sonuç, container→QuAmi geri bağlantısının, WebSocket'in veya dosya kaydının test edildiği anlamına gelmez.
+8. Entegrasyonu etkinleştirin. Ayrı deneme dokümanında DOCX/XLSX açma → düzenleme → kayıt → QuAmi yeni revizyon kontrolü yapın; sonra DOC/XLS ve PDF görüntülemeyi doğrulayın. İncelemede/eskide düzenleme kapalı olmalıdır. Test kayıtlarını uygulamanın veri saklama politikasına göre yönetin.
 
-Sunucu yoksa/erişilemiyorsa QMS çalışmaya devam eder: ofis ekranı devre dışı/hata durumunu gösterir, web editörüne bağlantı sunar. Discovery timeout en fazla 8 saniyedir; 5 dakikalık özel önbellek vardır. TLS doğrulama hatasında sertifikayı düzeltin; doğrulamayı kapatmayın.
+Sunucu yoksa/erişilemiyorsa QuAmi çalışmaya devam eder: ofis ekranı devre dışı/hata durumunu gösterir, web editörüne bağlantı sunar. Discovery timeout en fazla 8 saniyedir; 5 dakikalık özel önbellek vardır. TLS doğrulama hatasında sertifikayı düzeltin; doğrulamayı kapatmayın.
 
 ## Üretim ve lisans kapısı
 
@@ -78,9 +78,9 @@ HTTPS reverse proxy, WebSocket geçişi, iframe/CSP ayarları, karşılıklı ho
 
 ## Sağlayıcı değiştirme adımları
 
-1. Yeni sağlayıcının destek/lisans ve veri işleme koşullarını tamamlayın. Destekli Collabora için `collabora`, ONLYOFFICE için `onlyoffice-wopi` seçin. ONLYOFFICE tarafında `wopi.enable=true`, proof keys ve QMS host/IP sınırlarını yapılandırın. [ONLYOFFICE resmî WOPI yapılandırması](https://api.onlyoffice.com/docs/docs-api/using-wopi/overview/).
+1. Yeni sağlayıcının destek/lisans ve veri işleme koşullarını tamamlayın. Destekli Collabora için `collabora`, ONLYOFFICE için `onlyoffice-wopi` seçin. ONLYOFFICE tarafında `wopi.enable=true`, proof keys ve QuAmi host/IP sınırlarını yapılandırın. [ONLYOFFICE resmî WOPI yapılandırması](https://api.onlyoffice.com/docs/docs-api/using-wopi/overview/).
 2. Açık düzenlemeleri kaydedip kapatın; kilit ve oturumların sona ermesini bekleyin. Ofis entegrasyonunu geçici devre dışı bırakın. Kaydedilmemiş düzenleme varken sağlayıcı değiştirmeyin.
-3. Ortam değişkenlerini veya yönetim ayarlarını güncelleyin: provider, public/discovery adresleri, callback IP'leri, QMS ve tarayıcı adresleri. HTTPS/proof açık olsun. Eski token'lar yapılandırma özeti değişince reddedilir.
+3. Ortam değişkenlerini veya yönetim ayarlarını güncelleyin: provider, public/discovery adresleri, callback IP'leri, QuAmi ve tarayıcı adresleri. HTTPS/proof açık olsun. Eski token'lar yapılandırma özeti değişince reddedilir.
 4. Sağlık kontrolü, aşağıdaki testler ve gerçek DOC/DOCX/XLS/XLSX/PDF kabul testini yeni sağlayıcıyla tekrarlayın. Biçim dönüşümü/PutRelativeFile gerekirse ek geliştirme yapmadan o biçim için düzenleme açmayın. Eski `document_versions` dosyaları taşınmaz veya yeniden yazılmaz.
 5. Etkinleştirin ve audit/hata oranını izleyin. Sorunda ofisi kapatıp web editörüne dönün; yeni sağlayıcıda kaydedilmiş revizyonları koruyun. Eski ayarları geri almak yeni ofis oturumu gerektirir.
 

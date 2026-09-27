@@ -1,6 +1,6 @@
 # Yerel TinyMCE web editörü
 
-QMS web doküman editörü TinyMCE 8.9.1 ücretsiz çekirdeğini yerel olarak kullanır. Dosyalar `assets/vendor/tinymce` altında tutulur; sayfa Tiny Cloud, CDN veya API anahtarı kullanmaz. Yapılandırmada `license_key: "gpl"` seçilmiştir. TinyMCE lisansı `assets/vendor/tinymce/license.md`, Türkçe dil paketinin lisansı `assets/vendor/tinymce/I18N-LICENSE.md` dosyasındadır.
+QuAmi web doküman editörü TinyMCE 8.9.1 ücretsiz çekirdeğini yerel olarak kullanır. Dosyalar `assets/vendor/tinymce` altında tutulur; sayfa Tiny Cloud, CDN veya API anahtarı kullanmaz. Yapılandırmada `license_key: "gpl"` seçilmiştir. TinyMCE lisansı `assets/vendor/tinymce/license.md`, Türkçe dil paketinin lisansı `assets/vendor/tinymce/I18N-LICENSE.md` dosyasındadır.
 
 Bu kayıt teknik envanter bilgisidir; uygulamanın ticari SaaS kullanımında GPL şartlarına uygun olduğuna dair hukuki garanti değildir. Dağıtım modeli için lisans değerlendirmesi ayrıca yapılmalıdır.
 

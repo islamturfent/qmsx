@@ -124,7 +124,7 @@ $html = '<!doctype html><html lang="tr"><head><meta charset="UTF-8"><style>
     </div>
     <h2>Satır Düzeyi Fark</h2>
     <table class="data"><thead><tr><th>Durum</th><th>İçerik</th></tr></thead><tbody>' . $diffRows . '</tbody></table>
-    <div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
+    <div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div>
 </body></html>';
 
 $options = new Options();

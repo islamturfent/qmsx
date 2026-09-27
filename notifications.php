@@ -65,7 +65,7 @@ $activeNav = "notifications";
 <html lang="tr">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#f9fafb">
-    <title>QMS Bildirim Merkezi</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/style.css">
+    <title>QuAmi Bildirim Merkezi</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="has-sidebar">
     <?php require __DIR__ . '/includes/app-sidebar.php'; ?>

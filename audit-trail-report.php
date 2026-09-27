@@ -134,7 +134,7 @@ if (($_GET["export"] ?? "") === "pdf") {
         <table class="data"><thead><tr><th>İşlem</th><th>Adet</th></tr></thead><tbody>' . $actionRows . '</tbody></table>
         <h2>Kayıtlar</h2>
         <table class="data"><thead><tr><th>Tarih</th><th>Kişi</th><th>Kayıt Türü</th><th>İşlem</th><th>Özet</th><th>Şirket</th></tr></thead><tbody>' . $detailRows . '</tbody></table>
-        <div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
+        <div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
     $options = new Options();
@@ -163,7 +163,7 @@ $activeNav = "audit-trail";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f9fafb">
-    <title>QMS Denetim İzi Raporu</title>
+    <title>QuAmi Denetim İzi Raporu</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/css/style.css">

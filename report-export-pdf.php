@@ -295,7 +295,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     .two-column td { width: 50%; vertical-align: top; }
     .footer { margin-top: 18px; color: #98a2b3; font-size: 8px; text-align: right; }
     </style></head><body>
-    <h1>QMS Yönetim Raporu</h1>
+    <h1>QuAmi Yönetim Raporu</h1>
     <div class="meta"><strong>Şirket:</strong> ' . $escape($report['company_name'])
     . ' &nbsp; | &nbsp; <strong>Dönem:</strong> ' . $escape($report['start_date']) . ' - ' . $escape($report['end_date'])
     . ' &nbsp; | &nbsp; <strong>Oluşturulma:</strong> ' . date('d.m.Y H:i') . '</div>
@@ -398,7 +398,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Teslimat Performansı', '<th>Şirket</th><th>Müşteri</th><th>Dönem</th><th>Sipariş</th><th>Zamanında (%)</th><th>Reddedilen</th>', $deliveryRows)
     . $detailSection('Kalibrasyonlar', '<th>Şirket</th><th>Alet</th><th>Sonuç</th><th>Tarih</th><th>Sonraki</th><th>Sertifika No</th>', $calibrationRows)
     . $detailSection('Denetim İzi', '<th>Şirket</th><th>Kişi</th><th>Kayıt Türü</th><th>İşlem</th><th>Özet</th><th>Tarih</th>', $auditTrailRows)
-    . '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturulmuştur.</div>
+    . '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';
 
 $options = new Options();

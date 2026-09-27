@@ -24,7 +24,7 @@ if (!$cfg['enabled'] || $cfg['host'] === '') {
     exit(1);
 }
 
-$content = qmsMailNotificationContent('QMS SMTP Testi', 'Bu mesaj SMTP uzerinden gonderildi. Tebrikler, e-posta calisiyor.', 'https://localhost/qmsx/');
+$content = qmsMailNotificationContent('QuAmi SMTP Testi', 'Bu mesaj SMTP uzerinden gonderildi. Tebrikler, e-posta calisiyor.', 'https://localhost/qmsx/');
 $sent = qmsMailSend($to, null, $content['subject'], $content['html'], $content['plain']);
 echo $sent ? "Gonderildi: $to\n" : "Gonderilemedi: $to (smtp ayarlarini kontrol edin)\n";
 exit($sent ? 0 : 1);

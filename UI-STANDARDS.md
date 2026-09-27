@@ -1,4 +1,4 @@
-# QMS Arayuz Standartlari
+# QuAmi Arayuz Standartlari
 
 ## Tasarim Sistemi
 

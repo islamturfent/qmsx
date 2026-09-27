@@ -84,7 +84,7 @@ h3 { font-size: 13px; margin: 14px 0 6px; color:#101828; }
 . '</tbody></table>'
 . '<h2>Düzeltici / Önleyici Faaliyetler</h2>' . $actionHtml
 . '<div class="verdict"><strong>Sonuç:</strong> Bu paket, uygunsuzluğun kök nedeni ile planlanan/uygulanan faaliyetleri ve kanıt belgelerini içerir; kapanış için doğrulama kaydı ektedir.</div>'
-. '<div class="footer">QMS tarafından yetkili kullanıcı için oluşturuldu. Kapanış paketi denetim kanıtı olarak saklanır.</div></body></html>';
+. '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturuldu. Kapanış paketi denetim kanıtı olarak saklanır.</div></body></html>';
 
 $options = new Options();
 $options->set('defaultFont', 'DejaVu Sans');

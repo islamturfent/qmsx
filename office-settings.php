@@ -33,17 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             qmsOfficeAudit($pdo, 'config_change', 'ok', ['user_id' => $actor['id']], $_SERVER['REMOTE_ADDR'] ?? '');
         } elseif (($_POST['action'] ?? '') === 'health') {
             $health = qmsOfficeProvider($config)->discovery($config, true);
-            $message = 'Discovery bağlantısı başarılı. Bu kontrol, ofis sunucusundan QMS’ye dönüş bağlantısını veya gerçek dosya kaydını henüz doğrulamaz.';
+            $message = 'Discovery bağlantısı başarılı. Bu kontrol, ofis sunucusundan QuAmi’ye dönüş bağlantısını veya gerçek dosya kaydını henüz doğrulamaz.';
             qmsOfficeAudit($pdo, 'health_check', 'ok', ['user_id' => $actor['id']], $_SERVER['REMOTE_ADDR'] ?? '');
         }
     } catch (Throwable $e) { $error = $e instanceof PDOException ? 'Ofis ayarları işlenemedi.' : $e->getMessage(); }
 }
 function officeSettingsEscape($v): string { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
-$labels = ['public_url' => 'Ofis sunucusu — tarayıcı adresi', 'discovery_url' => 'Discovery XML adresi', 'qms_url' => 'Ofis sunucusunun erişebildiği QMS adresi', 'host_url' => 'QMS — tarayıcı adresi',
+$labels = ['public_url' => 'Ofis sunucusu — tarayıcı adresi', 'discovery_url' => 'Discovery XML adresi', 'qms_url' => 'Ofis sunucusunun erişebildiği QuAmi adresi', 'host_url' => 'QuAmi — tarayıcı adresi',
     'callback_ips' => 'İzin verilen callback IP adresleri', 'token_ttl' => 'Oturum süresi (saniye)', 'max_bytes' => 'Dosya boyut sınırı (bayt)'];
 $activeNav = 'office_settings';
 ?>
-<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QMS Ofis Entegrasyonu</title><link rel="stylesheet" href="assets/css/style.css"></head><body class="has-sidebar">
+<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QuAmi Ofis Entegrasyonu</title><link rel="stylesheet" href="assets/css/style.css"></head><body class="has-sidebar">
 <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
 <header class="topbar"><div class="topbar-inner"><div class="page-title-block"><strong>Ofis Entegrasyonu</strong><span>Sunucu yapılandırması ve bağlantı kontrolü</span></div><div class="topbar-actions"><button class="topbar-button" id="languageToggle">EN</button><button class="topbar-button" id="themeToggle" aria-label="Tema değiştir">🌙</button></div></div></header>
 <main class="page-container narrow-page"><section class="page-heading"><span class="section-kicker">Sistem Yönetimi</span><h1>Ofis Entegrasyonu</h1><p><?= $config['enabled'] ? 'Etkin — bağlantı testi ile sunucu durumunu kontrol edin.' : 'Devre dışı — mevcut web editörü kullanılabilir.' ?></p></section>
