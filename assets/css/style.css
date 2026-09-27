@@ -2426,6 +2426,41 @@ form + .admin-list {
     gap: 8px;
 }
 
+/* TailAdmin uyumlu filtre select'i: dogal ok yerine ozel chevron + yuvarlak/odak halkasi. */
+.filter-inline select {
+    appearance: none;
+    -webkit-appearance: none;
+    min-height: 40px;
+    padding: 0 38px 0 14px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background-color: var(--control-bg-color);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.2;
+    outline: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-theme-xs);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filter-inline select::-ms-expand {
+    display: none;
+}
+
+.filter-inline select:hover {
+    border-color: var(--gray-400, #94a3b8);
+}
+
+.filter-inline select:focus {
+    border-color: var(--brand-500);
+    box-shadow: var(--shadow-focus-ring);
+}
+
 .announcement-feed {
     display: flex;
     flex-direction: column;

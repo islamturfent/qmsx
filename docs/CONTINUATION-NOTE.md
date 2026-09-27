@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Yillik Kalite Plani filtre dropdown TailAdmin uyumlu (2026-10-08)
+- `.filter-inline select` TailAdmin stilinde yapildi: `appearance:none` + ozel
+  chevron (SVG data-uri) ile dogal ok kaldirildi; yuvarlak kose, hover border ve
+  focus halkasi (`--shadow-focus-ring`) eklendi. Sadece Planlar kutusundaki Yil
+  filtresini hedefler; diger select'leri etkilemez. Fonksiyonlara dokunulmadi.
+  cache v110.
+
 ### COQ trendi bosluk duzeltmesi (2026-10-08)
 - `main > .report-panel { margin-top: 22px; margin-bottom: 22px; }` eklendi;
   "Aylik COQ Trendi" kutusu artik ustteki KPI kartlarina ve alttaki kutulara
