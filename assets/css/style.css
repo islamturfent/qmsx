@@ -3914,8 +3914,8 @@ body.modal-open {
     border-radius: 999px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-500);
-    background: var(--surface, #fff);
+    color: var(--muted-color);
+    background: var(--surface-color);
     transition: all 0.15s ease;
 }
 
@@ -3925,8 +3925,8 @@ body.modal-open {
 
 .filter-pill.active {
     border-color: var(--brand-500);
-    color: var(--brand-700);
-    background: var(--brand-50);
+    color: var(--brand-soft-text);
+    background: var(--brand-soft);
 }
 
 .review-queue-item {
@@ -3942,7 +3942,7 @@ body.modal-open {
 .review-submit-form {
     margin: 0 0 18px;
     padding: 12px 14px;
-    background: var(--gray-50);
+    background: var(--surface-strong-color);
     border: 1px solid var(--border-subtle);
     border-radius: 10px;
 }

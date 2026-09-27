@@ -1159,6 +1159,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
 - Kullanici menusu "Hesap Ayarlari" artik `account-settings.php`'e gider; profil
   basligina da Hesap Ayarlari kisa yolu eklendi. i18n accountSettingsTitle/Text.
 - cache v100.
+
+### Dokuman gozden gecirme dark mod duzeltmesi (2026-10-08)
+- `.filter-pill` arka plani tanimsiz `var(--surface, #fff)` idi -> hep beyaz
+  kaliyordu; `--surface-color` yapildi. `.filter-pill.active` `brand-50`/`brand-700`
+  yerine dark moda uyan `--brand-soft`/`--brand-soft-text`.
+- `.review-submit-form` arka plani sabit `--gray-50` idi -> `--surface-strong-color`.
+- cache v101.
 - `appIcon()`'a `user`,`cog`,`key`,`chevronDown` ikonlari; app-sidebar gizli
   ikon span'lari + i18n `accountSettingsMenuLabel`.
 - `.user-menu-*` TailAdmin olcultur (iki satir id, ikonlu madde, ayrac). cache v98.
