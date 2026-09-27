@@ -154,7 +154,7 @@ $companyStmt = $pdo->prepare('SELECT companies.id, companies.company_name FROM c
 $companyStmt->execute($companyScope['params']);
 $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$activeNav = "audit-trail";
+$activeNav = "audit_trail_report";
 
 ?>
 <!DOCTYPE html>

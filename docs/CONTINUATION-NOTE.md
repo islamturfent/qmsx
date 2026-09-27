@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Denetim izi/reporu sol menu aktif duzeltmesi (2026-10-08)
+- `audit-trail.php` `$activeNav = "audit-trail"` (tire) idi; sidebar anahtari
+  `audit_trail` (alt cizgi) oldugundan eslesmiyor, aktif gorunmuyordu.
+  `audit-trail.php` -> `audit_trail`, `audit-trail-report.php` ->
+  `audit_trail_report` yapildi. Ikisi de artik tiklaninca sol menude aktif.
+  Fonksiyonlara dokunulmadi. cache v112.
+
 ### Dokuman Gozden Gecirme Gecmisi bosluk duzeltmesi (2026-10-08)
 - `.console-card + .console-card { margin-top: 16px; }` eklendi; Dokuman Gozden
   Gecirme Merkezi'nde "Gozden Gecirme Gecmisi" kutusu artik ustteki kutuya

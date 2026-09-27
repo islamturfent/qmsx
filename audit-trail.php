@@ -54,7 +54,7 @@ $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $rows = qmsAuditLogList($pdo, $userId, $role, $filter);
 
-$activeNav = "audit-trail";
+$activeNav = "audit_trail";
 
 ?>
 <!DOCTYPE html>
