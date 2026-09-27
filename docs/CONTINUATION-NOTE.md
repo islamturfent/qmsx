@@ -1174,6 +1174,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   20px yuvarlatilmis kutu, marka rengi + beyaz tik, hover/focus/disabled).
   Duyuru Merkezi "Yayinda", ic anket, e-posta ayarlari ve ofis ayarlari
   checkbox'lari artik birebir ayni. `.pref-check` .box yapisi korunur. cache v106.
+
+### Iç anket sonuclari hata duzeltmesi (2026-10-08)
+- internal-surveys.php'de `$manageSurvey['respond_count']`/`avg_rating` anahtarlari
+  yoktu (Warning). Sayfada bu degerler artik yanit tablosundan hesaplaniyor
+  (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
+  basliginda kullaniliyor. cache v107.
 - Kod kimlikleri KORUNDU: `qms*` on-ekleri ve `QMS_*` PHP sabitleri + lower-case
   `qms` dosya/cache adlari ve storage/documents icerigi degismedi. cache v104.
 

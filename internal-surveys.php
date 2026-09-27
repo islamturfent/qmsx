@@ -108,9 +108,23 @@ if ($editing) {
 }
 $manageQuestions = [];
 $manageResults = [];
+$respondCount = 0;
+$avgRating = null;
 if ($manageId > 0) {
     $manageQuestions = qmsInternalSurveyQuestions($pdo, $manageId);
     $manageResults = qmsInternalSurveyResults($pdo, $manageId);
+    $respStmt = $pdo->prepare('SELECT COUNT(DISTINCT user_id) FROM internal_survey_responses WHERE survey_id = ?');
+    $respStmt->execute([$manageId]);
+    $respondCount = (int) $respStmt->fetchColumn();
+    $ratingStmt = $pdo->prepare(
+        'SELECT ROUND(AVG(r.rating), 1)
+         FROM internal_survey_responses r
+         INNER JOIN internal_survey_questions q ON q.id = r.question_id
+         WHERE r.survey_id = ? AND q.question_type = \'rating\''
+    );
+    $ratingStmt->execute([$manageId]);
+    $avg = $ratingStmt->fetchColumn();
+    $avgRating = ($avg !== null && $avg !== false) ? (float) $avg : null;
 }
 
 ?>
@@ -129,7 +143,7 @@ if ($manageId > 0) {
             <div>
                 <span class="section-kicker" data-i18n="internalSurveyKicker">İnsan Kaynakları</span>
                 <h1><?= htmlspecialchars($manageSurvey['title'], ENT_QUOTES, 'UTF-8') ?></h1>
-                <p><span data-i18n="internalSurveyRespondentsLabel">Katılımcı</span>: <strong><?= (int) $manageSurvey['respond_count'] ?></strong><?= $manageSurvey['avg_rating'] !== null ? ' · ortalama ' . htmlspecialchars((string) $manageSurvey['avg_rating'], ENT_QUOTES, 'UTF-8') . '/5' : '' ?></p>
+                <p><span data-i18n="internalSurveyRespondentsLabel">Katılımcı</span>: <strong><?= (int) $respondCount ?></strong><?= $avgRating !== null ? ' · ortalama ' . htmlspecialchars((string) $avgRating, ENT_QUOTES, 'UTF-8') . '/5' : '' ?></p>
             </div>
             <a class="secondary-button" href="internal-surveys.php" data-i18n="internalSurveyBack">Anketlere Dön</a>
         </section>
@@ -183,7 +197,7 @@ if ($manageId > 0) {
                 </section>
 
                 <section class="console-card checklist-section">
-                    <div class="section-heading compact-heading"><div><h3 data-i18n="internalSurveyResultsTitle">Sonuçlar</h3><p><span data-i18n="internalSurveyRespondentsLabel">Katılımcı</span>: <strong><?= (int) $manageSurvey['respond_count'] ?></strong></p></div></div>
+                    <div class="section-heading compact-heading"><div><h3 data-i18n="internalSurveyResultsTitle">Sonuçlar</h3><p><span data-i18n="internalSurveyRespondentsLabel">Katılımcı</span>: <strong><?= (int) $respondCount ?></strong></p></div></div>
                     <div class="admin-list">
                         <?php if (!$manageResults): ?><div class="empty-state" data-i18n="internalSurveyNoResults">Henüz yanıt yok.</div><?php endif; ?>
                         <?php foreach ($manageResults as $r): ?>
