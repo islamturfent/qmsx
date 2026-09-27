@@ -1181,6 +1181,14 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Tum checkbox'lar Bildirim Tercihleri ile ayni stil (2026-10-08)
+- Global `input[type=checkbox]` zaten TailAdmin (pref-check .box ile ayni)
+  idi; eksik olan `focus-visible` border-color ve etiket hizalamasi eklendi.
+- `.checkbox-field`, `.switch-label` ve checkbox iceren `.form-field > span`
+  icin pref-check gibi `inline-flex + gap:10px` verildi -> tum onay kutulari
+  Bildirim Tercihleri'ndekilerle birebir ayni gorunuyor. Fonksiyonlara
+  dokunulmadi. cache v117.
+
 ### secondary-button text underline kaldirildi (2026-10-08)
 - `.secondary-button` ve `.secondary-button:hover` icin `text-decoration: none`
   eklendi; link olan secondary-button'larda (genel `a:hover` kuralindan gelen)

@@ -3513,7 +3513,18 @@ input[type="checkbox"]:disabled {
 
 input[type="checkbox"]:focus-visible {
     outline: none;
+    border-color: var(--brand-500);
     box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+/* Bildirim Tercihleri kutucuguyla ayni stil: onay kutusu iceren etiketlere
+   ayni hizalama ve bosluk ver (TailAdmin onay kutusu gorunumu). */
+.checkbox-field,
+.switch-label,
+.form-field > span:has(> input[type="checkbox"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
 }
 
 /* Bildirim tercihleri: kategori secimi */
