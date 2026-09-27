@@ -1171,6 +1171,11 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
 - `.profile-avatar` arka plani `--brand-50`/rengi `--brand-500` -> dark moda uyan
   `--brand-soft`/`--brand-soft-text`; `.profile-cover` dark override
   (`--brand-700` -> `--gray-900` gradyan) eklendi. Fonksiyonlara dokunulmadi.
+
+### Dokuman dagitim kontrolu filtre cakismasi duzeltmesi (2026-10-08)
+- `.filter-bar`'a ust bosluk (margin-top 18px) eklendi; filtre dügmeleri
+  (Tumu/Dagitilmis/Iade/Gecersiz) artik ustteki istatistik kartlarina degmiyor.
+  Fonksiyonlara dokunulmadi. cache v103.
 - `.profile-card .record-card-grid` Sistem Ozeti kartlari kompakt (min 140px,
   min-height 118px, kucuk ikon) hale getirildi. cache v102.
 - `appIcon()`'a `user`,`cog`,`key`,`chevronDown` ikonlari; app-sidebar gizli

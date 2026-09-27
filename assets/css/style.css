@@ -3938,7 +3938,8 @@ body.dark-mode .profile-cover {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 14px;
+    margin-top: 18px;
+    margin-bottom: 16px;
 }
 
 .filter-pill {
