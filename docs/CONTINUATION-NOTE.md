@@ -1181,6 +1181,17 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Sirket Kullanicisi Sirket Panosu (Secenek A) (2026-10-08)
+- Yeni sayfa `company-overview.php`: sirket kullanicisinin kendi sirketine ozel
+  baslangic panosu (acik uygunsuzluk/sikayet/risk, aktif dokuman, kalibrasyon
+  gecen alet, surem dolan sozlesme, denetimler, tedarikciler). KPI'lar kendi
+  `company_id` kapsaminda SQL COUNT ile.
+- `qmsLandingPage()`: company_user -> company-overview.php (match); sidebar
+  Dashboard linki company_user icin company-overview.php'ye isaret eder.
+- i18n TR/EN anahtarlari; qmsCanSession('dashboard.view') + role company_user
+  guard. Render test: id=8 company_user ile HTML uretildi, sidebar link dogru.
+  cache v130.
+
 ### Izinler sayfasi Varsayilanlara Don dugmesi (2026-10-08)
 - `permissions.php`'ye "Varsayilanlara Don" sekonder dugmesi eklendi; tüm
   override'lari siler ve izinler kod varsayilanlarina doner. Onay (confirm) ve

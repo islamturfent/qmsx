@@ -174,8 +174,12 @@ function qmsAuditRecordScope(PDO $pdo, int $userId, string $auditColumn, string 
  */
 function qmsLandingPage(string $role): string
 {
-    // Denetci kendi denetim listesine duser; yonetim sayfalari ona kapali.
-    return $role === 'auditor' ? 'my-audits.php' : 'dashboard.php';
+    // Denetci kendi denetim listesine, sirket kullanicisi kendi sirket panosuna duser.
+    return match ($role) {
+        'auditor' => 'my-audits.php',
+        'company_user' => 'company-overview.php',
+        default => 'dashboard.php',
+    };
 }
 
 /**

@@ -94,7 +94,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 <?php endif; ?>
         <?php else: ?>
             <?php if (qmsSidebarVisible('dashboard.view')): ?>
-<a class="<?= sidebarLinkClass("dashboard", $activeNav) ?>" href="dashboard.php">
+<a class="<?= sidebarLinkClass("dashboard", $activeNav) ?>" href="<?= $sidebarRole === 'company_user' ? 'company-overview.php' : 'dashboard.php' ?>">
                 <?= appIcon("dashboard") ?>
                 <span data-i18n="dashboardLinkLabel">Dashboard</span>
             </a>
