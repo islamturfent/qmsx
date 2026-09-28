@@ -1181,6 +1181,11 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### permissions.php Kaydet dugmesi bosluk duzeltmesi (2026-10-08)
+- `.report-table-wrap + .form-actions { margin-top: 16px }` eklendi; Izinler
+  sayfasinda "Izinleri Kaydet" dugmesi artik ustteki matris kutusuna degmiyor.
+  Fonksiyonlara dokunulmadi. cache v127.
+
 ### Sol menu RBAC'e gore gizleniyor (2026-10-08)
 - `app-sidebar.php`'de helper `qmsSidebarVisible($action)` eklendi (qmsCanSession'a
   dayali) ve `access.php` require edildi.

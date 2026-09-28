@@ -2335,6 +2335,11 @@ form + .admin-list {
     margin-top: 16px;
 }
 
+/* Rapor/matris tablosunun altindaki islem dugmeleri ustteki kutuya degmesin. */
+.report-table-wrap + .form-actions {
+    margin-top: 16px;
+}
+
 .super-admin-console {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
