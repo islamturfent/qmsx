@@ -1181,6 +1181,11 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Egitim detay katilimci dugmeleri bosluk duzeltmesi (2026-10-08)
+- `.checklist-item-form .form-actions { margin-top: 14px }` eklendi; Egitim
+  detay sayfasinda "Katilimciyi Kaydet" ve "Kaldir" dugmeleri artik ustteki edit
+  kutusuna degmiyor. Fonksiyonlara dokunulmadi. cache v134.
+
 ### Eğitim Şablonu / Yetkinlik Matrisi modulu (2026-10-08)
 - Yeni tablo `training_templates` (migration: scripts/migrate-training-templates.php).
 - `training-templates.php`: yeniden kullanilabilir eğitim tanimlari kütüphanesi

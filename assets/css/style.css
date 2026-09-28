@@ -2335,6 +2335,11 @@ form + .admin-list {
     margin-top: 16px;
 }
 
+/* Katilimci formunun islem dugmeleri ustteki editi degmesin. */
+.checklist-item-form .form-actions {
+    margin-top: 14px;
+}
+
 /* Rapor/matris tablosunun altindaki islem dugmeleri ustteki kutuya degmesin. */
 .report-table-wrap + .form-actions {
     margin-top: 16px;
