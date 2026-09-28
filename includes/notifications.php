@@ -190,6 +190,7 @@ function qmsNotificationTypes(): array
         'incident_reported' => ['icon' => 'alert', 'group' => 'incident'],
         'delivery_rejection' => ['icon' => 'truck', 'group' => 'delivery'],
         'overdue_competency' => ['icon' => 'users', 'group' => 'competency'],
+        'assigned_audit_due' => ['icon' => 'alert', 'group' => 'audit'],
     ];
 }
 
@@ -224,6 +225,7 @@ function qmsNotificationGroupLabels(): array
         'incident' => 'Olay',
         'delivery' => 'Teslimat',
         'competency' => 'Yetkinlik',
+        'audit' => 'Denetim',
         'general' => 'Genel',
     ];
 }

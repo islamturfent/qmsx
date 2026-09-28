@@ -37,25 +37,52 @@ $auditsStmt = $pdo->prepare(
 $auditsStmt->execute(["user_id" => $userId]);
 $audits = $auditsStmt->fetchAll(PDO::FETCH_ASSOC);
 
+$today = date('Y-m-d');
+$auditStatusLabels = ['planned' => 'Planlandı', 'in_progress' => 'Devam Ediyor', 'done' => 'Tamamlandı'];
+
 $totalAssigned = count($audits);
 $pendingAssigned = 0;
 $completedAssigned = 0;
 $overdueAssigned = 0;
-$today = date('Y-m-d');
-$auditStatusLabels = ['planned' => 'Planlandı', 'in_progress' => 'Devam Ediyor', 'done' => 'Tamamlandı'];
+$classed = [];
 foreach ($audits as $assignedAudit) {
     $total = (int) $assignedAudit['checklist_total'];
     $done  = (int) $assignedAudit['checklist_done'];
-    if ($done < $total) {
+    $assignOverdue = $done < $total && !empty($assignedAudit['planned_date']) && $assignedAudit['planned_date'] < $today;
+    $assignCompleted = $total > 0 && $done >= $total;
+    $assignPending = $done < $total;
+    $assignedAudit['_pending'] = $assignPending;
+    $assignedAudit['_completed'] = $assignCompleted;
+    $assignedAudit['_overdue'] = $assignOverdue;
+    $classed[] = $assignedAudit;
+    if ($assignPending) {
         $pendingAssigned++;
     }
-    if ($total > 0 && $done >= $total) {
+    if ($assignCompleted) {
         $completedAssigned++;
     }
-    if ($done < $total && !empty($assignedAudit['planned_date']) && $assignedAudit['planned_date'] < $today) {
+    if ($assignOverdue) {
         $overdueAssigned++;
     }
 }
+
+// Durum filtresi (Tum / Devam Eden / Tamamlanan / Geciken).
+$filter = (string) ($_GET['filter'] ?? 'all');
+if (!in_array($filter, ['all', 'pending', 'completed', 'overdue'], true)) {
+    $filter = 'all';
+}
+$displayAudits = array_values(array_filter($classed, static function (array $a) use ($filter): bool {
+    if ($filter === 'pending') {
+        return $a['_pending'];
+    }
+    if ($filter === 'completed') {
+        return $a['_completed'];
+    }
+    if ($filter === 'overdue') {
+        return $a['_overdue'];
+    }
+    return true;
+}));
 
 $activeNav = "my_audits";
 
@@ -124,12 +151,28 @@ $activeNav = "my_audits";
         </section>
 
         <section class="page-section">
-            <div class="section-heading"><div><h2 data-i18n="myAuditsListTitle">Atanmış Denetimler</h2><p data-i18n="myAuditsListText">Yalnızca size atanmış denetimleri görürsünüz.</p></div></div>
-            <?php if (!$audits): ?>
+            <div class="section-heading">
+                <div><h2 data-i18n="myAuditsListTitle">Atanmış Denetimler</h2><p data-i18n="myAuditsListText">Yalnızca size atanmış denetimleri görürsünüz.</p></div>
+                <?php if ($totalAssigned > 0): ?>
+                <div class="page-heading-actions-buttons">
+                    <a class="secondary-button" href="my-audits-export.php?filter=<?= htmlspecialchars($filter, ENT_QUOTES, "UTF-8") ?>&format=xlsx" data-i18n="excelDownloadLabel">Excel İndir</a>
+                    <a class="secondary-button" href="my-audits-export.php?filter=<?= htmlspecialchars($filter, ENT_QUOTES, "UTF-8") ?>&format=pdf" data-i18n="pdfDownloadLabel">PDF İndir</a>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="filter-tabs">
+                <a class="filter-tab<?= $filter === 'all' ? ' active' : '' ?>" href="my-audits.php?filter=all"><span data-i18n="myAuditsFilterAllLabel">Tümü</span> (<?= $totalAssigned ?>)</a>
+                <a class="filter-tab<?= $filter === 'pending' ? ' active' : '' ?>" href="my-audits.php?filter=pending"><span data-i18n="myAuditsFilterPendingLabel">Devam Eden</span> (<?= $pendingAssigned ?>)</a>
+                <a class="filter-tab<?= $filter === 'completed' ? ' active' : '' ?>" href="my-audits.php?filter=completed"><span data-i18n="myAuditsFilterCompletedLabel">Tamamlanan</span> (<?= $completedAssigned ?>)</a>
+                <a class="filter-tab<?= $filter === 'overdue' ? ' active' : '' ?>" href="my-audits.php?filter=overdue"><span data-i18n="myAuditsFilterOverdueLabel">Geciken</span> (<?= $overdueAssigned ?>)</a>
+            </div>
+
+            <?php if (!$displayAudits): ?>
                 <div class="empty-state" data-i18n="noAssignedAuditsText">Henüz size atanmış bir denetim yok.</div>
             <?php else: ?>
                 <div class="record-card-grid">
-                    <?php foreach ($audits as $audit): ?>
+                    <?php foreach ($displayAudits as $audit): ?>
                         <?php
                         $checklistTotal = (int) $audit["checklist_total"];
                         $checklistDone = (int) $audit["checklist_done"];
@@ -139,7 +182,7 @@ $activeNav = "my_audits";
                             <div class="record-card-topline">
                                 <span><?= htmlspecialchars($audit["company_name"], ENT_QUOTES, "UTF-8") ?></span>
                                 <span class="status-badge" data-i18n="<?= 'auditStatus_' . $audit["status"] ?? '' ?>"><?= htmlspecialchars($auditStatusLabels[$audit["status"]] ?? $audit["status"], ENT_QUOTES, "UTF-8") ?></span>
-                                <?php if ($checklistTotal > 0 && $checklistDone < $checklistTotal && !empty($audit["planned_date"]) && $audit["planned_date"] < $today): ?>
+                                <?php if ($audit["_pending"] && !empty($audit["planned_date"]) && $audit["planned_date"] < $today): ?>
                                     <span class="record-card-label danger-text" data-i18n="myAuditOverdueTag">Gecikti</span>
                                 <?php endif; ?>
                             </div>
@@ -150,6 +193,12 @@ $activeNav = "my_audits";
                                 <div class="table-progress"><i style="width: <?= $progress ?>%"></i></div>
                                 <strong><?= $checklistDone ?>/<?= $checklistTotal ?></strong>
                             </div>
+                            <span class="record-card-cta">
+                                <?php if ($audit["status"] === "planned"): ?><span data-i18n="myAuditStartCta">Denetime Başla</span>
+                                <?php elseif ($audit["status"] === "in_progress"): ?><span data-i18n="myAuditContinueCta">Denetime Devam Et</span>
+                                <?php else: ?><span data-i18n="myAuditViewReportCta">Raporu Görüntüle</span><?php endif; ?>
+                                →
+                            </span>
                         </a>
                     <?php endforeach; ?>
                 </div>

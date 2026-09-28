@@ -40,6 +40,7 @@ $stats = [
     'instrument_calibration_overdue' => 0,
     'delivery_rejection' => 0,
     'overdue_competency' => 0,
+    'assigned_audit_due' => 0,
 ];
 
 /** Belirtilen kullaniciya (tur+link) dedupli bildirim ekler. */
@@ -394,6 +395,44 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     }
     if ($allUsers) {
         $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_competency', $msg, $link);
+    }
+}
+
+// --- Vadesi gecen atanmis denetimler (denetcinin baslamadigi/tamamlamadigi) ---
+$stmt = $pdo->prepare(
+    "SELECT DISTINCT audits.id, audits.title, audits.planned_date, audits.status,
+            companies.company_name, companies.id AS company_id, users.id AS auditor_user_id
+     FROM audits
+     INNER JOIN companies ON companies.id = audits.company_id
+     INNER JOIN audit_auditors ON audit_auditors.audit_id = audits.id
+     INNER JOIN auditors ON auditors.id = audit_auditors.auditor_id
+     INNER JOIN users ON users.id = auditors.user_id
+     WHERE audits.active = 1
+       AND audits.status IN ('planned', 'in_progress')
+       AND audits.planned_date IS NOT NULL AND audits.planned_date < ?"
+);
+$stmt->execute([$today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $doneStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM audit_checklist_items
+         WHERE audit_id = ? AND active = 1 AND result_status <> 'pending'"
+    );
+    $doneStmt->execute([(int) $r['id']]);
+    $totalStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM audit_checklist_items WHERE audit_id = ? AND active = 1"
+    );
+    $totalStmt->execute([(int) $r['id']]);
+    $todo = (int) $totalStmt->fetchColumn();
+    $done = (int) $doneStmt->fetchColumn();
+    if ($todo > 0 && $done >= $todo) {
+        continue; // kontrol listesi tamamlanmis; denetim bitmis sayilir
+    }
+    $link = 'my-audits.php';
+    $msg = (string) $r['company_name'] . ' · ' . (string) $r['title']
+        . ' (planlanan: ' . (string) $r['planned_date'] . ') denetimi vadeyi geçti.';
+    $notify($pdo, (int) $r['auditor_user_id'], 'assigned_audit_due', $msg, $link);
+    if ($allUsers) {
+        $notifyAdmins($pdo, (int) $r['company_id'], 'assigned_audit_due', $msg, $link);
     }
 }
 

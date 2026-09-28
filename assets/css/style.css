@@ -4527,3 +4527,40 @@ input[type="checkbox"]:focus-visible {
         align-items: flex-start;
     }
 }
+
+/* Denetçi Panosu filtre sekmeleri + CTA rozeti */
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 18px;
+}
+.filter-tab {
+    padding: 7px 14px;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    background: #fff;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background .15s, border-color .15s, color .15s;
+}
+.filter-tab:hover {
+    border-color: var(--brand-400, #3b82f6);
+    color: var(--brand-600, #2563eb);
+}
+.filter-tab.active {
+    background: var(--brand-600, #2563eb);
+    border-color: var(--brand-600, #2563eb);
+    color: #fff;
+}
+.record-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--brand-600, #2563eb);
+}

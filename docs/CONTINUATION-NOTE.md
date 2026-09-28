@@ -1983,6 +1983,21 @@ per-column emphasis, so uniform gray-500 reads washed out.
   aciklayici bir bos-durum mesaji ve "Şirket Denetimleri" butonu (company-detail) sunuyor.
   Sirkette hic denetim yoksa ("once denetim olusturun") ile tum denetimler zaten
   baglanmissa ("tum denetimler programa bagli") ayri mesajlar gosterir. Cache `v151`.
+- Audit denetci paneli + otomasyon (2026-10) - dort is birlikte yapildi:
+  1. **Otomatik rapor taslagi**: `audit-detail.php`'de denetim tamamlaninca henuz bir rapor
+     yoksa `qmsAuditReportGenerateDraft()` (yeni) taslak rapor uretir; kullanici rapora
+     baglantidan gider. Mevcut rapora dokunulmaz. `audit-report-functions.php`'ye eklendi.
+  2. **Denetci panosu guclendirildi** (`my-audits.php`): durum filtre sekmeleri
+     (Tum/Devam Eden/Tamamlanan/Geciken), kart basina yurume rozeti (Basla/Devam/Rapor)
+     ve Excel/PDF disa aktarma (`my-audits-export.php`).
+  3. **Dashboard & bildirim**: Dashboard Donem Ozeti'ne devam eden + vadeyi gecen denetim
+     gostergesi eklendi (`dashboard-functions.php`); `notify-overdue.php`'ye
+     `assigned_audit_due` bolumu eklendi (vadeyi gecen ananmis denetim icin denetciye +
+     `--all`'da sirket adminlerine bildirim/eposta). `notifications.php`'ye `audit` grubu
+     ve `assigned_audit_due` turu eklendi.
+  4. **Uygunsuzluk -> CAPA**: `audit-detail.php` uygunsuzluk listesinde her kayit icin
+     tek tik "Faaliyet Olustur" butonu (corrective-action-create) eklendi.
+  Cache `v152`.
 
 ## Working preferences
 

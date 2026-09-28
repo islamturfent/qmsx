@@ -260,6 +260,19 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
          INNER JOIN companies co ON co.id = al.company_id' . $scope['sql']
     );
 
+    // Devam eden ve vadeyi gecen denetimler (kapsamli).
+    $openAudits = $agg(
+        'SELECT COUNT(*) FROM audits a
+         INNER JOIN companies co ON co.id = a.company_id
+         WHERE a.active = 1 AND a.status IN (\'planned\', \'in_progress\')' . $scope['sql']
+    );
+    $overdueAudits = $agg(
+        'SELECT COUNT(*) FROM audits a
+         INNER JOIN companies co ON co.id = a.company_id
+         WHERE a.active = 1 AND a.status IN (\'planned\', \'in_progress\')
+           AND a.planned_date IS NOT NULL AND a.planned_date < CURDATE()' . $scope['sql']
+    );
+
     // En yogun ay (denetim bazinda).
     $topMonth = null;
     $topAudits = 0;
@@ -280,6 +293,11 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
     }
 
     $points[] = ['tone' => 'neutral', 'text' => $audits . ' denetim gerçekleştirildi' . ($topMonth ? " (en yoğun $topMonth)" : '') . '.'];
+    if ($openAudits > 0) {
+        $points[] = ['tone' => $overdueAudits > 0 ? 'warning' : 'neutral', 'text' => $openAudits . ' denetim devam ediyor' . ($overdueAudits > 0 ? '; ' . $overdueAudits . ' tanesi vadeyi geçti.' : '.')];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Devam eden denetim bulunmuyor.'];
+    }
     $points[] = ['tone' => 'neutral', 'text' => $nonconformities . ' uygunsuzluk açıldı; şu an ' . $openNonconformities . ' açık durumda.'];
     $points[] = ['tone' => 'neutral', 'text' => $actionsCompleted . ' aksiyon tamamlandı.'];
 

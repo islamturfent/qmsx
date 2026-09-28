@@ -312,6 +312,36 @@ function qmsSaveAuditReport(PDO $pdo, int $auditId, int $companyId, array $data,
 }
 
 /**
+ * Denetim tamamlandiginda ilk kez otomatik taslak rapor uretir.
+ *
+ * Mevcut bir rapor (taslak veya kesinlesmis) varsa dokunulmaz; rapor sadece
+ * ilk tamamlamada uretilir. Boylece kullanicinin elle duzenlemeleri korunur.
+ *
+ * @return bool Rapor olusturuldu ise true.
+ */
+function qmsAuditReportGenerateDraft(PDO $pdo, int $auditId, int $companyId, int $userId): bool
+{
+    $exists = $pdo->prepare('SELECT COUNT(*) FROM audit_reports WHERE audit_id = ? AND active = 1');
+    $exists->execute([$auditId]);
+    if ((int) $exists->fetchColumn() > 0) {
+        return false;
+    }
+
+    $snapshot = qmsAuditReportSnapshot($pdo, $auditId);
+    if (!$snapshot) {
+        return false;
+    }
+
+    $text = qmsGenerateAuditReportText($snapshot);
+    $data = $text;
+    $data['status'] = 'draft';
+    $data['report_date'] = date('Y-m-d');
+
+    qmsSaveAuditReport($pdo, $auditId, $companyId, $data, $userId);
+    return true;
+}
+
+/**
  * Raporu onaylayarak kesinlesme bilgisini yazar (final).
  */
 function qmsAuditReportFinalize(PDO $pdo, int $reportId, int $userId): void
