@@ -326,7 +326,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
-<a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="document-compare.php">
+<a class="<?= sidebarLinkClass("document_compare", $activeNav) ?>" href="document-compare.php">
             <?= appIcon("documents") ?>
             <span data-i18n="docCompareMenuLabel">Versiyon Karşılaştırma</span>
         </a>

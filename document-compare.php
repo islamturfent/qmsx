@@ -46,7 +46,7 @@ if ($selectedDoc) {
 }
 
 
-$activeNav = "documents";
+$activeNav = "document_compare";
 $versionA = null;
 $versionB = null;
 $diffOps = [];

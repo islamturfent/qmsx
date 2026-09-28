@@ -133,6 +133,17 @@ foreach ($delivStmt as $drow) {
 }
 $dashRejectAvg = $dashDeliverQty > 0 ? round(($dashRejectTotal / $dashDeliverQty) * 100, 1) : 0;
 $dashCompetencyOverdueCount = count($dashboardCompetencyOverdue);
+
+// Denetim & rapor durumu (sirket scope).
+$dashOpenAudits = $scopedCount("SELECT COUNT(*) FROM audits WHERE active=1 AND status IN ('planned','in_progress')" . $scopeClause);
+$dashAuditOverdue = $scopedCount("SELECT COUNT(*) FROM audits WHERE active=1 AND status IN ('planned','in_progress') AND planned_date IS NOT NULL AND planned_date < CURDATE()" . $scopeClause);
+$audRepScope = qmsCompanyScope('a.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$audRepStmt = $pdo->prepare("SELECT COUNT(*) FROM audit_reports ar INNER JOIN audits a ON a.id = ar.audit_id WHERE ar.active = 1 AND ar.status = ?" . $audRepScope['sql']);
+$audRepStmt->execute(array_merge(['draft'], $audRepScope['params']));
+$dashAuditReportDraft = (int) $audRepStmt->fetchColumn();
+$audRepStmt->execute(array_merge(['final'], $audRepScope['params']));
+$dashAuditReportFinal = (int) $audRepStmt->fetchColumn();
+$dashAuditOpenNc = $scopedCount("SELECT COUNT(*) FROM nonconformities WHERE active=1 AND status<>'closed' AND audit_id IS NOT NULL" . $scopeClause);
 $cockpitKpiLabels = qmsPerformanceKpiLabels();
 $cockpitCostRows = array_values($dashboardTrend);
 $cockpitMaxCost = 1.0;
@@ -599,6 +610,23 @@ $activeNav = "dashboard";
                         <a href="competency-matrix.php"><div><span class="metric-mini-label">Yetkinlik Vadesi Geçen</span><strong><?= $dashCompetencyOverdueCount ?></strong></div></a>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardAuditTitle">Denetim & Rapor Durumu</h3>
+                    <p data-i18n="dashboardAuditText">Devam eden denetimler ve rapor durumu.</p>
+                </div>
+                <a class="secondary-button" href="audit-programs.php" data-i18n="auditProgramsMenuLabel">Denetim Programları</a>
+            </div>
+            <div class="metric-mini-row">
+                <a href="audit-programs.php"><div><span class="metric-mini-label">Devam Eden Denetim</span><strong><?= $dashOpenAudits ?></strong></div></a>
+                <a href="audit-programs.php"><div><span class="metric-mini-label">Vadeyi Geçen</span><strong class="<?= $dashAuditOverdue > 0 ? 'danger-text' : '' ?>"><?= $dashAuditOverdue ?></strong></div></a>
+                <a href="reports.php"><div><span class="metric-mini-label">Taslak Rapor</span><strong><?= $dashAuditReportDraft ?></strong></div></a>
+                <a href="reports.php"><div><span class="metric-mini-label">Kesinleşmiş Rapor</span><strong><?= $dashAuditReportFinal ?></strong></div></a>
+                <a href="actions.php"><div><span class="metric-mini-label">Denetim Kaynaklı Açık NC</span><strong><?= $dashAuditOpenNc ?></strong></div></a>
             </div>
         </section>
 

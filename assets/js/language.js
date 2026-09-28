@@ -3181,10 +3181,12 @@ Object.assign(translations.tr, {
 Object.assign(translations.tr, {
   dashboardPeriodTitle: "Dönem Özeti", dashboardPeriodText: "Şirket panosu, müşteri performansı ve yetkinlik göstergeleri.",
   dashboardCompanyKpisTitle: "Şirket Panosu", dashboardCustomerTitle: "Müşteri & Yetkinlik",
+  dashboardAuditTitle: "Denetim & Rapor Durumu", dashboardAuditText: "Devam eden denetimler ve rapor durumu.",
 });
 Object.assign(translations.en, {
   dashboardPeriodTitle: "Period Summary", dashboardPeriodText: "Company dashboard, customer performance and competency indicators.",
   dashboardCompanyKpisTitle: "Company Dashboard", dashboardCustomerTitle: "Customer & Competency",
+  dashboardAuditTitle: "Audit & Report Status", dashboardAuditText: "Ongoing audits and report status.",
 });
 Object.assign(translations.en, {
   dashboardCompetencyTitle: "Overdue Competencies", dashboardCompetencyText: "Competency assessments that are overdue for review.",

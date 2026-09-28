@@ -2003,8 +2003,16 @@ per-column emphasis, so uniform gray-500 reads washed out.
   anahtarini paylasiyordu (`internal_surveys` / `quality_costs`), bu yuzden ikisi birden
   vurgulamıyordu. Iki kisiye ozgu anahtar verildi: `internal_survey_fill` ve
   `quality_cost_trend` (app-sidebar ogeleri + sayfa `$activeNav` eslestirildi).
-  Benzer bir cakisma `document-compare.php` (dokuments anahtari) icin de aday; kullanici
+  Benzer bir cakisma `document-compare.php` (documents anahtari) icin de aday; kullanici
   istekte bulunursa ayni sekilde ayrilabilir. Cache `v153`.
+- `document-compare.php` aktiflik cakismasi **giderildi** (2026-10): "Versiyon Karşılaştırma"
+  menü ogesi ve sayfa `document_compare` anahtarini kullanir; artik Dokuman Yonetimi ile
+  birlikte aktif gozukmez. Cache `v154`.
+- Dashboard **Denetim & Rapor Durumu** paneli eklendi (2026-10): devam eden denetim,
+  vadeyi gecen denetim, taslak / kesinlesmis rapor sayisi ve denetim kaynakli acik NC.
+  Kapsamli sorgular `$dashOpenAudits`, `$dashAuditOverdue`, `$dashAuditReportDraft`,
+  `$dashAuditReportFinal`, `$dashAuditOpenNc` (rapor sayilari `a.company_id` uzerinden
+  kapsamlidir). Dashboard icin dogrulandi. Cache `v154`.
 
 ## Working preferences
 
