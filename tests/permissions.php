@@ -57,6 +57,8 @@ $newActions = [
     'approvals.manage' => ['super_admin', 'system_admin'],
     'document_reviews.manage' => ['super_admin', 'system_admin'],
     'document_approvals.manage' => ['super_admin', 'system_admin'],
+    'training_templates.manage' => ['super_admin', 'system_admin'],
+    'competency_matrix.view' => ['super_admin', 'system_admin'],
     'admin.office' => ['super_admin'],
     'admin.mail' => ['super_admin'],
 ];

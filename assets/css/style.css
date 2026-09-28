@@ -4205,6 +4205,30 @@ input[type="checkbox"]:focus-visible {
     color: var(--brand-600);
 }
 
+/* Yetkinlik matrisi: yetkinlik cipleri */
+.competency-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+.competency-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    background: var(--surface-strong-color);
+    color: var(--text-body);
+    font-size: 12px;
+}
+.competency-chip.is-overdue {
+    border-color: var(--error-soft-text, #dc2626);
+    background: var(--error-soft);
+    color: var(--error-soft-text);
+}
+
 /* Izinler matrisi filtre cubugu */
 .perm-filter-bar {
     display: flex;

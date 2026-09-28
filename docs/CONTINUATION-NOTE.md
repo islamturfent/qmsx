@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Eğitim Şablonu / Yetkinlik Matrisi modulu (2026-10-08)
+- Yeni tablo `training_templates` (migration: scripts/migrate-training-templates.php).
+- `training-templates.php`: yeniden kullanilabilir eğitim tanimlari kütüphanesi
+  (CRUD, sirket kapsami, CSRF).
+- `competency-matrix.php`: personel x yetkinlik gorunumu (staff_competencies), vadesi
+  gecen yetkinlikler vurgulaniyor (next_assessment_date < bugun), 3 KPI kartı.
+- RBAC eylemleri: `training_templates.manage`, `competency_matrix.view` (super+system).
+- Sidebar linkleri + i18n TR/EN. RBAC testi 24/24; lint + render gecti. cache v133.
+
 ### Izinler matrisine filtre/arama (2026-10-08)
 - `permissions.php`'ye eylem arama kutusu + rol kolon filtre pilleri eklendi.
   Filtre client-side (JS) ile gorunumu gizler; tum toggle'lar DOM'da kalir,

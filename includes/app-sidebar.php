@@ -3,9 +3,11 @@
 // RBAC servisi: menü öğelerini cari kullanıcı iznine göre gizler.
 require_once __DIR__ . '/access.php';
 
-function qmsSidebarVisible(string $action): bool
-{
-    return function_exists('qmsCanSession') && qmsCanSession($action);
+if (!function_exists('qmsSidebarVisible')) {
+    function qmsSidebarVisible(string $action): bool
+    {
+        return function_exists('qmsCanSession') && qmsCanSession($action);
+    }
 }
 
 $activeNav = $activeNav ?? "";
@@ -187,6 +189,18 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 <a class="<?= sidebarLinkClass("trainings", $activeNav) ?>" href="trainings.php">
             <?= appIcon("training") ?>
             <span data-i18n="trainingManagementTitle">Eğitim Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('training_templates.manage')): ?>
+<a class="<?= sidebarLinkClass("training_templates", $activeNav) ?>" href="training-templates.php">
+            <?= appIcon("training") ?>
+            <span data-i18n="trainingTemplatesMenuLabel">Eğitim Şablonları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('competency_matrix.view')): ?>
+<a class="<?= sidebarLinkClass("competency_matrix", $activeNav) ?>" href="competency-matrix.php">
+            <?= appIcon("users") ?>
+            <span data-i18n="competencyMatrixMenuLabel">Yetkinlik Matrisi</span>
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>

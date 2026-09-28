@@ -3106,3 +3106,24 @@ languageToggle.addEventListener("click", function() {
 
     changeLanguage(currentLanguage);
 });
+// Eğitim Şablonlari / Yetkinlik Matrisi
+Object.assign(translations.tr, {
+  trainingTemplatesMenuLabel: "Eğitim Şablonları", trainingTemplatesTitle: "Eğitim Şablonları",
+  trainingTemplatesKicker: "Eğitim Yönetimi", trainingTemplatesText: "Tekrar kullanılacak eğitim tanımlarını saklayın.",
+  trainingTemplatesFormTitle: "Yeni Eğitim Şablonu", trainingTemplateTitleLabel: "Başlık",
+  trainingTemplateDurationLabel: "Varsayılan Süre (saat)", trainingTemplateCompetencyLabel: "Hedef Yetkinlik",
+  trainingTemplatesListTitle: "Şablon Listesi", trainingTemplatesEmpty: "Henüz eğitim şablonu yok.",
+  competencyMatrixMenuLabel: "Yetkinlik Matrisi", competencyMatrixTitle: "Yetkinlik Matrisi",
+  competencyMatrixKicker: "Personel & Yetkinlik", competencyMatrixText: "Personel bazında yetkinlikler ve vadesi geçen değerlendirmeler.",
+  competencyMatrixListTitle: "Personel Yetkinlikleri", competencyMatrixEmpty: "Henüz kayıtlı personel veya yetkinlik yok.",
+});
+Object.assign(translations.en, {
+  trainingTemplatesMenuLabel: "Training Templates", trainingTemplatesTitle: "Training Templates",
+  trainingTemplatesKicker: "Training Management", trainingTemplatesText: "Store reusable training definitions.",
+  trainingTemplatesFormTitle: "New Training Template", trainingTemplateTitleLabel: "Title",
+  trainingTemplateDurationLabel: "Default Duration (hours)", trainingTemplateCompetencyLabel: "Target Competency",
+  trainingTemplatesListTitle: "Template List", trainingTemplatesEmpty: "No training templates yet.",
+  competencyMatrixMenuLabel: "Competency Matrix", competencyMatrixTitle: "Competency Matrix",
+  competencyMatrixKicker: "Personnel & Competency", competencyMatrixText: "Personnel competencies and overdue assessments.",
+  competencyMatrixListTitle: "Personnel Competencies", competencyMatrixEmpty: "No personnel or competencies recorded yet.",
+});

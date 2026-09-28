@@ -21,6 +21,7 @@ $isLoggedIn = isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] ==
     <link rel="icon" href="assets/icons/qms-icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/icons/qms-icon-192.png">
     <link rel="stylesheet" href="assets/css/style.css">
+    <meta name="author" content="Islam Turfent">
 </head>
 
 <body>
