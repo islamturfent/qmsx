@@ -36,6 +36,11 @@ $available = array_values(array_filter(
     static fn(array $audit): bool => !in_array((int) $audit["id"], $linkedIds, true)
 ));
 
+// Bolum hic denetim bekliyor mu (tumu baglanmis) yoksa sirkette hic denetim yok mu?
+$companyAuditCountStmt = $pdo->prepare('SELECT COUNT(*) FROM audits WHERE active = 1 AND company_id = :company_id');
+$companyAuditCountStmt->execute(['company_id' => $companyId]);
+$companyAuditCount = (int) $companyAuditCountStmt->fetchColumn();
+
 $formError = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -238,6 +243,18 @@ $activeNav = "audit_programs";
                     <p data-i18n="auditProgramLinkText">Bu şirketin denetimlerinden programa denetim bağlayın.</p>
                 </div>
             </div>
+            <?php if (!$available): ?>
+                <div class="empty-state">
+                    <?php if ($companyAuditCount === 0): ?>
+                        <span data-i18n="noCompanyAuditsToLinkText">Bu şirkette henüz denetim yok. Önce şirket sayfasından bir denetim oluşturun.</span>
+                    <?php else: ?>
+                        <span data-i18n="allCompanyAuditsLinkedText">Bu şirketteki tüm denetimler zaten bu programa bağlı.</span>
+                    <?php endif; ?>
+                </div>
+                <div class="form-actions">
+                    <a class="secondary-button" href="company-detail.php?id=<?= $companyId ?>" data-i18n="createAuditsForCompanyButton">Şirket Denetimleri</a>
+                </div>
+            <?php else: ?>
             <form class="auditor-form link-audit-form" method="post" action="audit-program-detail.php?id=<?= $programId ?>">
                 <?= qmsCsrfField($csrfScope) ?>
                 <input type="hidden" name="form_type" value="link_audit">
@@ -247,9 +264,6 @@ $activeNav = "audit_programs";
                         <span data-i18n="auditSelectLabel">Denetim</span>
                         <select name="audit_id" required>
                             <option value="0" data-i18n="selectAuditOption">Denetim seçin</option>
-                            <?php if (!$available): ?>
-                                <option value="0" disabled data-i18n="noAvailableAuditsText">Programa eklenebilecek denetim yok</option>
-                            <?php endif; ?>
                             <?php foreach ($available as $audit): ?>
                                 <option value="<?= (int) $audit["id"] ?>"><?= htmlspecialchars($audit["title"], ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars($audit["status"], ENT_QUOTES, "UTF-8") ?></option>
                             <?php endforeach; ?>
@@ -260,6 +274,7 @@ $activeNav = "audit_programs";
                     <button class="primary-button" type="submit" data-i18n="linkAuditButton">Denetimi Ekle</button>
                 </div>
             </form>
+            <?php endif; ?>
         </section>
 
         <section class="console-card checklist-section">

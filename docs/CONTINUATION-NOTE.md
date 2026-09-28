@@ -1978,6 +1978,11 @@ per-column emphasis, so uniform gray-500 reads washed out.
   Kapsam artik `c.company_id` uzerinden (`$yearScope`) kuruluyor. Ayni sinif bir hata
   daha once `dashboard.php`'de duzeltilmisti; COQ Trend degisikligi bunun dogrulugunu
   DB'de yeniden ureterek test edildi. Cache `v150`.
+- "Programa Denetim Ekle" bos durum UX'i **iyilestirildi** (2026-10): `audit-program-detail.php`
+  artik `$available` bosken yalnizca devre disi bir dropdown secenegi gostermek yerine
+  aciklayici bir bos-durum mesaji ve "Şirket Denetimleri" butonu (company-detail) sunuyor.
+  Sirkette hic denetim yoksa ("once denetim olusturun") ile tum denetimler zaten
+  baglanmissa ("tum denetimler programa bagli") ayri mesajlar gosterir. Cache `v151`.
 
 ## Working preferences
 
