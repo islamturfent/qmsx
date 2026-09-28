@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Yetkinlik vade bildirimi (notify-overdue entegrasyonu) (2026-10-08)
+- `scripts/notify-overdue.php`'ye `overdue_competency` bolumu eklendi: vadesi gecen
+  yetkinlikler (staff_competencies.next_assessment_date < bugun) icin bildirim
+  uretilir. Personel ile eslesen kullanici varsa ona, yoksa sirket adminlerine;
+  --all modda tüm sirkete. Idempotent (okunmamis ayni tur+link atlanir).
+- `tests/notify-overdue.php`: staff_members/staff_competencies temp, vadesi gecen
+  yetkinlik; ilk run 6 bildirim, idempotent, overdue_competency testi. 15/15 gecti.
+  cache v139.
+
 ### Arama yapilabilir dropdown (Secenek A) (2026-10-08)
 - Yeni `assets/js/searchable-select.js`: 4+ secenekli `<select>` elemanlarini
   acilinca en ustte "Ara..." kutusu olan ozel listeye donusturur. Native select

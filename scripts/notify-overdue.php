@@ -38,6 +38,7 @@ $stats = [
     'process_review_overdue' => 0,
     'instrument_calibration_overdue' => 0,
     'delivery_rejection' => 0,
+    'overdue_competency' => 0,
 ];
 
 /** Belirtilen kullaniciya (tur+link) dedupli bildirim ekler. */
@@ -344,6 +345,39 @@ if ($deliveryRejectThreshold > 0) {
         if ($allUsers) {
             $notifyCompanyAll($pdo, (int) $r['company_id'], 'delivery_rejection', $msg, $link);
         }
+    }
+}
+
+// --- Vadesi gecen yetkinlik degerlendirmeleri ---
+$stmt = $pdo->prepare(
+    "SELECT sc.id, sc.competency_name, sc.next_assessment_date,
+            s.first_name, s.last_name, s.email AS staff_email, s.company_id, co.company_name
+     FROM staff_competencies sc
+     INNER JOIN staff_members s ON s.id = sc.staff_id
+     INNER JOIN companies co ON co.id = s.company_id
+     WHERE sc.active = 1 AND sc.next_assessment_date IS NOT NULL AND sc.next_assessment_date < ?"
+);
+$stmt->execute([$today]);
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $link = 'competency-matrix.php';
+    $person = trim((string) $r['first_name'] . ' ' . (string) $r['last_name']);
+    $msg = (string) $r['company_name'] . ' · ' . $person . ' · ' . (string) $r['competency_name']
+        . ' (vade: ' . (string) $r['next_assessment_date'] . ')';
+
+    // Personel ile eslesen kullaniciya; yoksa sirket adminlerine.
+    $staffUserId = 0;
+    if (!empty($r['staff_email'])) {
+        $u = $pdo->prepare('SELECT id FROM users WHERE email = ? AND active = 1 LIMIT 1');
+        $u->execute([$r['staff_email']]);
+        $staffUserId = (int) $u->fetchColumn();
+    }
+    if ($staffUserId > 0) {
+        $notify($pdo, $staffUserId, 'overdue_competency', $msg, $link);
+    } else {
+        $notifyAdmins($pdo, (int) $r['company_id'], 'overdue_competency', $msg, $link);
+    }
+    if ($allUsers) {
+        $notifyCompanyAll($pdo, (int) $r['company_id'], 'overdue_competency', $msg, $link);
     }
 }
 
