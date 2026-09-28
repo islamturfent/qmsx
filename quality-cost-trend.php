@@ -21,9 +21,11 @@ $companyStmt = $pdo->prepare("SELECT companies.id, companies.company_name FROM c
 $companyStmt->execute($companyScope['params']);
 $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Mevcut yillar (filtre icin).
-$yearStmt = $pdo->prepare('SELECT DISTINCT YEAR(incurred_on) AS y FROM quality_costs c WHERE c.active = 1' . $companyScope['sql'] . ' ORDER BY y DESC');
-$yearStmt->execute($companyScope['params']);
+// Mevcut yillar (filtre icin). Sorgu quality_costs uzerinde calistigi icin kapsam
+// c.company_id uzerinden kurulur (companies.id tablosu bu sorguda yok).
+$yearScope = qmsCompanyScope('c.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+$yearStmt = $pdo->prepare('SELECT DISTINCT YEAR(incurred_on) AS y FROM quality_costs c WHERE c.active = 1' . $yearScope['sql'] . ' ORDER BY y DESC');
+$yearStmt->execute($yearScope['params']);
 $availableYears = array_map('intval', array_filter(array_column($yearStmt->fetchAll(PDO::FETCH_ASSOC), 'y')));
 
 $selectedYear = (int) ($_GET["year"] ?? (int) date("Y"));

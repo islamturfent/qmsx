@@ -1971,6 +1971,13 @@ per-column emphasis, so uniform gray-500 reads washed out.
   `20261010-audit-execution.sql` adds `audits.started_at` / `audits.completed_at`;
   `tests/audit-execution.php` (7/7) covers the lifecycle; `my-audits.php` cards now
   show a friendly status label. Cache `v149`.
+- COQ Trend yil sorgusu hatasi **cozuldu** (2026-10): `quality-cost-trend.php`'nin
+  yil (YEAR) sorgusu `FROM quality_costs c` uzerinde calisirken `companies.id`
+  kapsamini (`qmsCompanyScope('companies.id', ...)`) yeniden kullaniyordu; bu tablo o
+  sorguda olmadigi icin "Unknown column 'companies.id'" (1054) hatasi veriyordu.
+  Kapsam artik `c.company_id` uzerinden (`$yearScope`) kuruluyor. Ayni sinif bir hata
+  daha once `dashboard.php`'de duzeltilmisti; COQ Trend degisikligi bunun dogrulugunu
+  DB'de yeniden ureterek test edildi. Cache `v150`.
 
 ## Working preferences
 
