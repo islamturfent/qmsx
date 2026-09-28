@@ -29,6 +29,7 @@ $filter = [
     "company_id" => (int) ($_GET["company_id"] ?? 0),
     "entity_type" => (string) ($_GET["entity_type"] ?? ""),
     "action" => (string) ($_GET["action"] ?? ""),
+    "actor_user_id" => (int) ($_GET["actor_user_id"] ?? 0),
     "from" => (string) ($_GET["from"] ?? ""),
     "to" => (string) ($_GET["to"] ?? ""),
 ];
@@ -63,6 +64,7 @@ $buildQuery = static function (array $extra = []) use ($filter): string {
         "company_id" => $filter["company_id"],
         "entity_type" => $filter["entity_type"],
         "action" => $filter["action"],
+        "actor_user_id" => $filter["actor_user_id"],
         "from" => $filter["from"],
         "to" => $filter["to"],
     ], $extra));
@@ -154,6 +156,9 @@ $companyStmt = $pdo->prepare('SELECT companies.id, companies.company_name FROM c
 $companyStmt->execute($companyScope['params']);
 $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Aktör (kullanıcı) filtre listesi.
+$users = $pdo->query('SELECT id, full_name FROM users WHERE active = 1 ORDER BY full_name')->fetchAll(PDO::FETCH_ASSOC);
+
 $activeNav = "audit_trail_report";
 
 ?>
@@ -200,6 +205,7 @@ $activeNav = "audit_trail_report";
                 <label><span data-i18n="companySelectLabel">Şirket</span><select name="company_id"><option value="0" data-i18n="allCompaniesOption">Tümü</option><?php foreach ($companies as $company): ?><option value="<?= (int) $company['id'] ?>" <?= $filter['company_id'] === (int) $company['id'] ? 'selected' : '' ?>><?= htmlspecialchars($company['company_name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="auditEntityTypeLabel">Kayıt Türü</span><select name="entity_type"><option value="" data-i18n="allTypesOption">Tümü</option><?php foreach ($entityLabels as $key => $label): ?><option value="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" <?= $filter['entity_type'] === $key ? 'selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="auditActionLabel">İşlem</span><select name="action"><option value="" data-i18n="allActionsOption">Tümü</option><?php foreach ($actionLabels as $key => $label): ?><option value="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" <?= $filter['action'] === $key ? 'selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
+                <label><span data-i18n="auditActorLabel">Kullanıcı</span><select name="actor_user_id"><option value="0" data-i18n="allUsersOption">Tümü</option><?php foreach ($users as $user): ?><option value="<?= (int) $user['id'] ?>" <?= $filter['actor_user_id'] === (int) $user['id'] ? 'selected' : '' ?>><?= htmlspecialchars((string) ($user['full_name'] ?: ('#' . (int) $user['id'])), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="fromDateLabel">Başlangıç</span><input type="date" name="from" value="<?= htmlspecialchars($filter['from'], ENT_QUOTES, 'UTF-8') ?>"></label>
                 <label><span data-i18n="toDateLabel">Bitiş</span><input type="date" name="to" value="<?= htmlspecialchars($filter['to'], ENT_QUOTES, 'UTF-8') ?>"></label>
                 <div class="filter-actions">

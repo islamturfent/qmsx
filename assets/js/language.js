@@ -195,6 +195,8 @@ const translations = {
         auditTrailText: "Kim, neyi, ne zaman değiştirdi bilgisini tutan, değiştirilemeyen kayıt. Bu kayıtlar salt-okunurdur ve silinemez.",
         auditEntityTypeLabel: "Kayıt Türü",
         auditActionLabel: "İşlem",
+        auditActorLabel: "Kullanıcı",
+        allUsersOption: "Tümü",
         allTypesOption: "Tümü",
         allActionsOption: "Tümü",
         fromDateLabel: "Başlangıç",
@@ -688,6 +690,8 @@ const translations = {
         auditTrailText: "An immutable record of who changed what and when. These records are read-only and cannot be deleted.",
         auditEntityTypeLabel: "Record Type",
         auditActionLabel: "Action",
+        auditActorLabel: "User",
+        allUsersOption: "All",
         allTypesOption: "All",
         allActionsOption: "All",
         fromDateLabel: "From",
@@ -1285,9 +1289,11 @@ translations.en.notificationGroupProcessLabel = "Process";
 translations.tr.notificationGroupInstrumentLabel = "Metroloji";
 translations.tr.notificationGroupIncidentLabel = "Olay";
 translations.tr.notificationGroupDeliveryLabel = "Teslimat";
+translations.tr.notificationGroupCompetencyLabel = "Yetkinlik";
 translations.en.notificationGroupInstrumentLabel = "Metrology";
 translations.en.notificationGroupIncidentLabel = "Incident";
 translations.en.notificationGroupDeliveryLabel = "Delivery";
+translations.en.notificationGroupCompetencyLabel = "Competency";
 
 Object.assign(translations.tr, {
     reviewsTitle: "Yönetimin Gözden Geçirmesi", reviewsText: "Gözden geçirme toplantılarını, girdileri ve çıkan aksiyonları izleyin.",

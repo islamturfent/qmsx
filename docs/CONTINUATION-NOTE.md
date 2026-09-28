@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Denetim izi sozuyle + Bildirim merkezi (2026-10-08)
+- Denetim izi raporu sebeni: `qmsAuditLogList`'e `actor_user_id` filtresi;
+  audit-trail-report.php'ye Kullanici (aktor) filtre dropdown'i + export
+  buildQuery + i18n. Rapor kullanicilara gore filtrelenip CSV/PDF disa verilebilir.
+- Bildirim merkezi: `qmsNotificationTypes`'e `overdue_competency` (ikon users,
+  grup competency); yeni `competency` grubu etiketi 'Yetkinlik' + i18n keys +
+  language.js TR/EN. Bildirim merkezinde yetkinlik bildirimleri artik gorunur
+  ikon/grup etiketiyle. cache v142.
+
 ### Musteri Teslimat / Performans Karti (2026-10-08)
 - Yeni yuzey `customer-delivery-performance.php`: musteri bazli teslimat ozeti
   (zamaninda teslimat %, red %, toplam siparis, donem sayisi). KPI kartlari:

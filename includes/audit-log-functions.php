@@ -164,6 +164,10 @@ function qmsAuditLogList(PDO $pdo, int $userId, string $role, array $filter = []
         $where[] = 'audit_log.action = ?';
         $params[] = $filter['action'];
     }
+    if (!empty($filter['actor_user_id'])) {
+        $where[] = 'audit_log.actor_user_id = ?';
+        $params[] = (int) $filter['actor_user_id'];
+    }
     if (!empty($filter['from']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $filter['from'])) {
         $where[] = 'audit_log.created_at >= ?';
         $params[] = $filter['from'] . ' 00:00:00';
