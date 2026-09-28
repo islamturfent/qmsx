@@ -242,7 +242,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
-<a class="<?= sidebarLinkClass("internal_surveys", $activeNav) ?>" href="internal-survey-fill.php">
+<a class="<?= sidebarLinkClass("internal_survey_fill", $activeNav) ?>" href="internal-survey-fill.php">
             <?= appIcon("checkBadge") ?>
             <span data-i18n="internalSurveyFillMenuLabel">Anketi Doldur</span>
         </a>
@@ -260,7 +260,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
-<a class="<?= sidebarLinkClass("quality_costs", $activeNav) ?>" href="quality-cost-trend.php">
+<a class="<?= sidebarLinkClass("quality_cost_trend", $activeNav) ?>" href="quality-cost-trend.php">
             <?= appIcon("trend") ?>
             <span data-i18n="costTrendMenuLabel">COQ Trendi</span>
         </a>

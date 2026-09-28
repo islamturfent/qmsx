@@ -1998,6 +1998,13 @@ per-column emphasis, so uniform gray-500 reads washed out.
   4. **Uygunsuzluk -> CAPA**: `audit-detail.php` uygunsuzluk listesinde her kayit icin
      tek tik "Faaliyet Olustur" butonu (corrective-action-create) eklendi.
   Cache `v152`.
+- Sol menude ayni anda aktif gozukme hatasi **giderildi** (2026-10): "İç Memnuniyet Anketi"
+  ile "Anketi Doldur" ve "Kalite Maliyeti (COQ)" ile "COQ Trendi" ciftleri ayni `$activeNav`
+  anahtarini paylasiyordu (`internal_surveys` / `quality_costs`), bu yuzden ikisi birden
+  vurgulamıyordu. Iki kisiye ozgu anahtar verildi: `internal_survey_fill` ve
+  `quality_cost_trend` (app-sidebar ogeleri + sayfa `$activeNav` eslestirildi).
+  Benzer bir cakisma `document-compare.php` (dokuments anahtari) icin de aday; kullanici
+  istekte bulunursa ayni sekilde ayrilabilir. Cache `v153`.
 
 ## Working preferences
 

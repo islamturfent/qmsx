@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 $surveys = qmsInternalFillableSurveys($pdo, $userId, $role);
-$activeNav = "internal_surveys";
+$activeNav = "internal_survey_fill";
 
 ?>
 <!DOCTYPE html>

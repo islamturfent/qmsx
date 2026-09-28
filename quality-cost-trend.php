@@ -54,7 +54,7 @@ $annualTotal = round(array_sum($annualTotals), 2);
 $monthShortNames = [1 => 'Oca', 2 => 'Şub', 3 => 'Mar', 4 => 'Nis', 5 => 'May', 6 => 'Haz', 7 => 'Tem', 8 => 'Ağu', 9 => 'Eyl', 10 => 'Eki', 11 => 'Kas', 12 => 'Ara'];
 $typeLabels = qmsCostTypeLabels();
 $typeI18n = qmsCostTypeI18nKeys();
-$activeNav = "quality_costs";
+$activeNav = "quality_cost_trend";
 
 // Ay bazinda yigili bar yuksekliklerini hesapla (maksimuma gore normalize).
 $maxMonthTotal = max(1.0, max(array_column($trend, 'total')));
