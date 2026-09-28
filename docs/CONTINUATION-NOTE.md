@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Izinler sayfasi Varsayilanlara Don dugmesi (2026-10-08)
+- `permissions.php`'ye "Varsayilanlara Don" sekonder dugmesi eklendi; tüm
+  override'lari siler ve izinler kod varsayilanlarina doner. Onay (confirm) ve
+  CSRF korunur (ayni scope). `qmsPermissionResetOverrides()` backend'e eklendi.
+  Test: override yazildi, reset sonrasi count=0 ve qmsCan varsayilana dondu.
+  cache v129.
+
 ### RBAC kalici test eklenmesi (2026-10-08)
 - `tests/permissions.php` 17 -> 24 kontrol olarak genisletildi: yeni sol menü
   yüzey eylemlerinin varsayilan rolleri, `search.view` kaldirildigi,

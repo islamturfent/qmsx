@@ -100,6 +100,15 @@ function qmsCan(string $role, string $action): bool
  *
  * @param array<string, array<string, bool>> $sets action -> role -> allowed
  */
+/**
+ * Tum izin override'larini siler: izinler kod varsayilanlarina doner.
+ */
+function qmsPermissionResetOverrides(PDO $pdo): void
+{
+    $pdo->exec('DELETE FROM permission_overrides');
+    qmsPermissionOverrides($pdo, true); // cache'i yenile
+}
+
 function qmsPermissionSaveOverrides(PDO $pdo, array $sets): void
 {
     $del = $pdo->prepare('DELETE FROM permission_overrides WHERE action = ? AND role = ?');

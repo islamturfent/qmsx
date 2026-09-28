@@ -22,10 +22,17 @@ $roles = array_keys($roleLabels);
 
 $formMessage = '';
 
-// POST: super admin, toggle'larin yeni durumunu kaydeder.
+// POST: super admin, ya toggle'lari kaydeder ya da tum override'lari sifirlar.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     qmsRequirePermission('permissions.view');
     qmsCsrfVerify('permissions', $_POST['csrf'] ?? null);
+
+    if (($_POST['action'] ?? '') === 'reset') {
+        // Tum izinler kod varsayilanlarina doner.
+        qmsPermissionResetOverrides($pdo);
+        header('Location: permissions.php?reset=1');
+        exit;
+    }
 
     $posted = $_POST['perm'] ?? [];
     $sets = [];
@@ -47,6 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (($_GET['saved'] ?? '') === '1') {
     $formMessage = 'İzinler güncellendi.';
+}
+if (($_GET['reset'] ?? '') === '1') {
+    $formMessage = 'İzinler varsayılanlara döndürüldü.';
 }
 
 $matrix = qmsPermissionMatrix();
@@ -128,7 +138,8 @@ $activeNav = "permissions";
                     </table>
                 </div>
                 <div class="form-actions">
-                    <button class="primary-button" type="submit" data-i18n="permissionsSaveButton">İzinleri Kaydet</button>
+                    <button class="primary-button" type="submit" name="action" value="save" data-i18n="permissionsSaveButton">İzinleri Kaydet</button>
+                    <button class="secondary-button" type="submit" name="action" value="reset" data-i18n="permissionsResetButton" onclick="return confirm('Tüm izinler varsayılanlara mı döndürülsün?');">Varsayılanlara Dön</button>
                 </div>
             </section>
         </form>
