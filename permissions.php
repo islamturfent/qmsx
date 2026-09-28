@@ -100,16 +100,26 @@ $activeNav = "permissions";
             <div class="form-message success"><?= htmlspecialchars($formMessage, ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>
 
+        <div class="perm-filter-bar">
+            <input type="search" id="permFilter" class="perm-search" placeholder="Eylem ara..." autocomplete="off">
+            <div class="filter-pills">
+                <button type="button" class="filter-pill active" data-rolefilter="all">Tümü</button>
+                <?php foreach ($roles as $role): ?>
+                    <button type="button" class="filter-pill" data-rolefilter="<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($roleLabels[$role], ENT_QUOTES, 'UTF-8') ?></button>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
         <form method="post" action="permissions.php">
             <?= qmsCsrfField('permissions') ?>
             <section class="page-section console-card">
                 <div class="report-table-wrap">
-                    <table class="report-table">
+                    <table class="report-table" id="permTable">
                         <thead>
                             <tr>
                                 <th data-i18n="permissionActionLabel">Eylem</th>
                                 <?php foreach ($roles as $role): ?>
-                                    <th class="rbac-role-col"><?= htmlspecialchars($roleLabels[$role], ENT_QUOTES, "UTF-8") ?></th>
+                                    <th class="rbac-role-col" data-role="<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($roleLabels[$role], ENT_QUOTES, "UTF-8") ?></th>
                                 <?php endforeach; ?>
                             </tr>
                         </thead>
@@ -118,7 +128,7 @@ $activeNav = "permissions";
                                 <tr>
                                     <td><?= htmlspecialchars($labels[$action] ?? $action, ENT_QUOTES, "UTF-8") ?></td>
                                     <?php foreach ($roles as $role): ?>
-                                        <td class="rbac-role-col">
+                                        <td class="rbac-role-col" data-role="<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>">
                                             <?php if ($role === 'super_admin'): ?>
                                                 <label class="toggle-field rbac-toggle">
                                                     <input type="checkbox" checked disabled>
@@ -148,5 +158,34 @@ $activeNav = "permissions";
     <script src="assets/js/language.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script src="assets/js/pwa.js"></script>
+    <script>
+    /* Izinler matrisi filtre/arama - sadece gorseldir; tum toggle'lar DOM'da kalir. */
+    (function () {
+        var table = document.getElementById('permTable');
+        if (!table) { return; }
+        var rows = table.querySelectorAll('tbody tr');
+
+        document.getElementById('permFilter').addEventListener('input', function () {
+            var q = this.value.trim().toLowerCase();
+            rows.forEach(function (r) {
+                var cell = r.querySelector('td');
+                var label = cell ? cell.textContent.toLowerCase() : '';
+                r.style.display = (q === '' || label.indexOf(q) !== -1) ? '' : 'none';
+            });
+        });
+
+        var pills = document.querySelectorAll('[data-rolefilter]');
+        pills.forEach(function (p) {
+            p.addEventListener('click', function () {
+                pills.forEach(function (x) { x.classList.remove('active'); });
+                p.classList.add('active');
+                var rf = p.getAttribute('data-rolefilter');
+                table.querySelectorAll('[data-role]').forEach(function (c) {
+                    c.style.display = (rf === 'all' || c.getAttribute('data-role') === rf) ? '' : 'none';
+                });
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

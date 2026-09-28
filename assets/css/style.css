@@ -4205,6 +4205,30 @@ input[type="checkbox"]:focus-visible {
     color: var(--brand-600);
 }
 
+/* Izinler matrisi filtre cubugu */
+.perm-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 14px;
+}
+.perm-search {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background: var(--control-bg-color);
+    color: var(--text-color);
+    font-size: 14px;
+    box-shadow: var(--shadow-theme-xs);
+    outline: none;
+}
+.perm-search:focus {
+    border-color: var(--brand-500);
+    box-shadow: var(--shadow-focus-ring);
+}
+
 .filter-pill.active {
     border-color: var(--brand-500);
     color: var(--brand-soft-text);

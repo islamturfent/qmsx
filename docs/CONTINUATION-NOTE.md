@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Izinler matrisine filtre/arama (2026-10-08)
+- `permissions.php`'ye eylem arama kutusu + rol kolon filtre pilleri eklendi.
+  Filtre client-side (JS) ile gorunumu gizler; tum toggle'lar DOM'da kalir,
+  boylece kaydetme akisi bozulmaz (gizli eylemlerin override'i kaybolmaz).
+  Tabloya `data-role`, `#permTable` eklendi; CSS (perm-filter-bar/perm-search).
+  cache v132.
+
 ### Denetci Panosu (2026-10-08)
 - `my-audits.php` 4 KPI kartina cikti: Atanan, Devam Eden, Tamamlanan,
   Geciken (tarih bugun oncesi + tamamlanmamis kontrol listesi). Listedeki
