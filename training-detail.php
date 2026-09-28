@@ -307,6 +307,15 @@ $activeNav = "trainings";
                     <strong class="dashboard-card-number detail-card-value"><?= $participantSummary["rate"] ?>%</strong>
                 </div>
             </div>
+            <?php if ((string) ($training["target_competency"] ?? "") !== ""): ?>
+            <div class="dashboard-card metric-violet">
+                <?= appIcon("sparkles", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="trainingCompetencyLabel">Hedef Yetkinlik</span>
+                    <strong class="dashboard-card-number detail-card-value"><?= htmlspecialchars((string) $training["target_competency"], ENT_QUOTES, "UTF-8") ?></strong>
+                </div>
+            </div>
+            <?php endif; ?>
         </section>
 
         <section class="form-panel">

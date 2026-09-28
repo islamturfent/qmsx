@@ -38,8 +38,21 @@ $formData = [
     "trainer_name" => "",
     "planned_date" => "",
     "duration_hours" => "",
-    "description" => ""
+    "description" => "",
+    "template_id" => 0,
+    "target_competency" => ""
 ];
+
+// Şablondan türetme için görünür şirketlerin eğitim şablonları.
+$templates = [];
+if ($allowedCompanyIds) {
+    $tmpIn = implode(',', array_map('intval', $allowedCompanyIds));
+    $templateStmt = $pdo->query(
+        'SELECT id, company_id, title, category, default_duration_hours, target_competency
+         FROM training_templates WHERE active = 1 AND company_id IN (' . $tmpIn . ') ORDER BY title ASC'
+    );
+    $templates = $templateStmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     qmsCsrfVerify($csrfScope, $_POST["csrf"] ?? null);
@@ -52,7 +65,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "trainer_name" => qmsTrainingText($_POST["trainer_name"] ?? "", 150),
         "planned_date" => trim((string) ($_POST["planned_date"] ?? "")),
         "duration_hours" => trim((string) ($_POST["duration_hours"] ?? "")),
-        "description" => qmsTrainingText($_POST["description"] ?? "", 4000)
+        "description" => qmsTrainingText($_POST["description"] ?? "", 4000),
+        "template_id" => (int) ($_POST["template_id"] ?? 0),
+        "target_competency" => qmsTrainingText($_POST["target_competency"] ?? "", 120)
     ];
 
     $plannedDate = qmsTrainingDate($formData["planned_date"]);
@@ -67,13 +82,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($formData["duration_hours"] !== "" && $durationHours === null) {
         $formError = "Süre 0 ile 1000 saat arasında bir sayı olmalıdır.";
     } else {
+        // Seçilen şablon bu şirkete ait mi (tenant güvenliği).
+        $template_id = null;
+        $templateCompetency = $formData["target_competency"];
+        if ($formData["template_id"] > 0) {
+            $tplCheck = $pdo->prepare('SELECT id, target_competency FROM training_templates WHERE id = ? AND company_id = ? AND active = 1');
+            $tplCheck->execute([$formData["template_id"], $formData["company_id"]]);
+            $tpl = $tplCheck->fetch(PDO::FETCH_ASSOC);
+            if ($tpl) {
+                $template_id = (int) $tpl['id'];
+                if ($templateCompetency === '') { $templateCompetency = (string) $tpl['target_competency']; }
+            }
+        }
+
         $insertStmt = $pdo->prepare(
             "INSERT INTO trainings
                 (company_id, title, category, provider, trainer_name, planned_date,
-                 duration_hours, status, description, created_by, updated_by, active)
+                 duration_hours, status, description, created_by, updated_by, active,
+                 template_id, target_competency)
              VALUES
                 (:company_id, :title, :category, :provider, :trainer_name, :planned_date,
-                 :duration_hours, 'planned', :description, :created_by, :updated_by, 1)"
+                 :duration_hours, 'planned', :description, :created_by, :updated_by, 1,
+                 :template_id, :target_competency)"
         );
         $insertStmt->execute([
             "company_id" => $formData["company_id"],
@@ -85,7 +115,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "duration_hours" => $durationHours,
             "description" => $formData["description"] !== "" ? $formData["description"] : null,
             "created_by" => $userId ?: null,
-            "updated_by" => $userId ?: null
+            "updated_by" => $userId ?: null,
+            "template_id" => $template_id,
+            "target_competency" => $templateCompetency
         ]);
 
         $trainingId = (int) $pdo->lastInsertId();
@@ -153,6 +185,23 @@ $activeNav = "trainings";
             <form class="auditor-form" method="post" action="training-create.php">
                 <?= qmsCsrfField($csrfScope) ?>
                 <div class="form-grid">
+                    <?php if ($templates): ?>
+                    <label class="form-field">
+                        <span data-i18n="trainingTemplatePrefillLabel">Şablondan Doldur (isteğe bağlı)</span>
+                        <select name="template_id" id="trainingTemplateSelect">
+                            <option value="0" data-i18n="trainingTemplateNoneOption">— Şablon seçilmedi —</option>
+                            <?php foreach ($templates as $tpl): ?>
+                                <option value="<?= (int) $tpl['id'] ?>"
+                                    data-company="<?= (int) $tpl['company_id'] ?>"
+                                    data-title="<?= htmlspecialchars($tpl['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-category="<?= htmlspecialchars($tpl['category'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-duration="<?= htmlspecialchars((string) $tpl['default_duration_hours'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-competency="<?= htmlspecialchars($tpl['target_competency'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-company-set="<?= (int) $tpl['company_id'] ?>"><?= htmlspecialchars($tpl['title'], ENT_QUOTES, 'UTF-8') ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <?php endif; ?>
                     <label class="form-field">
                         <span data-i18n="companySelectLabel">Şirket</span>
                         <select name="company_id" required>
@@ -186,6 +235,10 @@ $activeNav = "trainings";
                         <span data-i18n="trainingDurationLabel">Süre (saat)</span>
                         <input type="number" name="duration_hours" min="0" max="1000" step="0.5" value="<?= htmlspecialchars($formData["duration_hours"], ENT_QUOTES, "UTF-8") ?>">
                     </label>
+                    <label class="form-field">
+                        <span data-i18n="trainingCompetencyLabel">Hedef Yetkinlik</span>
+                        <input type="text" name="target_competency" id="trainingCompetency" maxlength="120" value="<?= htmlspecialchars($formData["target_competency"], ENT_QUOTES, "UTF-8") ?>">
+                    </label>
                     <label class="form-field form-field-wide">
                         <span data-i18n="trainingDescriptionLabel">Açıklama</span>
                         <textarea name="description" rows="5"><?= htmlspecialchars($formData["description"], ENT_QUOTES, "UTF-8") ?></textarea>
@@ -203,5 +256,24 @@ $activeNav = "trainings";
     <script src="assets/js/language.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script src="assets/js/pwa.js"></script>
+    <script>
+    /* Şablondan eğitim alanlarini doldur (gorsel; is mantigini degistirmez). */
+    (function () {
+        var sel = document.getElementById('trainingTemplateSelect');
+        if (!sel) { return; }
+        var company = document.querySelector('select[name="company_id"]');
+        var f = function (name) { return document.querySelector('input[name="' + name + '"]'); };
+        var title = f('title'), category = f('category'), dur = f('duration_hours'), comp = document.getElementById('trainingCompetency');
+        sel.addEventListener('change', function () {
+            var opt = sel.selectedOptions && sel.selectedOptions[0];
+            if (!opt || !opt.value || opt.value === '0') { return; }
+            if (company && opt.getAttribute('data-company-set')) { company.value = opt.getAttribute('data-company-set'); }
+            if (title && opt.getAttribute('data-title')) { title.value = opt.getAttribute('data-title'); }
+            if (category && opt.getAttribute('data-category')) { category.value = opt.getAttribute('data-category'); }
+            if (dur && opt.getAttribute('data-duration') && opt.getAttribute('data-duration') !== '0') { dur.value = opt.getAttribute('data-duration'); }
+            if (comp && opt.getAttribute('data-competency')) { comp.value = opt.getAttribute('data-competency'); }
+        });
+    })();
+    </script>
 </body>
 </html>

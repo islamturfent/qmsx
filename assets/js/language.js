@@ -3117,6 +3117,14 @@ Object.assign(translations.tr, {
   competencyMatrixKicker: "Personel & Yetkinlik", competencyMatrixText: "Personel bazında yetkinlikler ve vadesi geçen değerlendirmeler.",
   competencyMatrixListTitle: "Personel Yetkinlikleri", competencyMatrixEmpty: "Henüz kayıtlı personel veya yetkinlik yok.",
 });
+Object.assign(translations.tr, {
+  trainingTemplatePrefillLabel: "Şablondan Doldur (isteğe bağlı)", trainingTemplateNoneOption: "— Şablon seçilmedi —",
+  trainingCompetencyLabel: "Hedef Yetkinlik",
+});
+Object.assign(translations.en, {
+  trainingTemplatePrefillLabel: "Fill from Template (optional)", trainingTemplateNoneOption: "— No template selected —",
+  trainingCompetencyLabel: "Target Competency",
+});
 Object.assign(translations.en, {
   trainingTemplatesMenuLabel: "Training Templates", trainingTemplatesTitle: "Training Templates",
   trainingTemplatesKicker: "Training Management", trainingTemplatesText: "Store reusable training definitions.",

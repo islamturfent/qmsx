@@ -1181,6 +1181,14 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Eğitim Şablonu - Eğitim / Yetkinlik entegrasyonu (2026-10-08)
+- Migration: `trainings.template_id` (nullable) + `trainings.target_competency`.
+- `training-create.php`: "Sablondan Doldur" secimi (gorsel JS orn doldurma) +
+  hedef yetkinlik alani. Tenant guvenligi: secilen sablonun sirkete ait oldugu
+  dogrulanir; template_id + target_competency INSERT'e yazilir.
+- `training-detail.php`: hedef yetkinlik KPI karti (target_competency varsa).
+- i18n TR/EN. Lint gecti. cache v136.
+
 ### Metin tarihleri Turkce gun ay yil formatina cevrildi (2026-10-08)
 - Yeni `assets/js/dates.js`: gorunen metin (text node) duzeyinde ISO `YYYY-MM-DD`
   tarihlerini Turkce "15 Mayis 2026" bicimine cevirir. `<input type="date">`
