@@ -3136,6 +3136,14 @@ Object.assign(translations.tr, {
   customerPerformanceKicker: "Teslimat Performansı", customerPerformanceText: "Her müşterinin zamanında teslimat ve red oranının güncel görünümü.",
   customerPerformanceListTitle: "Müşteri Kartları", customerPerformanceEmpty: "Henüz teslimat performansı kaydı yok.",
 });
+Object.assign(translations.tr, {
+  dashboardCompetencyTitle: "Yetkinlik Vadesi Geçenler", dashboardCompetencyText: "Gözden geçirilmesi geciken yetkinlik değerlendirmeleri.",
+  dashboardCompetencyEmpty: "Vadesi geçen yetkinlik yok.",
+});
+Object.assign(translations.en, {
+  dashboardCompetencyTitle: "Overdue Competencies", dashboardCompetencyText: "Competency assessments that are overdue for review.",
+  dashboardCompetencyEmpty: "No overdue competencies.",
+});
 Object.assign(translations.en, {
   customerPerformanceMenuLabel: "Customer Performance", customerPerformanceTitle: "Customer Delivery / Performance",
   customerPerformanceKicker: "Delivery Performance", customerPerformanceText: "Current view of each customer's on-time and rejection rates.",

@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Dashboard Yetkinlik vadesi widget (2026-10-08)
+- `dashboard.php` altina "Yetkinlik Vadesi Gecenler" console-card eklendi
+  (staff_members uzerinden sirket scope; kisi + yetkinlik + sirket + vade listesi,
+  Yetkinlik Matrisi linki). Bosken "Vadesi gecen yetkinlik yok." gosterir.
+- i18n TR/EN. Render test gecti. cache v144.
+
 ### Dashboard rapor entegrasyonu: Yetkinlik vadesi (2026-10-08)
 - Sirket panosu KPI'lari (NC/sikayet/risk/dokuman) ve musteri performansi
   (delivery) rapor export'ta zaten mevcuttu; eksik olan Yetkinlik vadesi eklendi.
