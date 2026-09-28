@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     } elseif ($formType === "attachment_add") {
         $target = (int) ($_POST["contract_id"] ?? 0);
-        qmsContractAddAttachment($pdo, $target, $_FILES["attachment_file"] ?? [], $userId, $role);
+        qmsContractAddAttachments($pdo, $target, $_FILES["attachment_files"] ?? [], $userId, $role);
         header("Location: contracts.php?manage=" . $target . "&fileadded=1");
         exit;
     } elseif ($formType === "attachment_delete") {
@@ -162,7 +162,7 @@ if ($editing) {
                 <input type="hidden" name="form_type" value="attachment_add">
                 <input type="hidden" name="contract_id" value="<?= (int) $manageId ?>">
                 <div class="form-grid">
-                    <label class="form-field form-field-wide"><span data-i18n="contractFileLabel">Dosya Yükle</span><input type="file" name="attachment_file" required><small data-i18n="contractFileHelp">PDF, Word, Excel veya diğer; en fazla 10 MB.</small></label>
+                    <label class="form-field form-field-wide"><span data-i18n="contractFileLabel">Dosya Yükle</span><input type="file" name="attachment_files[]" multiple required><small data-i18n="contractFileHelp">PDF, Word, Excel veya diğer; her biri en fazla 10 MB, birden fazla seçilebilir.</small></label>
                 </div>
                 <div class="form-actions"><button class="primary-button" type="submit" data-i18n="contractUpload">Yükle</button></div>
             </form>

@@ -1181,6 +1181,14 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Sozlesme coklu dosya yukleme (2026-10-08)
+- `qmsContractAddAttachments()` eklendi: `$_FILES["attachment_files"]` (name[],
+  tmp_name[]) icerisindeki her dosyayi tek tek isler, kac tanesinin eklendigini
+  doner. Tekli `qmsContractAddAttachment` korundu.
+- `contracts.php`: dosya input `multiple` yapildi (`attachment_files[]`); POST
+  coklu fonksiyonu cagirir. Mevcut tek dosya akisi/limitleri (10 MB) korunur.
+  contract-attachments testi 7/7 gecti. cache v140.
+
 ### Yetkinlik vade bildirimi (notify-overdue entegrasyonu) (2026-10-08)
 - `scripts/notify-overdue.php`'ye `overdue_competency` bolumu eklendi: vadesi gecen
   yetkinlikler (staff_competencies.next_assessment_date < bugun) icin bildirim

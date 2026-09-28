@@ -195,6 +195,39 @@ function qmsContractAddAttachment(PDO $pdo, int $contractId, array $file, int $u
     return true;
 }
 
+/**
+ * Coklu dosya yukleme: $_FILES["attachment_files"] (name[], tmp_name[] ...)
+ * icerisindeki her dosyayi tek tek isler; kac tanesinin eklendigini doner.
+ */
+function qmsContractAddAttachments(PDO $pdo, int $contractId, array $files, int $userId, string $role): int
+{
+    if (!qmsContractFind($pdo, $contractId, $userId, $role)) {
+        return 0;
+    }
+    $names = $files['name'] ?? [];
+    if (!is_array($names)) {
+        $names = [$names];
+    }
+    $added = 0;
+    for ($i = 0; $i < count($names); $i++) {
+        $tmp = $files['tmp_name'] ?? '';
+        $types = $files['type'] ?? '';
+        $errors = $files['error'] ?? UPLOAD_ERR_NO_FILE;
+        $sizes = $files['size'] ?? 0;
+        $one = [
+            'name' => $names[$i] ?? null,
+            'tmp_name' => is_array($tmp) ? ($tmp[$i] ?? null) : null,
+            'type' => is_array($types) ? ($types[$i] ?? null) : null,
+            'error' => is_array($errors) ? ($errors[$i] ?? UPLOAD_ERR_NO_FILE) : (int) $errors,
+            'size' => is_array($sizes) ? ((int) ($sizes[$i] ?? 0)) : (int) $sizes,
+        ];
+        if (qmsContractAddAttachment($pdo, $contractId, $one, $userId, $role)) {
+            $added++;
+        }
+    }
+    return $added;
+}
+
 /** Sözlesme dosyasini siler (kapsam icinde olmali). */
 function qmsContractDeleteAttachment(PDO $pdo, int $attId, int $userId, string $role): bool
 {
