@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Dashboard rapor entegrasyonu: Yetkinlik vadesi (2026-10-08)
+- Sirket panosu KPI'lari (NC/sikayet/risk/dokuman) ve musteri performansi
+  (delivery) rapor export'ta zaten mevcuttu; eksik olan Yetkinlik vadesi eklendi.
+- `report-export-data.php`: `competency_overdue_list` (vadesi gecen yetkinlikler,
+  sirket scope `s.company_id`).
+- `report-export-xlsx.php`: "Yetkinlik Vade" worksheet.
+- `report-export-pdf.php`: "Yetkinlik Vadesi" tablo bolumu.
+- report-export-data testi 23/23 gecti. cache v143.
+
 ### Denetim izi sozuyle + Bildirim merkezi (2026-10-08)
 - Denetim izi raporu sebeni: `qmsAuditLogList`'e `actor_user_id` filtresi;
   audit-trail-report.php'ye Kullanici (aktor) filtre dropdown'i + export

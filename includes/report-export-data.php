@@ -1111,6 +1111,29 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         ];
     }
 
+    // Vadesi gecen yetkinlik degerlendirmeleri (personel bazinda).
+    $compScope = qmsCompanyScope('s.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+    $compScopeSql = $compScope['sql'];
+    $compScopeParams = $compScope['params'];
+    $competencyOverdueList = [];
+    $compStmt = $pdo->prepare(
+        "SELECT s.first_name, s.last_name, co.company_name, sc.competency_name, sc.next_assessment_date
+         FROM staff_competencies sc
+         INNER JOIN staff_members s ON s.id = sc.staff_id
+         INNER JOIN companies co ON co.id = s.company_id
+         WHERE sc.active = 1 AND sc.next_assessment_date IS NOT NULL AND sc.next_assessment_date < ?"
+        . $compScopeSql
+    );
+    $compStmt->execute(array_merge([date('Y-m-d')], $compScopeParams));
+    foreach ($compStmt->fetchAll(PDO::FETCH_ASSOC) as $compRow) {
+        $competencyOverdueList[] = [
+            'person' => trim((string) $compRow['first_name'] . ' ' . (string) $compRow['last_name']),
+            'company' => (string) $compRow['company_name'],
+            'competency' => (string) $compRow['competency_name'],
+            'due_date' => (string) $compRow['next_assessment_date'],
+        ];
+    }
+
     return [
         'start_date' => $startDate,
         'end_date' => $endDate,
@@ -1144,6 +1167,7 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'instrument_list' => $instrumentList,
         'incident_list' => $incidentList,
         'delivery_list' => $deliveryList,
+        'competency_overdue_list' => $competencyOverdueList,
         'calibration_list' => $calibrationList,
         'audit_trail_list' => $auditTrailList,
         'audit_trail_entity' => $auditAgg['entity'],

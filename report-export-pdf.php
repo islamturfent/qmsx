@@ -262,6 +262,12 @@ foreach ($report['calibration_list'] as $row) {
         . $escape($row['due_date'] ?? '') . '</td><td>' . $escape($row['cert_number'] ?? '-') . '</td></tr>';
 }
 
+$competencyRows = '';
+foreach (($report['competency_overdue_list'] ?? []) as $crow) {
+    $competencyRows .= '<tr><td>' . $escape($crow['company']) . '</td><td>' . $escape($crow['person']) . '</td><td>'
+        . $escape($crow['competency']) . '</td><td>' . $escape($crow['due_date']) . '</td></tr>';
+}
+
 $deliveryRows = '';
 foreach ($report['delivery_list'] as $row) {
     $deliveryRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['customer_name']) . '</td><td>'
@@ -396,6 +402,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Ölçü Aletleri', '<th>Şirket</th><th>Alet</th><th>Tip</th><th>Konum</th><th>Sonraki Kalib.</th><th>Durum</th>', $instrumentRows)
     . $detailSection('Olay Raporlama', '<th>Şirket</th><th>Olay</th><th>Tür</th><th>Şiddet</th><th>Tarih</th><th>Durum</th>', $incidentRows)
     . $detailSection('Teslimat Performansı', '<th>Şirket</th><th>Müşteri</th><th>Dönem</th><th>Sipariş</th><th>Zamanında (%)</th><th>Reddedilen</th>', $deliveryRows)
+    . $detailSection('Yetkinlik Vadesi', '<th>Şirket</th><th>Personel</th><th>Yetkinlik</th><th>Vade</th>', $competencyRows)
     . $detailSection('Kalibrasyonlar', '<th>Şirket</th><th>Alet</th><th>Sonuç</th><th>Tarih</th><th>Sonraki</th><th>Sertifika No</th>', $calibrationRows)
     . $detailSection('Denetim İzi', '<th>Şirket</th><th>Kişi</th><th>Kayıt Türü</th><th>İşlem</th><th>Özet</th><th>Tarih</th>', $auditTrailRows)
     . '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div>

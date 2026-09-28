@@ -633,6 +633,21 @@ foreach ($report['incident_list'] as $row) {
     ];
 }
 
+$competencyOverdueRows = [[
+    ['value' => 'Şirket', 'style' => 2],
+    ['value' => 'Personel', 'style' => 2],
+    ['value' => 'Yetkinlik', 'style' => 2],
+    ['value' => 'Vade', 'style' => 2],
+]];
+foreach (($report['competency_overdue_list'] ?? []) as $crow) {
+    $competencyOverdueRows[] = [
+        ['value' => $crow['company'], 'style' => 3],
+        ['value' => $crow['person'], 'style' => 3],
+        ['value' => $crow['competency'], 'style' => 3],
+        ['value' => $crow['due_date'], 'style' => 3],
+    ];
+}
+
 $deliveryRows = [[
     ['value' => 'Şirket', 'style' => 2],
     ['value' => 'Müşteri', 'style' => 2],
@@ -732,6 +747,7 @@ try {
         ['name' => 'Teslimat', 'xml' => xlsxWorksheet($deliveryRows, [28, 28, 12, 12, 14, 16, 16, 18])],
         ['name' => 'Kalibrasyonlar', 'xml' => xlsxWorksheet($calibrationRows, [28, 28, 18, 14, 14, 14, 24, 18, 20])],
         ['name' => 'Denetim İzi', 'xml' => xlsxWorksheet($auditTrailRows, [28, 22, 24, 18, 50, 20])],
+        ['name' => 'Yetkinlik Vade', 'xml' => xlsxWorksheet($competencyOverdueRows, [28, 28, 34, 16])],
     ], $temporaryPath);
 
     $filename = 'qms-yonetim-raporu-' . date('Y-m-d') . '.xlsx';
