@@ -1181,6 +1181,17 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### RBAC kalici test eklenmesi (2026-10-08)
+- `tests/permissions.php` 17 -> 24 kontrol olarak genisletildi: yeni sol menü
+  yüzey eylemlerinin varsayilan rolleri, `search.view` kaldirildigi,
+  override kaydetme/uygulama akisi (operations.view kapatilinca system_admin
+  erisemez, approvals.manage acilinca company_user erisebilir) ve süper admin'in
+  override ile kisitlanmadigi. Test, mevcut override'lari koruyup kendi test
+  degerlerini temizler.
+- `qmsPermissionOverrides()` cagrisina test amaci `$forceReload` parametresi
+  eklendi (cache'i yeniden yukler; varsayilan davranis degismez). 24/24 gecti.
+  cache v128.
+
 ### permissions.php Kaydet dugmesi bosluk duzeltmesi (2026-10-08)
 - `.report-table-wrap + .form-actions { margin-top: 16px }` eklendi; Izinler
   sayfasinda "Izinleri Kaydet" dugmesi artik ustteki matris kutusuna degmiyor.

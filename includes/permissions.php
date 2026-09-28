@@ -55,11 +55,14 @@ function qmsPermissions(): array
  *
  * @return array<string, array<string, bool>> action -> role -> allowed
  */
-function qmsPermissionOverrides(?PDO $pdo = null): array
+function qmsPermissionOverrides(?PDO $pdo = null, bool $forceReload = false): array
 {
     static $cache = null;
-    if ($cache !== null) {
+    if ($cache !== null && !$forceReload) {
         return $cache;
+    }
+    if ($forceReload) {
+        $cache = null;
     }
     $cache = [];
     $pdo = $pdo ?? ($GLOBALS['pdo'] ?? null);
