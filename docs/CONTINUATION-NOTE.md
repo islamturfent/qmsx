@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### notify-overdue e-posta bildirimi (2026-10-08)
+- `scripts/notify-overdue.php` `$notify` closure'i artik bildirim uretirken ilgili
+  kullanicinin e-postasina da gonderir (mail yapilandirmasi etkinse: config/mail.php
+  enabled true + host tanimli). mailer require eklendi. E-posta hatasi bildirim
+  uretimini bozmaz. notify-overdue testi 15/15. cache v146.
+
 ### Dashboard Donem Ozeti blogu + Denetim izi baglantisi (2026-10-08)
 - Donem Ozeti konsol karti: Sirket Panosu KPI'lari (acik NC/sikayet/risk, aktif
   dokuman, dolan sozlesme, gecik kalibrasyon) + Musteri & Yetkinlik (dusuk

@@ -17,6 +17,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
 require_once dirname(__DIR__) . '/config/database.php';
 require_once dirname(__DIR__) . '/includes/notifications.php';
+require_once dirname(__DIR__) . '/includes/mailer.php';
 
 // --all: her geciken kayit icin ilgili sirketin TUM aktif kullanicilarina
 // (sorumlu ve adminler dahil) da bildirim bas; varsayilan mod yalnizca sorumlu
@@ -56,6 +57,21 @@ $notify = static function (PDO $pdo, int $userId, string $type, string $message,
     }
     qmsNotify($pdo, $userId, $type, 'Geciken kayıt', $message, $link);
     $stats[$type] = ($stats[$type] ?? 0) + 1;
+
+    // E-posta (mail yapilandirmasi etkinse): ilgili kullanicinin e-postasina.
+    if (function_exists('qmsMailSend') && function_exists('qmsMailNotificationContent')) {
+        try {
+            $ue = $pdo->prepare('SELECT email, full_name FROM users WHERE id = ? AND active = 1');
+            $ue->execute([$userId]);
+            $usr = $ue->fetch(PDO::FETCH_ASSOC);
+            if ($usr && !empty($usr['email'])) {
+                $content = qmsMailNotificationContent('QuAmi · Geciken kayıt bildirimi', $message, $link, 'Geciken');
+                qmsMailSend($usr['email'], $usr['full_name'] ?: null, (string) $content['subject'], (string) $content['html'], (string) $content['plain']);
+            }
+        } catch (Throwable $e) {
+            // E-posta hatasi bildirim uretimini bozmaz.
+        }
+    }
 };
 
 /** Sirket sistem adminlerine (kullanici basina) dedupli bildirim ekler. */
