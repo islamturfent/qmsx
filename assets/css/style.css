@@ -4484,3 +4484,46 @@ input[type="checkbox"]:focus-visible {
         font-size: 10px;
     }
 }
+
+/* Denetim calisma yuzeyi (audit execution bar) */
+.audit-execution-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.audit-execution-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    flex: 1 1 auto;
+    min-width: 240px;
+}
+.audit-execution-info .status-pill {
+    font-size: 14px;
+    padding: 6px 14px;
+}
+.execution-progress {
+    flex: 1 1 220px;
+    min-width: 200px;
+}
+.audit-execution-dates {
+    font-size: 13px;
+    color: var(--sidebar-text, #64748b);
+}
+.audit-execution-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.audit-execution-actions form {
+    margin: 0;
+}
+@media (max-width: 720px) {
+    .audit-execution-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

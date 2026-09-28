@@ -1961,6 +1961,16 @@ per-column emphasis, so uniform gray-500 reads washed out.
   `tests/permissions.php` was hardened to snapshot live `permission_overrides`, run
   default-behaviour assertions against a clean set, then restore the real rows; it is
   26/26 and never touches the user's saved permissions. Cache `v148`.
+- Auditor execution workspace is **added** (2026-10): `audit-detail.php` now carries a
+  real denetim yasam dongusu - an assigned auditor / management / company admin can
+  **Baslat** (status -> `in_progress`, sets `started_at`), **Tamamla** (status -> `done`,
+  sets `completed_at`, blocked while any checklist item is still `pending`), and
+  **Yeniden Ac** (back to `in_progress`, clears `completed_at`). An execution progress
+  bar + status pill + dates sit at the top of the audit detail page, and the auditor
+  role gate reads `my_audits.view` through RBAC. Migration
+  `20261010-audit-execution.sql` adds `audits.started_at` / `audits.completed_at`;
+  `tests/audit-execution.php` (7/7) covers the lifecycle; `my-audits.php` cards now
+  show a friendly status label. Cache `v149`.
 
 ## Working preferences
 

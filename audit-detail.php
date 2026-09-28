@@ -9,6 +9,8 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
+require_once __DIR__ . '/includes/permissions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 require_once __DIR__ . '/includes/checklist-template-functions.php';
 
 $auditId = (int) ($_GET["id"] ?? 0);
@@ -22,7 +24,8 @@ $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $isSuperAdmin = ($_SESSION["qms_role"] ?? "") === "super_admin";
 
 $sql = "SELECT audits.id, audits.company_id, audits.title, audits.audit_type,
-            audits.planned_date, audits.status, audits.active, companies.company_name
+            audits.planned_date, audits.status, audits.active, audits.started_at, audits.completed_at,
+            companies.company_name
      FROM audits
      INNER JOIN companies ON companies.id = audits.company_id
      WHERE audits.id = ?";
@@ -40,6 +43,34 @@ if (!$audit) {
     header("Location: dashboard.php");
     exit;
 }
+
+// Denetci rolu icin calisma yuzeyi RBAC iznine baglidir.
+if (qmsIsAuditor() && !qmsCanSession('my_audits.view')) {
+    header("Location: dashboard.php");
+    exit;
+}
+
+$currentRole = qmsCurrentRole();
+$isManagement = in_array($currentRole, ["super_admin", "system_admin"], true);
+$isAssignedAuditor = false;
+if ($currentRole === 'auditor') {
+    $assignedStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM audit_auditors
+         INNER JOIN auditors ON auditors.id = audit_auditors.auditor_id
+         WHERE audit_auditors.audit_id = :audit_id
+           AND auditors.user_id = :user_id AND auditors.active = 1"
+    );
+    $assignedStmt->execute(["audit_id" => $auditId, "user_id" => $userId]);
+    $isAssignedAuditor = (int) $assignedStmt->fetchColumn() > 0;
+}
+// Denetimi yurutebilecekler: yonetim, atanan denetci ve sirket yoneticisi.
+$canExecute = $isManagement || $isAssignedAuditor || $currentRole === 'company_user';
+
+$auditStatusLabels = [
+    'planned' => 'Planlandı',
+    'in_progress' => 'Devam Ediyor',
+    'done' => 'Tamamlandı',
+];
 
 $formError = "";
 $allowedResults = ["pending", "compliant", "noncompliant", "not_applicable"];
@@ -95,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    if ($formType === "create_checklist_item") {
+    if ($canExecute && $formType === "create_checklist_item") {
         $itemText = trim($_POST["item_text"] ?? "");
         $requirementRef = trim($_POST["requirement_ref"] ?? "");
         $notes = trim($_POST["notes"] ?? "");
@@ -131,7 +162,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $formError = "Şablon seçilmedi.";
     }
 
-    if ($formType === "update_checklist_item") {
+    if ($canExecute && $formType === "update_checklist_item") {
         $itemId = (int) ($_POST["item_id"] ?? 0);
         $resultStatus = $_POST["result_status"] ?? "pending";
         $notes = trim($_POST["notes"] ?? "");
@@ -156,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $formError = "Kontrol maddesi güncellenemedi.";
     }
 
-    if ($formType === "create_nonconformity") {
+    if ($canExecute && $formType === "create_nonconformity") {
         $itemId = (int) ($_POST["item_id"] ?? 0);
         $itemStmt = $pdo->prepare(
             "SELECT id, item_text, notes
@@ -190,6 +221,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         $formError = "Yalnızca uygunsuz kontrol maddeleri dönüştürülebilir.";
+    }
+
+    if ($canExecute && $formType === "start_audit") {
+        $pdo->prepare("UPDATE audits SET status = 'in_progress', started_at = COALESCE(started_at, NOW()) WHERE id = :id")->execute(["id" => $auditId]);
+        qmsAuditLog($pdo, (int) $audit["company_id"], $userId, 'audit', $auditId, 'start', 'Denetim başlatıldı: ' . $audit["title"]);
+        header("Location: audit-detail.php?id=" . $auditId . "&started=1");
+        exit;
+    }
+
+    if ($canExecute && $formType === "complete_audit") {
+        $pendingStmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM audit_checklist_items
+             WHERE audit_id = :audit_id AND active = 1 AND result_status = 'pending'"
+        );
+        $pendingStmt->execute(["audit_id" => $auditId]);
+        if ((int) $pendingStmt->fetchColumn() > 0) {
+            $formError = "Tüm kontrol maddeleri değerlendirilmeden denetim tamamlanamaz.";
+        } else {
+            $pdo->prepare("UPDATE audits SET status = 'done', completed_at = NOW() WHERE id = :id")->execute(["id" => $auditId]);
+            qmsAuditLog($pdo, (int) $audit["company_id"], $userId, 'audit', $auditId, 'complete', 'Denetim tamamlandı: ' . $audit["title"]);
+            header("Location: audit-detail.php?id=" . $auditId . "&completed=1");
+            exit;
+        }
+    }
+
+    if ($canExecute && $formType === "reopen_audit") {
+        $pdo->prepare("UPDATE audits SET status = 'in_progress', completed_at = NULL WHERE id = :id")->execute(["id" => $auditId]);
+        qmsAuditLog($pdo, (int) $audit["company_id"], $userId, 'audit', $auditId, 'reopen', 'Denetim yeniden açıldı: ' . $audit["title"]);
+        header("Location: audit-detail.php?id=" . $auditId . "&reopened=1");
+        exit;
     }
 }
 
@@ -241,6 +302,15 @@ foreach ($checklistItems as $item) {
         $checklistCounts["noncompliant"]++;
     }
 }
+
+$execChecklistTotal = (int) $checklistCounts["total"];
+$execPending = 0;
+foreach ($checklistItems as $item) {
+    if ($item["result_status"] === "pending") {
+        $execPending++;
+    }
+}
+$execProgress = $execChecklistTotal > 0 ? (int) round((($execChecklistTotal - $execPending) / $execChecklistTotal) * 100) : 0;
 
 $nonconformitiesStmt = $pdo->prepare(
     "SELECT id, checklist_item_id, title, severity, status, due_date, responsible_person
@@ -321,6 +391,54 @@ $resultLabels = [
                     <a class="secondary-button" href="company-detail.php?id=<?= (int) $audit["company_id"] ?>" data-i18n="backToCompanyButton">Şirkete Dön</a>
                 </div>
             </div>
+        </section>
+
+        <section class="console-card audit-execution-bar">
+            <?php if (isset($_GET["started"])): ?>
+                <div class="form-message success" data-i18n="auditStartedMessage">Denetim başlatıldı.</div>
+            <?php elseif (isset($_GET["completed"])): ?>
+                <div class="form-message success" data-i18n="auditCompletedMessage">Denetim tamamlandı.</div>
+            <?php elseif (isset($_GET["reopened"])): ?>
+                <div class="form-message success" data-i18n="auditReopenedMessage">Denetim yeniden açıldı.</div>
+            <?php endif; ?>
+            <div class="audit-execution-info">
+                <div>
+                    <span class="dashboard-card-label" data-i18n="auditExecutionStatusLabel">Denetim Durumu</span>
+                    <strong class="status-pill" data-i18n="<?= 'auditStatus_' . $audit["status"] ?? '' ?>"><?= htmlspecialchars($auditStatusLabels[$audit["status"]] ?? $audit["status"], ENT_QUOTES, "UTF-8") ?></strong>
+                </div>
+                <div class="status-chart-row execution-progress">
+                    <span data-i18n="auditExecutionProgressLabel">Kontrol listesi değerlendirme</span>
+                    <div class="table-progress"><i style="width: <?= $execProgress ?>%"></i></div>
+                    <strong><?= ($execChecklistTotal - $execPending) ?>/<?= $execChecklistTotal ?></strong>
+                </div>
+                <div class="audit-execution-dates">
+                    <?php if (!empty($audit["started_at"])): ?><span data-i18n="auditStartedLabel">Başlangıç</span> · <?= htmlspecialchars($audit["started_at"], ENT_QUOTES, "UTF-8") ?><?php endif; ?>
+                    <?php if (!empty($audit["completed_at"])): ?> · <span data-i18n="auditCompletedAtLabel">Tamamlandı</span> <?= htmlspecialchars($audit["completed_at"], ENT_QUOTES, "UTF-8") ?><?php endif; ?>
+                </div>
+            </div>
+            <?php if ($canExecute): ?>
+            <div class="audit-execution-actions">
+                <?php if ($audit["status"] === "planned"): ?>
+                    <form method="post" action="audit-detail.php?id=<?= $auditId ?>">
+                        <?= qmsCsrfField('audit_detail') ?>
+                        <input type="hidden" name="form_type" value="start_audit">
+                        <button class="primary-button" type="submit" data-i18n="startAuditButton">Denetimi Başlat</button>
+                    </form>
+                <?php elseif ($audit["status"] === "in_progress"): ?>
+                    <form method="post" action="audit-detail.php?id=<?= $auditId ?>">
+                        <?= qmsCsrfField('audit_detail') ?>
+                        <input type="hidden" name="form_type" value="complete_audit">
+                        <button class="primary-button" type="submit" data-i18n="completeAuditButton">Denetimi Tamamla</button>
+                    </form>
+                <?php elseif ($audit["status"] === "done"): ?>
+                    <form method="post" action="audit-detail.php?id=<?= $auditId ?>">
+                        <?= qmsCsrfField('audit_detail') ?>
+                        <input type="hidden" name="form_type" value="reopen_audit">
+                        <button class="secondary-button" type="submit" data-i18n="reopenAuditButton">Yeniden Aç</button>
+                    </form>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </section>
 
         <section class="dashboard-grid">

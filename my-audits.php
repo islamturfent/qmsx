@@ -42,6 +42,7 @@ $pendingAssigned = 0;
 $completedAssigned = 0;
 $overdueAssigned = 0;
 $today = date('Y-m-d');
+$auditStatusLabels = ['planned' => 'Planlandı', 'in_progress' => 'Devam Ediyor', 'done' => 'Tamamlandı'];
 foreach ($audits as $assignedAudit) {
     $total = (int) $assignedAudit['checklist_total'];
     $done  = (int) $assignedAudit['checklist_done'];
@@ -137,7 +138,7 @@ $activeNav = "my_audits";
                         <a class="record-card document-card" href="audit-detail.php?id=<?= (int) $audit["id"] ?>">
                             <div class="record-card-topline">
                                 <span><?= htmlspecialchars($audit["company_name"], ENT_QUOTES, "UTF-8") ?></span>
-                                <span class="status-badge"><?= htmlspecialchars($audit["status"], ENT_QUOTES, "UTF-8") ?></span>
+                                <span class="status-badge" data-i18n="<?= 'auditStatus_' . $audit["status"] ?? '' ?>"><?= htmlspecialchars($auditStatusLabels[$audit["status"]] ?? $audit["status"], ENT_QUOTES, "UTF-8") ?></span>
                                 <?php if ($checklistTotal > 0 && $checklistDone < $checklistTotal && !empty($audit["planned_date"]) && $audit["planned_date"] < $today): ?>
                                     <span class="record-card-label danger-text" data-i18n="myAuditOverdueTag">Gecikti</span>
                                 <?php endif; ?>
