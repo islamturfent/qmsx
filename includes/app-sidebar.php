@@ -424,3 +424,4 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
     </nav>
 </aside>
 <script src="assets/js/dates.js"></script>
+<script src="assets/js/searchable-select.js"></script>

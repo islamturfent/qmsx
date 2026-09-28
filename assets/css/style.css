@@ -4215,6 +4215,89 @@ input[type="checkbox"]:focus-visible {
     color: var(--brand-600);
 }
 
+/* Arama yapilabilir select (bileşen) */
+.sb-searchable {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    min-width: 160px;
+}
+.sb-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background: var(--control-bg-color);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--shadow-theme-xs);
+}
+.sb-trigger:hover {
+    border-color: var(--brand-500);
+}
+.sb-trigger:focus-visible {
+    outline: none;
+    border-color: var(--brand-500);
+    box-shadow: var(--shadow-focus-ring);
+}
+.sb-chevron {
+    color: var(--muted-color);
+    font-size: 12px;
+}
+.sb-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--surface-color);
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-theme-md, 0 10px 30px rgba(0, 0, 0, 0.12));
+    overflow: hidden;
+}
+.sb-search {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    background: transparent;
+    color: var(--text-color);
+    font-size: 14px;
+    outline: none;
+}
+.sb-options {
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+}
+.sb-option {
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-body);
+    cursor: pointer;
+}
+.sb-option:hover {
+    background: var(--brand-soft);
+}
+.sb-option.is-selected {
+    background: var(--brand-soft);
+    color: var(--brand-soft-text);
+    font-weight: 600;
+}
+
 /* Yetkinlik matrisi: yetkinlik cipleri */
 .competency-chips {
     display: flex;

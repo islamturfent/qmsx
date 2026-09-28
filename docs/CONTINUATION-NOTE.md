@@ -1181,6 +1181,14 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Arama yapilabilir dropdown (Secenek A) (2026-10-08)
+- Yeni `assets/js/searchable-select.js`: 4+ secenekli `<select>` elemanlarini
+  acilinca en ustte "Ara..." kutusu olan ozel listeye donusturur. Native select
+  gizli kalir, secimi onun value/change'ine yazar (form gonderimi/is mantigi
+  bozulmaz). Kucuk (<4 secenek) listeler native kalir.
+- CSS: .sb-searchable/.sb-trigger/.sb-list/.sb-search/.sb-option (token tabanli).
+- `app-sidebar.php` uzerinden tum sayfalara dahil edildi. cache v138.
+
 ### Egitim Sablonu sirket dropdown bos + Kaydet bosluk (2026-10-08)
 - `qmsVisibleCompanyIds()` super admin icin null doner (kisit yok = tumu);
   kod null'i "sirket yok" gibi isliyordu -> sirket dropdown bos cikiyordu.
