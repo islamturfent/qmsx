@@ -39,9 +39,20 @@ $audits = $auditsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $totalAssigned = count($audits);
 $pendingAssigned = 0;
+$completedAssigned = 0;
+$overdueAssigned = 0;
+$today = date('Y-m-d');
 foreach ($audits as $assignedAudit) {
-    if ((int) $assignedAudit["checklist_done"] < (int) $assignedAudit["checklist_total"]) {
+    $total = (int) $assignedAudit['checklist_total'];
+    $done  = (int) $assignedAudit['checklist_done'];
+    if ($done < $total) {
         $pendingAssigned++;
+    }
+    if ($total > 0 && $done >= $total) {
+        $completedAssigned++;
+    }
+    if ($done < $total && !empty($assignedAudit['planned_date']) && $assignedAudit['planned_date'] < $today) {
+        $overdueAssigned++;
     }
 }
 
@@ -95,6 +106,20 @@ $activeNav = "my_audits";
                     <strong class="dashboard-card-number"><?= $pendingAssigned ?></strong>
                 </div>
             </div>
+            <div class="dashboard-card metric-green">
+                <?= appIcon("check", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="myAuditsCompletedLabel">Tamamlanan</span>
+                    <strong class="dashboard-card-number"><?= $completedAssigned ?></strong>
+                </div>
+            </div>
+            <div class="dashboard-card metric-red">
+                <?= appIcon("alert", "dashboard-card-icon") ?>
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label" data-i18n="myAuditsOverdueLabel">Geciken</span>
+                    <strong class="dashboard-card-number"><?= $overdueAssigned ?></strong>
+                </div>
+            </div>
         </section>
 
         <section class="page-section">
@@ -113,6 +138,9 @@ $activeNav = "my_audits";
                             <div class="record-card-topline">
                                 <span><?= htmlspecialchars($audit["company_name"], ENT_QUOTES, "UTF-8") ?></span>
                                 <span class="status-badge"><?= htmlspecialchars($audit["status"], ENT_QUOTES, "UTF-8") ?></span>
+                                <?php if ($checklistTotal > 0 && $checklistDone < $checklistTotal && !empty($audit["planned_date"]) && $audit["planned_date"] < $today): ?>
+                                    <span class="record-card-label danger-text" data-i18n="myAuditOverdueTag">Gecikti</span>
+                                <?php endif; ?>
                             </div>
                             <h3><?= htmlspecialchars($audit["title"], ENT_QUOTES, "UTF-8") ?></h3>
                             <p><?= htmlspecialchars($audit["audit_type"] ?: "-", ENT_QUOTES, "UTF-8") ?> · <?= htmlspecialchars($audit["planned_date"] ?: "-", ENT_QUOTES, "UTF-8") ?></p>

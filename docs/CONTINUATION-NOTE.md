@@ -1181,6 +1181,12 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Denetci Panosu (2026-10-08)
+- `my-audits.php` 4 KPI kartina cikti: Atanan, Devam Eden, Tamamlanan,
+  Geciken (tarih bugun oncesi + tamamlanmamis kontrol listesi). Listedeki
+  geciken denetim kartlarina "Gecikti" rozeti eklendi (gorsel; fonksiyonlara
+  dokunulmadi). i18n TR/EN. cache v131.
+
 ### Sirket Kullanicisi Sirket Panosu (Secenek A) (2026-10-08)
 - Yeni sayfa `company-overview.php`: sirket kullanicisinin kendi sirketine ozel
   baslangic panosu (acik uygunsuzluk/sikayet/risk, aktif dokuman, kalibrasyon
