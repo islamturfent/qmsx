@@ -423,3 +423,4 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         <?php endif; ?>
     </nav>
 </aside>
+<script src="assets/js/dates.js"></script>

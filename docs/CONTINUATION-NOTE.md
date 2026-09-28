@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Metin tarihleri Turkce gun ay yil formatina cevrildi (2026-10-08)
+- Yeni `assets/js/dates.js`: gorunen metin (text node) duzeyinde ISO `YYYY-MM-DD`
+  tarihlerini Turkce "15 Mayis 2026" bicimine cevirir. `<input type="date">`
+  degerine ve form gizli alanlarina dokunmaz (backend ISO okumaya devam eder).
+- `app-sidebar.php` sonuna dates.js dahil edildi (sidebar her sayfada oldugundan
+  tum sayfalarda geçerli). Fonksiyonlara/is mantigina dokunulmadi. cache v135.
+
 ### Egitim detay katilimci dugmeleri bosluk duzeltmesi (2026-10-08)
 - `.checklist-item-form .form-actions { margin-top: 14px }` eklendi; Egitim
   detay sayfasinda "Katilimciyi Kaydet" ve "Kaldir" dugmeleri artik ustteki edit
