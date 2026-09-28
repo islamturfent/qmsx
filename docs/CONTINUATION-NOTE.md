@@ -1181,6 +1181,13 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### dashboard musteri performans SQL hatasi duzeltmesi (2026-10-08)
+- dashboard.php Donem Ozeti musteri sorgusu `$pdo->query()` ile calistiriliyordu
+  ama `$scopeClause` parametreli (`IN (?)`) idi; system_admin gibi scope-u dolu
+  kullanicida placeholder doldurulamadigi icin SQL hatasi veriyordu. Sorgu
+  `prepare + execute($scopeParams)` yapildi. system_admin render testi gecti.
+  cache v147.
+
 ### notify-overdue e-posta bildirimi (2026-10-08)
 - `scripts/notify-overdue.php` `$notify` closure'i artik bildirim uretirken ilgili
   kullanicinin e-postasina da gonderir (mail yapilandirmasi etkinse: config/mail.php

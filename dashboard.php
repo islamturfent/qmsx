@@ -119,10 +119,11 @@ $dashCalib = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND n
 $dashLowCustomers = 0;
 $dashRejectTotal = 0;
 $dashDeliverQty = 0;
-$delivStmt = $pdo->query(
+$delivStmt = $pdo->prepare(
     "SELECT customer_name, SUM(quantity_delivered) qd, SUM(quantity_rejected) qr
      FROM delivery_performance WHERE active = 1" . $scopeClause . " GROUP BY customer_name, company_id"
 );
+$delivStmt->execute($scopeParams);
 foreach ($delivStmt as $drow) {
     $dashDeliverQty += (int) $drow['qd'];
     $dashRejectTotal += (int) $drow['qr'];
