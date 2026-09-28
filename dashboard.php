@@ -106,6 +106,32 @@ $compStmt = $pdo->prepare(
 );
 $compStmt->execute($compScope['params']);
 $dashboardCompetencyOverdue = $compStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Donem Ozeti: sirket panosu KPI'lari (company scope).
+$dashNc = $scopedCount("SELECT COUNT(*) FROM nonconformities WHERE active=1 AND status<>'closed'" . $scopeClause);
+$dashComplaints = $scopedCount("SELECT COUNT(*) FROM complaints WHERE active=1 AND status<>'closed'" . $scopeClause);
+$dashRisks = $scopedCount("SELECT COUNT(*) FROM risks WHERE active=1 AND status<>'closed'" . $scopeClause);
+$dashDocs = $scopedCount("SELECT COUNT(*) FROM documents WHERE active=1" . $scopeClause);
+$dashContracts = $scopedCount("SELECT COUNT(*) FROM contracts WHERE active=1 AND end_date < CURDATE()" . $scopeClause);
+$dashCalib = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND next_calibration_date < CURDATE()" . $scopeClause);
+
+// Müşteri performansı (red eşiği %5 ustu musteri + ort. red).
+$dashLowCustomers = 0;
+$dashRejectTotal = 0;
+$dashDeliverQty = 0;
+$delivStmt = $pdo->query(
+    "SELECT customer_name, SUM(quantity_delivered) qd, SUM(quantity_rejected) qr
+     FROM delivery_performance WHERE active = 1" . $scopeClause . " GROUP BY customer_name, company_id"
+);
+foreach ($delivStmt as $drow) {
+    $dashDeliverQty += (int) $drow['qd'];
+    $dashRejectTotal += (int) $drow['qr'];
+    if ((int) $drow['qd'] > 0 && ((int) $drow['qr'] / (int) $drow['qd']) > 0.05) {
+        $dashLowCustomers++;
+    }
+}
+$dashRejectAvg = $dashDeliverQty > 0 ? round(($dashRejectTotal / $dashDeliverQty) * 100, 1) : 0;
+$dashCompetencyOverdueCount = count($dashboardCompetencyOverdue);
 $cockpitKpiLabels = qmsPerformanceKpiLabels();
 $cockpitCostRows = array_values($dashboardTrend);
 $cockpitMaxCost = 1.0;
@@ -543,6 +569,36 @@ $activeNav = "dashboard";
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardPeriodTitle">Dönem Özeti</h3>
+                    <p data-i18n="dashboardPeriodText">Şirket panosu, müşteri performansı ve yetkinlik göstergeleri.</p>
+                </div>
+            </div>
+            <div class="period-overview-grid">
+                <div class="period-overview-group">
+                    <h4 data-i18n="dashboardCompanyKpisTitle">Şirket Panosu</h4>
+                    <div class="metric-mini-row">
+                        <div><span class="metric-mini-label">Açık NC</span><strong><?= $dashNc ?></strong></div>
+                        <div><span class="metric-mini-label">Açık Şikayet</span><strong><?= $dashComplaints ?></strong></div>
+                        <div><span class="metric-mini-label">Açık Risk</span><strong><?= $dashRisks ?></strong></div>
+                        <div><span class="metric-mini-label">Aktif Doküman</span><strong><?= $dashDocs ?></strong></div>
+                        <div><span class="metric-mini-label">Sözleşme (dolan)</span><strong><?= $dashContracts ?></strong></div>
+                        <div><span class="metric-mini-label">Kalibrasyon (geçik)</span><strong><?= $dashCalib ?></strong></div>
+                    </div>
+                </div>
+                <div class="period-overview-group">
+                    <h4 data-i18n="dashboardCustomerTitle">Müşteri & Yetkinlik</h4>
+                    <div class="metric-mini-row">
+                        <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Düşük Performanslı Müşteri</span><strong><?= $dashLowCustomers ?></strong></div></a>
+                        <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Ort. Red Oranı</span><strong>%<?= $dashRejectAvg ?></strong></div></a>
+                        <a href="competency-matrix.php"><div><span class="metric-mini-label">Yetkinlik Vadesi Geçen</span><strong><?= $dashCompetencyOverdueCount ?></strong></div></a>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="page-section console-card">

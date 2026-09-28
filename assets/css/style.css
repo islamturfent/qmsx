@@ -4322,6 +4322,31 @@ input[type="checkbox"]:focus-visible {
     border-color: var(--error-soft-text, #dc2626);
 }
 
+/* Dashboard Donem Ozeti grid'i */
+.period-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+.period-overview-group h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted-color);
+}
+.period-overview-grid a {
+    text-decoration: none;
+    color: inherit;
+}
+.period-overview-grid a > div {
+    min-width: 72px;
+}
+@media (max-width: 720px) {
+    .period-overview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Yetkinlik matrisi: yetkinlik cipleri */
 .competency-chips {
     display: flex;

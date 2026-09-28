@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Dashboard Donem Ozeti blogu + Denetim izi baglantisi (2026-10-08)
+- Donem Ozeti konsol karti: Sirket Panosu KPI'lari (acik NC/sikayet/risk, aktif
+  dokuman, dolan sozlesme, gecik kalibrasyon) + Musteri & Yetkinlik (dusuk
+  performans musteri, ort. red % , yetkinlik vadesi gecen) - sirket scope.
+- Musteri/Yetkinlik metrikleri ilgili yüzeylere linkli.
+- Denetim izi Dönem Ozeti baglantisi zaten mevcuttu (audit_trail_count metric +
+  Excel/PDF Denetim Izi bolumu) - dogrulandi, ek is gerekmedi.
+- i18n TR/EN, CSS period-overview-grid. Render test gecti. cache v145.
+
 ### Dashboard Yetkinlik vadesi widget (2026-10-08)
 - `dashboard.php` altina "Yetkinlik Vadesi Gecenler" console-card eklendi
   (staff_members uzerinden sirket scope; kisi + yetkinlik + sirket + vade listesi,

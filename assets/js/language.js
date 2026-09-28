@@ -3140,6 +3140,14 @@ Object.assign(translations.tr, {
   dashboardCompetencyTitle: "Yetkinlik Vadesi Geçenler", dashboardCompetencyText: "Gözden geçirilmesi geciken yetkinlik değerlendirmeleri.",
   dashboardCompetencyEmpty: "Vadesi geçen yetkinlik yok.",
 });
+Object.assign(translations.tr, {
+  dashboardPeriodTitle: "Dönem Özeti", dashboardPeriodText: "Şirket panosu, müşteri performansı ve yetkinlik göstergeleri.",
+  dashboardCompanyKpisTitle: "Şirket Panosu", dashboardCustomerTitle: "Müşteri & Yetkinlik",
+});
+Object.assign(translations.en, {
+  dashboardPeriodTitle: "Period Summary", dashboardPeriodText: "Company dashboard, customer performance and competency indicators.",
+  dashboardCompanyKpisTitle: "Company Dashboard", dashboardCustomerTitle: "Customer & Competency",
+});
 Object.assign(translations.en, {
   dashboardCompetencyTitle: "Overdue Competencies", dashboardCompetencyText: "Competency assessments that are overdue for review.",
   dashboardCompetencyEmpty: "No overdue competencies.",
