@@ -4298,6 +4298,30 @@ input[type="checkbox"]:focus-visible {
     font-weight: 600;
 }
 
+/* Müşteri performans kartı mini metrikleri */
+.metric-mini-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 14px;
+}
+.metric-mini-row > div {
+    min-width: 70px;
+}
+.metric-mini-label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted-color);
+    margin-bottom: 2px;
+}
+.metric-mini-row strong {
+    font-size: 15px;
+    color: var(--text-color);
+}
+.card-overdue {
+    border-color: var(--error-soft-text, #dc2626);
+}
+
 /* Yetkinlik matrisi: yetkinlik cipleri */
 .competency-chips {
     display: flex;

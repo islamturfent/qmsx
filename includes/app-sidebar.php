@@ -241,6 +241,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("customer_performance", $activeNav) ?>" href="customer-delivery-performance.php">
+            <?= appIcon("trend") ?>
+            <span data-i18n="customerPerformanceMenuLabel">Müşteri Performansı</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("internal_surveys", $activeNav) ?>" href="internal-surveys.php">
             <?= appIcon("sparkles") ?>
             <span data-i18n="internalSurveyMenuLabel">İç Memnuniyet Anketi</span>

@@ -3125,6 +3125,16 @@ Object.assign(translations.en, {
   trainingTemplatePrefillLabel: "Fill from Template (optional)", trainingTemplateNoneOption: "— No template selected —",
   trainingCompetencyLabel: "Target Competency",
 });
+Object.assign(translations.tr, {
+  customerPerformanceMenuLabel: "Müşteri Performansı", customerPerformanceTitle: "Müşteri Teslimat / Performans",
+  customerPerformanceKicker: "Teslimat Performansı", customerPerformanceText: "Her müşterinin zamanında teslimat ve red oranının güncel görünümü.",
+  customerPerformanceListTitle: "Müşteri Kartları", customerPerformanceEmpty: "Henüz teslimat performansı kaydı yok.",
+});
+Object.assign(translations.en, {
+  customerPerformanceMenuLabel: "Customer Performance", customerPerformanceTitle: "Customer Delivery / Performance",
+  customerPerformanceKicker: "Delivery Performance", customerPerformanceText: "Current view of each customer's on-time and rejection rates.",
+  customerPerformanceListTitle: "Customer Cards", customerPerformanceEmpty: "No delivery performance records yet.",
+});
 Object.assign(translations.en, {
   trainingTemplatesMenuLabel: "Training Templates", trainingTemplatesTitle: "Training Templates",
   trainingTemplatesKicker: "Training Management", trainingTemplatesText: "Store reusable training definitions.",

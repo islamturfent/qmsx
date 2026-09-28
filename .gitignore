@@ -32,3 +32,6 @@ deploy/office/.env
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Kullanici yuklenen sozlesme ekleri
+storage/contracts/

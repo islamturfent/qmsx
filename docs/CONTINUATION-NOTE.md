@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Musteri Teslimat / Performans Karti (2026-10-08)
+- Yeni yuzey `customer-delivery-performance.php`: musteri bazli teslimat ozeti
+  (zamaninda teslimat %, red %, toplam siparis, donem sayisi). KPI kartlari:
+  musteri sayisi, ort. zam. teslimat %, ort. red %, dusuk performansli musteri
+  (red esigi varsayilan %5; QMS_DELIVERY_REJECT_THRESHOLD). Dusuk performansli
+  musteri karti kirmizi vurgulanir.
+- operations.view RBAC + sidebar linki (Teslimat Performansi altina) + i18n TR/EN.
+  Render test gecti. cache v141.
+
 ### Sozlesme coklu dosya yukleme (2026-10-08)
 - `qmsContractAddAttachments()` eklendi: `$_FILES["attachment_files"]` (name[],
   tmp_name[]) icerisindeki her dosyayi tek tek isler, kac tanesinin eklendigini
