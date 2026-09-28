@@ -1181,6 +1181,15 @@ degiskenler kaldirildi. Profil sayfasi TailAdmin tarzi kart duzeni korur.
   (`COUNT(DISTINCT user_id)` ve rating sorulari ortalamasi); baslikta ve Sonuclar
   basliginda kullaniliyor. cache v107.
 
+### Egitim Sablonu sirket dropdown bos + Kaydet bosluk (2026-10-08)
+- `qmsVisibleCompanyIds()` super admin icin null doner (kisit yok = tumu);
+  kod null'i "sirket yok" gibi isliyordu -> sirket dropdown bos cikiyordu.
+  `training-templates.php` ve `competency-matrix.php` null'i "tum sirketler" olarak
+  ele alacak sekilde duzeltildi (isAllCompanies).
+- `.form-grid + .form-actions { margin-top: 16px }` eklendi; Egitim Sablonlari
+  sayfasinda Kaydet dugmesi ustteki kutuya degmiyor. Fonksiyonlara dokunulmadi.
+  cache v137.
+
 ### Eğitim Şablonu - Eğitim / Yetkinlik entegrasyonu (2026-10-08)
 - Migration: `trainings.template_id` (nullable) + `trainings.target_competency`.
 - `training-create.php`: "Sablondan Doldur" secimi (gorsel JS orn doldurma) +

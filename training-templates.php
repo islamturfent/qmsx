@@ -18,19 +18,22 @@ qmsRequirePermission('training_templates.manage');
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
 $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role);
+$isAllCompanies = $companyIds === null; // super admin: kısıt yok, tüm şirketler.
 
 // Form için seçilebilir şirketler (görünür kapsam).
 $companies = [];
-if ($companyIds) {
+if ($isAllCompanies) {
+    $companies = $pdo->query('SELECT id, company_name FROM companies WHERE active = 1 ORDER BY company_name')->fetchAll(PDO::FETCH_ASSOC);
+} elseif ($companyIds) {
     $marks = implode(',', array_fill(0, count($companyIds), '?'));
     $cs = $pdo->prepare("SELECT id, company_name FROM companies WHERE id IN ($marks) ORDER BY company_name");
     $cs->execute(array_map('intval', $companyIds));
     $companies = $cs->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$scopeSql = $companyIds
-    ? ' AND t.company_id IN (' . implode(',', array_map('intval', $companyIds)) . ')'
-    : ' AND 1 = 0';
+$scopeSql = $isAllCompanies
+    ? ''
+    : ($companyIds ? ' AND t.company_id IN (' . implode(',', array_map('intval', $companyIds)) . ')' : ' AND 1 = 0');
 
 $editItem = null;
 $formSuccess = '';

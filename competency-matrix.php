@@ -17,10 +17,11 @@ qmsRequirePermission('competency_matrix.view');
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
 $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role);
+$isAllCompanies = $companyIds === null; // super admin: kısıt yok.
 
-$scopeSql = $companyIds
-    ? ' AND s.company_id IN (' . implode(',', array_map('intval', $companyIds)) . ')'
-    : ' AND 1 = 0';
+$scopeSql = $isAllCompanies
+    ? ''
+    : ($companyIds ? ' AND s.company_id IN (' . implode(',', array_map('intval', $companyIds)) . ')' : ' AND 1 = 0');
 
 // Personel + yetkinlikleri.
 $stmt = $pdo->query(

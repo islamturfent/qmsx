@@ -2340,6 +2340,11 @@ form + .admin-list {
     margin-top: 14px;
 }
 
+/* Form alan izgarasinin altindaki islem dugmeleri ustteki kutuya degmesin. */
+.form-grid + .form-actions {
+    margin-top: 16px;
+}
+
 /* Rapor/matris tablosunun altindaki islem dugmeleri ustteki kutuya degmesin. */
 .report-table-wrap + .form-actions {
     margin-top: 16px;
