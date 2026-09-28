@@ -7,6 +7,13 @@ require 'includes/permissions.php';
 $checks = 0;
 function pCheck(bool $ok, string $name): void { global $checks; if (!$ok) throw new RuntimeException('FAIL: ' . $name); $checks++; echo 'PASS: ' . $name . PHP_EOL; }
 
+// Varsayilan davranis dogrulansin diye canli override'lar gecici silinir (sonra geri yazilir).
+$existingRows = $pdo->query('SELECT action, role, allowed FROM permission_overrides')->fetchAll(PDO::FETCH_ASSOC);
+$existing = [];
+foreach ($existingRows as $r) { $existing[(string) $r['action']][(string) $r['role']] = (bool) $r['allowed']; }
+$pdo->exec('DELETE FROM permission_overrides');
+qmsPermissionOverrides($pdo, true);
+
 $permissions = qmsPermissions();
 $actionLabels = qmsPermissionActionLabels();
 $roleLabels = qmsPermissionRoleLabels();
@@ -70,20 +77,19 @@ foreach ($newActions as $a => $roles) {
 pCheck($newOk, 'New RBAC surface actions carry the expected default role sets');
 pCheck(!isset($permissions['search.view']), 'search.view replaced by operations.view');
 
-// --- Override kaydetme / uygulama akisi (mevcut override'lar korunur) ---
-$existingRows = $pdo->query('SELECT action, role, allowed FROM permission_overrides')->fetchAll(PDO::FETCH_ASSOC);
-$existing = [];
-foreach ($existingRows as $r) { $existing[(string) $r['action']][(string) $r['role']] = (bool) $r['allowed']; }
-
+// --- Override kaydetme / uygulama akisi (mevcut override'lar en basta kaydedildi ve sonra geri yazilir) ---
 qmsPermissionSaveOverrides($pdo, [
     'operations.view' => ['system_admin' => false],
     'approvals.manage' => ['company_user' => true],
+    'reports.view' => ['auditor' => true],
 ]);
 $o = qmsPermissionOverrides($pdo, true);
 pCheck(($o['operations.view']['system_admin'] ?? null) === false, 'Override disables operations.view for system_admin');
 pCheck(($o['approvals.manage']['company_user'] ?? null) === true, 'Override enables approvals.manage for company_user');
+pCheck(($o['reports.view']['auditor'] ?? null) === true, 'Override enables reports.view for auditor');
 pCheck(qmsCan('system_admin', 'operations.view') === false, 'qmsCan honours disabled override');
 pCheck(qmsCan('company_user', 'approvals.manage') === true, 'qmsCan honours enabled override');
+pCheck(qmsCan('auditor', 'reports.view') === true, 'Granted auditor override takes effect on reports');
 pCheck(qmsCan('super_admin', 'operations.view') === true, 'Super admin is not restricted by overrides');
 
 // Test override'larini geri al; onceki durumu geri yaz.

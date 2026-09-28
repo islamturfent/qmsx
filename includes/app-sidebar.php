@@ -13,10 +13,8 @@ if (!function_exists('qmsSidebarVisible')) {
 $activeNav = $activeNav ?? "";
 $sidebarRole = (string) ($_SESSION["qms_role"] ?? "");
 $isSuperAdminNav = $sidebarRole === "super_admin";
-$isManagementNav = in_array($sidebarRole, ["super_admin", "system_admin"], true);
-$isAuditorNav = $sidebarRole === "auditor";
-// Denetci operasyon modullerini ve raporlari gormez; yalniz kendi denetimleri.
-$canSeeOperations = !$isAuditorNav;
+// Operasyon bolumu kullaniciya verilen RBAC iznine gore render edilir (rol sabit degil).
+$canSeeOperations = qmsSidebarVisible('operations.view');
 $sidebarUnreadCount = 0;
 if (isset($pdo, $_SESSION["qms_user_id"])) {
     $sidebarNotificationStmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = 0");
@@ -31,7 +29,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 }
 $sidebarOverdueCount = 0;
 $sidebarSupplierEvalOverdue = 0;
-if (!empty($pdo) && !$isAuditorNav && isset($_SESSION["qms_user_id"])) {
+if (!empty($pdo) && isset($_SESSION["qms_user_id"])) {
     require_once __DIR__ . '/due-workbench-functions.php';
     require_once __DIR__ . '/supplier-eval-schedule-functions.php';
     $sidebarOverdueCount = qmsOverdueActionCount($pdo, (int) $_SESSION["qms_user_id"], qmsCurrentRole());
@@ -87,29 +85,24 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 
     <nav class="sidebar-nav" aria-label="Ana menü">
         <span class="sidebar-section-label" data-i18n="sidebarOverviewLabel">Genel</span>
-        <?php if ($isAuditorNav): ?>
-            <?php if (qmsSidebarVisible('my_audits.view')): ?>
+        <?php if (qmsSidebarVisible('my_audits.view')): ?>
 <a class="<?= sidebarLinkClass("my_audits", $activeNav) ?>" href="my-audits.php">
-                <?= appIcon("check") ?>
-                <span data-i18n="myAuditsTitle">Denetimlerim</span>
-            </a>
+            <?= appIcon("check") ?>
+            <span data-i18n="myAuditsTitle">Denetimlerim</span>
+        </a>
 <?php endif; ?>
-        <?php else: ?>
-            <?php if (qmsSidebarVisible('dashboard.view')): ?>
+        <?php if (qmsSidebarVisible('dashboard.view')): ?>
 <a class="<?= sidebarLinkClass("dashboard", $activeNav) ?>" href="<?= $sidebarRole === 'company_user' ? 'company-overview.php' : 'dashboard.php' ?>">
-                <?= appIcon("dashboard") ?>
-                <span data-i18n="dashboardLinkLabel">Dashboard</span>
-            </a>
+            <?= appIcon("dashboard") ?>
+            <span data-i18n="dashboardLinkLabel">Dashboard</span>
+        </a>
 <?php endif; ?>
-        <?php endif; ?>
-        <?php if (!$isAuditorNav): ?>
         <?php if (qmsSidebarVisible('my_assignments.view')): ?>
 <a class="<?= sidebarLinkClass("my_assignments", $activeNav) ?>" href="my-assignments.php">
             <?= appIcon("checkBadge") ?>
             <span data-i18n="myAssignmentsMenuLabel">Bana Atanmışlar</span>
         </a>
 <?php endif; ?>
-        <?php endif; ?>
         <?php if (qmsSidebarVisible('notifications.view')): ?>
 <a class="<?= sidebarLinkClass("notifications", $activeNav) ?>" href="notifications.php">
             <?= appIcon("notifications") ?>
@@ -117,7 +110,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <?php if ($sidebarUnreadCount > 0): ?><span class="sidebar-count"><?= $sidebarUnreadCount ?></span><?php endif; ?>
         </a>
 <?php endif; ?>
-        <?php if (!$isAuditorNav): ?>
         <?php if (qmsSidebarVisible('reports.view')): ?>
 <a class="<?= sidebarLinkClass("reports", $activeNav) ?>" href="reports.php">
             <?= appIcon("reports") ?>
@@ -130,7 +122,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <span data-i18n="overdueMenuLabel">Vadesi Gelen İşler</span>
         </a>
 <?php endif; ?>
-        <?php endif; ?>
 
         <?php if ($canSeeOperations): ?>
         <span class="sidebar-section-label" data-i18n="sidebarOperationsLabel">Operasyonlar</span>
@@ -146,7 +137,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <span data-i18n="announcementsMenuLabel">Duyuru Merkezi</span>
         </a>
 <?php endif; ?>
-        <?php if ($isManagementNav): ?>
         <?php if (qmsSidebarVisible('auditors.manage')): ?>
 <a class="<?= sidebarLinkClass("auditors", $activeNav) ?>" href="auditors.php">
             <?= appIcon("users") ?>
@@ -171,7 +161,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <span data-i18n="externalAuditsMenuLabel">Dış Denetim & Kapama</span>
         </a>
 <?php endif; ?>
-        <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("actions", $activeNav) ?>" href="actions.php">
             <?= appIcon("check") ?>
@@ -354,7 +343,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <span data-i18n="equipmentMenuLabel">Ekipman ve Kalibrasyon</span>
         </a>
 <?php endif; ?>
-        <?php if ($isManagementNav): ?>
         <?php if (qmsSidebarVisible('approvals.manage')): ?>
 <a class="<?= sidebarLinkClass("approvals", $activeNav) ?>" href="approval-runs.php">
             <?= appIcon("approvals") ?>
@@ -385,7 +373,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
             <span data-i18n="auditTrailReportTitle">Denetim İzi Raporu</span>
         </a>
 <?php endif; ?>
-        <?php endif; ?>
         <?php endif; /* canSeeOperations */ ?>
 
         <?php if ($isSuperAdminNav): ?>

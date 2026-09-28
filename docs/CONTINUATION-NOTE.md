@@ -1951,6 +1951,16 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - `qmsVisibleCompanyIds()` returning `null` means "no restriction". Wrapping the
   result in `?? []` silently turns a super admin into "sees nothing" - this trap
   produced two real bugs. See the warning in `includes/access.php`.
+- Auditor RBAC effect is **resolved** (2026-10): the auditor role no longer runs on
+  hard-coded `$isAuditorNav` / `$isManagementNav` sidebar guards. `includes/app-sidebar.php`
+  now renders every menu item purely by `qmsSidebarVisible()` (i.e. `qmsCanSession`),
+  so enabling `dashboard.view`, `reports.view`, `operations.view`, `audit_trail.view`,
+  `document_reviews.manage`, `document_approvals.manage`, `training_templates.manage`
+  etc. for the auditor actually surfaces those pages in the menu. `dashboard.php`
+  only redirects an auditor to `my-audits.php` when `dashboard.view` is not granted.
+  `tests/permissions.php` was hardened to snapshot live `permission_overrides`, run
+  default-behaviour assertions against a clean set, then restore the real rows; it is
+  26/26 and never touches the user's saved permissions. Cache `v148`.
 
 ## Working preferences
 

@@ -11,8 +11,8 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 qmsRequirePermission('dashboard.view');
 
-// Denetci rolunun kendi calisma alani var.
-if (qmsIsAuditor()) {
+// Denetci dashboard'a yetkiliyse kendi panosuna duser; dashboard.view verilmisse dashboard gecerlidir.
+if (qmsIsAuditor() && !qmsCanSession('dashboard.view')) {
     header("Location: my-audits.php");
     exit;
 }
