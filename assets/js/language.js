@@ -3204,7 +3204,6 @@ translations.en.incidentCreateNcButton = "Create Nonconformity";
 
 // --- Kalibrasyon & Metroloji ---
 translations.tr.instrumentsMenuLabel = "Kalibrasyon & Metroloji";
-translations.tr.instrumentsListMenuLabel = "Ölçü Aletleri";
 translations.tr.calibrationHistoryMenuLabel = "Kalibrasyon Geçmişi";
 translations.tr.instrumentCalibrationHistoryButton = "Geçmiş";
 translations.tr.calibrationAdded = "Kalibrasyon kaydı eklendi.";
@@ -3274,7 +3273,6 @@ translations.tr.instrumentCalibrateButton = "Kalibre Et";
 translations.tr.instrumentEmpty = "Henüz ölçü aleti tanımlanmadı.";
 translations.tr.instrumentDelete = "Sil";
 translations.en.instrumentsMenuLabel = "Calibration & Metrology";
-translations.en.instrumentsListMenuLabel = "Instruments";
 translations.en.calibrationHistoryMenuLabel = "Calibration History";
 translations.en.instrumentCalibrationHistoryButton = "History";
 translations.en.calibrationAdded = "Calibration record added.";
