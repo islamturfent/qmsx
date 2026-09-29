@@ -2055,6 +2055,14 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - **Denetim Izi -> ana rapor export**: zaten bagliydi (Excel "Denetim Izi" sheet +
   PDF bolumu + `audit_trail_count` metriği `includes/report-export-data.php` + xlsx/pdf).
   Degisiklik gerekmedi; dogrulandi.
+- **Dashboard Donem Ozeti genisletildi** (2026-10): acik denetim bulgulari, kok neden
+  bekleyen NC ve dokuman teslim onayi bekleyen gostergeleri. Cache `v161`.
+- **Bildirim Merkezi akisi**: zaten vardi (`mark_read`, `mark_all_read`, unread/read
+  filtre); degisiklik gerekmedi. Dogrulandi.
+- **Denetim Izi -> ana rapor export**: zaten bagliydi; degisiklik gerekmedi.
+- **Dogrulama & Kapanis Merkezi** (`verification-center.php`) eklendi (2026-10):
+  dogrulama bekleyen CAPA + acik uygunsuzluk kapanis hatti (kok neden, acik CAPA,
+  kapanis paketi). Sol menude `verification_center`; i18n TR/EN. Cache `v162`.
 
 ## GIT DURUMU (COZULDU)
 

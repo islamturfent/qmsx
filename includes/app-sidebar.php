@@ -169,6 +169,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("verification_center", $activeNav) ?>" href="verification-center.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="verificationCenterMenuLabel">Doğrulama & Kapanış</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("risks", $activeNav) ?>" href="risks.php">
             <?= appIcon("warning") ?>
             <span data-i18n="riskManagementTitle">Risk Yönetimi</span>
