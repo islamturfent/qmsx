@@ -2063,6 +2063,13 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - **Dogrulama & Kapanis Merkezi** (`verification-center.php`) eklendi (2026-10):
   dogrulama bekleyen CAPA + acik uygunsuzluk kapanis hatti (kok neden, acik CAPA,
   kapanis paketi). Sol menude `verification_center`; i18n TR/EN. Cache `v162`.
+- **Ana rapor export zenginlesti** (2026-10): Excel'e Denetim Bulgulari, Kok Neden,
+  Dagitim Onayi ve Dogrulama Bekleyen sheet'ler + PDF'e ayni bolumler eklendi
+  (`report-export-data.php` -> findings/root_cause/doc_confirm/verification listeleri;
+  xlsx/pdf render). Cache `v163`.
+- **Olcu Aleti Detay sayfasi** (`instrument-detail.php`) eklendi (2026-10): alet bilgileri,
+  son/sonraki kalibrasyon tarihleri (gecikme uyarisi), kalibrasyon gecmisi + sertifika
+  indirme. `instruments.php` listesinde alet adi detaya baglandi. Cache `v164`.
 
 ## GIT DURUMU (COZULDU)
 

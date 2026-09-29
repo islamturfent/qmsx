@@ -175,7 +175,7 @@ if ($editing) {
                         <?php $isOverdue = $row['status'] === 'active' && $row['next_calibration_date'] !== null && (string) $row['next_calibration_date'] < date('Y-m-d'); ?>
                         <div class="admin-list-item">
                             <div class="list-item-main">
-                                <strong><?= $row['instrument_code'] ? '[' . htmlspecialchars($row['instrument_code'], ENT_QUOTES, 'UTF-8') . '] ' : '' ?><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <strong><a href="instrument-detail.php?id=<?= (int) $row['id'] ?>"><?= $row['instrument_code'] ? '[' . htmlspecialchars($row['instrument_code'], ENT_QUOTES, 'UTF-8') . '] ' : '' ?><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') ?></a></strong>
                                 <span>
                                     <?php if ($isOverdue): ?><span class="overdue-badge" data-i18n="instrumentOverdueBadge">Kalibrasyonu Geçti</span>
                                     <?php else: ?><span class="status-badge <?= $row['status'] === 'active' ? 'status-pill' : '' ?>"><?= htmlspecialchars(qmsInstrumentStatusLabel($row['status']), ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
