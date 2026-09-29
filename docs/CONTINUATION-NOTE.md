@@ -2047,6 +2047,14 @@ per-column emphasis, so uniform gray-500 reads washed out.
 - **Denetim Bulgulari + Kok Neden Analizi export**: `audit-findings-export.php` ve
   `root-cause-export.php` (Excel/PDF) eklendi; iki sayfaya da export butonlari.
   Cache `v159`.
+- **Dagitim & Imza Takibi** eklendi (2026-10): `document-distribution-tracking.php` -
+  dagitilan kontrollu kopyalar icin teslim/onay durumu; `qmsDocumentCopyConfirm()` ile
+  kopya `received_confirmed`/`received_on`/`signed_by` isaretlenir. Migration
+  `20261012-doc-copy-confirmation.sql` (3 kolon). Sol menude `document_tracking`.
+  DB'de dogrulandi. Cache `v160`.
+- **Denetim Izi -> ana rapor export**: zaten bagliydi (Excel "Denetim Izi" sheet +
+  PDF bolumu + `audit_trail_count` metriği `includes/report-export-data.php` + xlsx/pdf).
+  Degisiklik gerekmedi; dogrulandi.
 
 ## GIT DURUMU (COZULDU)
 

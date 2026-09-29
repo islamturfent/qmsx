@@ -350,6 +350,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("document_tracking", $activeNav) ?>" href="document-distribution-tracking.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="docTrackingMenuLabel">Dağıtım & İmza Takibi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("document_compare", $activeNav) ?>" href="document-compare.php">
             <?= appIcon("documents") ?>
             <span data-i18n="docCompareMenuLabel">Versiyon Karşılaştırma</span>

@@ -150,3 +150,19 @@ function qmsDocumentCopyUpdateStatus(PDO $pdo, int $copyId, string $status, ?str
     $stmt->execute([$status, $returnedOn, $copyId]);
     return true;
 }
+
+/**
+ * Bir kontrollu kopyanin teslim alindigini / imzalandigini isaretler.
+ * `received_confirmed=1`, `received_on`, `signed_by` yazilir.
+ */
+function qmsDocumentCopyConfirm(PDO $pdo, int $copyId, string $signedBy, int $userId, string $role): bool
+{
+    $copy = qmsDocumentCopyFind($pdo, $copyId, $userId, $role);
+    if ($copy === []) {
+        return false;
+    }
+    $signedBy = trim($signedBy) !== '' ? mb_substr(trim($signedBy), 0, 180) : null;
+    $stmt = $pdo->prepare('UPDATE document_copies SET received_confirmed = 1, received_on = ?, signed_by = ? WHERE id = ?');
+    $stmt->execute([date('Y-m-d'), $signedBy, $copyId]);
+    return true;
+}
