@@ -213,7 +213,7 @@ $activeNav = "document_copies";
                                     <?= qmsCsrfField($csrfScope) ?>
                                     <input type="hidden" name="form_type" value="update_copy_status">
                                     <input type="hidden" name="copy_id" value="<?= (int) $copy["id"] ?>">
-                                    <select name="copy_status" onchange="this.form.submit()">
+                                    <select class="doc-roll-select" name="copy_status" onchange="this.form.submit()">
                                         <?php foreach ($statusLabels as $key => $label): ?>
                                             <option value="<?= $key ?>" <?= $copy["status"] === $key ? "selected" : "" ?>><?= htmlspecialchars($label, ENT_QUOTES, "UTF-8") ?></option>
                                         <?php endforeach; ?>

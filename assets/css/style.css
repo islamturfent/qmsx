@@ -4633,6 +4633,30 @@ body.dark-mode .trend-bar-label { color: var(--gray-400); }
     box-shadow: var(--shadow-focus-ring);
 }
 
+/* Doküman Dağıtım Kontrolü: Dağıtılmış Kopyalar satır içi durum dropdown'u. */
+.doc-roll-select {
+    appearance: none;
+    -webkit-appearance: none;
+    min-height: 34px;
+    padding: 0 30px 0 10px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background-color: var(--control-bg-color);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 15px;
+    color: var(--text-color);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+}
+.doc-roll-select:focus {
+    border-color: var(--brand-400, #3b82f6);
+    box-shadow: var(--shadow-focus-ring);
+}
+
 /* Kalibrasyon/denetim yillik takvim kutusu - dark mode overrides. */
 body.dark-mode .calendar-month {
     border-color: var(--gray-700);
