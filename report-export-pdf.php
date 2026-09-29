@@ -248,6 +248,29 @@ foreach ($report['incident_list'] as $row) {
         . $escape($row['reported_at'] ?? '') . '</td><td>' . $escape($row['status_label']) . '</td></tr>';
 }
 
+$findingsRows = '';
+foreach ($report['findings_list'] as $row) {
+    $findingsRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['audit_title']) . '</td><td>'
+        . $escape($row['item_text']) . '</td><td>' . $escape($row['requirement_ref'] ?: '-') . '</td><td>'
+        . $escape($row['nc_status'] ?: 'bulgu') . '</td></tr>';
+}
+$rootCauseRows = '';
+foreach ($report['root_cause_list'] as $row) {
+    $rootCauseRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['nc_title']) . '</td><td>'
+        . $escape($row['severity']) . '</td></tr>';
+}
+$docConfirmRows = '';
+foreach ($report['doc_confirm_list'] as $row) {
+    $docConfirmRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['document_title']) . '</td><td>'
+        . $escape($row['copy_no']) . '</td><td>' . $escape($row['recipient_name']) . '</td><td>'
+        . $escape($row['location'] ?: '-') . '</td><td>' . ($row['confirmed'] ? 'Evet' : 'Bekliyor') . '</td></tr>';
+}
+$verificationRows = '';
+foreach ($report['verification_list'] as $row) {
+    $verificationRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['action_text']) . '</td><td>'
+        . $escape($row['nc_title']) . '</td><td>' . $escape($row['severity']) . '</td><td>'
+        . $escape($row['due_date'] ?: '-') . '</td></tr>';
+}
 $auditTrailRows = '';
 foreach ($report['audit_trail_list'] as $row) {
     $auditTrailRows .= '<tr><td>' . $escape($row['company_name']) . '</td><td>' . $escape($row['actor_name']) . '</td><td>'
@@ -404,6 +427,10 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Teslimat Performansı', '<th>Şirket</th><th>Müşteri</th><th>Dönem</th><th>Sipariş</th><th>Zamanında (%)</th><th>Reddedilen</th>', $deliveryRows)
     . $detailSection('Yetkinlik Vadesi', '<th>Şirket</th><th>Personel</th><th>Yetkinlik</th><th>Vade</th>', $competencyRows)
     . $detailSection('Kalibrasyonlar', '<th>Şirket</th><th>Alet</th><th>Sonuç</th><th>Tarih</th><th>Sonraki</th><th>Sertifika No</th>', $calibrationRows)
+    . $detailSection('Denetim Bulguları', '<th>Şirket</th><th>Denetim</th><th>Bulgu</th><th>Referans</th><th>NC</th>', $findingsRows)
+    . $detailSection('Kök Neden (bekleyen)', '<th>Şirket</th><th>Uygunsuzluk</th><th>Şiddet</th>', $rootCauseRows)
+    . $detailSection('Dağıtım Onayı', '<th>Şirket</th><th>Doküman</th><th>Kopya No</th><th>Alıcı</th><th>Konum</th><th>Onay</th>', $docConfirmRows)
+    . $detailSection('Doğrulama Bekleyen', '<th>Şirket</th><th>Faaliyet</th><th>Uygunsuzluk</th><th>Şiddet</th><th>Termin</th>', $verificationRows)
     . $detailSection('Denetim İzi', '<th>Şirket</th><th>Kişi</th><th>Kayıt Türü</th><th>İşlem</th><th>Özet</th><th>Tarih</th>', $auditTrailRows)
     . '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div>
     </body></html>';

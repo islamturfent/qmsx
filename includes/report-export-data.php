@@ -694,6 +694,87 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
     }
     $calibrationCount = count($calibrationList);
 
+    // Denetim bulgulari (acik; kapsamli).
+    $findingsList = [];
+    $findingsRaw = $fetchRows(
+        "SELECT cit.item_text, cit.requirement_ref, a.title AS audit_title,
+                a.planned_date, companies.company_name, nc.status AS nc_status
+         FROM audit_checklist_items cit
+         INNER JOIN audits a ON a.id = cit.audit_id
+         INNER JOIN companies ON companies.id = a.company_id
+         LEFT JOIN nonconformities nc ON nc.checklist_item_id = cit.id AND nc.active = 1
+         WHERE cit.active = 1 AND cit.result_status = 'noncompliant'
+           AND (nc.id IS NULL OR nc.status <> 'closed')" . $scopeSql, $scopeParams
+    );
+    foreach ($findingsRaw as $f) {
+        $findingsList[] = [
+            'company_name' => $f['company_name'],
+            'audit_title' => $f['audit_title'],
+            'item_text' => $f['item_text'],
+            'requirement_ref' => $f['requirement_ref'] ?: null,
+            'planned_date' => $f['planned_date'],
+            'nc_status' => $f['nc_status'] ?: null,
+        ];
+    }
+
+    // Kok neden analizi: analiz bekleyen (acik ve analysiz) uygunsuzluklar.
+    $rootCauseList = [];
+    $rootCauseRaw = $fetchRows(
+        "SELECT n.title AS nc_title, n.severity, companies.company_name
+         FROM nonconformities n
+         INNER JOIN companies ON companies.id = n.company_id
+         LEFT JOIN nc_root_cause rc ON rc.nonconformity_id = n.id AND rc.active = 1
+         WHERE n.active = 1 AND n.status <> 'closed' AND rc.id IS NULL" . $scopeSql, $scopeParams
+    );
+    foreach ($rootCauseRaw as $r) {
+        $rootCauseList[] = [
+            'company_name' => $r['company_name'],
+            'nc_title' => $r['nc_title'],
+            'severity' => $r['severity'],
+        ];
+    }
+
+    // Dagitim & imza onayi bekleyen kopyalar.
+    $docConfirmList = [];
+    $docConfirmRaw = $fetchRows(
+        "SELECT dc.copy_no, dc.recipient_name, dc.location, documents.title AS document_title,
+                companies.company_name, dc.received_confirmed
+         FROM document_copies dc
+         INNER JOIN documents ON documents.id = dc.document_id
+         INNER JOIN companies ON companies.id = dc.company_id
+         WHERE dc.active = 1 AND dc.status = 'distributed'" . $scopeSql, $scopeParams
+    );
+    foreach ($docConfirmRaw as $d) {
+        $docConfirmList[] = [
+            'company_name' => $d['company_name'],
+            'document_title' => $d['document_title'],
+            'copy_no' => $d['copy_no'],
+            'recipient_name' => $d['recipient_name'],
+            'location' => $d['location'],
+            'confirmed' => (int) $d['received_confirmed'] === 1,
+        ];
+    }
+
+    // Dogrulama bekleyen faaliyetler.
+    $verificationList = [];
+    $verificationRaw = $fetchRows(
+        "SELECT ca.action_text, ca.due_date, n.title AS nc_title, n.severity,
+                companies.company_name
+         FROM corrective_actions ca
+         INNER JOIN nonconformities n ON n.id = ca.nonconformity_id
+         INNER JOIN companies ON companies.id = n.company_id
+         WHERE ca.active = 1 AND ca.status = 'verification'" . $scopeSql, $scopeParams
+    );
+    foreach ($verificationRaw as $v) {
+        $verificationList[] = [
+            'company_name' => $v['company_name'],
+            'action_text' => $v['action_text'],
+            'nc_title' => $v['nc_title'],
+            'severity' => $v['severity'],
+            'due_date' => $v['due_date'],
+        ];
+    }
+
     // Denetim izi: donemdeki kayitlar (kapsamli) + ozet. $fetchRows kullanilmaz
     // cunku bu yardimci SQL'in sonuna 'AND companies.id = ?' ekler ve ORDER BY/LIMIT
     // ile bozulur; burada kapsam + secili sirket filtreleri acikca kurulur.
@@ -1169,6 +1250,10 @@ function buildReportExportData(PDO $pdo, int $userId, bool $isSuperAdmin, array 
         'delivery_list' => $deliveryList,
         'competency_overdue_list' => $competencyOverdueList,
         'calibration_list' => $calibrationList,
+        'findings_list' => $findingsList,
+        'root_cause_list' => $rootCauseList,
+        'doc_confirm_list' => $docConfirmList,
+        'verification_list' => $verificationList,
         'audit_trail_list' => $auditTrailList,
         'audit_trail_entity' => $auditAgg['entity'],
         'audit_trail_action' => $auditAgg['action'],

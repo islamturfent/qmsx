@@ -692,6 +692,57 @@ foreach ($report['calibration_list'] as $row) {
     ];
 }
 
+$findingsRows = [[
+    ['value' => 'Şirket', 'style' => 2], ['value' => 'Denetim', 'style' => 2], ['value' => 'Bulgu', 'style' => 2], ['value' => 'Referans', 'style' => 2], ['value' => 'NC', 'style' => 2],
+]];
+foreach ($report['findings_list'] as $f) {
+    $findingsRows[] = [
+        ['value' => $f['company_name'], 'style' => 3],
+        ['value' => $f['audit_title'], 'style' => 3],
+        ['value' => $f['item_text'], 'style' => 3],
+        ['value' => $f['requirement_ref'] ?: '-', 'style' => 3],
+        ['value' => $f['nc_status'] ?: 'bulgu', 'style' => 3],
+    ];
+}
+
+$rootCauseRows = [[
+    ['value' => 'Şirket', 'style' => 2], ['value' => 'Uygunsuzluk', 'style' => 2], ['value' => 'Şiddet', 'style' => 2],
+]];
+foreach ($report['root_cause_list'] as $r) {
+    $rootCauseRows[] = [
+        ['value' => $r['company_name'], 'style' => 3],
+        ['value' => $r['nc_title'], 'style' => 3],
+        ['value' => $r['severity'], 'style' => 3],
+    ];
+}
+
+$docConfirmRows = [[
+    ['value' => 'Şirket', 'style' => 2], ['value' => 'Doküman', 'style' => 2], ['value' => 'Kopya No', 'style' => 2], ['value' => 'Alıcı', 'style' => 2], ['value' => 'Konum', 'style' => 2], ['value' => 'Onay', 'style' => 2],
+]];
+foreach ($report['doc_confirm_list'] as $d) {
+    $docConfirmRows[] = [
+        ['value' => $d['company_name'], 'style' => 3],
+        ['value' => $d['document_title'], 'style' => 3],
+        ['value' => $d['copy_no'], 'style' => 3],
+        ['value' => $d['recipient_name'], 'style' => 3],
+        ['value' => $d['location'] ?: '-', 'style' => 3],
+        ['value' => $d['confirmed'] ? 'Evet' : 'Bekliyor', 'style' => 3],
+    ];
+}
+
+$verificationRows = [[
+    ['value' => 'Şirket', 'style' => 2], ['value' => 'Faaliyet', 'style' => 2], ['value' => 'Uygunsuzluk', 'style' => 2], ['value' => 'Şiddet', 'style' => 2], ['value' => 'Termin', 'style' => 2],
+]];
+foreach ($report['verification_list'] as $v) {
+    $verificationRows[] = [
+        ['value' => $v['company_name'], 'style' => 3],
+        ['value' => $v['action_text'], 'style' => 3],
+        ['value' => $v['nc_title'], 'style' => 3],
+        ['value' => $v['severity'], 'style' => 3],
+        ['value' => $v['due_date'] ?: '-', 'style' => 3],
+    ];
+}
+
 $auditTrailRows = [[
     ['value' => 'Şirket', 'style' => 2],
     ['value' => 'Kişi', 'style' => 2],
@@ -746,6 +797,10 @@ try {
         ['name' => 'Olaylar', 'xml' => xlsxWorksheet($incidentRows, [28, 40, 16, 14, 14, 16])],
         ['name' => 'Teslimat', 'xml' => xlsxWorksheet($deliveryRows, [28, 28, 12, 12, 14, 16, 16, 18])],
         ['name' => 'Kalibrasyonlar', 'xml' => xlsxWorksheet($calibrationRows, [28, 28, 18, 14, 14, 14, 24, 18, 20])],
+        ['name' => 'Denetim Bulguları', 'xml' => xlsxWorksheet($findingsRows, [28, 34, 50, 16, 16])],
+        ['name' => 'Kök Neden', 'xml' => xlsxWorksheet($rootCauseRows, [28, 50, 16])],
+        ['name' => 'Dağıtım Onayı', 'xml' => xlsxWorksheet($docConfirmRows, [28, 40, 14, 24, 20, 12])],
+        ['name' => 'Doğrulama', 'xml' => xlsxWorksheet($verificationRows, [28, 50, 34, 14, 14])],
         ['name' => 'Denetim İzi', 'xml' => xlsxWorksheet($auditTrailRows, [28, 22, 24, 18, 50, 20])],
         ['name' => 'Yetkinlik Vade', 'xml' => xlsxWorksheet($competencyOverdueRows, [28, 28, 34, 16])],
     ], $temporaryPath);
