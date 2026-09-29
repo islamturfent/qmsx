@@ -344,6 +344,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("calibration_calendar", $activeNav) ?>" href="calibration-calendar.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="calibCalendarMenuLabel">Kalibrasyon Takvimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="documents.php">
             <?= appIcon("documents") ?>
             <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>
