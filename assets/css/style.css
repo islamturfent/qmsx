@@ -4611,6 +4611,27 @@ body.dark-mode .trend-bar-label { color: var(--gray-400); }
     border-color: var(--brand-400, #3b82f6);
     box-shadow: var(--shadow-focus-ring);
 }
+.finding-filter-form input[type="text"],
+.finding-filter-form input[type="search"] {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background-color: var(--control-bg-color);
+    color: var(--text-color);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+.finding-filter-form input[type="text"]::placeholder,
+.finding-filter-form input[type="search"]::placeholder {
+    color: var(--gray-400);
+}
+.finding-filter-form input[type="text"]:focus,
+.finding-filter-form input[type="search"]:focus {
+    border-color: var(--brand-400, #3b82f6);
+    box-shadow: var(--shadow-focus-ring);
+}
 
 /* Kalibrasyon/denetim yillik takvim kutusu - dark mode overrides. */
 body.dark-mode .calendar-month {

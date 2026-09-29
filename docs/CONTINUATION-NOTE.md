@@ -2124,3 +2124,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **Son 12 Ay Trendleri dark mode** (cache v171): `style.css` icinde
   `body.dark-mode` overrides eklendi — `.trend-series-head` metni koyu yerine
   acik, `.trend-bar-track` zemini koyu, deger/etiket renkleri dark token'a.
+- **Denetim Bulgulari ara kutusu dark mode** (cache v172): `style.css` icinde
+  `.finding-filter-form input[type=text]` TailAdmin tarzi dark-adaptif stil eklendi
+  (control-bg/border/text token'lari + odak halkasi); select'lerle tutarli.
