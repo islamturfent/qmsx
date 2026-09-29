@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS nc_root_cause (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nonconformity_id INT NOT NULL,
+  why1 VARCHAR(255) NULL,
+  why2 VARCHAR(255) NULL,
+  why3 VARCHAR(255) NULL,
+  why4 VARCHAR(255) NULL,
+  why5 VARCHAR(255) NULL,
+  root_cause TEXT NULL,
+  corrective_action TEXT NULL,
+  preventive_action TEXT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'open',
+  created_by INT NULL,
+  updated_by INT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_ncroot_nc (nonconformity_id),
+  CONSTRAINT fk_ncroot_nc FOREIGN KEY (nonconformity_id) REFERENCES nonconformities(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -266,6 +266,30 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("audit_findings", $activeNav) ?>" href="audit-findings.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="auditFindingsMenuLabel">Denetim Bulguları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("root_cause", $activeNav) ?>" href="root-cause.php">
+            <?= appIcon("sparkles") ?>
+            <span data-i18n="rootCauseMenuLabel">Kök Neden Analizi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("audit_calendar", $activeNav) ?>" href="audit-calendar.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="auditCalendarMenuLabel">Denetim Takvimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("audit_reports", $activeNav) ?>" href="audit-reports.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="auditReportsMenuLabel">Denetim Raporları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("reviews", $activeNav) ?>" href="reviews.php">
             <?= appIcon("reviews") ?>
             <span data-i18n="reviewsTitle">Yönetimin Gözden Geçirmesi</span>

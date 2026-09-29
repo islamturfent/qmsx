@@ -4564,3 +4564,32 @@ input[type="checkbox"]:focus-visible {
     font-weight: 600;
     color: var(--brand-600, #2563eb);
 }
+
+/* Denetim yillik takvimi */
+.calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.calendar-month { border: 1px solid #e4e7ec; border-radius: 12px; background: #fff; overflow: hidden; }
+.calendar-month-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f9fafb; border-bottom: 1px solid #e4e7ec; font-size: 13px; }
+.calendar-month-head span { background: #eef2ff; color: #2563eb; border-radius: 999px; padding: 1px 8px; font-size: 12px; font-weight: 600; }
+.calendar-month-body { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; min-height: 90px; }
+.calendar-empty { color: #98a2b3; font-size: 12px; }
+.calendar-item { display: flex; flex-direction: column; border-left: 3px solid #98a2b3; background: #fcfcfd; padding: 6px 8px; border-radius: 6px; text-decoration: none; color: inherit; }
+.calendar-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.calendar-item-date { font-size: 11px; color: #667085; font-weight: 600; }
+.calendar-item-title { font-size: 12px; font-weight: 600; color: #344054; }
+.calendar-item-company { font-size: 11px; color: #98a2b3; }
+.calendar-item.calendar-planned { border-left-color: #f59e0b; }
+.calendar-item.calendar-in_progress { border-left-color: #3b82f6; }
+.calendar-item.calendar-done { border-left-color: #22c55e; }
+.calendar-item.calendar-overdue { border-left-color: #ef4444; }
+@media (max-width: 720px) { .calendar-grid { grid-template-columns: 1fr 1fr; } }
+
+/* Satir ici sertifika yukleme */
+.inline-cert-upload { display: inline-flex; align-items: center; gap: 6px; }
+.inline-cert-upload input[type="file"] { max-width: 150px; font-size: 11px; }
+
+/* audit-detail: kutu araligi duzeltmeleri (yalnizca stil) */
+.audit-execution-bar { margin-top: 22px; }
+.super-admin-console + .console-card { margin-top: 18px; }
+
+/* Export buton satiri */
+.export-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }

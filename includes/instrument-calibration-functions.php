@@ -154,3 +154,39 @@ function qmsInstCalibResultLabel(string $result): string
 {
     return ['pass' => 'Başarılı', 'fail' => 'Başarısız'][$result] ?? $result;
 }
+
+/**
+ * Mevcut bir kalibrasyon kaydina sertifika dosyasi ekler veya degistirir.
+ * Eski dosya silinir; kayit kapsam icinde olmali.
+ *
+ * @param array $file $_FILES['certificate']
+ * @return bool
+ */
+function qmsInstCalibAttachCert(PDO $pdo, int $id, array $file, int $userId, string $role): bool
+{
+    $row = qmsInstCalibFind($pdo, $id, $userId, $role);
+    if (!$row) {
+        return false;
+    }
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || ($file['size'] ?? 0) <= 0 || ($file['size'] ?? 0) > 10 * 1024 * 1024) {
+        return false;
+    }
+    $ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
+    $stored = bin2hex(random_bytes(20)) . '.' . $ext;
+    $dir = QMS_INSTRUMENT_CALIB_STORAGE;
+    if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+        return false;
+    }
+    if (!move_uploaded_file($file['tmp_name'], $dir . '/' . $stored)) {
+        return false;
+    }
+
+    $pdo->prepare('UPDATE instrument_calibrations SET certificate_file = ? WHERE id = ?')->execute([$stored, $id]);
+    if (!empty($row['certificate_file'])) {
+        $old = $dir . '/' . $row['certificate_file'];
+        if (is_file($old)) {
+            @unlink($old);
+        }
+    }
+    return true;
+}

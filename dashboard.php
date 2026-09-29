@@ -144,6 +144,14 @@ $dashAuditReportDraft = (int) $audRepStmt->fetchColumn();
 $audRepStmt->execute(array_merge(['final'], $audRepScope['params']));
 $dashAuditReportFinal = (int) $audRepStmt->fetchColumn();
 $dashAuditOpenNc = $scopedCount("SELECT COUNT(*) FROM nonconformities WHERE active=1 AND status<>'closed' AND audit_id IS NOT NULL" . $scopeClause);
+
+// Kalite maliyeti (COQ): guncel yil toplami + hata payi (kapsamli).
+$coqStmt = $pdo->prepare('SELECT COALESCE(SUM(CASE WHEN c.cost_type IN (\'internal_failure\',\'external_failure\') THEN c.amount ELSE 0 END),0) AS fail, COALESCE(SUM(c.amount),0) AS total FROM quality_costs c WHERE c.active = 1 AND YEAR(c.incurred_on) = YEAR(CURDATE())' . $scopeClause);
+$coqStmt->execute($scopeParams);
+$coqRow = $coqStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+$dashCoqTotal = (float) ($coqRow['total'] ?? 0);
+$dashCoqFailure = (float) ($coqRow['fail'] ?? 0);
+$dashCoqFailurePct = $dashCoqTotal > 0 ? round(($dashCoqFailure / $dashCoqTotal) * 100, 1) : 0;
 $cockpitKpiLabels = qmsPerformanceKpiLabels();
 $cockpitCostRows = array_values($dashboardTrend);
 $cockpitMaxCost = 1.0;
@@ -608,6 +616,14 @@ $activeNav = "dashboard";
                         <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Düşük Performanslı Müşteri</span><strong><?= $dashLowCustomers ?></strong></div></a>
                         <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Ort. Red Oranı</span><strong>%<?= $dashRejectAvg ?></strong></div></a>
                         <a href="competency-matrix.php"><div><span class="metric-mini-label">Yetkinlik Vadesi Geçen</span><strong><?= $dashCompetencyOverdueCount ?></strong></div></a>
+                    </div>
+                </div>
+                <div class="period-overview-group">
+                    <h4 data-i18n="dashboardCoqTitle">Kalite Maliyeti</h4>
+                    <div class="metric-mini-row">
+                        <a href="quality-cost-trend.php"><div><span class="metric-mini-label">Yıllık COQ</span><strong>₺<?= number_format($dashCoqTotal, 0, ',', '.') ?></strong></div></a>
+                        <a href="quality-cost-trend.php"><div><span class="metric-mini-label">Hata Maliyeti</span><strong>₺<?= number_format($dashCoqFailure, 0, ',', '.') ?></strong></div></a>
+                        <a href="quality-cost-trend.php"><div><span class="metric-mini-label">Hata Oranı</span><strong>%<?= $dashCoqFailurePct ?></strong></div></a>
                     </div>
                 </div>
             </div>

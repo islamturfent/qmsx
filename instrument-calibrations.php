@@ -62,6 +62,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
         $formError = "Kalibrasyon kaydı eklenemedi. Geçerli bir alet, tarih ve dosya kontrol edin.";
+    } elseif (($_POST["form_type"] ?? "") === "attach_cert") {
+        $calId = (int) ($_POST["id"] ?? 0);
+        $file = isset($_FILES['certificate']) ? $_FILES['certificate'] : [];
+        if ($calId > 0 && qmsInstCalibAttachCert($pdo, $calId, $file, $userId, $role)) {
+            header("Location: instrument-calibrations.php?attached=1");
+            exit;
+        }
+        $formError = "Sertifika güncellenemedi. Geçerli bir dosya (en fazla 10 MB) seçin.";
     } elseif (($_POST["form_type"] ?? "") === "delete") {
         qmsInstCalibDelete($pdo, (int) ($_POST["id"] ?? 0), $userId, $role);
         header("Location: instrument-calibrations.php?deleted=1");
@@ -100,6 +108,7 @@ $activeNav = "calibration_history";
 
         <?php if ($formError !== ""): ?><div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div><?php endif; ?>
         <?php if (($_GET["added"] ?? "") === "1"): ?><div class="form-message success" data-i18n="calibrationAdded">Kalibrasyon kaydı eklendi.</div><?php endif; ?>
+        <?php if (($_GET["attached"] ?? "") === "1"): ?><div class="form-message success" data-i18n="calibrationCertAttached">Sertifika güncellendi.</div><?php endif; ?>
         <?php if (($_GET["deleted"] ?? "") === "1"): ?><div class="form-message success" data-i18n="calibrationDeleted">Kalibrasyon kaydı silindi.</div><?php endif; ?>
 
         <section class="filter-panel">
@@ -148,6 +157,7 @@ $activeNav = "calibration_history";
                                 <?php if ($row['certificate_file']): ?>
                                     <a class="secondary-button" href="instrument-calibrations.php?download=<?= (int) $row['id'] ?>" data-i18n="calibrationDownload">Sertifika</a>
                                 <?php endif; ?>
+                                <form class="inline-cert-upload" method="post" action="instrument-calibrations.php" enctype="multipart/form-data"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="attach_cert"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png"><button class="secondary-button secondary-button-sm" type="submit" data-i18n="calibrationAttachCert">Sertifika Yükle</button></form>
                                 <form method="post" action="instrument-calibrations.php" onsubmit="return confirm('Kayıt silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="calibrationDelete">Sil</button></form>
                             </div>
                         </div>

@@ -1907,6 +1907,64 @@ translations.en.costTypeInternalFailureLabel = "Internal Failure";
 translations.en.costTypeExternalFailureLabel = "External Failure";
 
 // --- COQ Trendi ---
+translations.tr.rootCauseMenuLabel = "Kök Neden Analizi";
+translations.tr.rootCauseTitle = "Kök Neden Analizi";
+translations.tr.rootCauseText = "Uygunsuzlukların kök nedenini 5 Neden ile belgeleyin.";
+translations.tr.rootCauseKicker = "İyileştirme";
+translations.tr.rootCauseSavedMessage = "Kök neden analizi kaydedildi.";
+translations.tr.rootCauseFieldLabel = "Kök Neden";
+translations.tr.rootCauseCorrectiveLabel = "Düzeltici Önlem";
+translations.tr.rootCausePreventiveLabel = "Önleyici Önlem";
+translations.tr.rootCauseSaveButton = "Kaydet";
+translations.tr.openNcButton = "Uygunsuzluğu Aç";
+translations.tr.backToRootCauseListButton = "Listeye Dön";
+translations.tr.rootCauseEmpty = "Analiz edilecek uygunsuzluk yok.";
+translations.tr.rootCausePendingBadge = "Analiz yok";
+translations.tr.auditCalendarMenuLabel = "Denetim Takvimi";
+translations.tr.auditCalendarTitle = "Denetim Yıllık Takvimi";
+translations.tr.auditCalendarText = "Planlanmış ve gerçekleşen denetimleri yıl bazında görün.";
+translations.tr.auditCalendarKicker = "Denetim Planı";
+translations.tr.auditCalendarTotalAudits = "Toplam Denetim";
+translations.tr.auditCalendarPlanned = "Planlandı";
+translations.tr.auditCalendarInProgress = "Devam Ediyor";
+translations.tr.auditCalendarDone = "Tamamlandı";
+translations.tr.auditCalendarOverdue = "Vadeyi Geçen";
+translations.tr.auditReportsMenuLabel = "Denetim Raporları";
+translations.tr.auditReportsText = "Tüm denetim raporlarını listeler ve yönetir.";
+translations.tr.auditReportsKicker = "Denetim Takibi";
+translations.tr.auditReportsTotal = "Toplam Rapor";
+translations.tr.auditReportsDraft = "Taslak";
+translations.tr.auditReportsFinal = "Kesinleşmiş";
+translations.tr.auditReportsDraftFilter = "Taslak";
+translations.tr.auditReportsFinalFilter = "Kesinleşmiş";
+translations.tr.auditReportsEmpty = "Eşleşen denetim raporu yok.";
+translations.tr.auditReportsAuditCol = "Denetim";
+translations.tr.auditReportsReportCol = "Rapor";
+translations.tr.auditReportsStatusCol = "Durum";
+translations.tr.auditReportsDateCol = "Tarih";
+translations.tr.auditReportsActionsCol = "İşlem";
+translations.tr.auditReportsEditButton = "Düzenle";
+translations.tr.auditReportsPdfButton = "PDF";
+translations.tr.auditFindingsMenuLabel = "Denetim Bulguları";
+translations.tr.auditFindingsTitle = "Denetim Bulguları";
+translations.tr.auditFindingsText = "Uygun bulunmayan denetim maddelerini ve kapanış durumlarını izleyin.";
+translations.tr.auditFindingsKicker = "Denetim Takibi";
+translations.tr.auditFindingsOpenLabel = "Açık Bulgu";
+translations.tr.auditFindingsClosedLabel = "Kapalı Bulgu";
+translations.tr.auditFindingsTotalLabel = "Toplam Bulgu";
+translations.tr.auditFindingsOpenFilter = "Açık";
+translations.tr.auditFindingsAllFilter = "Tümü";
+translations.tr.auditFindingsClosedFilter = "Kapalı";
+translations.tr.allCompaniesOption = "Tüm Şirketler";
+translations.tr.applyFiltersButton = "Filtrele";
+translations.tr.auditFindingsEmpty = "Eşleşen denetim bulgusu yok.";
+translations.tr.auditFindingsCompanyCol = "Şirket";
+translations.tr.auditFindingsAuditCol = "Denetim";
+translations.tr.auditFindingsBulguCol = "Bulgu";
+translations.tr.auditFindingsNcStatusCol = "Uygunsuzluk";
+translations.tr.auditFindingsCapaCol = "CAPA";
+translations.tr.auditFindingsNoNc = "Bağlı NC yok";
+translations.tr.auditFindingsNoCapa = "Faaliyet yok";
 translations.tr.costTrendMenuLabel = "COQ Trendi";
 translations.tr.costTrendTitle = "COQ Trendi";
 translations.tr.costTrendText = "Kalite maliyetlerini aylık ve kategori bazında analiz edin.";
@@ -1921,6 +1979,64 @@ translations.tr.annualCategoryText = "Seçilen yıldaki toplam maliyet dağılı
 translations.tr.monthlyDetailTitle = "Aylık Detay";
 translations.tr.monthlyDetailText = "Her ay için kategori toplamları (₺).";
 
+translations.en.rootCauseMenuLabel = "Root Cause Analysis";
+translations.en.rootCauseTitle = "Root Cause Analysis";
+translations.en.rootCauseText = "Document nonconformity root causes using 5-Why.";
+translations.en.rootCauseKicker = "Improvement";
+translations.en.rootCauseSavedMessage = "Root cause analysis saved.";
+translations.en.rootCauseFieldLabel = "Root Cause";
+translations.en.rootCauseCorrectiveLabel = "Corrective Action";
+translations.en.rootCausePreventiveLabel = "Preventive Action";
+translations.en.rootCauseSaveButton = "Save";
+translations.en.openNcButton = "Open Nonconformity";
+translations.en.backToRootCauseListButton = "Back to List";
+translations.en.rootCauseEmpty = "No nonconformities to analyze.";
+translations.en.rootCausePendingBadge = "No analysis";
+translations.en.auditCalendarMenuLabel = "Audit Calendar";
+translations.en.auditCalendarTitle = "Annual Audit Calendar";
+translations.en.auditCalendarText = "View planned and completed audits by year.";
+translations.en.auditCalendarKicker = "Audit Plan";
+translations.en.auditCalendarTotalAudits = "Total Audits";
+translations.en.auditCalendarPlanned = "Planned";
+translations.en.auditCalendarInProgress = "In Progress";
+translations.en.auditCalendarDone = "Completed";
+translations.en.auditCalendarOverdue = "Overdue";
+translations.en.auditReportsMenuLabel = "Audit Reports";
+translations.en.auditReportsText = "List and manage all audit reports.";
+translations.en.auditReportsKicker = "Audit Tracking";
+translations.en.auditReportsTotal = "Total Reports";
+translations.en.auditReportsDraft = "Draft";
+translations.en.auditReportsFinal = "Final";
+translations.en.auditReportsDraftFilter = "Draft";
+translations.en.auditReportsFinalFilter = "Final";
+translations.en.auditReportsEmpty = "No matching audit reports.";
+translations.en.auditReportsAuditCol = "Audit";
+translations.en.auditReportsReportCol = "Report";
+translations.en.auditReportsStatusCol = "Status";
+translations.en.auditReportsDateCol = "Date";
+translations.en.auditReportsActionsCol = "Actions";
+translations.en.auditReportsEditButton = "Edit";
+translations.en.auditReportsPdfButton = "PDF";
+translations.en.auditFindingsMenuLabel = "Audit Findings";
+translations.en.auditFindingsTitle = "Audit Findings";
+translations.en.auditFindingsText = "Track noncompliant audit items and their closure status.";
+translations.en.auditFindingsKicker = "Audit Tracking";
+translations.en.auditFindingsOpenLabel = "Open Findings";
+translations.en.auditFindingsClosedLabel = "Closed Findings";
+translations.en.auditFindingsTotalLabel = "Total Findings";
+translations.en.auditFindingsOpenFilter = "Open";
+translations.en.auditFindingsAllFilter = "All";
+translations.en.auditFindingsClosedFilter = "Closed";
+translations.en.allCompaniesOption = "All Companies";
+translations.en.applyFiltersButton = "Apply";
+translations.en.auditFindingsEmpty = "No matching audit findings.";
+translations.en.auditFindingsCompanyCol = "Company";
+translations.en.auditFindingsAuditCol = "Audit";
+translations.en.auditFindingsBulguCol = "Finding";
+translations.en.auditFindingsNcStatusCol = "Nonconformity";
+translations.en.auditFindingsCapaCol = "CAPA";
+translations.en.auditFindingsNoNc = "No linked NC";
+translations.en.auditFindingsNoCapa = "No CAPA";
 translations.en.costTrendMenuLabel = "COQ Trend";
 translations.en.costTrendTitle = "COQ Trend";
 translations.en.costTrendText = "Analyze quality costs by month and category.";
@@ -3051,6 +3167,8 @@ translations.tr.calibrationCertFileLabel = "Sertifika Dosyası (en fazla 10 MB)"
 translations.tr.calibrationNotesLabel = "Not";
 translations.tr.calibrationSave = "Kaydet";
 translations.tr.calibrationDownload = "Sertifika";
+translations.tr.calibrationAttachCert = "Sertifika Yükle";
+translations.tr.calibrationCertAttached = "Sertifika güncellendi.";
 translations.tr.calibrationDelete = "Sil";
 translations.tr.calibrationEmpty = "Henüz kalibrasyon kaydı yok.";
 translations.tr.instrumentsTitle = "Kalibrasyon & Metroloji";
@@ -3105,6 +3223,8 @@ translations.en.calibrationCertFileLabel = "Certificate File (max 10 MB)";
 translations.en.calibrationNotesLabel = "Notes";
 translations.en.calibrationSave = "Save";
 translations.en.calibrationDownload = "Certificate";
+translations.en.calibrationAttachCert = "Upload Certificate";
+translations.en.calibrationCertAttached = "Certificate updated.";
 translations.en.calibrationDelete = "Delete";
 translations.en.calibrationEmpty = "No calibration records yet.";
 translations.en.instrumentsTitle = "Calibration & Metrology";
@@ -3182,11 +3302,13 @@ Object.assign(translations.tr, {
   dashboardPeriodTitle: "Dönem Özeti", dashboardPeriodText: "Şirket panosu, müşteri performansı ve yetkinlik göstergeleri.",
   dashboardCompanyKpisTitle: "Şirket Panosu", dashboardCustomerTitle: "Müşteri & Yetkinlik",
   dashboardAuditTitle: "Denetim & Rapor Durumu", dashboardAuditText: "Devam eden denetimler ve rapor durumu.",
+  dashboardCoqTitle: "Kalite Maliyeti",
 });
 Object.assign(translations.en, {
   dashboardPeriodTitle: "Period Summary", dashboardPeriodText: "Company dashboard, customer performance and competency indicators.",
   dashboardCompanyKpisTitle: "Company Dashboard", dashboardCustomerTitle: "Customer & Competency",
   dashboardAuditTitle: "Audit & Report Status", dashboardAuditText: "Ongoing audits and report status.",
+  dashboardCoqTitle: "Cost of Quality",
 });
 Object.assign(translations.en, {
   dashboardCompetencyTitle: "Overdue Competencies", dashboardCompetencyText: "Competency assessments that are overdue for review.",

@@ -2013,6 +2013,73 @@ per-column emphasis, so uniform gray-500 reads washed out.
   Kapsamli sorgular `$dashOpenAudits`, `$dashAuditOverdue`, `$dashAuditReportDraft`,
   `$dashAuditReportFinal`, `$dashAuditOpenNc` (rapor sayilari `a.company_id` uzerinden
   kapsamlidir). Dashboard icin dogrulandi. Cache `v154`.
+- Bu turde uc is birlikte (2026-10):
+  1. **notify-overdue cron**: `scripts/cron-notify-overdue.bat` + Windows zamanlanmis
+     gorev `QuAmiNotifyOverdue` (gunluk 08:00) olusturuldu; calistirilip dogrulandi
+     (overdue bildirimleri + log `storage/logs/notify-overdue.log`).
+  2. **Denetim Bulgulari yuzeyi** (`audit-findings.php`): uygun bulunmayan kontrol
+     maddelerini (bulgu) sirkelet, audit, bagli NC durumu ve CAPA sayisi ile listeler;
+     acik/kapali filtre, sirket ve arama; sol menuye `audit_findings` anahtari ile eklendi.
+  3. **COQ Dashboard**: Donem Ozeti'ne "Kalite Maliyeti" grubu (yillik COQ, hata maliyeti,
+     hata orani) kapsamli olarak eklendi (`$dashCoqTotal/Failure/FailurePct`).
+  Cache `v155`.
+- **Kok Neden Analizi modulu** eklendi (2026-10): `nc_root_cause` tablosu + `root-cause.php`
+  (5 Neden + kok neden + duzeltici/onleyici onlem). `includes/root-cause-functions.php`
+  (qmsRootCauseFind/Save upsert; kok neden doluysa otomatik `done`). Sol menude
+  `root_cause`; `nonconformity-detail.php`'de "Kok Neden Analizi" butonu. Kapsam sirke
+  uzerinden. DB'de dogrulandi. Cache `v156`.
+- **Denetim Yillik Takvimi** eklendi (2026-10): `audit-calendar.php` - 12 ay grid,
+  ay bazinda planlanan/devam eden/tamamlanan denetimler, yil + sirket filtresi, ozet
+  kartlari (toplam/plan/int_progress/done/vadeyi gecen). Sol menude `audit_calendar`.
+  Cache `v156` sonrasi ek yeni `v157`.
+- **Kalibrasyon sertifika ekle/guncelle** eklendi (2026-10): `instrument-calibrations.php`
+  arti `qmsInstCalibAttachCert()` ile mevcut bir kayda sertifika dosyasi eklenebilir /
+  degistirilebilir (eski dosya silinir, 10MB, storage/calibrations). Satir ici "Sertifika
+  Yükle" + `attached=1` mesaji. `certificate_file` kolonu zaten vardi; migration yok.
+  Cache `v157`.
+- `audit-detail.php` kutu degme sorunu **giderildi** (2026-10, stil only):
+  `.audit-execution-bar` (Denetim Calisma Alani alti) icin `margin-top:22px` ve
+  `.super-admin-console + .console-card` (Denetciler karti) icin `margin-top:18px`
+  eklendi; kutular birbirine degmiyor. Cache `v158`.
+- **Denetim Raporlari Merkezi** (`audit-reports.php`) eklendi (2026-10): tum raporlari
+  (taslak/kesinlesmis) sirke/denetim/durum filtreleriyle listeler; satir basi Dusenle +
+  PDF; ozet kartlari; sol menude `audit_reports`.
+- **Denetim Bulgulari + Kok Neden Analizi export**: `audit-findings-export.php` ve
+  `root-cause-export.php` (Excel/PDF) eklendi; iki sayfaya da export butonlari.
+  Cache `v159`.
+
+## PENDING GIT COMMITS (proje bitince yapilacak)
+
+Kabuk bu oturumlarda PowerShell'e gecti ve `git` PATH'te / makinede erisilebilir degil
+(bash WSL kurulu degil); bu nedenle commit edilemedi. Kullanici git adimini **proje
+bitince** yapilacaklar listesine aldi. Asagidaki degisiklikler **calsa da calisma
+ağacında bekliyor** ve `git add -A` ile tek commit'te toplanmali:
+
+1. **Denetim Bulguları + COQ Dashboard + notify cron** (cache v155):
+   - `audit-findings.php` (yeni)
+   - `scripts/cron-notify-overdue.bat` (yeni) + Windows gorev `QuAmiNotifyOverdue` (gunluk 08:00; sistem seviyesi, dosya degil)
+   - `includes/app-sidebar.php`, `dashboard.php`, `assets/js/language.js`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
+   - `storage/logs/` (log dosyasi; gitignore durumu kontrol edilmeli)
+2. **Kök Neden Analizi modulu** (cache v156):
+   - `migrations/20261011-nc-root-cause.sql`, `scripts/migrate-nc-root-cause.php` (yeni)
+   - `includes/root-cause-functions.php` (yeni), `root-cause.php` (yeni)
+   - `includes/app-sidebar.php`, `assets/js/language.js`, `nonconformity-detail.php`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
+3. **Denetim Yillik Takvimi + Kalibrasyon sertifika ekle** (cache v157):
+   - `audit-calendar.php` (yeni)
+   - `includes/instrument-calibration-functions.php` (`qmsInstCalibAttachCert`)
+   - `instrument-calibrations.php`
+   - `includes/app-sidebar.php`, `assets/css/style.css`, `assets/js/language.js`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
+4. **Denetim Raporlari Merkezi + Bulgu/Kök Neden export** (cache v159):
+   - `audit-reports.php` (yeni)
+   - `audit-findings-export.php`, `root-cause-export.php` (yeni)
+   - `audit-findings.php`, `root-cause.php`, `includes/app-sidebar.php`, `assets/css/style.css`, `assets/js/language.js`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
+
+Onerilen commit:
+```
+cd C:\xampp\htdocs\qmsx
+rem (git PATH'teyken) git add -A
+rem git commit -m "modul: root cause analysis + audit findings + COQ dashboard + cron" -m "cache v156"
+```
 
 ## Working preferences
 
