@@ -3193,6 +3193,7 @@ translations.tr.incidentNcLinkedText = "Bu olay için uygunsuzluk oluşturulmuş
 translations.tr.incidentNcCreateText = "Olaydan bir uygunsuzluk (ve ardından CAPA) oluşturabilirsiniz.";
 translations.tr.incidentOpenNcButton = "Uygunsuzluğu Aç";
 translations.tr.incidentCreateNcButton = "Uygunsuzluk Oluştur";
+translations.tr.incidentCreateCapaButton = "Düzeltici Faaliyet Aç";
 translations.en.incidentDetailTitle = "Incident Detail";
 translations.en.incidentDetailText = "View incident details and create a nonconformity if needed.";
 translations.en.incidentBackTo = "Back to Incidents";
@@ -3203,6 +3204,7 @@ translations.en.incidentNcLinkedText = "A nonconformity already exists for this 
 translations.en.incidentNcCreateText = "You can create a nonconformity (and then a CAPA) from this incident.";
 translations.en.incidentOpenNcButton = "Open Nonconformity";
 translations.en.incidentCreateNcButton = "Create Nonconformity";
+translations.en.incidentCreateCapaButton = "Open Corrective Action";
 
 // --- Kalibrasyon & Metroloji ---
 translations.tr.instrumentsMenuLabel = "Kalibrasyon & Metroloji";

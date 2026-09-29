@@ -38,6 +38,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
         $message = 'Uygunsuzluk oluşturulamadı.';
+    } elseif (($_POST["form_type"] ?? "") === "create_capa") {
+        $actionId = qmsIncidentCreateCorrectiveAction($pdo, $id, $userId, $role);
+        if ($actionId !== null) {
+            header("Location: corrective-action-detail.php?id=" . $actionId);
+            exit;
+        }
+        $message = 'Düzeltici faaliyet oluşturulamadı.';
     }
 }
 
@@ -89,10 +96,16 @@ $activeNav = "incidents";
             <div class="section-heading compact-heading"><div><h3 data-i18n="incidentCapaTitle">Düzeltici Faaliyet (CAPA) Bağlantısı</h3></div></div>
             <?php if ($linkedNc > 0): ?>
                 <p data-i18n="incidentNcLinkedText">Bu olay için uygunsuzluk oluşturulmuş durumda.</p>
-                <a class="primary-button" href="nonconformity-detail.php?id=<?= (int) $linkedNc ?>" data-i18n="incidentOpenNcButton">Uygunsuzluğu Aç</a>
+                <div style="display:inline-flex;gap:8px;flex-wrap:wrap;">
+                    <a class="secondary-button" href="nonconformity-detail.php?id=<?= (int) $linkedNc ?>" data-i18n="incidentOpenNcButton">Uygunsuzluğu Aç</a>
+                    <form method="post" action="incident-detail.php?id=<?= (int) $id ?>"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="create_capa"><button class="primary-button" type="submit" data-i18n="incidentCreateCapaButton">Düzeltici Faaliyet Aç</button></form>
+                </div>
             <?php else: ?>
-                <p data-i18n="incidentNcCreateText">Olaydan bir uygunsuzluk (ve ardından CAPA) oluşturabilirsiniz.</p>
-                <form method="post" action="incident-detail.php?id=<?= (int) $id ?>"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="create_nc"><button class="primary-button" type="submit" data-i18n="incidentCreateNcButton">Uygunsuzluk Oluştur</button></form>
+                <p data-i18n="incidentNcCreateText">Olaydan bir uygunsuzluk ve ardından düzeltici faaliyet (CAPA) oluşturabilirsiniz.</p>
+                <div style="display:inline-flex;gap:8px;flex-wrap:wrap;">
+                    <form method="post" action="incident-detail.php?id=<?= (int) $id ?>"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="create_nc"><button class="secondary-button" type="submit" data-i18n="incidentCreateNcButton">Uygunsuzluk Oluştur</button></form>
+                    <form method="post" action="incident-detail.php?id=<?= (int) $id ?>"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="create_capa"><button class="primary-button" type="submit" data-i18n="incidentCreateCapaButton">Düzeltici Faaliyet Aç</button></form>
+                </div>
             <?php endif; ?>
         </section>
     </main>

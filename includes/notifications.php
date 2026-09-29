@@ -155,6 +155,7 @@ function qmsNotificationTypes(): array
         'corrective_action_assigned' => ['icon' => 'check', 'group' => 'capa'],
         'corrective_action_verification' => ['icon' => 'approvals', 'group' => 'capa'],
         'corrective_action_closed' => ['icon' => 'checkBadge', 'group' => 'capa'],
+        'capa_opened_from_incident' => ['icon' => 'check', 'group' => 'capa'],
         'document_approval_request' => ['icon' => 'approvals', 'group' => 'document'],
         'document_approval_decision' => ['icon' => 'documents', 'group' => 'document'],
         'document_published' => ['icon' => 'documents', 'group' => 'document'],

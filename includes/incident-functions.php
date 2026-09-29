@@ -201,6 +201,65 @@ function qmsIncidentCreateNonconformity(PDO $pdo, int $incidentId, int $userId, 
 }
 
 /**
+ * Olaydan tek akista CAPA acar: gerekirse uygunsuzluk olusturur, ona bagli
+ * duzeltici faaliyet yazar, sirket adminlerine bildirim + denetim izi gonderir.
+ *
+ * @return int|null Yeni duzeltici faaliyet id'si; basarisizlikta null.
+ */
+function qmsIncidentCreateCorrectiveAction(PDO $pdo, int $incidentId, int $userId, string $role): ?int
+{
+    $inc = qmsIncidentFind($pdo, $incidentId, $userId, $role);
+    if (!$inc) {
+        return null;
+    }
+
+    // NC var mi diye bak; yoksa olustur (idempotent).
+    $ncId = qmsIncidentLinkedNonconformity($pdo, $incidentId);
+    if ($ncId <= 0) {
+        $ncId = (int) qmsIncidentCreateNonconformity($pdo, $incidentId, $userId, $role);
+    }
+    if ($ncId <= 0) {
+        return null;
+    }
+
+    $title = mb_substr(trim((string) ($inc['title'] ?? '')), 0, 255);
+    if ($title === '') {
+        $title = 'Olay düzeltici faaliyeti';
+    }
+    $actionText = 'Olay: ' . $title . ' için düzeltici faaliyet.';
+
+    $insert = $pdo->prepare(
+        'INSERT INTO corrective_actions
+            (nonconformity_id, action_type, action_text, status, active)
+         VALUES (?, \'corrective\', ?, \'planned\', 1)'
+    );
+    $insert->execute([$ncId, $actionText]);
+    $newActionId = (int) $pdo->lastInsertId();
+
+    $link = 'corrective-action-detail.php?id=' . $newActionId;
+
+    // Sirket adminlerine bildirim (tercihe bagli eposta).
+    require_once __DIR__ . '/notifications.php';
+    require_once __DIR__ . '/capa-functions.php';
+    $suffix = ((string) $inc['severity']) === 'critical' ? ' (Kritik)' : '';
+    qmsNotifyCompanyAdmins(
+        $pdo,
+        (int) $inc['company_id'],
+        'capa_opened_from_incident',
+        'Olaydan CAPA açıldı',
+        'Olay: ' . $title . ' için düzeltici faaliyet açıldı' . $suffix,
+        $link,
+        $userId
+    );
+
+    // Denetim izi.
+    require_once __DIR__ . '/audit-log-functions.php';
+    qmsAuditLog($pdo, (int) $inc['company_id'], $userId, 'incident', $incidentId, 'capa_created', 'Olaydan düzeltici faaliyet açıldı: ' . $title);
+
+    return $newActionId;
+}
+
+/**
  * Sirketin sistem adminlerine yeni olay bildirimi gonderir (tercihe bagli eposta).
  */
 function qmsIncidentNotify(PDO $pdo, int $companyId, string $title, string $severity, string $link): void

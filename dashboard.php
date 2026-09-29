@@ -114,6 +114,8 @@ $dashRisks = $scopedCount("SELECT COUNT(*) FROM risks WHERE active=1 AND status<
 $dashDocs = $scopedCount("SELECT COUNT(*) FROM documents WHERE active=1" . $scopeClause);
 $dashContracts = $scopedCount("SELECT COUNT(*) FROM contracts WHERE active=1 AND end_date < CURDATE()" . $scopeClause);
 $dashCalib = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND next_calibration_date < CURDATE()" . $scopeClause);
+$dashOpenIncidentsKpi = $scopedCount("SELECT COUNT(*) FROM incidents WHERE active=1 AND status<>'closed'" . $scopeClause);
+$dashCriticalIncidentsKpi = $scopedCount("SELECT COUNT(*) FROM incidents WHERE active=1 AND status<>'closed' AND severity='critical'" . $scopeClause);
 
 // Müşteri performansı (red eşiği %5 ustu musteri + ort. red).
 $dashLowCustomers = 0;
@@ -608,6 +610,8 @@ $activeNav = "dashboard";
                         <div><span class="metric-mini-label">Aktif Doküman</span><strong><?= $dashDocs ?></strong></div>
                         <div><span class="metric-mini-label">Sözleşme (dolan)</span><strong><?= $dashContracts ?></strong></div>
                         <div><span class="metric-mini-label">Kalibrasyon (geçik)</span><strong><?= $dashCalib ?></strong></div>
+                        <a href="incidents.php"><div><span class="metric-mini-label">Açık Olay</span><strong><?= $dashOpenIncidentsKpi ?></strong></div></a>
+                        <a href="incidents.php"><div><span class="metric-mini-label">Kritik Olay</span><strong class="<?= $dashCriticalIncidentsKpi > 0 ? 'danger-text' : '' ?>"><?= $dashCriticalIncidentsKpi ?></strong></div></a>
                     </div>
                 </div>
                 <div class="period-overview-group">

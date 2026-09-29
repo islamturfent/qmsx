@@ -2112,3 +2112,12 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   `qmsIncidentCreateNonconformity()` yeni bir olay kaynakli ucunsuzluk acarken
   sirket adminlerine `nc_status_changed` bildirimi + (tercihe bagli) eposta
   gonderir; CAPA kapanis bildirimi zaten durum degisiminde gider.
+- **Olaydan tek akista CAPA acma** (cache v170): `qmsIncidentCreateCorrectiveAction()`
+  gerekirse uygunsuzluk olusturur, ona bagli duzeltici faaliyet yazar, sirket
+  adminlerine `capa_opened_from_incident` bildirimi + denetim izi (`incident`/
+  `capa_created`) gonderir. `incident-detail.php` CAPA bolumune "Duzeltici Faaliyet
+  Ac" butonu (her durumda) eklendi; i18n `incidentCreateCapaButton`.
+- **Olay -> Dashboard Donem Ozeti** (cache v170): `dashboard.php` Donem Ozeti
+  izgarasinin Sirket Panosu grubuna "Acik Olay" ve "Kritik Olay" KPI'lari eklendi
+  (incidents.php linkli; kritik kirmizi vurgulu). Rapor export'u zaten Olaylar
+  sheet/metriklerini iceriyordu (dogrulandi).

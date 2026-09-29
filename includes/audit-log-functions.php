@@ -24,6 +24,7 @@ function qmsAuditLogEntityLabels(): array
         'document' => 'Doküman',
         'nonconformity' => 'Uygunsuzluk',
         'corrective_action' => 'Düzeltici Faaliyet',
+        'incident' => 'Olay',
         'risk' => 'Risk',
         'supplier' => 'Tedarikçi',
         'training' => 'Eğitim',
@@ -50,6 +51,7 @@ function qmsAuditLogActionLabels(): array
         'close' => 'Kapatma',
         'complete' => 'Tamamlama',
         'assign' => 'Atama',
+        'capa_created' => 'CAPA Açma',
     ];
 }
 
@@ -63,6 +65,7 @@ function qmsAuditLogEntityIcons(): array
         'document' => 'documents',
         'nonconformity' => 'alert',
         'corrective_action' => 'checkBadge',
+        'incident' => 'alert',
         'risk' => 'warning',
         'supplier' => 'suppliers',
         'training' => 'training',
