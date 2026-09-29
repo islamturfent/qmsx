@@ -171,6 +171,8 @@ function qmsNotificationTypes(): array
         'calibration_failed' => ['icon' => 'warning', 'group' => 'calibration'],
         'overdue_action' => ['icon' => 'alert', 'group' => 'capa'],
         'overdue_nonconformity' => ['icon' => 'alert', 'group' => 'capa'],
+        'nc_status_changed' => ['icon' => 'alert', 'group' => 'nc'],
+        'nc_closed' => ['icon' => 'checkBadge', 'group' => 'nc'],
         'overdue_training' => ['icon' => 'training', 'group' => 'training'],
         'overdue_calibration' => ['icon' => 'warning', 'group' => 'calibration'],
         'overdue_finding' => ['icon' => 'alert', 'group' => 'capa'],
@@ -210,6 +212,7 @@ function qmsNotificationGroupLabels(): array
 {
     return [
         'capa' => 'Düzeltici Faaliyet',
+        'nc' => 'Uygunsuzluk',
         'document' => 'Doküman',
         'training' => 'Eğitim',
         'supplier' => 'Tedarikçi',
@@ -235,6 +238,7 @@ function qmsNotificationGroupI18nKeys(): array
 {
     return [
         'capa' => 'notificationGroupCapaLabel',
+        'nc' => 'notificationGroupNcLabel',
         'document' => 'notificationGroupDocumentLabel',
         'training' => 'notificationGroupTrainingLabel',
         'supplier' => 'notificationGroupSupplierLabel',

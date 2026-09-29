@@ -2093,3 +2093,15 @@ en guvenlisi. `service-worker.js` cache su an `v159`.
 ## Owning task
 
 Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
+
+## Log (2026-10)
+
+- **Kalibrasyon Takvimi** (`calibration-calendar.php`) eklendi (commit `3374120`, cache v167):
+  olcu aletlerinin yillik gorunumu (sonraki kalibrasyon tarihleri). Sol menude
+  `calibration_calendar`; i18n TR/EN.
+- **NC durum degisimi bildirimi** (cache v168): `nonconformity-detail.php`
+  `update_nonconformity` handler'inda durum degisiminde sirket adminlerine bildirim
+  + (tercihe bagli) e-posta. Yeni bildirim tipleri `nc_status_changed` ve `nc_closed`
+  (`includes/notifications.php` -> `nc` grubu); grup etiketi + i18n anahtari
+  `notificationGroupNcLabel` eklendi. Kapanis ayri tip olarak `nc_closed`; diger
+  durum gecisleri `nc_status_changed`. Islem yapan kullanici dislanir.

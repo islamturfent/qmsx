@@ -1199,12 +1199,14 @@ Object.assign(translations.en, {
 });
 
 Object.assign(translations.tr, {
-    notificationGroupCapaLabel: "Düzeltici Faaliyet", notificationGroupDocumentLabel: "Doküman",
+    notificationGroupCapaLabel: "Düzeltici Faaliyet", notificationGroupNcLabel: "Uygunsuzluk",
+    notificationGroupDocumentLabel: "Doküman",
     notificationGroupTrainingLabel: "Eğitim", notificationGroupSupplierLabel: "Tedarikçi",
     notificationGroupComplaintLabel: "Şikayet", notificationGroupGeneralLabel: "Genel"
 });
 Object.assign(translations.en, {
-    notificationGroupCapaLabel: "Corrective Action", notificationGroupDocumentLabel: "Document",
+    notificationGroupCapaLabel: "Corrective Action", notificationGroupNcLabel: "Nonconformity",
+    notificationGroupDocumentLabel: "Document",
     notificationGroupTrainingLabel: "Training", notificationGroupSupplierLabel: "Supplier",
     notificationGroupComplaintLabel: "Complaint", notificationGroupGeneralLabel: "General"
 });

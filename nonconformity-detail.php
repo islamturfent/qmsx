@@ -11,6 +11,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/vocabulary.php';
 require_once __DIR__ . '/includes/audit-log-functions.php';
+require_once __DIR__ . '/includes/notifications.php';
 
 $nonconformityId = (int) ($_GET["id"] ?? 0);
 
@@ -112,6 +113,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && ($_POST["form_type"] ?? "") === "up
             ? 'close'
             : ($formData["status"] !== $nonconformity["status"] ? 'status_change' : 'update');
         qmsAuditLog($pdo, (int) $nonconformity["company_id"], $userId, 'nonconformity', $nonconformityId, $ncAction, 'Uygunsuzluk güncellendi: ' . $formData["title"] . ' (durum: ' . $formData["status"] . ')');
+
+        // Durum degisiminde sirket adminlerine bildirim (kapanis ayri tiptir).
+        if ($formData["status"] !== (string) ($nonconformity["status"] ?? '')) {
+            $ncLink = 'nonconformity-detail.php?id=' . $nonconformityId;
+            $ncMessage = 'Uygunsuzluk: ' . $formData["title"] . ' (durum: ' . $formData["status"] . ')';
+            if ($formData["status"] === "closed") {
+                qmsNotifyCompanyAdmins($pdo, (int) $nonconformity["company_id"], 'nc_closed', 'Uygunsuzluk kapatıldı', $ncMessage, $ncLink, $userId);
+            } else {
+                qmsNotifyCompanyAdmins($pdo, (int) $nonconformity["company_id"], 'nc_status_changed', 'Uygunsuzluk durumu değişti', $ncMessage, $ncLink, $userId);
+            }
+        }
 
         header("Location: nonconformity-detail.php?id=" . $nonconformityId . "&updated=1");
         exit;
