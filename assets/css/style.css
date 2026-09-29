@@ -3914,6 +3914,12 @@ input[type="checkbox"]:focus-visible {
     text-overflow: ellipsis;
 }
 
+/* Son 12 Ay Trendleri - dark mode overrides. */
+body.dark-mode .trend-series-head { color: var(--gray-100); }
+body.dark-mode .trend-bar-track { background: var(--gray-800); }
+body.dark-mode .trend-bar-value { color: var(--gray-400); }
+body.dark-mode .trend-bar-label { color: var(--gray-400); }
+
 /* ----------------------------------------------------------------------------
    Denetim raporu yuzeyi
    ---------------------------------------------------------------------------- */

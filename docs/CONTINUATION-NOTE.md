@@ -2121,3 +2121,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   izgarasinin Sirket Panosu grubuna "Acik Olay" ve "Kritik Olay" KPI'lari eklendi
   (incidents.php linkli; kritik kirmizi vurgulu). Rapor export'u zaten Olaylar
   sheet/metriklerini iceriyordu (dogrulandi).
+- **Son 12 Ay Trendleri dark mode** (cache v171): `style.css` icinde
+  `body.dark-mode` overrides eklendi — `.trend-series-head` metni koyu yerine
+  acik, `.trend-bar-track` zemini koyu, deger/etiket renkleri dark token'a.
