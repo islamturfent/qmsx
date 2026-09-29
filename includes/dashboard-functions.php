@@ -273,6 +273,29 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
            AND a.planned_date IS NOT NULL AND a.planned_date < CURDATE()' . $scope['sql']
     );
 
+    // Acik denetim bulgulari (kapatilmamis NC'ye bagli uygun bulunmayan maddeler).
+    $openFindings = $agg(
+        'SELECT COUNT(*) FROM audit_checklist_items cit
+         INNER JOIN audits a ON a.id = cit.audit_id
+         INNER JOIN companies co ON co.id = a.company_id
+         LEFT JOIN nonconformities nc ON nc.checklist_item_id = cit.id AND nc.active = 1
+         WHERE cit.active = 1 AND cit.result_status = \'noncompliant\'
+           AND (nc.id IS NULL OR nc.status <> \'closed\')' . $scope['sql']
+    );
+    // Kok neden analizi bekleyen uygunsuzluklar.
+    $ncPendingAnalysis = $agg(
+        'SELECT COUNT(*) FROM nonconformities n
+         INNER JOIN companies co ON co.id = n.company_id
+         LEFT JOIN nc_root_cause rc ON rc.nonconformity_id = n.id AND rc.active = 1
+         WHERE n.active = 1 AND n.status <> \'closed\' AND rc.id IS NULL' . $scope['sql']
+    );
+    // Dagitilan dokumanlar icin teslim onayi bekleyen kopyalar.
+    $docConfirmPending = $agg(
+        'SELECT COUNT(*) FROM document_copies c
+         INNER JOIN companies co ON co.id = c.company_id
+         WHERE c.active = 1 AND c.status = \'distributed\' AND c.received_confirmed = 0' . $scope['sql']
+    );
+
     // En yogun ay (denetim bazinda).
     $topMonth = null;
     $topAudits = 0;
@@ -297,6 +320,22 @@ function qmsDashboardSummary(PDO $pdo, int $userId, string $role, array $trend):
         $points[] = ['tone' => $overdueAudits > 0 ? 'warning' : 'neutral', 'text' => $openAudits . ' denetim devam ediyor' . ($overdueAudits > 0 ? '; ' . $overdueAudits . ' tanesi vadeyi geçti.' : '.')];
     } else {
         $points[] = ['tone' => 'positive', 'text' => 'Devam eden denetim bulunmuyor.'];
+    }
+
+    if ($openFindings > 0) {
+        $points[] = ['tone' => 'neutral', 'text' => $openFindings . ' açık denetim bulgusu var; kapanışı takip edilmeli.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Açık denetim bulgusu bulunmuyor.'];
+    }
+    if ($ncPendingAnalysis > 0) {
+        $points[] = ['tone' => 'warning', 'text' => $ncPendingAnalysis . ' uygunsuzluğun kök neden analizi bekliyor.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Kök neden analizi bekleyen uygunsuzluk bulunmuyor.'];
+    }
+    if ($docConfirmPending > 0) {
+        $points[] = ['tone' => 'neutral', 'text' => $docConfirmPending . ' dağıtılmış doküman teslim onayı bekliyor.'];
+    } else {
+        $points[] = ['tone' => 'positive', 'text' => 'Bekleyen doküman teslim onayı bulunmuyor.'];
     }
     $points[] = ['tone' => 'neutral', 'text' => $nonconformities . ' uygunsuzluk açıldı; şu an ' . $openNonconformities . ' açık durumda.'];
     $points[] = ['tone' => 'neutral', 'text' => $actionsCompleted . ' aksiyon tamamlandı.'];
