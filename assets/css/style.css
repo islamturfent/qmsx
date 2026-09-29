@@ -4685,6 +4685,24 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
 .inline-cert-upload { display: inline-flex; align-items: center; gap: 6px; }
 .inline-cert-upload input[type="file"] { max-width: 150px; font-size: 11px; }
 
+/* Dagitim & Imza Takibi: onaylayan kutusu (text) - TailAdmin dark-adaptif. */
+.inline-cert-upload input[type="text"] {
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background-color: var(--control-bg-color);
+    color: var(--text-color);
+    font-size: 13px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+.inline-cert-upload input[type="text"]::placeholder { color: var(--gray-400); }
+.inline-cert-upload input[type="text"]:focus {
+    border-color: var(--brand-400, #3b82f6);
+    box-shadow: var(--shadow-focus-ring);
+}
+
 /* audit-detail: kutu araligi duzeltmeleri (yalnizca stil) */
 .audit-execution-bar { margin-top: 22px; }
 .super-admin-console + .console-card { margin-top: 18px; }

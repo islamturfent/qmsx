@@ -2130,3 +2130,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **Dokuman Dagitim Kontrolu dropdown dark mode** (cache v173): `copy_status`
   selectine `doc-roll-select` sinifi eklendi (presentational) + `style.css`'e
   TailAdmin tarzi dark-adaptif inline durum select stili; fonksiyona dokunulmadi.
+- **Dagitim & Imza Takibi onaylayan kutusu dark mode** (cache v174):
+  `.inline-cert-upload input[type=text]` TailAdmin tarzi dark-adaptif stil eklendi
+  (control-bg/border/text + odak halkasi); fonksiyona dokunulmadi.
