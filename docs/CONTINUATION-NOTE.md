@@ -2048,38 +2048,15 @@ per-column emphasis, so uniform gray-500 reads washed out.
   `root-cause-export.php` (Excel/PDF) eklendi; iki sayfaya da export butonlari.
   Cache `v159`.
 
-## PENDING GIT COMMITS (proje bitince yapilacak)
+## GIT DURUMU (COZULDU)
 
-Kabuk bu oturumlarda PowerShell'e gecti ve `git` PATH'te / makinede erisilebilir degil
-(bash WSL kurulu degil); bu nedenle commit edilemedi. Kullanici git adimini **proje
-bitince** yapilacaklar listesine aldi. Asagidaki degisiklikler **calsa da calisma
-ağacında bekliyor** ve `git add -A` ile tek commit'te toplanmali:
-
-1. **Denetim Bulguları + COQ Dashboard + notify cron** (cache v155):
-   - `audit-findings.php` (yeni)
-   - `scripts/cron-notify-overdue.bat` (yeni) + Windows gorev `QuAmiNotifyOverdue` (gunluk 08:00; sistem seviyesi, dosya degil)
-   - `includes/app-sidebar.php`, `dashboard.php`, `assets/js/language.js`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
-   - `storage/logs/` (log dosyasi; gitignore durumu kontrol edilmeli)
-2. **Kök Neden Analizi modulu** (cache v156):
-   - `migrations/20261011-nc-root-cause.sql`, `scripts/migrate-nc-root-cause.php` (yeni)
-   - `includes/root-cause-functions.php` (yeni), `root-cause.php` (yeni)
-   - `includes/app-sidebar.php`, `assets/js/language.js`, `nonconformity-detail.php`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
-3. **Denetim Yillik Takvimi + Kalibrasyon sertifika ekle** (cache v157):
-   - `audit-calendar.php` (yeni)
-   - `includes/instrument-calibration-functions.php` (`qmsInstCalibAttachCert`)
-   - `instrument-calibrations.php`
-   - `includes/app-sidebar.php`, `assets/css/style.css`, `assets/js/language.js`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
-4. **Denetim Raporlari Merkezi + Bulgu/Kök Neden export** (cache v159):
-   - `audit-reports.php` (yeni)
-   - `audit-findings-export.php`, `root-cause-export.php` (yeni)
-   - `audit-findings.php`, `root-cause.php`, `includes/app-sidebar.php`, `assets/css/style.css`, `assets/js/language.js`, `service-worker.js`, `docs/CONTINUATION-NOTE.md`
-
-Onerilen commit:
-```
-cd C:\xampp\htdocs\qmsx
-rem (git PATH'teyken) git add -A
-rem git commit -m "modul: root cause analysis + audit findings + COQ dashboard + cron" -m "cache v156"
-```
+Git for Windows (2.56.0) kullanici tarafindan kuruldu; adres:
+`C:\Program Files\Git\cmd\git.exe`. Tum birikmis degisiklikler tek kapsamli commit
+`b49e1f2` (19 dosya, +1487) ile kaydedildi. Bundan sonra commit icin git PATH'te
+olmazsa oturum basina `$env:Path = 'C:\Program Files\Git\cmd;' + $env:Path`
+(veya tam yol) kullan. Her `shell_command` taze bir PowerShell ile baslayip
+kurulum oncesi onbelleklenmis PATH'i alabilir; bu yuzden PATH on-ekini tekrarlamak
+en guvenlisi. `service-worker.js` cache su an `v159`.
 
 ## Working preferences
 
