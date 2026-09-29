@@ -179,7 +179,25 @@ function qmsIncidentCreateNonconformity(PDO $pdo, int $incidentId, int $userId, 
         (string) $inc['severity'],
         $incidentId,
     ]);
-    return (int) $pdo->lastInsertId();
+    $newNcId = (int) $pdo->lastInsertId();
+
+    // Yeni olusturulan olay kaynakli uygunsuzluk icin sirket adminlerine bildirim
+    // (tercihe bagli eposta). CAPA zinciri, uygunsuzluk detayindan duzeltici
+    // faaliyet acilmasyla surer; kapanis bildirimi zaten durum degisiminde gider.
+    require_once __DIR__ . '/notifications.php';
+    $link = 'nonconformity-detail.php?id=' . $newNcId;
+    $suffix = ((string) $inc['severity']) === 'critical' ? ' (Kritik)' : '';
+    qmsNotifyCompanyAdmins(
+        $pdo,
+        (int) $inc['company_id'],
+        'nc_status_changed',
+        'Yeni olay uygunsuzluğu açıldı',
+        'Olaydan uygunsuzluk: ' . $title . $suffix,
+        $link,
+        $userId
+    );
+
+    return $newNcId;
 }
 
 /**

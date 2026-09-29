@@ -2105,3 +2105,10 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   (`includes/notifications.php` -> `nc` grubu); grup etiketi + i18n anahtari
   `notificationGroupNcLabel` eklendi. Kapanis ayri tip olarak `nc_closed`; diger
   durum gecisleri `nc_status_changed`. Islem yapan kullanici dislanir.
+- **Kalibrasyon Takvimi dark mode** (cache v169): `assets/css/style.css` icinde
+  `finding-filter-form select` TailAdmin chevron stili + `.calendar-*` kutulari
+  icin `body.dark-mode` overrides eklendi (dropdown ve kutular dark modda okunur).
+- **Olay -> NC -> CAPA baglantisi derinlestirildi** (cache v169):
+  `qmsIncidentCreateNonconformity()` yeni bir olay kaynakli ucunsuzluk acarken
+  sirket adminlerine `nc_status_changed` bildirimi + (tercihe bagli) eposta
+  gonderir; CAPA kapanis bildirimi zaten durum degisiminde gider.
