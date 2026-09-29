@@ -334,7 +334,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("instruments", $activeNav) ?>" href="instruments.php">
             <?= appIcon("clock") ?>
-            <span data-i18n="instrumentsMenuLabel">Kalibrasyon & Metroloji</span>
+            <span data-i18n="instrumentsListMenuLabel">Ölçü Aletleri</span>
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
