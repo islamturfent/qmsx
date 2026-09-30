@@ -41,9 +41,9 @@ function qmsAiProviderPresets(): array
             'whisper_model' => 'whisper-1',
         ],
         'groq' => [
-            'label' => 'Groq (Llama 4 Scout + whisper-large-v3)',
+            'label' => 'Groq (GPT-OSS-20b + whisper-large-v3)',
             'base_url' => 'https://api.groq.com/openai/v1',
-            'model' => 'meta-llama/llama-4-scout-17b-16e-instruct',
+            'model' => 'openai/gpt-oss-20b',
             'whisper_model' => 'whisper-large-v3',
         ],
     ];

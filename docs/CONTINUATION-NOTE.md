@@ -2238,3 +2238,7 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   modeli yazip kaydeder). i18n `aiUseModel` + CSS.
 - **Hata Detayi bosluk duzeltmesi** (cache v191): `ai-settings.php` 'de
   Hata Detayi section'ina `margin-top:20px` (ust kutuya degmesin diye).
+- **Groq calisan model bulundu** (cache v192): anahtar erisimi sorgulandi;
+  `llama-4-scout` yok. Erisilebilir sohbet modeli `openai/gpt-oss-20b`
+  (whisper-large-v3). Groq preset + settings.json bu modele cevrildi; gercek
+  test OK (model calisiyor).
