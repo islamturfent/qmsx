@@ -24,14 +24,12 @@ if (!qmsCanSession('audit_trail.view')) {
 // Filtre: yalniz onayli degerler.
 $filter = [
     "company_id" => (int) ($_GET["company_id"] ?? 0),
-    "entity_type" => (string) ($_GET["entity_type"] ?? ""),
+    // Kayit turu filtresi her zaman "tumu"dir; kutucugu gosterilmez.
+    "entity_type" => "",
     "action" => (string) ($_GET["action"] ?? ""),
     "from" => (string) ($_GET["from"] ?? ""),
     "to" => (string) ($_GET["to"] ?? ""),
 ];
-if ($filter["entity_type"] !== "" && !isset(qmsAuditLogEntityLabels()[$filter["entity_type"]])) {
-    $filter["entity_type"] = "";
-}
 if ($filter["action"] !== "" && !isset(qmsAuditLogActionLabels()[$filter["action"]])) {
     $filter["action"] = "";
 }
@@ -101,15 +99,7 @@ $activeNav = "audit_trail";
                             <?php endforeach; ?>
                         </select>
                     </label>
-                    <label class="form-field">
-                        <span data-i18n="auditEntityTypeLabel">Kayıt Türü</span>
-                        <select name="entity_type">
-                            <option value="" data-i18n="allTypesOption">Tümü</option>
-                            <?php foreach ($entityLabels as $value => $label): ?>
-                                <option value="<?= $value ?>" <?= $filter["entity_type"] === $value ? "selected" : "" ?>><?= htmlspecialchars($label, ENT_QUOTES, "UTF-8") ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
+                    <input type="hidden" name="entity_type" value="">
                     <label class="form-field">
                         <span data-i18n="auditActionLabel">İşlem</span>
                         <select name="action">

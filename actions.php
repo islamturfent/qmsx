@@ -83,7 +83,8 @@ foreach ($records as $record) {
 
 $filters = [
     "company_id" => (int) ($_GET["company_id"] ?? 0),
-    "record_type" => $_GET["record_type"] ?? "",
+    // Kayit turu filtresi her zaman "tumu"dir; kutucugu gosterilmez.
+    "record_type" => "",
     "status" => $_GET["status"] ?? "",
     "severity" => $_GET["severity"] ?? "",
     "responsible" => trim($_GET["responsible"] ?? ""),
@@ -167,7 +168,7 @@ $activeNav = "actions";
         <section class="filter-panel">
             <form class="filter-form" method="get" action="actions.php">
                 <label><span data-i18n="companySelectLabel">Şirket</span><select name="company_id"><option value="0" data-i18n="allCompaniesOption">Tüm şirketler</option><?php foreach ($companies as $company): ?><option value="<?= (int) $company["id"] ?>" <?= $filters["company_id"] === (int) $company["id"] ? "selected" : "" ?>><?= htmlspecialchars($company["company_name"], ENT_QUOTES, "UTF-8") ?></option><?php endforeach; ?></select></label>
-                <label><span data-i18n="recordTypeLabel">Kayıt Türü</span><select name="record_type"><option value="" data-i18n="allRecordsOption">Tüm kayıtlar</option><option value="nonconformity" <?= $filters["record_type"] === "nonconformity" ? "selected" : "" ?> data-i18n="nonconformityTypeLabel">Uygunsuzluk</option><option value="corrective_action" <?= $filters["record_type"] === "corrective_action" ? "selected" : "" ?> data-i18n="correctiveActionTypeLabel">Düzeltici Faaliyet</option></select></label>
+                <input type="hidden" name="record_type" value="">
                 <label><span data-i18n="actionStatusLabel">Durum</span><select name="status"><option value="" data-i18n="allStatusesOption">Tüm durumlar</option><?php foreach ($statusLabels as $value => $label): ?><option value="<?= $value ?>" <?= $filters["status"] === $value ? "selected" : "" ?>><?= $label ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="severityLabel">Önem Seviyesi</span><select name="severity"><option value="" data-i18n="allSeveritiesOption">Tüm seviyeler</option><?php foreach ($severityLabels as $value => $label): ?><option value="<?= $value ?>" <?= $filters["severity"] === $value ? "selected" : "" ?>><?= $label ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="dueFilterLabel">Termin</span><select name="due"><option value="" data-i18n="allDueDatesOption">Tüm kayıtlar</option><option value="overdue" <?= $filters["due"] === "overdue" ? "selected" : "" ?> data-i18n="overdueOnlyOption">Yalnız gecikenler</option><option value="open" <?= $filters["due"] === "open" ? "selected" : "" ?> data-i18n="openOnlyOption">Yalnız açıklar</option><option value="closed" <?= $filters["due"] === "closed" ? "selected" : "" ?> data-i18n="closedOnlyOption">Yalnız kapananlar</option></select></label>

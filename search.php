@@ -17,10 +17,8 @@ $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
 
 $query = trim((string) ($_GET["q"] ?? ""));
-$type = (string) ($_GET["type"] ?? "");
-if ($type !== "" && !isset(qmsSearchTypes()[$type])) {
-    $type = "";
-}
+// Kayit turu filtresi her zaman "tumu"dir; sekme kutucugu gosterilmez.
+$type = "";
 
 $searchTypes = qmsSearchTypes();
 $keywords = qmsSearchKeywords($query);
@@ -93,15 +91,7 @@ $activeNav = "search";
                         <span data-i18n="searchQueryLabel">Arama</span>
                         <input type="text" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES, "UTF-8") ?>" placeholder="Örn. tartı, kalibrasyon, kritik uygunsuzluk" autofocus>
                     </label>
-                    <label class="form-field">
-                        <span data-i18n="searchTypeLabel">Kayıt Türü</span>
-                        <select name="type">
-                            <option value="" data-i18n="allTypesOption">Tümü</option>
-                            <?php foreach ($searchTypes as $value => $def): ?>
-                                <option value="<?= $value ?>" <?= $type === $value ? "selected" : "" ?>><?= htmlspecialchars($def["label"], ENT_QUOTES, "UTF-8") ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
+                    <input type="hidden" name="type" value="">
                 </div>
                 <div class="form-actions">
                     <button class="primary-button" type="submit" data-i18n="searchButton">Ara</button>

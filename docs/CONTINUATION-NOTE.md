@@ -2171,3 +2171,9 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   filtresi ekledi (LIKE). "Kayit turu" (entity_type) secim kutusu kaldirildi ve
   her zaman "tumu" yapildi (filtre bos; ozet dagilim gorseli korundu). CSS
   `.topbar-search` dark-adaptif.
+- **Global header arama (tüm sayfalar)** (cache v178): `sidebar.js` sonuna IIFE
+  eklendi - her sayfada `.topbar .page-title-block` yerine `search.php`'ye giden
+  `topbar-search` (Ara...) kutusu koyar. "Kayit turu" (record/entity/type)
+  filtreleri her zaman "tumu" yapildi ve kutucugu kaldirildi: `search.php`
+  (type), `actions.php` (record_type), `audit-trail.php` (entity_type),
+  `audit-trail-report.php` (daha once).
