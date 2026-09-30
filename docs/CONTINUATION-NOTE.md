@@ -2182,3 +2182,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   sayfasinda gorunur). Header'larda kayit turu gorunmez (kuresel arama box'i
   `q` ile `search.php` 'ye gider). `actions.php` / `audit-trail.php` de kayit
   turu hâlâ gizli + "tumu".
+- **Sidebar Arama dugmesi kaldirildi** (cache v180): `app-sidebar.php`'den
+  `search.php` menü ogesi cikti (yalnizca görünüm). `search.php` sayfasi ve
+  global header aramasi etkin kaldi (fonksiyona dokunulmadi).

@@ -126,12 +126,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         <?php if ($canSeeOperations): ?>
         <span class="sidebar-section-label" data-i18n="sidebarOperationsLabel">Operasyonlar</span>
         <?php if (qmsSidebarVisible('operations.view')): ?>
-<a class="<?= sidebarLinkClass("search", $activeNav) ?>" href="search.php">
-            <?= appIcon("search") ?>
-            <span data-i18n="searchMenuLabel">Arama</span>
-        </a>
-<?php endif; ?>
-        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("announcements", $activeNav) ?>" href="announcements.php">
             <?= appIcon("complaints") ?>
             <span data-i18n="announcementsMenuLabel">Duyuru Merkezi</span>
