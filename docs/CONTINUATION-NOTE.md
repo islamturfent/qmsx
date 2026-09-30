@@ -2133,3 +2133,21 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **Dagitim & Imza Takibi onaylayan kutusu dark mode** (cache v174):
   `.inline-cert-upload input[type=text]` TailAdmin tarzi dark-adaptif stil eklendi
   (control-bg/border/text + odak halkasi); fonksiyona dokunulmadi.
+
+## Log A/B/C (cache v175)
+
+- **A - Egitim -> Yetkinlik otomatik senkron**: `staff_members.user_id` eklendi
+  (migration `migrate-staff-user-link.php`). `qmsTrainingSyncCompetency()` bir
+  katilimci "tamamlandi" olunca egitimin `target_competency`'sini ilgili
+  personelin `staff_competencies` kaydina isler (+1yil vade, tamamlanma tarihi).
+  Kullanici->personel eslesmesi: user_id baglantisi, email, ad+soyad. Esl estirme
+  `competency-matrix.php`'e "Esl" dropdown ile eklendi (`comp-user-link`).
+  `training-detail.php` katilimci guncelleme akisinda cagrilir. Vade gecikince
+  mevcut overdue_competency bildirimi devreye girer.
+- **B - Kalibrasyon & Metroloji**: Donem Ozeti izgarasina "Kalibrasyon & Metroloji"
+  grubu eklendi (Toplam Alet / Yakinlasan 60g / Gecikmis, linkli). Sertifika-
+  geçmiş (`calibration_list`) rapor export'unun XLSX/PDF'inde zaten vardi;
+  `instrument_calibration_overdue` e-posta bildirimi pref-aware idi (dogrulandi).
+- **C - Musteri Memnuniyeti Anketi**: modul zaten mevcuttu ve rapor export'una
+  bagliydi (satisfaction_count/avg + list). Donem Ozeti "Musteri & Yetkinlik"
+  grubuna Memnuniyet Puanı (x/5) ve Yanıt adedi linkli metrikleri eklendi.

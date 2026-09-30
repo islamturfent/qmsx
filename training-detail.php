@@ -218,6 +218,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     "id" => $participantId
                 ]);
 
+                // Katilimci egitimi tamamlayinca hedef yetkinlik personelin
+                // yetkinlik kaydina islenir (personel eslenirse).
+                if ($participantStatus === "completed") {
+                    qmsTrainingSyncCompetency($pdo, $trainingId, (int) $participant["user_id"]);
+                }
+
                 header("Location: " . $redirect . "&participant=updated");
                 exit;
             }

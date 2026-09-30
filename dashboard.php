@@ -117,6 +117,10 @@ $dashCalib = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND n
 $dashOpenIncidentsKpi = $scopedCount("SELECT COUNT(*) FROM incidents WHERE active=1 AND status<>'closed'" . $scopeClause);
 $dashCriticalIncidentsKpi = $scopedCount("SELECT COUNT(*) FROM incidents WHERE active=1 AND status<>'closed' AND severity='critical'" . $scopeClause);
 
+// Metroloji ozet (Donem Ozeti grubu).
+$dashInstrumentsTotal = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1" . $scopeClause);
+$dashInstrumentsDueSoon = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND next_calibration_date IS NOT NULL AND next_calibration_date >= CURDATE() AND next_calibration_date <= DATE_ADD(CURDATE(), INTERVAL 60 DAY)" . $scopeClause);
+
 // Müşteri performansı (red eşiği %5 ustu musteri + ort. red).
 $dashLowCustomers = 0;
 $dashRejectTotal = 0;
@@ -620,6 +624,16 @@ $activeNav = "dashboard";
                         <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Düşük Performanslı Müşteri</span><strong><?= $dashLowCustomers ?></strong></div></a>
                         <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Ort. Red Oranı</span><strong>%<?= $dashRejectAvg ?></strong></div></a>
                         <a href="competency-matrix.php"><div><span class="metric-mini-label">Yetkinlik Vadesi Geçen</span><strong><?= $dashCompetencyOverdueCount ?></strong></div></a>
+                        <a href="satisfaction-surveys.php"><div><span class="metric-mini-label">Memnuniyet Puanı</span><strong><?= (int) round((float) $reportMetrics['satisfaction_avg'], 0) ?>/5</strong></div></a>
+                        <a href="satisfaction-surveys.php"><div><span class="metric-mini-label">Memnuniyet Yanıtı</span><strong><?= (int) $reportMetrics['satisfaction_count'] ?></strong></div></a>
+                    </div>
+                </div>
+                <div class="period-overview-group">
+                    <h4 data-i18n="dashboardMetroTitle">Kalibrasyon & Metroloji</h4>
+                    <div class="metric-mini-row">
+                        <a href="instruments.php"><div><span class="metric-mini-label">Toplam Alet</span><strong><?= $dashInstrumentsTotal ?></strong></div></a>
+                        <a href="calibration-calendar.php"><div><span class="metric-mini-label">Yaklaşan (60 g)</span><strong><?= $dashInstrumentsDueSoon ?></strong></div></a>
+                        <a href="instruments.php"><div><span class="metric-mini-label">Gecikmiş</span><strong class="<?= $dashCalib > 0 ? 'danger-text' : '' ?>"><?= $dashCalib ?></strong></div></a>
                     </div>
                 </div>
                 <div class="period-overview-group">

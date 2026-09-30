@@ -4377,6 +4377,35 @@ body.dark-mode .trend-bar-label { color: var(--gray-400); }
     color: var(--error-soft-text);
 }
 
+/* Yetkinlik matrisi: personel -> kullanici eslestirmesi */
+.comp-user-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+.comp-user-link select {
+    appearance: none;
+    -webkit-appearance: none;
+    min-height: 32px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background-color: var(--control-bg-color);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+    color: var(--text-color);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+}
+.comp-user-link select:focus {
+    border-color: var(--brand-400, #3b82f6);
+    box-shadow: var(--shadow-focus-ring);
+}
+
 /* Izinler matrisi filtre cubugu */
 .perm-filter-bar {
     display: flex;

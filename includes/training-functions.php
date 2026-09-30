@@ -195,3 +195,110 @@ function qmsTrainingParticipantSummary(array $participants): array
         'rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0.0,
     ];
 }
+
+/**
+ * Bir kullanici hesabini ayni sirketteki bir personele eslestirir.
+ *
+ * Oncelik: staff_members.user_id baglantisi; yoksa email; son olarak ad+soyad.
+ *
+ * @return array{id:int}|null
+ */
+function qmsTrainingFindStaffByUser(PDO $pdo, int $companyId, int $userId): ?array
+{
+    $u = $pdo->prepare('SELECT email, full_name FROM users WHERE id = ? AND active = 1 LIMIT 1');
+    $u->execute([$userId]);
+    $user = $u->fetch(PDO::FETCH_ASSOC);
+    if (!$user) {
+        return null;
+    }
+
+    // 1) Acik kullanici baglantisi (tercih edilen).
+    $c = $pdo->prepare('SELECT id FROM staff_members WHERE company_id = ? AND user_id = ? AND active = 1 LIMIT 1');
+    $c->execute([$companyId, $userId]);
+    if ($v = $c->fetchColumn()) {
+        return ['id' => (int) $v];
+    }
+
+    // 2) Email eslesmesi.
+    $email = trim((string) ($user['email'] ?? ''));
+    if ($email !== '') {
+        $ce = $pdo->prepare('SELECT id FROM staff_members WHERE company_id = ? AND LOWER(email) = LOWER(?) AND active = 1 LIMIT 1');
+        $ce->execute([$companyId, $email]);
+        if ($v = $ce->fetchColumn()) {
+            return ['id' => (int) $v];
+        }
+    }
+
+    // 3) Ad + soyad eslesmesi.
+    $parts = preg_split('/\s+/', trim((string) ($user['full_name'] ?? '')), -1, PREG_SPLIT_NO_EMPTY);
+    if (is_array($parts) && count($parts) >= 2) {
+        $fn = $parts[0];
+        $ln = implode(' ', array_slice($parts, 1));
+        $cn = $pdo->prepare('SELECT id FROM staff_members WHERE company_id = ? AND first_name = ? AND last_name = ? AND active = 1 LIMIT 1');
+        $cn->execute([$companyId, $fn, $ln]);
+        if ($v = $cn->fetchColumn()) {
+            return ['id' => (int) $v];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Bir katilimcinin egitimi tamamlamasiyla ilgili personelin yetkinligini
+ * gunceller. Egitim hedef yetkinlik (target_competency) tasiyorsa ve katilimci
+ * bir personele baglanabiliyorsa staff_competencies kaydi olusturur/gunceller.
+ *
+ * Vade varsayilan olarak +1 yildir; egitimin tamamlanma tarihi esas alinir.
+ *
+ * @return bool Personel bulunup yetkinlik yazildiysa true.
+ */
+function qmsTrainingSyncCompetency(PDO $pdo, int $trainingId, int $participantUserId): bool
+{
+    $train = $pdo->prepare(
+        'SELECT company_id, title, target_competency, completed_date FROM trainings WHERE id = ? AND active = 1 LIMIT 1'
+    );
+    $train->execute([$trainingId]);
+    $t = $train->fetch(PDO::FETCH_ASSOC);
+    if (!$t) {
+        return false;
+    }
+
+    $competency = trim((string) ($t['target_competency'] ?? ''));
+    if ($competency === '') {
+        return false;
+    }
+    $companyId = (int) $t['company_id'];
+
+    $staff = qmsTrainingFindStaffByUser($pdo, $companyId, $participantUserId);
+    if (!$staff) {
+        return false;
+    }
+    $staffId = (int) $staff['id'];
+
+    $achieved = trim((string) ($t['completed_date'] ?? ''));
+    if ($achieved === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $achieved)) {
+        $achieved = date('Y-m-d');
+    }
+    $nextAssessment = date('Y-m-d', strtotime($achieved . ' +1 year'));
+    $notes = 'Eğitim tamamlandı: ' . mb_substr(trim((string) $t['title']), 0, 200);
+
+    $find = $pdo->prepare('SELECT id FROM staff_competencies WHERE staff_id = ? AND competency_name = ? AND active = 1 LIMIT 1');
+    $find->execute([$staffId, $competency]);
+    $existing = $find->fetchColumn();
+
+    if ($existing) {
+        $upd = $pdo->prepare(
+            'UPDATE staff_competencies SET achieved_date = ?, next_assessment_date = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        );
+        $upd->execute([$achieved, $nextAssessment, $notes, (int) $existing]);
+    } else {
+        $ins = $pdo->prepare(
+            'INSERT INTO staff_competencies (staff_id, competency_name, level, achieved_date, next_assessment_date, notes, active)
+             VALUES (?, ?, NULL, ?, ?, ?, 1)'
+        );
+        $ins->execute([$staffId, $competency, $achieved, $nextAssessment, $notes]);
+    }
+
+    return true;
+}

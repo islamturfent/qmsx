@@ -3380,6 +3380,7 @@ Object.assign(translations.tr, {
   competencyMatrixMenuLabel: "Yetkinlik Matrisi", competencyMatrixTitle: "Yetkinlik Matrisi",
   competencyMatrixKicker: "Personel & Yetkinlik", competencyMatrixText: "Personel bazında yetkinlikler ve vadesi geçen değerlendirmeler.",
   competencyMatrixListTitle: "Personel Yetkinlikleri", competencyMatrixEmpty: "Henüz kayıtlı personel veya yetkinlik yok.",
+  compUserLinkNone: "Kullanıcı seç", compUserLinkSave: "Eşle",
 });
 Object.assign(translations.tr, {
   trainingTemplatePrefillLabel: "Şablondan Doldur (isteğe bağlı)", trainingTemplateNoneOption: "— Şablon seçilmedi —",
@@ -3402,13 +3403,13 @@ Object.assign(translations.tr, {
   dashboardPeriodTitle: "Dönem Özeti", dashboardPeriodText: "Şirket panosu, müşteri performansı ve yetkinlik göstergeleri.",
   dashboardCompanyKpisTitle: "Şirket Panosu", dashboardCustomerTitle: "Müşteri & Yetkinlik",
   dashboardAuditTitle: "Denetim & Rapor Durumu", dashboardAuditText: "Devam eden denetimler ve rapor durumu.",
-  dashboardCoqTitle: "Kalite Maliyeti",
+  dashboardCoqTitle: "Kalite Maliyeti", dashboardMetroTitle: "Kalibrasyon & Metroloji",
 });
 Object.assign(translations.en, {
   dashboardPeriodTitle: "Period Summary", dashboardPeriodText: "Company dashboard, customer performance and competency indicators.",
   dashboardCompanyKpisTitle: "Company Dashboard", dashboardCustomerTitle: "Customer & Competency",
   dashboardAuditTitle: "Audit & Report Status", dashboardAuditText: "Ongoing audits and report status.",
-  dashboardCoqTitle: "Cost of Quality",
+  dashboardCoqTitle: "Cost of Quality", dashboardMetroTitle: "Calibration & Metrology",
 });
 Object.assign(translations.en, {
   dashboardCompetencyTitle: "Overdue Competencies", dashboardCompetencyText: "Competency assessments that are overdue for review.",
@@ -3428,4 +3429,5 @@ Object.assign(translations.en, {
   competencyMatrixMenuLabel: "Competency Matrix", competencyMatrixTitle: "Competency Matrix",
   competencyMatrixKicker: "Personnel & Competency", competencyMatrixText: "Personnel competencies and overdue assessments.",
   competencyMatrixListTitle: "Personnel Competencies", competencyMatrixEmpty: "No personnel or competencies recorded yet.",
+  compUserLinkNone: "Select user", compUserLinkSave: "Link",
 });

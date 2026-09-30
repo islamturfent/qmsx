@@ -10,9 +10,26 @@ if (!isset($_SESSION["qms_logged_in"]) || $_SESSION["qms_logged_in"] !== true) {
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/permissions.php';
+require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/app-ui.php';
 
 qmsRequirePermission('competency_matrix.view');
+
+$csrfScope = 'competency_matrix';
+
+// Personel -> kullanici eslestirmesi (yetkinlik senkronu icin deterministik).
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'link_user') {
+    qmsRequirePermission('competency_matrix.view');
+    qmsCsrfVerify($csrfScope, $_POST['csrf'] ?? null);
+    $staffId = (int) ($_POST['staff_id'] ?? 0);
+    $userId = (int) ($_POST['user_id'] ?? 0);
+    if ($staffId > 0) {
+        $st = $pdo->prepare('UPDATE staff_members SET user_id = NULLIF(?, 0) WHERE id = ? AND active = 1');
+        $st->execute([$userId, $staffId]);
+    }
+    header('Location: competency-matrix.php?linked=1');
+    exit;
+}
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
@@ -25,7 +42,7 @@ $scopeSql = $isAllCompanies
 
 // Personel + yetkinlikleri.
 $stmt = $pdo->query(
-    'SELECT s.id AS staff_id, s.first_name, s.last_name, s.department, s.position, c.company_name,
+    'SELECT s.id AS staff_id, s.first_name, s.last_name, s.department, s.position, s.user_id, s.email, c.company_name,
             sc.id AS comp_id, sc.competency_name, sc.level, sc.achieved_date, sc.next_assessment_date, sc.active AS comp_active
      FROM staff_members s
      INNER JOIN companies c ON c.id = s.company_id
@@ -46,6 +63,8 @@ foreach ($rows as $row) {
             'department' => $row['department'],
             'position' => $row['position'],
             'company' => $row['company_name'],
+            'user_id' => (int) $row['user_id'],
+            'email' => $row['email'],
             'competencies' => [],
         ];
     }
@@ -63,6 +82,21 @@ foreach ($rows as $row) {
         $competencyCount++;
     }
 }
+
+// Kullanici eslestirme secenekleri (gorunur sirketlerin kullanicilari).
+$userOptions = [];
+if ($companyIds !== null) {
+    $uScope = $companyIds !== []
+        ? ' AND u.company_id IN (' . implode(',', array_map('intval', $companyIds)) . ')'
+        : ' AND 1 = 0';
+} else {
+    $uScope = '';
+}
+$userOptions = $companyIds === null ? $pdo->query(
+    'SELECT u.id, u.full_name FROM users u WHERE u.active = 1 AND u.company_id IS NOT NULL ORDER BY u.full_name ASC'
+)->fetchAll(PDO::FETCH_ASSOC) : $pdo->query(
+    'SELECT u.id, u.full_name FROM users u WHERE u.active = 1 AND u.company_id IS NOT NULL' . $uScope . ' ORDER BY u.full_name ASC'
+)->fetchAll(PDO::FETCH_ASSOC);
 
 $activeNav = "competency_matrix";
 
@@ -126,7 +160,7 @@ $activeNav = "competency_matrix";
                 <div class="empty-state" data-i18n="competencyMatrixEmpty">Henüz kayıtlı personel veya yetkinlik yok.</div>
             <?php else: ?>
                 <div class="record-card-grid">
-                    <?php foreach ($people as $person): ?>
+                    <?php foreach ($people as $sid => $person): ?>
                         <div class="record-card document-card">
                             <div class="record-card-topline">
                                 <span><?= htmlspecialchars($person['company'], ENT_QUOTES, 'UTF-8') ?></span>
@@ -135,6 +169,22 @@ $activeNav = "competency_matrix";
                                 <?php endif; ?>
                             </div>
                             <h3><?= htmlspecialchars($person['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                            <form class="comp-user-link" method="post" action="competency-matrix.php">
+                                <?= qmsCsrfField($csrfScope) ?>
+                                <input type="hidden" name="form_type" value="link_user">
+                                <input type="hidden" name="staff_id" value="<?= (int) $sid ?>">
+                                <select name="user_id">
+                                    <option value="0" data-i18n="compUserLinkNone">Kullanıcı seç</option>
+                                    <?php foreach ($userOptions as $uo): ?>
+                                        <option value="<?= (int) $uo['id'] ?>" <?= (int) $person['user_id'] === (int) $uo['id'] ? "selected" : "" ?>>
+                                            <?= htmlspecialchars($uo['full_name'], ENT_QUOTES, 'UTF-8') ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button class="primary-button primary-button-sm" type="submit">
+                                    <span data-i18n="compUserLinkSave">Eşle</span>
+                                </button>
+                            </form>
                             <?php if (!$person['competencies']): ?>
                                 <p class="muted-color">Yetkinlik tanımlı değil.</p>
                             <?php else: ?>
