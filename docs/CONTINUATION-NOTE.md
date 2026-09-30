@@ -2223,3 +2223,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **AI Hata Detayi** (cache v186): `includes/ai-functions.php` son hatayi
   `storage/ai/last-error.json`'a yazar (anahtarsiz, 4000 cr). `ai-settings.php`
   "Hata Detayi" panosunda HTTP + ham yanit gosterir. i18n `aiErrorDetail*`.
+- **Groq model duzeltmesi** (cache v187): `llama-3.3-70b-versatile` free tier'da
+  erisilemedi (model_not_found); Groq preset'i `llama-3.1-8b-instant` + 
+  `whisper-large-v3` olarak degistirildi.
