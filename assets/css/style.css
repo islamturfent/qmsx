@@ -1555,59 +1555,6 @@ body.has-sidebar {
     outline-offset: 2px;
 }
 
-/* TailAdmin tarzi grup + altmenu (accordion). */
-.sidebar-group {
-    display: flex;
-    flex-direction: column;
-}
-.sidebar-group-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    width: 100%;
-    min-height: 40px;
-    padding: 8px 12px;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--muted-color);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-}
-.sidebar-group-toggle:hover {
-    background: var(--nav-hover);
-    color: var(--text-body);
-}
-.sidebar-group-caret {
-    display: inline-flex;
-    flex-shrink: 0;
-    color: var(--muted-color);
-    transition: transform 0.2s ease;
-}
-.sidebar-group-toggle.sidebar-group-open .sidebar-group-caret {
-    transform: rotate(180deg);
-}
-.sidebar-submenu {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.25s ease, opacity 0.15s ease;
-}
-.sidebar-group-toggle.sidebar-group-open + .sidebar-submenu {
-    max-height: 640px;
-    opacity: 1;
-}
-.sidebar-submenu .sidebar-link {
-    padding-left: 22px;
-    font-size: 13px;
-}
-
 .sidebar-link-icon {
     display: inline-flex;
     width: 20px;

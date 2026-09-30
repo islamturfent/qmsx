@@ -277,14 +277,3 @@ if (userMenuState && topbarActions && languageButton) {
         changeLanguage(currentLanguage);
     }
 })();
-
-// TailAdmin tarzi sidebar grup/altmenu accordion toggle.
-(function () {
-    document.querySelectorAll(".sidebar-group-toggle").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            var isOpen = btn.classList.contains("sidebar-group-open");
-            btn.classList.toggle("sidebar-group-open", !isOpen);
-            btn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-        });
-    });
-})();

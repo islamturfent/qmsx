@@ -12,6 +12,7 @@ if (!function_exists('qmsSidebarVisible')) {
 
 $activeNav = $activeNav ?? "";
 $sidebarRole = (string) ($_SESSION["qms_role"] ?? "");
+$isSuperAdminNav = $sidebarRole === "super_admin";
 // Operasyon bolumu kullaniciya verilen RBAC iznine gore render edilir (rol sabit degil).
 $canSeeOperations = qmsSidebarVisible('operations.view');
 $sidebarUnreadCount = 0;
@@ -73,117 +74,6 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 <span id="qmsIconUserMenuLogout" hidden><?= appIcon("logout", "") ?></span>
 <script type="application/json" id="qmsNotificationRecent"><?= json_encode($sidebarRecentNotifications, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
-<?php
-$sidebarGroups = [
-    [
-        'label_key' => 'sidebarGroupGeneralLabel', 'label' => 'Genel',
-        'items' => [
-            ['key' => 'quality_plans', 'href' => 'quality-plan.php', 'perm' => 'operations.view', 'i18n' => 'qualityPlanMenuLabel', 'label' => 'Yıllık Kalite Planı', 'icon' => 'table'],
-            ['key' => 'reviews', 'href' => 'reviews.php', 'perm' => 'operations.view', 'i18n' => 'reviewsTitle', 'label' => 'Yönetimin Gözden Geçirmesi', 'icon' => 'reviews'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupDocumentsLabel', 'label' => 'Doküman Yönetimi',
-        'items' => [
-            ['key' => 'documents', 'href' => 'documents.php', 'perm' => 'operations.view', 'i18n' => 'documentManagementTitle', 'label' => 'Doküman Yönetimi (Ana Liste / Havuz)', 'icon' => 'documents'],
-            ['key' => 'document_templates', 'href' => 'document-templates.php', 'perm' => 'operations.view', 'i18n' => 'docTemplateMenuLabel', 'label' => 'Doküman Şablonları', 'icon' => 'documents'],
-            ['key' => 'approvals', 'href' => 'approval-runs.php', 'perm' => 'approvals.manage', 'i18n' => 'approvalWorkflowMenuLabel', 'label' => 'Onay & İmza Workflow', 'icon' => 'approvals'],
-            ['key' => 'document_approvals', 'href' => 'document-approvals.php', 'perm' => 'document_approvals.manage', 'i18n' => 'approvalInboxTitle', 'label' => 'Doküman Onay Kutusu', 'icon' => 'approvals'],
-            ['key' => 'document_reviews', 'href' => 'document-reviews.php', 'perm' => 'document_reviews.manage', 'i18n' => 'docReviewMenuLabel', 'label' => 'Doküman Gözden Geçirme', 'icon' => 'documents'],
-            ['key' => 'document_copies', 'href' => 'document-distribution.php', 'perm' => 'operations.view', 'i18n' => 'documentDistributionMenuLabel', 'label' => 'Dağıtım Kontrolü', 'icon' => 'table'],
-            ['key' => 'document_tracking', 'href' => 'document-distribution-tracking.php', 'perm' => 'operations.view', 'i18n' => 'docTrackingMenuLabel', 'label' => 'Dağıtım & İmza Takibi', 'icon' => 'checkBadge'],
-            ['key' => 'document_compare', 'href' => 'document-compare.php', 'perm' => 'operations.view', 'i18n' => 'docCompareMenuLabel', 'label' => 'Versiyon Karşılaştırma', 'icon' => 'documents'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupAuditsLabel', 'label' => 'Denetim Yönetimi',
-        'items' => [
-            ['key' => 'auditors', 'href' => 'auditors.php', 'perm' => 'auditors.manage', 'i18n' => 'auditorsCardLabel', 'label' => 'Denetçiler', 'icon' => 'users'],
-            ['key' => 'audit_programs', 'href' => 'audit-programs.php', 'perm' => 'audit_programs.manage', 'i18n' => 'auditProgramsMenuLabel', 'label' => 'Denetim Programları', 'icon' => 'approvals'],
-            ['key' => 'audit_calendar', 'href' => 'audit-calendar.php', 'perm' => 'operations.view', 'i18n' => 'auditCalendarMenuLabel', 'label' => 'Denetim Takvimi', 'icon' => 'reports'],
-            ['key' => 'checklist_templates', 'href' => 'checklist-templates.php', 'perm' => 'checklist_templates.view', 'i18n' => 'checklistTemplatesMenuLabel', 'label' => 'Kontrol Listesi Şablonları', 'icon' => 'approvals'],
-            ['key' => 'audit_reports', 'href' => 'audit-reports.php', 'perm' => 'operations.view', 'i18n' => 'auditReportsMenuLabel', 'label' => 'Denetim Raporları', 'icon' => 'reports'],
-            ['key' => 'audit_findings', 'href' => 'audit-findings.php', 'perm' => 'operations.view', 'i18n' => 'auditFindingsMenuLabel', 'label' => 'Denetim Bulguları', 'icon' => 'alert'],
-            ['key' => 'external_audits', 'href' => 'external-audits.php', 'perm' => 'external_audits.view', 'i18n' => 'externalAuditsMenuLabel', 'label' => 'Dış Denetim & Kapama', 'icon' => 'alert'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupCapaLabel', 'label' => 'CAPA & İyileştirme Yönetimi',
-        'items' => [
-            ['key' => 'incidents', 'href' => 'incidents.php', 'perm' => 'operations.view', 'i18n' => 'incidentsMenuLabel', 'label' => 'Olay Raporlama', 'icon' => 'alert'],
-            ['key' => 'actions', 'href' => 'actions.php', 'perm' => 'operations.view', 'i18n' => 'actionManagementTitle', 'label' => 'Düzeltici & Önleyici Faaliyet (CAPA)', 'icon' => 'check', 'countVar' => 'overdue'],
-            ['key' => 'rca', 'href' => 'rca.php', 'perm' => 'operations.view', 'i18n' => 'rcaMenuLabel', 'label' => 'Kök Neden Analizi', 'icon' => 'table'],
-            ['key' => 'verification_center', 'href' => 'verification-center.php', 'perm' => 'operations.view', 'i18n' => 'verificationCenterMenuLabel', 'label' => 'Doğrulama & Kapanış', 'icon' => 'checkBadge'],
-            ['key' => 'improvements', 'href' => 'improvements.php', 'perm' => 'operations.view', 'i18n' => 'improvementsMenuLabel', 'label' => 'İyileştirme Fırsatları', 'icon' => 'sparkles'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupPerformanceLabel', 'label' => 'Performans & Süreç Yönetimi',
-        'items' => [
-            ['key' => 'performance', 'href' => 'performance.php', 'perm' => 'operations.view', 'i18n' => 'performanceTitle', 'label' => 'Performans Yönetimi', 'icon' => 'performance'],
-            ['key' => 'processes', 'href' => 'processes.php', 'perm' => 'operations.view', 'i18n' => 'processesMenuLabel', 'label' => 'Süreç Envanteri', 'icon' => 'table'],
-            ['key' => 'quality_costs', 'href' => 'quality-costs.php', 'perm' => 'operations.view', 'i18n' => 'qualityCostMenuLabel', 'label' => 'Kalite Maliyeti (COQ)', 'icon' => 'table'],
-            ['key' => 'quality_cost_trend', 'href' => 'quality-cost-trend.php', 'perm' => 'operations.view', 'i18n' => 'costTrendMenuLabel', 'label' => 'COQ Trendi', 'icon' => 'trend'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupCustomerLabel', 'label' => 'Müşteri İlişkileri & Memnuniyet',
-        'items' => [
-            ['key' => 'complaints', 'href' => 'complaints.php', 'perm' => 'operations.view', 'i18n' => 'complaintsTitle', 'label' => 'Şikayet Yönetimi', 'icon' => 'complaints'],
-            ['key' => 'satisfaction', 'href' => 'satisfaction-surveys.php', 'perm' => 'operations.view', 'i18n' => 'satisfactionMenuLabel', 'label' => 'Müşteri Memnuniyeti', 'icon' => 'complaints'],
-            ['key' => 'customer_performance', 'href' => 'customer-delivery-performance.php', 'perm' => 'operations.view', 'i18n' => 'customerPerformanceMenuLabel', 'label' => 'Müşteri Performansı', 'icon' => 'trend'],
-            ['key' => 'delivery_performance', 'href' => 'delivery-performance.php', 'perm' => 'operations.view', 'i18n' => 'deliveryMenuLabel', 'label' => 'Teslimat Performansı', 'icon' => 'checkBadge'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupSurveyLabel', 'label' => 'Anket Yönetimi',
-        'items' => [
-            ['key' => 'internal_surveys', 'href' => 'internal-surveys.php', 'perm' => 'operations.view', 'i18n' => 'internalSurveyMenuLabel', 'label' => 'İç Memnuniyet Anketi', 'icon' => 'sparkles'],
-            ['key' => 'internal_survey_fill', 'href' => 'internal-survey-fill.php', 'perm' => 'operations.view', 'i18n' => 'internalSurveyFillMenuLabel', 'label' => 'Anketi Doldur', 'icon' => 'checkBadge'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupPersonnelLabel', 'label' => 'Personel & Eğitim Yönetimi',
-        'items' => [
-            ['key' => 'personnel', 'href' => 'personnel.php', 'perm' => 'operations.view', 'i18n' => 'personnelMenuLabel', 'label' => 'Personel & Yetkinlik', 'icon' => 'users'],
-            ['key' => 'trainings', 'href' => 'trainings.php', 'perm' => 'operations.view', 'i18n' => 'trainingManagementTitle', 'label' => 'Eğitim Yönetimi', 'icon' => 'training'],
-            ['key' => 'training_templates', 'href' => 'training-templates.php', 'perm' => 'training_templates.manage', 'i18n' => 'trainingTemplatesMenuLabel', 'label' => 'Eğitim Şablonları', 'icon' => 'training'],
-            ['key' => 'competency_matrix', 'href' => 'competency-matrix.php', 'perm' => 'competency_matrix.view', 'i18n' => 'competencyMatrixMenuLabel', 'label' => 'Yetkinlik Matrisi', 'icon' => 'users'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupSupplierLabel', 'label' => 'Tedarikçi & İş Ortakları Yönetimi',
-        'items' => [
-            ['key' => 'suppliers', 'href' => 'suppliers.php', 'perm' => 'operations.view', 'i18n' => 'suppliersTitle', 'label' => 'Tedarikçi Yönetimi', 'icon' => 'suppliers'],
-            ['key' => 'supplier_evaluations', 'href' => 'supplier-evaluations.php', 'perm' => 'operations.view', 'i18n' => 'supplierEvalMenuLabel', 'label' => 'Değerlendirme Takvimi', 'icon' => 'checkBadge', 'countVar' => 'supplier'],
-            ['key' => 'contracts', 'href' => 'contracts.php', 'perm' => 'operations.view', 'i18n' => 'contractsMenuLabel', 'label' => 'Sözleşme Yönetimi', 'icon' => 'approvals'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupEquipmentLabel', 'label' => 'Ekipman & Kalibrasyon',
-        'items' => [
-            ['key' => 'equipment', 'href' => 'equipment.php', 'perm' => 'operations.view', 'i18n' => 'equipmentMenuLabel', 'label' => 'Ekipman ve Kalibrasyon', 'icon' => 'table'],
-            ['key' => 'calibration_calendar', 'href' => 'calibration-calendar.php', 'perm' => 'operations.view', 'i18n' => 'calibCalendarMenuLabel', 'label' => 'Kalibrasyon Takvimi', 'icon' => 'reports'],
-            ['key' => 'calibration_history', 'href' => 'instrument-calibrations.php', 'perm' => 'operations.view', 'i18n' => 'calibrationHistoryMenuLabel', 'label' => 'Kalibrasyon Geçmişi', 'icon' => 'checkBadge'],
-            ['key' => 'instruments', 'href' => 'instruments.php', 'perm' => 'operations.view', 'i18n' => 'instrumentsMenuLabel', 'label' => 'Kalibrasyon & Metroloji', 'icon' => 'clock'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupRiskLabel', 'label' => 'Risk & Güvenlik',
-        'items' => [
-            ['key' => 'risks', 'href' => 'risks.php', 'perm' => 'operations.view', 'i18n' => 'riskManagementTitle', 'label' => 'Risk Yönetimi', 'icon' => 'warning'],
-        ],
-    ],
-    [
-        'label_key' => 'sidebarGroupSystemLabel', 'label' => 'Sistem Ayarları & Loglar',
-        'items' => [
-            ['key' => 'audit_trail', 'href' => 'audit-trail.php', 'perm' => 'audit_trail.view', 'i18n' => 'auditTrailMenuLabel', 'label' => 'Denetim İzi (Audit Trail)', 'icon' => 'checkBadge'],
-            ['key' => 'audit_trail_report', 'href' => 'audit-trail-report.php', 'perm' => 'audit_trail.view', 'i18n' => 'auditTrailReportTitle', 'label' => 'Denetim İzi Raporu', 'icon' => 'reports'],
-        ],
-    ],
-];
-?>
-
 <aside class="app-sidebar" id="appSidebar">
     <a class="sidebar-brand" href="dashboard.php">
         <span class="brand-icon"><img src="assets/icons/qms-logo.png" alt="QuAmi"></span>
@@ -194,51 +84,378 @@ $sidebarGroups = [
     </a>
 
     <nav class="sidebar-nav" aria-label="Ana menü">
-        <?php foreach ($sidebarGroups as $group): ?>
-            <?php
-            $visible = [];
-            foreach ($group['items'] as $item) {
-                if (qmsSidebarVisible($item['perm'])) {
-                    $visible[] = $item;
-                }
-            }
-            if ($visible === []) {
-                continue;
-            }
-            $groupOpen = false;
-            foreach ($visible as $item) {
-                if ($item['key'] === $activeNav) {
-                    $groupOpen = true;
-                    break;
-                }
-            }
-            ?>
-            <div class="sidebar-group">
-                <button type="button" class="sidebar-group-toggle<?= $groupOpen ? ' sidebar-group-open' : '' ?>" aria-expanded="<?= $groupOpen ? 'true' : 'false' ?>">
-                    <span class="sidebar-group-label" data-i18n="<?= $group['label_key'] ?>"><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
-                    <span class="sidebar-group-caret" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                    </span>
-                </button>
-                <div class="sidebar-submenu">
-                    <?php foreach ($visible as $item): ?>
-                        <?php
-                        $countVal = 0;
-                        if (($item['countVar'] ?? '') === 'overdue') {
-                            $countVal = $sidebarOverdueCount;
-                        } elseif (($item['countVar'] ?? '') === 'supplier') {
-                            $countVal = $sidebarSupplierEvalOverdue;
-                        }
-                        ?>
-                        <a class="<?= sidebarLinkClass($item['key'], $activeNav) ?>" href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>">
-                            <?= appIcon($item['icon'], '') ?>
-                            <span data-i18n="<?= $item['i18n'] ?>"><?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php if ($countVal > 0): ?><span class="sidebar-count"><?= $countVal ?></span><?php endif; ?>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        <?php endforeach; ?>
+        <span class="sidebar-section-label" data-i18n="sidebarOverviewLabel">Genel</span>
+        <?php if (qmsSidebarVisible('my_audits.view')): ?>
+<a class="<?= sidebarLinkClass("my_audits", $activeNav) ?>" href="my-audits.php">
+            <?= appIcon("check") ?>
+            <span data-i18n="myAuditsTitle">Denetimlerim</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('dashboard.view')): ?>
+<a class="<?= sidebarLinkClass("dashboard", $activeNav) ?>" href="<?= $sidebarRole === 'company_user' ? 'company-overview.php' : 'dashboard.php' ?>">
+            <?= appIcon("dashboard") ?>
+            <span data-i18n="dashboardLinkLabel">Dashboard</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('my_assignments.view')): ?>
+<a class="<?= sidebarLinkClass("my_assignments", $activeNav) ?>" href="my-assignments.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="myAssignmentsMenuLabel">Bana Atanmışlar</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('notifications.view')): ?>
+<a class="<?= sidebarLinkClass("notifications", $activeNav) ?>" href="notifications.php">
+            <?= appIcon("notifications") ?>
+            <span data-i18n="notificationCenterTitle">Bildirim Merkezi</span>
+            <?php if ($sidebarUnreadCount > 0): ?><span class="sidebar-count"><?= $sidebarUnreadCount ?></span><?php endif; ?>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('reports.view')): ?>
+<a class="<?= sidebarLinkClass("reports", $activeNav) ?>" href="reports.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="reportingTitle">Raporlama ve KPI</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('overdue.view')): ?>
+<a class="<?= sidebarLinkClass("overdue", $activeNav) ?>" href="overdue.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="overdueMenuLabel">Vadesi Gelen İşler</span>
+        </a>
+<?php endif; ?>
+
+        <?php if ($canSeeOperations): ?>
+        <span class="sidebar-section-label" data-i18n="sidebarOperationsLabel">Operasyonlar</span>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("announcements", $activeNav) ?>" href="announcements.php">
+            <?= appIcon("complaints") ?>
+            <span data-i18n="announcementsMenuLabel">Duyuru Merkezi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('auditors.manage')): ?>
+<a class="<?= sidebarLinkClass("auditors", $activeNav) ?>" href="auditors.php">
+            <?= appIcon("users") ?>
+            <span data-i18n="auditorsCardLabel">Denetçiler</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('audit_programs.manage')): ?>
+<a class="<?= sidebarLinkClass("audit_programs", $activeNav) ?>" href="audit-programs.php">
+            <?= appIcon("approvals") ?>
+            <span data-i18n="auditProgramsMenuLabel">Denetim Programları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('checklist_templates.view')): ?>
+<a class="<?= sidebarLinkClass("checklist_templates", $activeNav) ?>" href="checklist-templates.php">
+            <?= appIcon("approvals") ?>
+            <span data-i18n="checklistTemplatesMenuLabel">Kontrol Listesi Şablonları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('external_audits.view')): ?>
+<a class="<?= sidebarLinkClass("external_audits", $activeNav) ?>" href="external-audits.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="externalAuditsMenuLabel">Dış Denetim & Kapama</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("actions", $activeNav) ?>" href="actions.php">
+            <?= appIcon("check") ?>
+            <span data-i18n="actionManagementTitle">Düzeltici & Önleyici Faaliyet (CAPA)</span>
+            <?php if ($sidebarOverdueCount > 0): ?><span class="sidebar-count"><?= $sidebarOverdueCount ?></span><?php endif; ?>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("verification_center", $activeNav) ?>" href="verification-center.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="verificationCenterMenuLabel">Doğrulama & Kapanış</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("risks", $activeNav) ?>" href="risks.php">
+            <?= appIcon("warning") ?>
+            <span data-i18n="riskManagementTitle">Risk Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("trainings", $activeNav) ?>" href="trainings.php">
+            <?= appIcon("training") ?>
+            <span data-i18n="trainingManagementTitle">Eğitim Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('training_templates.manage')): ?>
+<a class="<?= sidebarLinkClass("training_templates", $activeNav) ?>" href="training-templates.php">
+            <?= appIcon("training") ?>
+            <span data-i18n="trainingTemplatesMenuLabel">Eğitim Şablonları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('competency_matrix.view')): ?>
+<a class="<?= sidebarLinkClass("competency_matrix", $activeNav) ?>" href="competency-matrix.php">
+            <?= appIcon("users") ?>
+            <span data-i18n="competencyMatrixMenuLabel">Yetkinlik Matrisi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("personnel", $activeNav) ?>" href="personnel.php">
+            <?= appIcon("users") ?>
+            <span data-i18n="personnelMenuLabel">Personel & Yetkinlik</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("suppliers", $activeNav) ?>" href="suppliers.php">
+            <?= appIcon("suppliers") ?>
+            <span data-i18n="suppliersTitle">Tedarikçi Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("supplier_evaluations", $activeNav) ?>" href="supplier-evaluations.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="supplierEvalMenuLabel">Değerlendirme Takvimi</span>
+            <?php if ($sidebarSupplierEvalOverdue > 0): ?><span class="sidebar-count"><?= $sidebarSupplierEvalOverdue ?></span><?php endif; ?>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("complaints", $activeNav) ?>" href="complaints.php">
+            <?= appIcon("complaints") ?>
+            <span data-i18n="complaintsTitle">Şikayet Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("satisfaction", $activeNav) ?>" href="satisfaction-surveys.php">
+            <?= appIcon("complaints") ?>
+            <span data-i18n="satisfactionMenuLabel">Müşteri Memnuniyeti</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("delivery_performance", $activeNav) ?>" href="delivery-performance.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="deliveryMenuLabel">Teslimat Performansı</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("customer_performance", $activeNav) ?>" href="customer-delivery-performance.php">
+            <?= appIcon("trend") ?>
+            <span data-i18n="customerPerformanceMenuLabel">Müşteri Performansı</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("internal_surveys", $activeNav) ?>" href="internal-surveys.php">
+            <?= appIcon("sparkles") ?>
+            <span data-i18n="internalSurveyMenuLabel">İç Memnuniyet Anketi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("internal_survey_fill", $activeNav) ?>" href="internal-survey-fill.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="internalSurveyFillMenuLabel">Anketi Doldur</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("performance", $activeNav) ?>" href="performance.php">
+            <?= appIcon("performance") ?>
+            <span data-i18n="performanceTitle">Performans Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("quality_costs", $activeNav) ?>" href="quality-costs.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="qualityCostMenuLabel">Kalite Maliyeti (COQ)</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("quality_cost_trend", $activeNav) ?>" href="quality-cost-trend.php">
+            <?= appIcon("trend") ?>
+            <span data-i18n="costTrendMenuLabel">COQ Trendi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("audit_findings", $activeNav) ?>" href="audit-findings.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="auditFindingsMenuLabel">Denetim Bulguları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("root_cause", $activeNav) ?>" href="root-cause.php">
+            <?= appIcon("sparkles") ?>
+            <span data-i18n="rootCauseMenuLabel">Kök Neden Analizi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("audit_calendar", $activeNav) ?>" href="audit-calendar.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="auditCalendarMenuLabel">Denetim Takvimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("audit_reports", $activeNav) ?>" href="audit-reports.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="auditReportsMenuLabel">Denetim Raporları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("reviews", $activeNav) ?>" href="reviews.php">
+            <?= appIcon("reviews") ?>
+            <span data-i18n="reviewsTitle">Yönetimin Gözden Geçirmesi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("quality_plans", $activeNav) ?>" href="quality-plan.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="qualityPlanMenuLabel">Yıllık Kalite Planı</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("improvements", $activeNav) ?>" href="improvements.php">
+            <?= appIcon("sparkles") ?>
+            <span data-i18n="improvementsMenuLabel">İyileştirme Fırsatları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("rca", $activeNav) ?>" href="rca.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="rcaMenuLabel">Kök Neden Analizi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("processes", $activeNav) ?>" href="processes.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="processesMenuLabel">Süreç Envanteri</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("contracts", $activeNav) ?>" href="contracts.php">
+            <?= appIcon("approvals") ?>
+            <span data-i18n="contractsMenuLabel">Sözleşme Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("incidents", $activeNav) ?>" href="incidents.php">
+            <?= appIcon("alert") ?>
+            <span data-i18n="incidentsMenuLabel">Olay Raporlama</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("instruments", $activeNav) ?>" href="instruments.php">
+            <?= appIcon("clock") ?>
+            <span data-i18n="instrumentsMenuLabel">Kalibrasyon & Metroloji</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("calibration_history", $activeNav) ?>" href="instrument-calibrations.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="calibrationHistoryMenuLabel">Kalibrasyon Geçmişi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("calibration_calendar", $activeNav) ?>" href="calibration-calendar.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="calibCalendarMenuLabel">Kalibrasyon Takvimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("documents", $activeNav) ?>" href="documents.php">
+            <?= appIcon("documents") ?>
+            <span data-i18n="documentManagementTitle">Doküman Yönetimi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("document_copies", $activeNav) ?>" href="document-distribution.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="documentDistributionMenuLabel">Dağıtım Kontrolü</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("document_tracking", $activeNav) ?>" href="document-distribution-tracking.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="docTrackingMenuLabel">Dağıtım & İmza Takibi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("document_compare", $activeNav) ?>" href="document-compare.php">
+            <?= appIcon("documents") ?>
+            <span data-i18n="docCompareMenuLabel">Versiyon Karşılaştırma</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("document_templates", $activeNav) ?>" href="document-templates.php">
+            <?= appIcon("documents") ?>
+            <span data-i18n="docTemplateMenuLabel">Doküman Şablonları</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("equipment", $activeNav) ?>" href="equipment.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="equipmentMenuLabel">Ekipman ve Kalibrasyon</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('approvals.manage')): ?>
+<a class="<?= sidebarLinkClass("approvals", $activeNav) ?>" href="approval-runs.php">
+            <?= appIcon("approvals") ?>
+            <span data-i18n="approvalWorkflowMenuLabel">Onay & İmza Workflow</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('document_reviews.manage')): ?>
+<a class="<?= sidebarLinkClass("document_reviews", $activeNav) ?>" href="document-reviews.php">
+            <?= appIcon("documents") ?>
+            <span data-i18n="docReviewMenuLabel">Doküman Gözden Geçirme</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('document_approvals.manage')): ?>
+<a class="<?= sidebarLinkClass("document_approvals", $activeNav) ?>" href="document-approvals.php">
+            <?= appIcon("approvals") ?>
+            <span data-i18n="approvalInboxTitle">Doküman Onay Kutusu</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('audit_trail.view')): ?>
+<a class="<?= sidebarLinkClass("audit_trail", $activeNav) ?>" href="audit-trail.php">
+            <?= appIcon("checkBadge") ?>
+            <span data-i18n="auditTrailMenuLabel">Denetim İzi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('audit_trail.view')): ?>
+<a class="<?= sidebarLinkClass("audit_trail_report", $activeNav) ?>" href="audit-trail-report.php">
+            <?= appIcon("reports") ?>
+            <span data-i18n="auditTrailReportTitle">Denetim İzi Raporu</span>
+        </a>
+<?php endif; ?>
+        <?php endif; /* canSeeOperations */ ?>
+
+        <?php if ($isSuperAdminNav): ?>
+            <span class="sidebar-section-label" data-i18n="sidebarManagementLabel">Sistem Yönetimi</span>
+            <?php if (qmsSidebarVisible('admin.office')): ?>
+<a class="<?= sidebarLinkClass("office_settings", $activeNav) ?>" href="office-settings.php">
+                <?= appIcon("office") ?>
+                <span data-i18n="officeSettingsTitle">Ofis Entegrasyonu</span>
+            </a>
+<?php endif; ?>
+            <?php if (qmsSidebarVisible('admin.mail')): ?>
+<a class="<?= sidebarLinkClass("mail_settings", $activeNav) ?>" href="mail-settings.php">
+                <?= appIcon("notifications") ?>
+                <span data-i18n="mailSettingsMenuLabel">E-posta Ayarları</span>
+            </a>
+<?php endif; ?>
+            <?php if (qmsSidebarVisible('admin.companies')): ?>
+<a class="<?= sidebarLinkClass("companies", $activeNav) ?>" href="super-admin-companies.php">
+                <?= appIcon("companies") ?>
+                <span data-i18n="manageCompaniesButton">Şirketler</span>
+            </a>
+<?php endif; ?>
+            <?php if (qmsSidebarVisible('admin.admins')): ?>
+<a class="<?= sidebarLinkClass("admins", $activeNav) ?>" href="super-admin-admins.php">
+                <?= appIcon("admins") ?>
+                <span data-i18n="accountsTitle">Kullanıcı Hesapları</span>
+            </a>
+<?php endif; ?>
+            <?php if (qmsSidebarVisible('admin.assignments')): ?>
+<a class="<?= sidebarLinkClass("assignments", $activeNav) ?>" href="super-admin-assignments.php">
+                <?= appIcon("assignments") ?>
+                <span data-i18n="manageAssignmentsButton">Admin Atamaları</span>
+            </a>
+<?php endif; ?>
+            <?php if (qmsSidebarVisible('permissions.view')): ?>
+<a class="<?= sidebarLinkClass("permissions", $activeNav) ?>" href="permissions.php">
+                <?= appIcon("checkBadge") ?>
+                <span data-i18n="permissionsMenuLabel">İzinler</span>
+            </a>
+<?php endif; ?>
+        <?php endif; ?>
     </nav>
 </aside>
 <script src="assets/js/dates.js"></script>
