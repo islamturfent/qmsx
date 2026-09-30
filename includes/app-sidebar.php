@@ -84,6 +84,7 @@ $sidebarGroups = [
             ['key' => 'overdue', 'href' => 'overdue.php', 'perm' => 'overdue.view', 'i18n' => 'overdueMenuLabel', 'label' => 'Vadesi Gelen İşler', 'icon' => 'alert'],
             ['key' => 'quality_plans', 'href' => 'quality-plan.php', 'perm' => 'operations.view', 'i18n' => 'qualityPlanMenuLabel', 'label' => 'Yıllık Kalite Planı', 'icon' => 'table'],
             ['key' => 'reviews', 'href' => 'reviews.php', 'perm' => 'operations.view', 'i18n' => 'reviewsTitle', 'label' => 'Yönetimin Gözden Geçirmesi', 'icon' => 'reviews'],
+            ['key' => 'ai_studio', 'href' => 'ai-document-studio.php', 'perm' => 'operations.view', 'i18n' => 'aiStudioMenuLabel', 'label' => 'AI Doküman Stüdyosu', 'icon' => 'sparkles'],
         ],
     ],
     [
@@ -194,6 +195,7 @@ $sidebarGroups = [
             ['key' => 'admins', 'href' => 'super-admin-admins.php', 'perm' => 'admin.admins', 'i18n' => 'accountsTitle', 'label' => 'Kullanıcı Hesapları', 'icon' => 'admins'],
             ['key' => 'assignments', 'href' => 'super-admin-assignments.php', 'perm' => 'admin.assignments', 'i18n' => 'manageAssignmentsButton', 'label' => 'Admin Atamaları', 'icon' => 'assignments'],
             ['key' => 'permissions', 'href' => 'permissions.php', 'perm' => 'permissions.view', 'i18n' => 'permissionsMenuLabel', 'label' => 'İzinler', 'icon' => 'checkBadge'],
+            ['key' => 'ai_settings', 'href' => 'ai-settings.php', 'roles' => ['super_admin', 'system_admin'], 'i18n' => 'aiSettingsMenuLabel', 'label' => 'Yapay Zeka Ayarları', 'icon' => 'cog'],
         ],
     ],
 ];
@@ -213,6 +215,12 @@ $sidebarGroups = [
             <?php
             $visible = [];
             foreach ($group['items'] as $item) {
+                if (isset($item['roles']) && is_array($item['roles'])) {
+                    if (in_array($sidebarRole, $item['roles'], true)) {
+                        $visible[] = $item;
+                    }
+                    continue;
+                }
                 if (qmsSidebarVisible($item['perm'])) {
                     $visible[] = $item;
                 }

@@ -3519,3 +3519,41 @@ Object.assign(translations.en, {
   competencyMatrixListTitle: "Personnel Competencies", competencyMatrixEmpty: "No personnel or competencies recorded yet.",
   compUserLinkNone: "Select user", compUserLinkSave: "Link",
 });
+
+Object.assign(translations.tr, {
+  aiStudioMenuLabel: "AI Doküman Stüdyosu",
+  aiSettingsMenuLabel: "Yapay Zeka Ayarları",
+  aiStudioTitle: "AI Doküman Stüdyosu", aiStudioKicker: "Yapay Zeka",
+  aiStudioText: "Dokümanı tarif edin (yazıyla ya da sesle) ve taslağı üretin.",
+  aiStudioPromptTitle: "Dokümanı Tarif Et", aiStudioPromptText: "Mikrofon ile söyleyin veya yazın; türü seçip üretin.",
+  aiStudioTypeLabel: "Doküman Türü", aiStudioTitleLabel: "Başlık (isteğe bağlı)", aiStudioDescLabel: "Açıklama / Konu",
+  aiStudioVoiceHint: "Mikrofonla konuşarak yazdırabilirsiniz.",
+  aiStudioGenerate: "Taslağı Üret", aiStudioResultTitle: "Üretilen Taslak", aiStudioCopy: "Kopyala",
+  aiSettingsTitle: "Yapay Zeka Ayarları", aiSettingsKicker: "Sistem Kurulumu",
+  aiSettingsText: "Doküman stüdyosu ve sesli komut için sağlayıcı bilgileri.",
+  aiSettingsFormTitle: "OpenAI Yapılandırması",
+  aiSettingsFormText: "API anahtarını platform.openai.com'den alın; gpt-4o-mini ve whisper-1 modelleri kullanılır.",
+  aiEnabledLabel: "Yapay zeka asistanını etkinleştir",
+  aiApiKeyLabel: "API Anahtarı", aiModelLabel: "Metin Modeli", aiWhisperModelLabel: "Ses Modeli",
+  aiBaseUrlLabel: "API Temel URL", aiTimeoutLabel: "Zaman Aşımı (sn)",
+  aiSettingsSave: "Kaydet", aiSettingsTest: "Bağlantıyı Test Et",
+});
+
+Object.assign(translations.en, {
+  aiStudioMenuLabel: "AI Document Studio",
+  aiSettingsMenuLabel: "AI Settings",
+  aiStudioTitle: "AI Document Studio", aiStudioKicker: "Artificial Intelligence",
+  aiStudioText: "Describe the document (type or speak) and generate the draft.",
+  aiStudioPromptTitle: "Describe the Document", aiStudioPromptText: "Speak via the microphone or type; choose the type and generate.",
+  aiStudioTypeLabel: "Document Type", aiStudioTitleLabel: "Title (optional)", aiStudioDescLabel: "Description / Topic",
+  aiStudioVoiceHint: "You can dictate using the microphone.",
+  aiStudioGenerate: "Generate Draft", aiStudioResultTitle: "Generated Draft", aiStudioCopy: "Copy",
+  aiSettingsTitle: "AI Settings", aiSettingsKicker: "System Setup",
+  aiSettingsText: "Provider credentials for the document studio and voice commands.",
+  aiSettingsFormTitle: "OpenAI Configuration",
+  aiSettingsFormText: "Get the API key from platform.openai.com; uses gpt-4o-mini and whisper-1.",
+  aiEnabledLabel: "Enable the AI assistant",
+  aiApiKeyLabel: "API Key", aiModelLabel: "Text Model", aiWhisperModelLabel: "Whisper Model",
+  aiBaseUrlLabel: "API Base URL", aiTimeoutLabel: "Timeout (sec)",
+  aiSettingsSave: "Save", aiSettingsTest: "Test Connection",
+});

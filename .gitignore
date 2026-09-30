@@ -33,5 +33,9 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
+# Yapay zeka ayarlari (API anahtari) - repo'ya asla girmemeli
+storage/ai/*
+!storage/ai/.htaccess
+
 # Kullanici yuklenen sozlesme ekleri
 storage/contracts/

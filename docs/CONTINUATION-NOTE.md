@@ -2200,3 +2200,18 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **Sidebar submenu ikon boyutu duzeltildi** (cache v183): submenu ogeleri
   `appIcon($icon,'')` yerine `appIcon($icon,'sidebar-link-icon')` ile render
   ediliyor (20px). Grup ikonuna `.sidebar-group-icon svg { width/height:20px }`.
+
+## AI Asistani (cache v184) - kuruldu
+- **Kurulum asamasinda**: `config/ai.php` (varsayilanlar + okuyucu), `.gitignore`'a
+  `storage/ai/*` (anahtar asla repo'ya girmez), `storage/ai/.htaccess`.
+- **Ayar sayfasi**: `ai-settings.php` (super/system admin) - OpenAI API anahtarini,
+  model (gpt-4o-mini), whisper-1, base_url, timeout'i `storage/ai/settings.json`'a
+  kaydeder; "Baglanti Test Et" butonu.
+- **Saglayici**: `includes/ai-functions.php` - `qmsAiChat()` (OpenAI chat),
+  `qmsAiWhisperTranscribe()` (ses tanima), `qmsAiFallbackDocument()` (offline
+  sablon motoru - AI kapaliyken calisir).
+- **Studio**: `ai-document-studio.php` - dokumani tarif et (yazi), tur sec,
+  "Taslagi Uret"; **voice** tarayicida Web Speech API (`webkitSpeechRecognition`,
+  tr-TR) ile metne cevirir. Cikti kopyalanabilir.
+- **Sidebar**: Genel -> "AI Dokuman Studusu", Sistem Yonetimi -> "Yapay Zeka Ayarlari".
+- i18n TR/EN; cache v184. Test: studio AI kapaliyken sablon motoru doner.

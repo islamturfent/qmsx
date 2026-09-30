@@ -4869,3 +4869,54 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
 
 /* Export buton satiri */
 .export-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+/* AI Dokuman Stüdyosu */
+.voice-field {
+    position: relative;
+}
+.voice-field textarea {
+    padding-right: 56px;
+}
+.voice-mic {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-control);
+    border-radius: 999px;
+    background: var(--control-bg-color);
+    color: var(--text-color);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background .15s, box-shadow .15s;
+}
+.voice-mic:hover { border-color: var(--brand-400); }
+.voice-mic.is-listening {
+    background: var(--error-50);
+    border-color: var(--error-500);
+    box-shadow: 0 0 0 4px rgba(240, 68, 56, 0.15);
+    animation: pulse-ring 1.2s ease-in-out infinite;
+}
+@keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(240, 68, 56, 0.12); }
+    50% { box-shadow: 0 0 0 7px rgba(240, 68, 56, 0.2); }
+}
+.result-editor {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+    background: var(--control-bg-color);
+    color: var(--text-color);
+    padding: 12px 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+}
+.result-editor:focus { border-color: var(--brand-400); box-shadow: var(--shadow-focus-ring); }
