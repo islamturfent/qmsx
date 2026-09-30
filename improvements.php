@@ -12,6 +12,7 @@ require_once __DIR__ . '/includes/access.php';
 qmsRequirePermission('operations.view');
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/improvement-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
@@ -36,6 +37,12 @@ if ($editId > 0) {
     }
 }
 
+// OFI -> NC baglama secenekleri (yalnizca duzenleme sirasinda ilgili sirket).
+$ncOptions = [];
+if ($editing) {
+    $ncOptions = qmsImprovementOpenNcOptions($pdo, (int) $editing['company_id']);
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     qmsCsrfVerify($csrfScope, $_POST["csrf"] ?? null);
     $formType = (string) ($_POST["form_type"] ?? "");
@@ -49,6 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "impact" => (string) ($_POST["impact"] ?? "medium"),
             "priority" => (string) ($_POST["priority"] ?? "normal"),
             "responsible" => (string) ($_POST["responsible"] ?? ""),
+            "linked_nc_id" => (int) ($_POST["linked_nc_id"] ?? 0),
             "target_date" => (string) ($_POST["target_date"] ?? ""),
             "status" => (string) ($_POST["status"] ?? "submitted"),
             "eval_score" => (string) ($_POST["eval_score"] ?? ""),
@@ -74,6 +82,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if ($priorStatus !== 'implemented' && (string) ($data['status'] ?? '') === 'implemented') {
                     qmsImprovementNotify($pdo, (int) ($prior['company_id'] ?? 0), 'improvement_implemented', 'Uygulandı: ' . (string) $data['title'], 'improvements.php');
                 }
+                // Durum degisiminde denetim izi kaydi.
+                qmsAuditLog(
+                    $pdo,
+                    (int) ($prior['company_id'] ?? 0) ?: null,
+                    $userId,
+                    'improvement',
+                    $updateId,
+                    ($priorStatus !== '' && $priorStatus !== (string) ($data['status'] ?? '')) ? ($data['status'] === 'implemented' ? 'complete' : 'status_change') : 'update',
+                    'İyileştirme Fırsatı güncellendi: ' . (string) $data['title'] . ' (durum: ' . qmsImprovementStatusLabel((string) ($data['status'] ?? '')) . ')'
+                );
                 header("Location: improvements.php?updated=1");
                 exit;
             }
@@ -107,7 +125,7 @@ $activeNav = "improvements";
 $selectedCompanyId = (int) ($_GET["company_id"] ?? 0);
 $prefill = $editing ?: [
     'title' => '', 'description' => '', 'category' => '', 'benefit_type' => 'quality',
-    'impact' => 'medium', 'priority' => 'normal', 'responsible' => '', 'target_date' => '',
+    'impact' => 'medium', 'priority' => 'normal', 'responsible' => '', 'linked_nc_id' => 0, 'target_date' => '',
     'status' => 'submitted', 'eval_score' => '', 'result' => '',
 ];
 if ($editing) {
@@ -161,6 +179,7 @@ if ($editing) {
                         <label class="form-field"><span data-i18n="improvementImpactLabel">Etki</span><select name="impact"><?php foreach (['low','medium','high'] as $lv): ?><option value="<?= $lv ?>" <?= (string) $prefill['impact'] === $lv ? 'selected' : '' ?>><?= htmlspecialchars(qmsImprovementLevelLabel($lv), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                         <label class="form-field"><span data-i18n="improvementPriorityLabel">Öncelik</span><select name="priority"><?php foreach (['low','normal','high'] as $pr): ?><option value="<?= $pr ?>" <?= (string) $prefill['priority'] === $pr ? 'selected' : '' ?>><?= htmlspecialchars(qmsImprovementLevelLabel($pr), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                         <label class="form-field"><span data-i18n="improvementResponsibleLabel">Sorumlu</span><input type="text" name="responsible" maxlength="180" value="<?= htmlspecialchars((string) $prefill['responsible'], ENT_QUOTES, 'UTF-8') ?>"></label>
+                        <label class="form-field"><span data-i18n="improvementLinkNcLabel">Bağlı Uygunsuzluk (isteğe bağlı)</span><select name="linked_nc_id"><option value="0" data-i18n="improvementLinkNcNone">Bağlı NC yok</option><?php foreach ($ncOptions as $nc): ?><option value="<?= (int) $nc['id'] ?>" <?= (int) ($prefill['linked_nc_id'] ?? 0) === (int) $nc['id'] ? 'selected' : '' ?>><?= htmlspecialchars('#' . (int) $nc['id'] . ' ' . $nc['title'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                         <label class="form-field"><span data-i18n="improvementTargetDateLabel">Hedef Tarih</span><input type="date" name="target_date" value="<?= htmlspecialchars((string) $prefill['target_date'], ENT_QUOTES, 'UTF-8') ?>"></label>
                         <label class="form-field"><span data-i18n="improvementStatusLabel">Durum</span><select name="status"><?php foreach (QMS_IMPROVEMENT_STATUSES as $st): ?><option value="<?= $st ?>" <?= (string) $prefill['status'] === $st ? 'selected' : '' ?>><?= htmlspecialchars(qmsImprovementStatusLabel($st), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                         <label class="form-field"><span data-i18n="improvementEvalScoreLabel">Değerlendirme Puanı (1-5)</span><input type="number" name="eval_score" min="1" max="5" value="<?= htmlspecialchars((string) ($prefill['eval_score'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></label>
@@ -187,6 +206,7 @@ if ($editing) {
                                 </span>
                             </div>
                             <div class="list-item-side">
+                                <?php if ((int) ($row['linked_nc_id'] ?? 0) > 0): ?><a class="secondary-button" href="nonconformity-detail.php?id=<?= (int) $row['linked_nc_id'] ?>" data-i18n="improvementLinkedNcButton">NC #<?= (int) $row['linked_nc_id'] ?></a><?php endif; ?>
                                 <a class="secondary-button" href="improvements.php?edit=<?= (int) $row['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="improvements.php" onsubmit="return confirm('Öneri silinsin mi?');"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="delete"><input type="hidden" name="id" value="<?= (int) $row['id'] ?>"><button class="danger-button danger-button-sm" type="submit" data-i18n="improvementDelete">Sil</button></form>
                             </div>

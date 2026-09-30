@@ -314,6 +314,12 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
         </a>
 <?php endif; ?>
         <?php if (qmsSidebarVisible('operations.view')): ?>
+<a class="<?= sidebarLinkClass("rca", $activeNav) ?>" href="rca.php">
+            <?= appIcon("table") ?>
+            <span data-i18n="rcaMenuLabel">Kök Neden Analizi</span>
+        </a>
+<?php endif; ?>
+        <?php if (qmsSidebarVisible('operations.view')): ?>
 <a class="<?= sidebarLinkClass("processes", $activeNav) ?>" href="processes.php">
             <?= appIcon("table") ?>
             <span data-i18n="processesMenuLabel">Süreç Envanteri</span>

@@ -2151,3 +2151,18 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **C - Musteri Memnuniyeti Anketi**: modul zaten mevcuttu ve rapor export'una
   bagliydi (satisfaction_count/avg + list). Donem Ozeti "Musteri & Yetkinlik"
   grubuna Memnuniyet Puanı (x/5) ve Yanıt adedi linkli metrikleri eklendi.
+
+## Log A/B/C (cache v176)
+
+- **A - OFI -> CAPA/NC baglantisi**: `improvements.linked_nc_id` eklendi
+  (migration `migrate-improvement-nc-link.php`). Edit formuna "Bagli Uygunsuzluk"
+  dropdown (sirketin acik NC'leri), listede NC linki, durum degisiminde denetim
+  izi (entity `improvement`) eklendi. `qmsImprovementOpenNcOptions`/`LinkedNc`.
+- **B - Yeni yüzey: Kok Neden Analizi (RCA)**: `rca_analyses` tablosu
+  (migration `migrate-rca.php`), `includes/rca-functions.php`, `rca.php` sayfasi.
+  5-Neden (JSON), sorun/kok neden/onerilen CAPA, kaynak (NC/olay/iyilestirme)
+  baglantisi; kaynak uygunsuzluk ise "CAPA Ac" butonu `qmsRcaOpenCapa()` ile
+  faaliyet + bildirim + denetim izi. Sidebar `rca` + i18n TR/EN.
+- **C - Denetim Izi raporlama sablonu**: zaten mevcuttu (`audit-trail-report.php`
+  filtre + CSV + PDF + ozet; sidebar `audit_trail_report`, RBAC
+  `audit_trail.view`). Ek kod gerekmedi; dogrulandi.

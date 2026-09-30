@@ -90,16 +90,29 @@ function qmsImprovementAdd(PDO $pdo, array $data, int $userId, string $role): ?i
 /** Öneriyi gunceller (kapsam içinde olmali). */
 function qmsImprovementUpdate(PDO $pdo, int $id, array $data, int $userId, string $role): bool
 {
-    if (!qmsImprovementFind($pdo, $id, $userId, $role)) {
+    $found = qmsImprovementFind($pdo, $id, $userId, $role);
+    if (!$found) {
         return false;
     }
     $title = trim((string) ($data['title'] ?? ''));
     if ($title === '') {
         return false;
     }
+
+    // Bagli uygunsuzluk: yalnizca bu sirketin acik NC'leri kabul edilir.
+    $ncId = (int) ($data['linked_nc_id'] ?? 0);
+    if ($ncId > 0) {
+        $scope = qmsCompanyScope('company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+        $chk = $pdo->prepare('SELECT id FROM nonconformities WHERE id = ? AND active = 1 AND status <> \'closed\'' . $scope['sql'] . ' LIMIT 1');
+        $chk->execute(array_merge([$ncId], $scope['params']));
+        if (!$chk->fetchColumn()) {
+            $ncId = 0;
+        }
+    }
+
     $pdo->prepare('UPDATE improvements SET
         title=?, description=?, category=?, benefit_type=?, impact=?, priority=?, responsible=?,
-        target_date=?, status=?, eval_score=?, result=? WHERE id=?')->execute([
+        linked_nc_id=?, target_date=?, status=?, eval_score=?, result=? WHERE id=?')->execute([
         mb_substr($title, 0, 190),
         trim((string) ($data['description'] ?? '')) !== '' ? mb_substr((string) $data['description'], 0, 4000) : null,
         trim((string) ($data['category'] ?? '')) !== '' ? mb_substr(trim((string) $data['category']), 0, 120) : null,
@@ -107,6 +120,7 @@ function qmsImprovementUpdate(PDO $pdo, int $id, array $data, int $userId, strin
         (string) ($data['impact'] ?? 'medium'),
         (string) ($data['priority'] ?? 'normal'),
         trim((string) ($data['responsible'] ?? '')) !== '' ? mb_substr(trim((string) $data['responsible']), 0, 180) : null,
+        $ncId > 0 ? $ncId : null,
         preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) ($data['target_date'] ?? '')) ? (string) $data['target_date'] : null,
         (string) ($data['status'] ?? 'submitted'),
         isset($data['eval_score']) && $data['eval_score'] !== '' ? max(1, min(5, (int) $data['eval_score'])) : null,
@@ -114,6 +128,40 @@ function qmsImprovementUpdate(PDO $pdo, int $id, array $data, int $userId, strin
         $id,
     ]);
     return true;
+}
+
+/**
+ * Bir sirketin acik uygunsuzluklari (OFI -> NC baglama secenekleri).
+ *
+ * @return array<int, array{id:int, title:string}>
+ */
+function qmsImprovementOpenNcOptions(PDO $pdo, int $companyId): array
+{
+    if ($companyId <= 0) {
+        return [];
+    }
+    $stmt = $pdo->prepare(
+        'SELECT id, title FROM nonconformities WHERE company_id = ? AND active = 1 AND status <> \'closed\' ORDER BY id DESC'
+    );
+    $stmt->execute([$companyId]);
+    return array_map(static fn(array $r): array => ['id' => (int) $r['id'], 'title' => (string) $r['title']], $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+/**
+ * Bir OFI'nin bagli uygunsuzlugunun ozeti (varsa): id + baslik + durum.
+ *
+ * @return array<string, mixed>|null
+ */
+function qmsImprovementLinkedNc(PDO $pdo, int $improvementId): ?array
+{
+    $stmt = $pdo->prepare(
+        'SELECT n.id, n.title, n.status FROM nonconformities n
+         INNER JOIN improvements i ON i.linked_nc_id = n.id
+         WHERE i.id = ? AND n.active = 1 LIMIT 1'
+    );
+    $stmt->execute([$improvementId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ?: null;
 }
 
 /** Öneriyi siler (aktif=0), kapsam içinde olmali. */
