@@ -123,6 +123,40 @@ function qmsAiWhisperTranscribe(string $audioBase64, string $mime = 'audio/webm'
     return ['ok' => true, 'text' => $text, 'error' => ''];
 }
 
+/** Sağlayicinin sunabileceği modelleri listeler. @return array{ok:bool,models:array<int,string>,error:string} */
+function qmsAiListModels(): array
+{
+    $cfg = qmsAiConfig();
+    if (!qmsAiAvailable()) {
+        return ['ok' => false, 'models' => [], 'error' => 'Yapay zeka etkin değil.'];
+    }
+    $url = rtrim((string) $cfg['base_url'], '/') . '/models';
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . (string) $cfg['api_key']],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => (int) $cfg['timeout'],
+    ]);
+    $body = curl_exec($ch);
+    $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($http !== 200) {
+        return ['ok' => false, 'models' => [], 'error' => 'Model listesi alınamadı (HTTP ' . $http . '): ' . (is_string($body) ? $body : '')];
+    }
+    $decoded = json_decode((string) $body, true);
+    $models = array_map('strval', (array) ($decoded['data'] ?? []));
+    // data bir dizi; her ogede 'id' alani var olabilir.
+    $ids = [];
+    foreach ((array) ($decoded['data'] ?? []) as $item) {
+        if (is_array($item) && isset($item['id'])) {
+            $ids[] = (string) $item['id'];
+        } elseif (is_string($item)) {
+            $ids[] = $item;
+        }
+    }
+    return ['ok' => true, 'models' => $ids, 'error' => ''];
+}
+
 /** Genel HTTP POST yardimcisi (JSON body). @return array{http:int,body:string} */
 function qmsAiHttpPost(string $url, array $payload, string $apiKey, int $timeout): array
 {

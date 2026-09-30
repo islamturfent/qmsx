@@ -2226,3 +2226,8 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **Groq model duzeltmesi** (cache v187): `llama-3.3-70b-versatile` free tier'da
   erisilemedi (model_not_found); Groq preset'i `llama-3.1-8b-instant` + 
   `whisper-large-v3` olarak degistirildi.
+- **Groq model listeleme** (cache v188): `llama-3.1` da erisilemedi; Groq eski
+  Llama modellerini kaldirmis. `qmsAiListModels()` (GET /models) + ayar sayfasinda
+  "Modelleri Listele" butonu ve secilebilir model listesi (cevap + "Bu Modeli Kullan"
+  -> kaydet). Groq preset'i `meta-llama/llama-4-scout-17b-16e-instruct` + 
+  `whisper-large-v3`.

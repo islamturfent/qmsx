@@ -66,6 +66,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $r = qmsAiChat("Kısa ve öz cevap ver.", "Bağlantı testi: sadece 'OK' yaz.");
         $message = $r['ok'] ? "AI bağlantısı çalışıyor: " . mb_substr($r['text'], 0, 80) : "AI bağlantı testi başarısız: " . $r['error'];
         $messageType = $r['ok'] ? "success" : "error";
+    } elseif ($formType === "list_models") {
+        $ml = qmsAiListModels();
+        if ($ml['ok']) {
+            $modelsList = array_values(array_filter($ml['models'], static fn($m): bool => trim((string) $m) !== ''));
+            $message = count($modelsList) > 0 ? count($modelsList) . " model bulundu; listeden seçip Kaydet'e basın." : "Hiç model döndürülmedi.";
+            $messageType = "success";
+        } else {
+            $modelsList = [];
+            $message = "Model listesi alınamadı: " . $ml['error'];
+            $messageType = "error";
+        }
     }
 }
 
@@ -126,9 +137,21 @@ if (is_file(qmsAiLastErrorPath())) {
                     <a class="secondary-button" href="ai-settings.php?test=1" onclick="this.href='ai-settings.php'">Test</a>
                 </div>
             </form>
-            <div style="margin-top:14px;">
+            <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
                 <form method="post" action="ai-settings.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="test"><button class="secondary-button" type="submit" data-i18n="aiSettingsTest">Bağlantıyı Test Et</button></form>
+                <form method="post" action="ai-settings.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="list_models"><button class="secondary-button" type="submit" data-i18n="aiListModelsButton">Modelleri Listele</button></form>
             </div>
+            <?php if (!empty($modelsList)): ?>
+            <div style="margin-top:14px;">
+                <label class="form-field"><span data-i18n="aiPickModelLabel">Erişilebilir Model Seç</span>
+                    <select id="aiModelPicker">
+                        <option value="" data-i18n="aiPickModelNone">— model seç —</option>
+                        <?php foreach ($modelsList as $mid): ?><option value="<?= htmlspecialchars($mid, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($mid, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+                    </select>
+                </label>
+                <div class="form-actions"><button class="primary-button" type="button" id="aiApplyModel" data-i18n="aiApplyModelButton">Bu Modeli Kullan</button></div>
+            </div>
+            <?php endif; ?>
         </section>
 
         <section class="console-card checkout-section">
@@ -156,6 +179,17 @@ if (is_file(qmsAiLastErrorPath())) {
             whisper.value = p.whisper_model;
             base.value = p.base_url;
         });
+
+        var applyBtn = document.getElementById("aiApplyModel");
+        var picker = document.getElementById("aiModelPicker");
+        if (applyBtn && picker && model) {
+            applyBtn.addEventListener("click", function () {
+                if (!picker.value) return;
+                model.value = picker.value;
+                var saveForm = document.querySelector("form.auditor-form");
+                if (saveForm) saveForm.submit();
+            });
+        }
     })();
     </script>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
