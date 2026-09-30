@@ -2166,3 +2166,8 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **C - Denetim Izi raporlama sablonu**: zaten mevcuttu (`audit-trail-report.php`
   filtre + CSV + PDF + ozet; sidebar `audit_trail_report`, RBAC
   `audit_trail.view`). Ek kod gerekmedi; dogrulandi.
+- **Denetim Izi Raporu header arama** (cache v177): header `page-title-block`
+  yerine `topbar-search` (ara kutusu) kondu; `audit-log-functions` `q` ozet-metni
+  filtresi ekledi (LIKE). "Kayit turu" (entity_type) secim kutusu kaldirildi ve
+  her zaman "tumu" yapildi (filtre bos; ozet dagilim gorseli korundu). CSS
+  `.topbar-search` dark-adaptif.

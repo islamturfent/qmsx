@@ -24,18 +24,17 @@ if (!qmsCanSession('audit_trail.view')) {
     exit;
 }
 
-// Filtre: yalniz onayli degerler.
+// Filtre: yalniz onayli degerler. Kayit turu (entity_type) her zaman "tumu"dir;
+// arama kutusu header'da (q) ozet metnini filtreler.
 $filter = [
     "company_id" => (int) ($_GET["company_id"] ?? 0),
-    "entity_type" => (string) ($_GET["entity_type"] ?? ""),
+    "entity_type" => "",
     "action" => (string) ($_GET["action"] ?? ""),
     "actor_user_id" => (int) ($_GET["actor_user_id"] ?? 0),
     "from" => (string) ($_GET["from"] ?? ""),
     "to" => (string) ($_GET["to"] ?? ""),
+    "q" => mb_substr(trim((string) ($_GET["q"] ?? "")), 0, 120),
 ];
-if ($filter["entity_type"] !== "" && !isset(qmsAuditLogEntityLabels()[$filter["entity_type"]])) {
-    $filter["entity_type"] = "";
-}
 if ($filter["action"] !== "" && !isset(qmsAuditLogActionLabels()[$filter["action"]])) {
     $filter["action"] = "";
 }
@@ -62,11 +61,11 @@ $periodTo = $filter["to"] !== "" ? $filter["to"] : '•';
 $buildQuery = static function (array $extra = []) use ($filter): string {
     return http_build_query(array_merge([
         "company_id" => $filter["company_id"],
-        "entity_type" => $filter["entity_type"],
         "action" => $filter["action"],
         "actor_user_id" => $filter["actor_user_id"],
         "from" => $filter["from"],
         "to" => $filter["to"],
+        "q" => $filter["q"],
     ], $extra));
 };
 
@@ -177,10 +176,17 @@ $activeNav = "audit_trail_report";
     <?php require __DIR__ . '/includes/app-sidebar.php'; ?>
     <header class="topbar">
         <div class="topbar-inner">
-            <div class="page-title-block">
-                <strong data-i18n="auditTrailReportTitle">Denetim İzi Raporu</strong>
-                <span data-i18n="auditTrailReportText">Salt-okunur kayıtların özet ve ihraç raporu.</span>
-            </div>
+            <form class="topbar-search" method="get" action="audit-trail-report.php">
+                <input type="search" name="q" value="<?= htmlspecialchars($filter['q'], ENT_QUOTES, 'UTF-8') ?>" placeholder="Denetim izinde ara...">
+                <input type="hidden" name="company_id" value="<?= (int) $filter['company_id'] ?>">
+                <input type="hidden" name="action" value="<?= htmlspecialchars($filter['action'], ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="actor_user_id" value="<?= (int) $filter['actor_user_id'] ?>">
+                <input type="hidden" name="from" value="<?= htmlspecialchars($filter['from'], ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="to" value="<?= htmlspecialchars($filter['to'], ENT_QUOTES, 'UTF-8') ?>">
+                <button type="submit" aria-label="Ara">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                </button>
+            </form>
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
                 <button class="topbar-button" id="themeToggle" type="button" aria-label="Tema değiştir">🌙</button>
@@ -203,7 +209,6 @@ $activeNav = "audit_trail_report";
         <section class="filter-panel">
             <form class="filter-form" method="get" action="audit-trail-report.php">
                 <label><span data-i18n="companySelectLabel">Şirket</span><select name="company_id"><option value="0" data-i18n="allCompaniesOption">Tümü</option><?php foreach ($companies as $company): ?><option value="<?= (int) $company['id'] ?>" <?= $filter['company_id'] === (int) $company['id'] ? 'selected' : '' ?>><?= htmlspecialchars($company['company_name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
-                <label><span data-i18n="auditEntityTypeLabel">Kayıt Türü</span><select name="entity_type"><option value="" data-i18n="allTypesOption">Tümü</option><?php foreach ($entityLabels as $key => $label): ?><option value="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" <?= $filter['entity_type'] === $key ? 'selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="auditActionLabel">İşlem</span><select name="action"><option value="" data-i18n="allActionsOption">Tümü</option><?php foreach ($actionLabels as $key => $label): ?><option value="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" <?= $filter['action'] === $key ? 'selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="auditActorLabel">Kullanıcı</span><select name="actor_user_id"><option value="0" data-i18n="allUsersOption">Tümü</option><?php foreach ($users as $user): ?><option value="<?= (int) $user['id'] ?>" <?= $filter['actor_user_id'] === (int) $user['id'] ? 'selected' : '' ?>><?= htmlspecialchars((string) ($user['full_name'] ?: ('#' . (int) $user['id'])), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
                 <label><span data-i18n="fromDateLabel">Başlangıç</span><input type="date" name="from" value="<?= htmlspecialchars($filter['from'], ENT_QUOTES, 'UTF-8') ?>"></label>

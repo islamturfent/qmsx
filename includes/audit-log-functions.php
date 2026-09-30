@@ -181,6 +181,11 @@ function qmsAuditLogList(PDO $pdo, int $userId, string $role, array $filter = []
         $where[] = 'audit_log.created_at <= ?';
         $params[] = $filter['to'] . ' 23:59:59';
     }
+    $q = trim((string) ($filter['q'] ?? ''));
+    if ($q !== '') {
+        $where[] = 'audit_log.summary LIKE ?';
+        $params[] = '%' . $q . '%';
+    }
 
     $whereSql = $where === [] ? '' : ' WHERE ' . implode(' AND ', $where);
     $limit = min(500, max(10, (int) ($filter['limit'] ?? 100)));

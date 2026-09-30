@@ -1700,6 +1700,58 @@ body.has-sidebar {
     gap: 8px;
 }
 
+/* Header icinde sigan arama kutusu (Denetim Izi Raporu). */
+.topbar-search {
+    display: flex;
+    align-items: center;
+    flex: 0 1 340px;
+    min-width: 160px;
+    max-width: 340px;
+    height: 40px;
+    gap: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--border-control);
+    border-radius: 999px;
+    background: var(--control-bg-color);
+    transition: border-color .15s, box-shadow .15s;
+}
+.topbar-search:focus-within {
+    border-color: var(--brand-400, #3b82f6);
+    box-shadow: var(--shadow-focus-ring);
+}
+.topbar-search input[type="search"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 13px;
+    outline: none;
+}
+.topbar-search input[type="search"]::placeholder {
+    color: var(--gray-400);
+}
+.topbar-search button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-500);
+    cursor: pointer;
+}
+.topbar-search button:hover {
+    background: var(--brand-100);
+    color: var(--brand-600);
+}
+@media (max-width: 600px) {
+    .topbar-search { flex: 1 1 auto; max-width: none; }
+}
+
 /* Header elemanlarini istenen sirada gosterir (soldan saga):
    uyari zili, tema, dil, kullanici (en sagda). Fonksiyonlari degistirmaz. */
 .topbar-actions > .notification-menu { order: 1; }
