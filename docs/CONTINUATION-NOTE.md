@@ -2177,3 +2177,8 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   filtreleri her zaman "tumu" yapildi ve kutucugu kaldirildi: `search.php`
   (type), `actions.php` (record_type), `audit-trail.php` (entity_type),
   `audit-trail-report.php` (daha once).
+- **Arama sayfasinda Kayit Turu geri geldi** (cache v179): `search.php` 'de
+  `type` filtresi ve secim kutusu yeniden etkinles tirildi (sadece arama
+  sayfasinda gorunur). Header'larda kayit turu gorunmez (kuresel arama box'i
+  `q` ile `search.php` 'ye gider). `actions.php` / `audit-trail.php` de kayit
+  turu hâlâ gizli + "tumu".
