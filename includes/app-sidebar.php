@@ -249,7 +249,7 @@ $sidebarGroups = [
                         }
                         ?>
                         <a class="<?= sidebarLinkClass($item['key'], $activeNav) ?>" href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>">
-                            <?= appIcon($item['icon'], '') ?>
+                            <?= appIcon($item['icon'], 'sidebar-link-icon') ?>
                             <span data-i18n="<?= $item['i18n'] ?>"><?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?></span>
                             <?php if ($countVal > 0): ?><span class="sidebar-count"><?= $countVal ?></span><?php endif; ?>
                         </a>

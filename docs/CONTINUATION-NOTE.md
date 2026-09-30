@@ -2197,3 +2197,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   kücük/buyuk-harfli etiket degil, normal menü ögesi gibi (ikon + etiket +
   cevron; 14px, 500). Her gruba ikon eklendi. Altmenu ögeleri girintili + sol
   kilavuz cizgisi ile (`sidebar-submenu`).
+- **Sidebar submenu ikon boyutu duzeltildi** (cache v183): submenu ogeleri
+  `appIcon($icon,'')` yerine `appIcon($icon,'sidebar-link-icon')` ile render
+  ediliyor (20px). Grup ikonuna `.sidebar-group-icon svg { width/height:20px }`.
