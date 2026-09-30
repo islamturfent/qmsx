@@ -2185,3 +2185,11 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **Sidebar Arama dugmesi kaldirildi** (cache v180): `app-sidebar.php`'den
   `search.php` menü ogesi cikti (yalnizca görünüm). `search.php` sayfasi ve
   global header aramasi etkin kaldi (fonksiyona dokunulmadi).
+- **Sidebar TailAdmin grup/altmenu (tam liste)** (cache v181): `app-sidebar.php`
+  yeniden yazildi - 13 grup ve alt oge (accordion). "Genel" grubunda Panel / Bana
+  Atanmislar / Bildirim Merkezi / Raporlama / Vadesi Gelen / Yillik Kalite Plani /
+  Yönetimin Gözden Geçirmesi; "Sistem Yönetimi" grubu admin sayfalari (Ofis,
+  Mail, Sirketler, Kullanicilar, Admin Atamalari, Izinler). `.sidebar-group`/
+  `.sidebar-submenu` CSS + `sidebar.js` toggle + grup i18n anahtarlari. Her oge
+  RBAC izniyle guard'li. (Grup/altmenu daha once acilmis, geri cekilmis, genisletilmis
+  liste ile yeniden uygulandi.)
