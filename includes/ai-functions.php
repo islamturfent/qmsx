@@ -20,12 +20,28 @@ function qmsAiAvailable(): bool
     return (bool) $cfg['enabled'] && trim((string) $cfg['api_key']) !== '';
 }
 
-/** OpenAI chat tamamlamasi. @return array{ok:bool,text:string,error:string} */
+/** AI son hata dosya yolu (gorsellestirme icin). */
+function qmsAiLastErrorPath(): string
+{
+    return __DIR__ . '/../storage/ai/last-error.json';
+}
+
+/** Son AI hatasini (anahtarsiz) disk'e yazar. */
+function qmsAiStoreLastError(int $http, string $body): void
+{
+    @file_put_contents(
+        qmsAiLastErrorPath(),
+        json_encode(['time' => date('Y-m-d H:i:s'), 'http' => $http, 'body' => mb_substr($body, 0, 4000)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        LOCK_EX
+    );
+}
+
+/** OpenAI/Groq chat tamamlamasi. @return array{ok:bool,text:string,error:string,http:int} */
 function qmsAiChat(string $systemPrompt, string $userPrompt, int $maxTokens = 2200): array
 {
     $cfg = qmsAiConfig();
     if (!qmsAiAvailable()) {
-        return ['ok' => false, 'text' => '', 'error' => 'Yapay zeka etkin değil.'];
+        return ['ok' => false, 'text' => '', 'error' => 'Yapay zeka etkin değil.', 'http' => 0];
     }
 
     $url = rtrim((string) $cfg['base_url'], '/') . '/chat/completions';
@@ -41,14 +57,16 @@ function qmsAiChat(string $systemPrompt, string $userPrompt, int $maxTokens = 22
 
     $result = qmsAiHttpPost($url, $payload, (string) $cfg['api_key'], (int) $cfg['timeout']);
     if ($result['http'] !== 200) {
-        return ['ok' => false, 'text' => '', 'error' => 'AI çağrısı başarısız (HTTP ' . $result['http'] . '): ' . $result['body']];
+        qmsAiStoreLastError($result['http'], $result['body']);
+        return ['ok' => false, 'text' => '', 'error' => 'AI çağrısı başarısız (HTTP ' . $result['http'] . '): ' . $result['body'], 'http' => $result['http']];
     }
     $decoded = json_decode($result['body'], true);
     $text = (string) ($decoded['choices'][0]['message']['content'] ?? '');
     if ($text === '') {
-        return ['ok' => false, 'text' => '', 'error' => 'AI boş yanıt döndürdü.'];
+        qmsAiStoreLastError(200, $result['body']);
+        return ['ok' => false, 'text' => '', 'error' => 'AI boş yanıt döndürdü.', 'http' => 200];
     }
-    return ['ok' => true, 'text' => $text, 'error' => ''];
+    return ['ok' => true, 'text' => $text, 'error' => '', 'http' => 200];
 }
 
 /** Whisper ile ses tanima (multipart). $audioBase64: ham ses, $mime: video/webm vb. */

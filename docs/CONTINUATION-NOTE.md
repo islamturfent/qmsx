@@ -2220,3 +2220,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   OpenAI(gpt-4o-mini/whisper-1) ve Groq(llama-3.3-70b-versatile/
   whisper-large-v3). Secici degisirse base_url/model/whisper otomatik dolar;
   sunucu tarafinda da preset uygulanir. i18n `aiProviderLabel`.
+- **AI Hata Detayi** (cache v186): `includes/ai-functions.php` son hatayi
+  `storage/ai/last-error.json`'a yazar (anahtarsiz, 4000 cr). `ai-settings.php`
+  "Hata Detayi" panosunda HTTP + ham yanit gosterir. i18n `aiErrorDetail*`.

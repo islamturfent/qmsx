@@ -3538,6 +3538,8 @@ Object.assign(translations.tr, {
   aiApiKeyLabel: "API Anahtarı", aiModelLabel: "Metin Modeli", aiWhisperModelLabel: "Ses Modeli",
   aiBaseUrlLabel: "API Temel URL", aiTimeoutLabel: "Zaman Aşımı (sn)",
   aiSettingsSave: "Kaydet", aiSettingsTest: "Bağlantıyı Test Et",
+  aiErrorDetailTitle: "Hata Detayı", aiErrorDetailText: "Son sağlayıcı hatasının ham yanıtı (API anahtarı içermez).",
+  aiErrorDetailEmpty: "Henüz bir sağlayıcı hatası kaydedilmedi.",
 });
 
 Object.assign(translations.en, {
@@ -3558,4 +3560,6 @@ Object.assign(translations.en, {
   aiApiKeyLabel: "API Key", aiModelLabel: "Text Model", aiWhisperModelLabel: "Whisper Model",
   aiBaseUrlLabel: "API Base URL", aiTimeoutLabel: "Timeout (sec)",
   aiSettingsSave: "Save", aiSettingsTest: "Test Connection",
+  aiErrorDetailTitle: "Error Detail", aiErrorDetailText: "Raw provider error response (does not contain the API key).",
+  aiErrorDetailEmpty: "No provider error recorded yet.",
 });

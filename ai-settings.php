@@ -71,6 +71,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 $activeNav = "ai_settings";
 
+// Son AI hata detayi (gorsellestirme).
+$lastError = null;
+if (is_file(qmsAiLastErrorPath())) {
+    $lastError = json_decode((string) file_get_contents(qmsAiLastErrorPath()), true);
+    if (!is_array($lastError)) {
+        $lastError = null;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -120,6 +129,16 @@ $activeNav = "ai_settings";
             <div style="margin-top:14px;">
                 <form method="post" action="ai-settings.php"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="form_type" value="test"><button class="secondary-button" type="submit" data-i18n="aiSettingsTest">Bağlantıyı Test Et</button></form>
             </div>
+        </section>
+
+        <section class="console-card checkout-section">
+            <div class="section-heading compact-heading"><div><h3 data-i18n="aiErrorDetailTitle">Hata Detayı</h3><p data-i18n="aiErrorDetailText">Son sağlayıcı hatasının ham yanıtı (API anahtarı içermez).</p></div></div>
+            <?php if ($lastError): ?>
+                <p class="muted-color"><?= htmlspecialchars((string) ($lastError['time'] ?? ''), ENT_QUOTES, 'UTF-8') ?> · HTTP <?= (int) ($lastError['http'] ?? 0) ?></p>
+                <textarea class="result-editor" rows="6" readonly><?= htmlspecialchars((string) ($lastError['body'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <?php else: ?>
+                <div class="empty-state" data-i18n="aiErrorDetailEmpty">Henüz bir sağlayıcı hatası kaydedilmedi.</div>
+            <?php endif; ?>
         </section>
     </main>
     <script>
