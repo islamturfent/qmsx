@@ -26,6 +26,29 @@ function qmsAiDefaults(): array
     return QMS_AI_DEFAULTS;
 }
 
+/**
+ * Sağlayici onayarlari (preset). Geciste base_url/model/whisper otomatik dolar.
+ *
+ * @return array<string, array{label:string, base_url:string, model:string, whisper_model:string}>
+ */
+function qmsAiProviderPresets(): array
+{
+    return [
+        'openai' => [
+            'label' => 'OpenAI (gpt-4o-mini + whisper-1)',
+            'base_url' => 'https://api.openai.com/v1',
+            'model' => 'gpt-4o-mini',
+            'whisper_model' => 'whisper-1',
+        ],
+        'groq' => [
+            'label' => 'Groq (Llama + whisper-large-v3)',
+            'base_url' => 'https://api.groq.com/openai/v1',
+            'model' => 'llama-3.3-70b-versatile',
+            'whisper_model' => 'whisper-large-v3',
+        ],
+    ];
+}
+
 /** Diskten okunan AI ayar dosyasi; yoksa varsayilanlar. */
 function qmsAiConfig(): array
 {

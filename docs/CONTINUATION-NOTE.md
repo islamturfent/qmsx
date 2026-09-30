@@ -2215,3 +2215,8 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   tr-TR) ile metne cevirir. Cikti kopyalanabilir.
 - **Sidebar**: Genel -> "AI Dokuman Studusu", Sistem Yonetimi -> "Yapay Zeka Ayarlari".
 - i18n TR/EN; cache v184. Test: studio AI kapaliyken sablon motoru doner.
+- **Saglayici secici eklendi** (cache v185): `ai-settings.php`'e OpenAI / Groq
+  secimi + JS on-doldurma. `config/ai.php` `qmsAiProviderPresets()`:
+  OpenAI(gpt-4o-mini/whisper-1) ve Groq(llama-3.3-70b-versatile/
+  whisper-large-v3). Secici degisirse base_url/model/whisper otomatik dolar;
+  sunucu tarafinda da preset uygulanir. i18n `aiProviderLabel`.

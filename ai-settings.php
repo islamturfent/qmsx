@@ -32,16 +32,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($formType === "save") {
         $saved = qmsAiDefaults();
         $saved['enabled'] = isset($_POST["enabled"]);
-        $saved['provider'] = 'openai';
+        $provider = in_array((string) ($_POST["provider"] ?? ''), ['openai', 'groq'], true) ? (string) $_POST["provider"] : 'openai';
+        $saved['provider'] = $provider;
         $newKey = trim((string) ($_POST["api_key"] ?? ""));
         if ($newKey !== "") {
             $saved['api_key'] = $newKey;
         } else {
             $saved['api_key'] = $config['api_key'] ?? '';
         }
-        $saved['model'] = trim((string) ($_POST["model"] ?? 'gpt-4o-mini')) !== '' ? trim((string) $_POST["model"]) : 'gpt-4o-mini';
-        $saved['whisper_model'] = trim((string) ($_POST["whisper_model"] ?? 'whisper-1')) !== '' ? trim((string) $_POST["whisper_model"]) : 'whisper-1';
-        $saved['base_url'] = rtrim(trim((string) ($_POST["base_url"] ?? 'https://api.openai.com/v1')), '/');
+
+        $presets = qmsAiProviderPresets();
+        // Sağlayici DEGISTIYSE (tek tik) preset degerlerini uygula.
+        if (($config['provider'] ?? '') !== $provider && isset($presets[$provider])) {
+            $saved['base_url'] = $presets[$provider]['base_url'];
+            $saved['model'] = $presets[$provider]['model'];
+            $saved['whisper_model'] = $presets[$provider]['whisper_model'];
+        } else {
+            $saved['model'] = trim((string) ($_POST["model"] ?? '')) !== '' ? trim((string) $_POST["model"]) : $saved['model'];
+            $saved['whisper_model'] = trim((string) ($_POST["whisper_model"] ?? '')) !== '' ? trim((string) $_POST["whisper_model"]) : $saved['whisper_model'];
+            $saved['base_url'] = rtrim(trim((string) ($_POST["base_url"] ?? '')), '/') !== '' ? rtrim(trim((string) $_POST["base_url"]), '/') : $saved['base_url'];
+        }
         $saved['timeout'] = max(10, min(300, (int) ($_POST["timeout"] ?? 60)));
 
         $dir = dirname($settingsPath);
@@ -88,9 +98,15 @@ $activeNav = "ai_settings";
             <form class="auditor-form" method="post" action="ai-settings.php">
                 <?= qmsCsrfField($csrfScope) ?>
                 <input type="hidden" name="form_type" value="save">
+                <?php $presets = qmsAiProviderPresets(); $provider = (string) ($config['provider'] ?? 'openai'); ?>
                 <div class="form-grid">
+                    <label class="form-field form-field-wide"><span data-i18n="aiProviderLabel">Sağlayıcı</span>
+                        <select name="provider" id="aiProvider">
+                            <?php foreach ($presets as $pk => $pv): ?><option value="<?= $pk ?>" <?= $provider === $pk ? 'selected' : '' ?>><?= htmlspecialchars($pv['label'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+                        </select>
+                    </label>
                     <label class="form-field form-field-wide"><span class="switch-label"><input type="checkbox" name="enabled" <?= $config['enabled'] ? 'checked' : '' ?>> <span data-i18n="aiEnabledLabel">Yapay zeka asistanını etkinleştir</span></span></label>
-                    <label class="form-field form-field-wide"><span data-i18n="aiApiKeyLabel">API Anahtarı</span><input type="password" name="api_key" placeholder="<?= $config['api_key'] ? '•••••••• (kayıtlı)' : 'sk-...' ?>" autocomplete="new-password"></label>
+                    <label class="form-field form-field-wide"><span data-i18n="aiApiKeyLabel">API Anahtarı</span><input type="password" name="api_key" placeholder="<?= $config['api_key'] ? '•••••••• (kayıtlı)' : 'sk-/gsk-...' ?>" autocomplete="new-password"></label>
                     <label class="form-field"><span data-i18n="aiModelLabel">Metin Modeli</span><input type="text" name="model" value="<?= htmlspecialchars((string) $config['model'], ENT_QUOTES, 'UTF-8') ?>" placeholder="gpt-4o-mini"></label>
                     <label class="form-field"><span data-i18n="aiWhisperModelLabel">Ses Modeli</span><input type="text" name="whisper_model" value="<?= htmlspecialchars((string) $config['whisper_model'], ENT_QUOTES, 'UTF-8') ?>" placeholder="whisper-1"></label>
                     <label class="form-field form-field-wide"><span data-i18n="aiBaseUrlLabel">API Temel URL</span><input type="text" name="base_url" value="<?= htmlspecialchars((string) $config['base_url'], ENT_QUOTES, 'UTF-8') ?>" placeholder="https://api.openai.com/v1"></label>
@@ -106,6 +122,23 @@ $activeNav = "ai_settings";
             </div>
         </section>
     </main>
+    <script>
+    (function () {
+        var presets = <?= json_encode($presets, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        var sel = document.getElementById("aiProvider");
+        var model = document.querySelector("input[name=model]");
+        var whisper = document.querySelector("input[name=whisper_model]");
+        var base = document.querySelector("input[name=base_url]");
+        if (!sel || !model || !whisper || !base) return;
+        sel.addEventListener("change", function () {
+            var p = presets[sel.value];
+            if (!p) return;
+            model.value = p.model;
+            whisper.value = p.whisper_model;
+            base.value = p.base_url;
+        });
+    })();
+    </script>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
 </body>
 </html>
