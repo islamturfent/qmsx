@@ -16,7 +16,7 @@ require_once __DIR__ . '/includes/ai-functions.php';
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $csrfScope = 'ai_studio';
 
-$docTypes = ['procedure', 'policy', 'instruction', 'form', 'guideline'];
+$docTypes = ['policy', 'procedure', 'instruction', 'guideline', 'form', 'plan', 'checklist', 'specification', 'report'];
 $formError = '';
 $resultText = '';
 $usedFallback = false;
@@ -82,7 +82,7 @@ $activeNav = "ai_studio";
                     <div class="form-grid">
                         <label class="form-field"><span data-i18n="aiStudioTypeLabel">Doküman Türü</span>
                             <select name="type">
-                                <?php foreach ($docTypes as $dt): ?><option value="<?= $dt ?>" <?= ($_POST['type'] ?? 'procedure') === $dt ? 'selected' : '' ?>><?= htmlspecialchars(qmsAiDocTypeLabel($dt), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+                                <?php foreach ($docTypes as $dt): ?><option value="<?= $dt ?>" <?= (($_POST['type'] ?? 'procedure') === $dt) || (($_POST['type'] ?? '') === '' && $dt === 'procedure') ? 'selected' : '' ?>><?= htmlspecialchars(qmsAiDocTypeLabel($dt), ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
                             </select>
                         </label>
                         <label class="form-field"><span data-i18n="aiStudioTitleLabel">Başlık (isteğe bağlı)</span><input type="text" name="title" value="<?= htmlspecialchars((string) ($_POST['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="örn. Kalite Politikası"></label>

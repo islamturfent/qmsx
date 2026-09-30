@@ -197,7 +197,13 @@ function qmsAiFallbackDocument(string $type, string $title, string $description)
     $body .= "   " . ($desc !== '' ? $desc : 'Bu dokümanın amacını tanımlayın.') . "\n\n";
 
     $body .= "2. KAPSAM\n";
-    $body .= "   " . ($type === 'policy' ? 'Organizasyon genelinde geçerlidir.' : ($type === 'procedure' ? 'İlgili tüm bölüm ve süreçler için geçerlidir.' : 'İlgili süreç ve faaliyetler için geçerlidir.')) . "\n\n";
+    $kapsam = 'policy' === $type ? 'Organizasyon genelinde ve tüm süreçlerde geçerlidir.'
+        : ('procedure' === $type ? 'İlgili tüm bölüm ve süreçler için geçerlidir.'
+        : ('instruction' === $type || 'guideline' === $type ? 'İlgili süreç, faaliyet ve operasyon alanı için geçerlidir.'
+        : ('plan' === $type || 'specification' === $type ? 'Tanımlanan kapsam ve/veya döneme ilişkin geçerlidir.'
+        : ('checklist' === $type || 'form' === $type ? 'İlgili kayıt ve kontrol faaliyetleri için kullanılır.'
+        : 'İlgili kayıt ve süreçler için geçerlidir.'))));
+    $body .= "   " . $kapsam . "\n\n";
 
     $body .= "3. TANIMLAR VE KISALTMALAR\n";
     $body .= "   (Gerekli terimleri tanımlayın.)\n\n";
@@ -207,13 +213,13 @@ function qmsAiFallbackDocument(string $type, string $title, string $description)
     $body .= "   • Uygulayan: İlgili bölümler\n\n";
 
     $body .= "5. UYGULAMA\n";
-    if ($type === 'policy' || $type === 'procedure' || $type === 'instruction') {
+    if (in_array($type, ['policy', 'procedure', 'instruction', 'guideline', 'plan', 'specification', 'report'], true)) {
         $body .= "   5.1 Girdiler ve kapsam\n";
         $body .= "   5.2 Uygulama adımları\n";
         $body .= "       (Adım adım açıklayın.)\n";
         $body .= "   5.3 Kontroller ve kayıtlar\n";
     } else {
-        $body .= "   (Form alanları ve doldurma talimatı buraya.)\n";
+        $body .= "   (Alan listesi ve doldurma talimatı buraya.)\n";
     }
     $body .= "\n";
 
@@ -226,15 +232,19 @@ function qmsAiFallbackDocument(string $type, string $title, string $description)
     return $head . $body;
 }
 
-/** Doküman turu etiketi (TR). */
+/** Doküman turu etiketi (TR) - QMS (ISO 9001) dokumantasyon hiyerarsisi. */
 function qmsAiDocTypeLabel(string $type): string
 {
     return [
         'policy' => 'Politika',
         'procedure' => 'Prosedür',
-        'instruction' => 'Talimat',
-        'form' => 'Form',
+        'instruction' => 'İş Talimatı',
         'guideline' => 'Yönerge',
+        'form' => 'Form / Kayıt',
+        'plan' => 'Plan',
+        'checklist' => 'Kontrol Listesi',
+        'specification' => 'Şartname',
+        'report' => 'Rapor',
     ][$type] ?? 'Prosedür';
 }
 

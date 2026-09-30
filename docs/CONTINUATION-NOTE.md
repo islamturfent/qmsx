@@ -2242,3 +2242,8 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   `llama-4-scout` yok. Erisilebilir sohbet modeli `openai/gpt-oss-20b`
   (whisper-large-v3). Groq preset + settings.json bu modele cevrildi; gercek
   test OK (model calisiyor).
+- **AI Dokuman Turleri QMS-uyumlu** (cache v193): `ai-document-studio.php` tur
+  listesi ISO 9001 dokumantasyon hiyerarsisine gore genisletildi: Politika,
+  Prosedür, İş Talimatı, Yönerge, Form/Kayıt, Plan, Kontrol Listesi, Şartname,
+  Rapor. `qmsAiDocTypeLabel` + fallback kapsam/uygulama mantigi da yeni turlere
+  gore iyilestirildi.
