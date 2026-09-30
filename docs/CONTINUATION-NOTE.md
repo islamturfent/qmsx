@@ -2231,3 +2231,5 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   "Modelleri Listele" butonu ve secilebilir model listesi (cevap + "Bu Modeli Kullan"
   -> kaydet). Groq preset'i `meta-llama/llama-4-scout-17b-16e-instruct` + 
   `whisper-large-v3`.
+- **Model listeleme uyarisi duzeltildi** (cache v189): `qmsAiListModels` 'deki
+  gereksiz `array_map('strval', ...)` satiri kaldirildi (Array to string warning).

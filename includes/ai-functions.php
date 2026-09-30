@@ -144,7 +144,6 @@ function qmsAiListModels(): array
         return ['ok' => false, 'models' => [], 'error' => 'Model listesi alınamadı (HTTP ' . $http . '): ' . (is_string($body) ? $body : '')];
     }
     $decoded = json_decode((string) $body, true);
-    $models = array_map('strval', (array) ($decoded['data'] ?? []));
     // data bir dizi; her ogede 'id' alani var olabilir.
     $ids = [];
     foreach ((array) ($decoded['data'] ?? []) as $item) {
