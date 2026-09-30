@@ -2193,3 +2193,7 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   `.sidebar-submenu` CSS + `sidebar.js` toggle + grup i18n anahtarlari. Her oge
   RBAC izniyle guard'li. (Grup/altmenu daha once acilmis, geri cekilmis, genisletilmis
   liste ile yeniden uygulandi.)
+- **Sidebar TailAdmin görünümü duzeltildi** (cache v182): grup basliklari artik
+  kücük/buyuk-harfli etiket degil, normal menü ögesi gibi (ikon + etiket +
+  cevron; 14px, 500). Her gruba ikon eklendi. Altmenu ögeleri girintili + sol
+  kilavuz cizgisi ile (`sidebar-submenu`).

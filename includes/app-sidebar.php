@@ -75,7 +75,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 $dashboardHref = $sidebarRole === 'company_user' ? 'company-overview.php' : 'dashboard.php';
 $sidebarGroups = [
     [
-        'label_key' => 'sidebarGroupGeneralLabel', 'label' => 'Genel',
+        'label_key' => 'sidebarGroupGeneralLabel', 'label' => 'Genel', 'icon' => 'dashboard',
         'items' => [
             ['key' => 'dashboard', 'href' => $dashboardHref, 'perm' => 'dashboard.view', 'i18n' => 'dashboardLinkLabel', 'label' => 'Panel', 'icon' => 'dashboard'],
             ['key' => 'my_assignments', 'href' => 'my-assignments.php', 'perm' => 'my_assignments.view', 'i18n' => 'myAssignmentsMenuLabel', 'label' => 'Bana Atanmışlar', 'icon' => 'checkBadge'],
@@ -87,7 +87,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupDocumentsLabel', 'label' => 'Doküman Yönetimi',
+        'label_key' => 'sidebarGroupDocumentsLabel', 'label' => 'Doküman Yönetimi', 'icon' => 'documents',
         'items' => [
             ['key' => 'documents', 'href' => 'documents.php', 'perm' => 'operations.view', 'i18n' => 'documentManagementTitle', 'label' => 'Doküman Yönetimi (Ana Liste / Havuz)', 'icon' => 'documents'],
             ['key' => 'document_templates', 'href' => 'document-templates.php', 'perm' => 'operations.view', 'i18n' => 'docTemplateMenuLabel', 'label' => 'Doküman Şablonları', 'icon' => 'documents'],
@@ -100,7 +100,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupAuditsLabel', 'label' => 'Denetim Yönetimi',
+        'label_key' => 'sidebarGroupAuditsLabel', 'label' => 'Denetim Yönetimi', 'icon' => 'check',
         'items' => [
             ['key' => 'auditors', 'href' => 'auditors.php', 'perm' => 'auditors.manage', 'i18n' => 'auditorsCardLabel', 'label' => 'Denetçiler', 'icon' => 'users'],
             ['key' => 'audit_programs', 'href' => 'audit-programs.php', 'perm' => 'audit_programs.manage', 'i18n' => 'auditProgramsMenuLabel', 'label' => 'Denetim Programları', 'icon' => 'approvals'],
@@ -112,7 +112,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupCapaLabel', 'label' => 'CAPA & İyileştirme Yönetimi',
+        'label_key' => 'sidebarGroupCapaLabel', 'label' => 'CAPA & İyileştirme Yönetimi', 'icon' => 'checkBadge',
         'items' => [
             ['key' => 'incidents', 'href' => 'incidents.php', 'perm' => 'operations.view', 'i18n' => 'incidentsMenuLabel', 'label' => 'Olay Raporlama', 'icon' => 'alert'],
             ['key' => 'actions', 'href' => 'actions.php', 'perm' => 'operations.view', 'i18n' => 'actionManagementTitle', 'label' => 'Düzeltici & Önleyici Faaliyet (CAPA)', 'icon' => 'check', 'countVar' => 'overdue'],
@@ -122,7 +122,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupPerformanceLabel', 'label' => 'Performans & Süreç Yönetimi',
+        'label_key' => 'sidebarGroupPerformanceLabel', 'label' => 'Performans & Süreç Yönetimi', 'icon' => 'performance',
         'items' => [
             ['key' => 'performance', 'href' => 'performance.php', 'perm' => 'operations.view', 'i18n' => 'performanceTitle', 'label' => 'Performans Yönetimi', 'icon' => 'performance'],
             ['key' => 'processes', 'href' => 'processes.php', 'perm' => 'operations.view', 'i18n' => 'processesMenuLabel', 'label' => 'Süreç Envanteri', 'icon' => 'table'],
@@ -131,7 +131,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupCustomerLabel', 'label' => 'Müşteri İlişkileri & Memnuniyet',
+        'label_key' => 'sidebarGroupCustomerLabel', 'label' => 'Müşteri İlişkileri & Memnuniyet', 'icon' => 'trend',
         'items' => [
             ['key' => 'complaints', 'href' => 'complaints.php', 'perm' => 'operations.view', 'i18n' => 'complaintsTitle', 'label' => 'Şikayet Yönetimi', 'icon' => 'complaints'],
             ['key' => 'satisfaction', 'href' => 'satisfaction-surveys.php', 'perm' => 'operations.view', 'i18n' => 'satisfactionMenuLabel', 'label' => 'Müşteri Memnuniyeti', 'icon' => 'complaints'],
@@ -140,14 +140,14 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupSurveyLabel', 'label' => 'Anket Yönetimi',
+        'label_key' => 'sidebarGroupSurveyLabel', 'label' => 'Anket Yönetimi', 'icon' => 'sparkles',
         'items' => [
             ['key' => 'internal_surveys', 'href' => 'internal-surveys.php', 'perm' => 'operations.view', 'i18n' => 'internalSurveyMenuLabel', 'label' => 'İç Memnuniyet Anketi', 'icon' => 'sparkles'],
             ['key' => 'internal_survey_fill', 'href' => 'internal-survey-fill.php', 'perm' => 'operations.view', 'i18n' => 'internalSurveyFillMenuLabel', 'label' => 'Anketi Doldur', 'icon' => 'checkBadge'],
         ],
     ],
     [
-        'label_key' => 'sidebarGroupPersonnelLabel', 'label' => 'Personel & Eğitim Yönetimi',
+        'label_key' => 'sidebarGroupPersonnelLabel', 'label' => 'Personel & Eğitim Yönetimi', 'icon' => 'users',
         'items' => [
             ['key' => 'personnel', 'href' => 'personnel.php', 'perm' => 'operations.view', 'i18n' => 'personnelMenuLabel', 'label' => 'Personel & Yetkinlik', 'icon' => 'users'],
             ['key' => 'trainings', 'href' => 'trainings.php', 'perm' => 'operations.view', 'i18n' => 'trainingManagementTitle', 'label' => 'Eğitim Yönetimi', 'icon' => 'training'],
@@ -156,7 +156,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupSupplierLabel', 'label' => 'Tedarikçi & İş Ortakları Yönetimi',
+        'label_key' => 'sidebarGroupSupplierLabel', 'label' => 'Tedarikçi & İş Ortakları Yönetimi', 'icon' => 'suppliers',
         'items' => [
             ['key' => 'suppliers', 'href' => 'suppliers.php', 'perm' => 'operations.view', 'i18n' => 'suppliersTitle', 'label' => 'Tedarikçi Yönetimi', 'icon' => 'suppliers'],
             ['key' => 'supplier_evaluations', 'href' => 'supplier-evaluations.php', 'perm' => 'operations.view', 'i18n' => 'supplierEvalMenuLabel', 'label' => 'Değerlendirme Takvimi', 'icon' => 'checkBadge', 'countVar' => 'supplier'],
@@ -164,7 +164,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupEquipmentLabel', 'label' => 'Ekipman & Kalibrasyon',
+        'label_key' => 'sidebarGroupEquipmentLabel', 'label' => 'Ekipman & Kalibrasyon', 'icon' => 'clock',
         'items' => [
             ['key' => 'equipment', 'href' => 'equipment.php', 'perm' => 'operations.view', 'i18n' => 'equipmentMenuLabel', 'label' => 'Ekipman ve Kalibrasyon', 'icon' => 'table'],
             ['key' => 'calibration_calendar', 'href' => 'calibration-calendar.php', 'perm' => 'operations.view', 'i18n' => 'calibCalendarMenuLabel', 'label' => 'Kalibrasyon Takvimi', 'icon' => 'reports'],
@@ -173,20 +173,20 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupRiskLabel', 'label' => 'Risk & Güvenlik',
+        'label_key' => 'sidebarGroupRiskLabel', 'label' => 'Risk & Güvenlik', 'icon' => 'warning',
         'items' => [
             ['key' => 'risks', 'href' => 'risks.php', 'perm' => 'operations.view', 'i18n' => 'riskManagementTitle', 'label' => 'Risk Yönetimi', 'icon' => 'warning'],
         ],
     ],
     [
-        'label_key' => 'sidebarGroupSystemLabel', 'label' => 'Sistem Ayarları & Loglar',
+        'label_key' => 'sidebarGroupSystemLabel', 'label' => 'Sistem Ayarları & Loglar', 'icon' => 'cog',
         'items' => [
             ['key' => 'audit_trail', 'href' => 'audit-trail.php', 'perm' => 'audit_trail.view', 'i18n' => 'auditTrailMenuLabel', 'label' => 'Denetim İzi (Audit Trail)', 'icon' => 'checkBadge'],
             ['key' => 'audit_trail_report', 'href' => 'audit-trail-report.php', 'perm' => 'audit_trail.view', 'i18n' => 'auditTrailReportTitle', 'label' => 'Denetim İzi Raporu', 'icon' => 'reports'],
         ],
     ],
     [
-        'label_key' => 'sidebarManagementLabel', 'label' => 'Sistem Yönetimi',
+        'label_key' => 'sidebarManagementLabel', 'label' => 'Sistem Yönetimi', 'icon' => 'cog',
         'items' => [
             ['key' => 'office_settings', 'href' => 'office-settings.php', 'perm' => 'admin.office', 'i18n' => 'officeSettingsTitle', 'label' => 'Ofis Entegrasyonu', 'icon' => 'office'],
             ['key' => 'mail_settings', 'href' => 'mail-settings.php', 'perm' => 'admin.mail', 'i18n' => 'mailSettingsMenuLabel', 'label' => 'E-posta Ayarları', 'icon' => 'notifications'],
@@ -230,6 +230,7 @@ $sidebarGroups = [
             ?>
             <div class="sidebar-group">
                 <button type="button" class="sidebar-group-toggle<?= $groupOpen ? ' sidebar-group-open' : '' ?>" aria-expanded="<?= $groupOpen ? 'true' : 'false' ?>">
+                    <?= appIcon($group['icon'], 'sidebar-group-icon') ?>
                     <span class="sidebar-group-label" data-i18n="<?= $group['label_key'] ?>"><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
                     <span class="sidebar-group-caret" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>

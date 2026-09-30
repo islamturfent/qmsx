@@ -1,6 +1,6 @@
 // Uygulama klasorunun adindan bagimsiz calismasi icin tum yollar gorelidir;
 // service worker'in kendi konumuna gore cozulur.
-const CACHE_NAME = "qms-cache-v181";
+const CACHE_NAME = "qms-cache-v182";
 
 const APP_SHELL = [
 
