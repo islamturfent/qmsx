@@ -143,13 +143,15 @@ if (is_file(qmsAiLastErrorPath())) {
             </div>
             <?php if (!empty($modelsList)): ?>
             <div style="margin-top:14px;">
-                <label class="form-field"><span data-i18n="aiPickModelLabel">Erişilebilir Model Seç</span>
-                    <select id="aiModelPicker">
-                        <option value="" data-i18n="aiPickModelNone">— model seç —</option>
-                        <?php foreach ($modelsList as $mid): ?><option value="<?= htmlspecialchars($mid, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($mid, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
-                    </select>
-                </label>
-                <div class="form-actions"><button class="primary-button" type="button" id="aiApplyModel" data-i18n="aiApplyModelButton">Bu Modeli Kullan</button></div>
+                <strong data-i18n="aiPickModelLabel">Erişilebilir Model Seç</strong>
+                <div class="ai-model-list">
+                    <?php foreach ($modelsList as $mid): ?>
+                    <button type="button" class="ai-model-item" data-model="<?= htmlspecialchars($mid, ENT_QUOTES, 'UTF-8') ?>" title="Bu modeli kullan">
+                        <code><?= htmlspecialchars($mid, ENT_QUOTES, 'UTF-8') ?></code>
+                        <span data-i18n="aiUseModel">Kullan</span>
+                    </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <?php endif; ?>
         </section>
@@ -180,16 +182,14 @@ if (is_file(qmsAiLastErrorPath())) {
             base.value = p.base_url;
         });
 
-        var applyBtn = document.getElementById("aiApplyModel");
-        var picker = document.getElementById("aiModelPicker");
-        if (applyBtn && picker && model) {
-            applyBtn.addEventListener("click", function () {
-                if (!picker.value) return;
-                model.value = picker.value;
+        document.querySelectorAll(".ai-model-item").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                if (!model) return;
+                model.value = btn.getAttribute("data-model") || "";
                 var saveForm = document.querySelector("form.auditor-form");
                 if (saveForm) saveForm.submit();
             });
-        }
+        });
     })();
     </script>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>

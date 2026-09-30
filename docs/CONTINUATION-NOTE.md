@@ -2233,3 +2233,6 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   `whisper-large-v3`.
 - **Model listeleme uyarisi duzeltildi** (cache v189): `qmsAiListModels` 'deki
   gereksiz `array_map('strval', ...)` satiri kaldirildi (Array to string warning).
+- **AI model listesi gorunur buton olarak** (cache v190): `ai-settings.php` 'de
+  model secici `<select>` yerine gorunur `ai-model-item` buton listesi (tiklayinca
+  modeli yazip kaydeder). i18n `aiUseModel` + CSS.
