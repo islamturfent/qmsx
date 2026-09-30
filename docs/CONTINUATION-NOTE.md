@@ -2247,3 +2247,7 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   Prosedür, İş Talimatı, Yönerge, Form/Kayıt, Plan, Kontrol Listesi, Şartname,
   Rapor. `qmsAiDocTypeLabel` + fallback kapsam/uygulama mantigi da yeni turlere
   gore iyilestirildi.
+- **Dokuman Web Editoru ile olusturma** (cache v194): `document-create.php`
+  "Web Dokuman Editoru ile Olustur" butonu. Secilince dosya yuklemeden dokuman
+  kaydedilir ve `document-edit.php?id=NEW` acilir (iciniz web editorde yazar).
+  i18n `saveAndOpenWebEditorButton`. Web modunda dosya dogrulamasi atlanir.

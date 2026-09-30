@@ -69,6 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "change_note" => trim($_POST["change_note"] ?? "")
     ];
 
+    // Web Doküman Editörü modu: dosya yuklemeden kaydedip editorde acar.
+    $webEditorMode = isset($_POST["open_in_web_editor"]);
+
     if (!in_array($formData["company_id"], $allowedCompanyIds, true)) {
         $formError = "Geçerli bir şirket seçin.";
     } elseif ($formData["document_code"] === "" || $formData["title"] === "") {
@@ -83,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $hasUpload = $upload && $upload["error"] !== UPLOAD_ERR_NO_FILE;
     $uploadData = null;
 
-    if ($formError === "" && $hasUpload) {
+    if ($formError === "" && !$webEditorMode && $hasUpload) {
         if ($upload["error"] !== UPLOAD_ERR_OK || $upload["size"] > 10 * 1024 * 1024) {
             $formError = "Dosya yüklenemedi veya 10 MB sınırını aşıyor.";
         } else {
@@ -127,6 +130,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "created_by" => $userId ?: null
             ]);
             $documentId = (int) $pdo->lastInsertId();
+
+            if ($webEditorMode) {
+                // Dosya yuklemeden dokumani olustur ve web editorunde ac.
+                $pdo->commit();
+                header("Location: document-edit.php?id=" . $documentId . "&created=1");
+                exit;
+            }
 
             if ($uploadData) {
                 $storageDir = __DIR__ . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "documents";
@@ -212,7 +222,10 @@ $activeNav = "documents";
                         <small data-i18n="docTemplateSelectHelp">Şablon seçerseniz başlık, kategori ve açıklama önceden doldurulur.</small>
                     </label>
                 </div>
-                <div class="form-actions"><button class="primary-button" type="submit" data-i18n="saveDocumentButton">Dokümanı Kaydet</button></div>
+                <div class="form-actions">
+                    <button class="primary-button" type="submit" data-i18n="saveDocumentButton">Dokümanı Kaydet</button>
+                    <button class="secondary-button" type="submit" name="open_in_web_editor" value="1" data-i18n="saveAndOpenWebEditorButton">Web Doküman Editörü ile Oluştur</button>
+                </div>
             </form>
         </section>
     </main>
