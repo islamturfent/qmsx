@@ -2236,3 +2236,5 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
 - **AI model listesi gorunur buton olarak** (cache v190): `ai-settings.php` 'de
   model secici `<select>` yerine gorunur `ai-model-item` buton listesi (tiklayinca
   modeli yazip kaydeder). i18n `aiUseModel` + CSS.
+- **Hata Detayi bosluk duzeltmesi** (cache v191): `ai-settings.php` 'de
+  Hata Detayi section'ina `margin-top:20px` (ust kutuya degmesin diye).

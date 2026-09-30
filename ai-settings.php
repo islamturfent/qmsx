@@ -156,7 +156,7 @@ if (is_file(qmsAiLastErrorPath())) {
             <?php endif; ?>
         </section>
 
-        <section class="console-card checkout-section">
+        <section class="console-card" style="margin-top:20px;">
             <div class="section-heading compact-heading"><div><h3 data-i18n="aiErrorDetailTitle">Hata Detayı</h3><p data-i18n="aiErrorDetailText">Son sağlayıcı hatasının ham yanıtı (API anahtarı içermez).</p></div></div>
             <?php if ($lastError): ?>
                 <p class="muted-color"><?= htmlspecialchars((string) ($lastError['time'] ?? ''), ENT_QUOTES, 'UTF-8') ?> · HTTP <?= (int) ($lastError['http'] ?? 0) ?></p>
