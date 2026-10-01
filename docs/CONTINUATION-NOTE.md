@@ -2306,3 +2306,9 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   - `customer-delivery-performance.php` basligina "Teslimat Kaydi" + "Rapor"
     butonlari eklendi (kayit girisinde ve rapora hizli erisim). i18n
     `deliveryAddRecord`, `deliveryReportButton`. Lint temiz; cache v199.
+- **Denetim Izi Raporlama Sablonu: XLSX export** (cache v200):
+  `audit-trail-report.php` zaten CSV + PDF export ve filtreleri iceriyordu; mevcut
+  `includes/xlsx-writer.php` kutuphanesiyle **Excel (XLSX) export** eklendi
+  (Tarih/Kisi/Kayit Turu/Islem/Ozet/Sirket/IP sutunlari, filtreler korunur).
+  Aksiyon alanina "Excel İndir" butonu eklendi. i18n `downloadXlsxButton`.
+  Lint temiz; cache v200.

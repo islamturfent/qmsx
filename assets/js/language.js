@@ -523,6 +523,7 @@ const translations = {
         ,noReportDataText: "Seçilen dönem için rapor verisi bulunmuyor."
         ,downloadExcelButton: "Excel İndir"
         ,downloadPdfButton: "PDF İndir"
+        ,downloadXlsxButton: "Excel İndir"
     },
 
     en: {
@@ -1049,6 +1050,7 @@ const translations = {
         ,noReportDataText: "No report data is available for the selected period."
         ,downloadExcelButton: "Download Excel"
         ,downloadPdfButton: "Download PDF"
+        ,downloadXlsxButton: "Download Excel"
     }
 };
 

@@ -91,6 +91,46 @@ if (($_GET["export"] ?? "") === "csv") {
     exit;
 }
 
+// ---------- XLSX export ----------
+if (($_GET["export"] ?? "") === "xlsx") {
+    require_once __DIR__ . '/includes/xlsx-writer.php';
+    $auditRows = [[
+        ['value' => 'Tarih', 'style' => 2],
+        ['value' => 'Kişi', 'style' => 2],
+        ['value' => 'Kayıt Türü', 'style' => 2],
+        ['value' => 'İşlem', 'style' => 2],
+        ['value' => 'Özet', 'style' => 2],
+        ['value' => 'Şirket', 'style' => 2],
+        ['value' => 'IP', 'style' => 2],
+    ]];
+    foreach ($rows as $entry) {
+        $auditRows[] = [
+            ['value' => date('d.m.Y H:i', strtotime($entry['created_at'])), 'style' => 3],
+            ['value' => $entry['actor_name'] ?? 'Sistem', 'style' => 3],
+            ['value' => $entityLabels[$entry['entity_type']] ?? $entry['entity_type'], 'style' => 3],
+            ['value' => $actionLabels[$entry['action']] ?? $entry['action'], 'style' => 3],
+            ['value' => (string) $entry['summary'], 'style' => 3],
+            ['value' => $entry['company_name'] ?? 'Sistem', 'style' => 3],
+            ['value' => (string) ($entry['ip_address'] ?? ''), 'style' => 3],
+        ];
+    }
+    $tmp = tempnam(sys_get_temp_dir(), 'qms-audit-');
+    try {
+        createXlsxFile([
+            ['name' => 'Denetim İzi', 'xml' => xlsxWorksheet($auditRows, [20, 22, 26, 18, 50, 26, 16])],
+        ], $tmp);
+        $filename = 'qms-denetim-izi-' . date('Y-m-d') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . filesize($tmp));
+        header('Cache-Control: private, no-store, max-age=0');
+        readfile($tmp);
+    } finally {
+        @unlink($tmp);
+    }
+    exit;
+}
+
 // ---------- PDF export ----------
 if (($_GET["export"] ?? "") === "pdf") {
     require_once __DIR__ . '/includes/app-ui.php';
@@ -202,6 +242,7 @@ $activeNav = "audit_trail_report";
             </div>
             <div class="report-export-actions">
                 <a class="primary-button" href="audit-trail-report.php?<?= htmlspecialchars($buildQuery(['export' => 'csv']), ENT_QUOTES, 'UTF-8') ?>" data-i18n="downloadCsvButton">CSV İndir</a>
+                <a class="primary-button" href="audit-trail-report.php?<?= htmlspecialchars($buildQuery(['export' => 'xlsx']), ENT_QUOTES, 'UTF-8') ?>" data-i18n="downloadXlsxButton">Excel İndir</a>
                 <a class="primary-button" href="audit-trail-report.php?<?= htmlspecialchars($buildQuery(['export' => 'pdf']), ENT_QUOTES, 'UTF-8') ?>" data-i18n="downloadPdfButton">PDF İndir</a>
             </div>
         </section>
