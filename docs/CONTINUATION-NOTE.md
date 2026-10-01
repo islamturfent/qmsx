@@ -2416,3 +2416,29 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     cache v206; tek tag v0.1.0. Kalan notlar: Collabora/Ofis entegrasyonu proje
     sonrasi (kasitsiz olarak dokunulmadi).
   - Bu final girdisi push edildi; cache v206.
+  ----
+- **ONLINE GECISI / KURULUM KONTROL LISTESI** (kullanici onayi ile eklendi):
+  - **PHP gereksinimleri:** PHP 8.0+, uzantilar `pdo_mysql`, `mbstring`,
+    `fileinfo` (upload tipi), `openssl` (mail TLS), `intl` (varsa),
+    `zip` (xlsx writer). `php.ini`: `upload_max_filesize` >= 20M,
+    `post_max_size` >= 20M, `memory_limit` >= 256M, `date.timezone`
+    (Europe/Istanbul).
+  - **Veritabani:** `config/database.example.php` -> `config/database.php`
+    kopyalanip DB bilgisi yazilir. Migration: `scripts/migrate-*.php` (52 adet)
+    oncelik temel tablolar (companies, users) olmak uzre projenin uygulanma
+    sirasinda (git gecmisi sirasi) calistirilir; scriptler idempotent.
+  - **Storage:** `storage/` altindaki 8 klasor (ai, avatars, calibrations,
+    contracts, documents, evidence, logs, office) yazilabilir olmali.
+    Guvenlik: dosyalar PHP (document-download.php, contract-attachment-
+    download.php vb.) uzerinden sunulur; storage dizinine dogrudan erisimi
+    engelleyen bir `storage/.htaccess` (`Require all denied`) eklenmeli
+    (local'de yok - production'da sart).
+  - **Anahtar / ozel dosyalar (gitignore'lu):** `storage/ai/settings.json`
+    (AI API anahtari/model), `storage/mail/settings.json` (SMTP) production'da
+    yeniden olusturulmalidir; repo'ya girmez.
+  - **Cron (Linux hosting):** `0 8 * * * php /path/to/qmsx/scripts/notify-overdue.php`
+    >/dev/null 2>&1  (Windows'ta Task Scheduler `QuAmi_OverdueNotify` ile ayni)
+  - **Guvence:** HTTPS zorunlulugu; upload limitleri; log dosyalarini
+    (`storage/logs`) disaridan koruma.
+  - Not: storage top .htaccess local ortamda bilincli olarak eklenmedi (XAMPP
+    calisma dizini); production oncesi eklenmesi onerilir.
