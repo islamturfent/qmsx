@@ -2269,3 +2269,18 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   - Yeni i18n TR/EN: `aiTransferTitle`, `aiTransferText`, `aiTransferCodeLabel`,
     `aiTransferButton`, `aiSaveTemplateButton`, `aiTemplateTypeLabel`.
   - Lint temiz; cache v195.
+- **Egitim Sablonu / Yetkinlik Matrisi derinlesmesi: 1-2-3** (cache v196):
+  - **1 - Sablondan tek tikla egitim kaydi**: `training-templates.php` sablon
+    listesinde her sablona "Egitim Olustur" butonu (`training-create.php?template_id=X`).
+    `training-create.php` GET `template_id` ile sunucu tarafinda sablon alanlarini
+    (sirket, baslik, kategori, sure, hedef yetkinlik) onceden doldurur ve sablon
+    secimini isaretler. i18n `trainingCreateFromTemplateButton`.
+  - **2 - Yetkinlik matrisi otomatik kaydı (puan/seviye)**: `qmsTrainingSyncCompetency`
+    artik opsiyonel `?int $score` alir; egitim tamamlaninca katilimci puani (0-100)
+    yetkinlik seviyesine (1-5) eslenir (score/20), sertifika/puan notu `notes`'a
+    yazilir, vade +1 yil. `training-detail.php` tamamlanma aninda skoru gecirir.
+  - **3 - Dashboard yetkinlik vadesi widget'ı guclendirildi**: `dashboard.php`
+    sorgusu artık son 30 gun icindeki yaklasan yetkinlikleri de (gecenlerin yaninda)
+    getirir; her satir icin "Vadesi gecti"/"Yaklasan vade" durum rozeti ve baslik
+    "Yetkinlik Vadesi (Yaklasan/Gecen)" olarak guncellendi. i18n guncellendi.
+  - Lint temiz; cache v196.

@@ -138,6 +138,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+// Şablondan doğrudan eğitim oluşturma: GET ?template_id=... seçildiğinde
+// şablondaki alanlar (şirket, başlık, kategori, süre, hedef yetkinlik) sunucu
+// tarafında önceden doldurulur ve şablon seçimi işaretlenir.
+$presetTemplateId = 0;
+$presetTplId = (int) ($_GET['template_id'] ?? 0);
+foreach ($templates as $tpl) {
+    if ((int) $tpl['id'] === $presetTplId) {
+        $presetTemplateId = $presetTplId;
+        $formData['company_id'] = (int) $tpl['company_id'];
+        $formData['title'] = (string) $tpl['title'];
+        $formData['category'] = (string) ($tpl['category'] ?? '');
+        $formData['duration_hours'] = (float) ($tpl['default_duration_hours'] ?? 0) > 0 ? (string) $tpl['default_duration_hours'] : '';
+        $formData['target_competency'] = (string) ($tpl['target_competency'] ?? '');
+        break;
+    }
+}
+
 $activeNav = "trainings";
 
 ?>
@@ -191,7 +208,7 @@ $activeNav = "trainings";
                         <select name="template_id" id="trainingTemplateSelect">
                             <option value="0" data-i18n="trainingTemplateNoneOption">— Şablon seçilmedi —</option>
                             <?php foreach ($templates as $tpl): ?>
-                                <option value="<?= (int) $tpl['id'] ?>"
+                                <option value="<?= (int) $tpl['id'] ?>" <?= $presetTemplateId === (int) $tpl['id'] ? 'selected' : '' ?>
                                     data-company="<?= (int) $tpl['company_id'] ?>"
                                     data-title="<?= htmlspecialchars($tpl['title'], ENT_QUOTES, 'UTF-8') ?>"
                                     data-category="<?= htmlspecialchars($tpl['category'], ENT_QUOTES, 'UTF-8') ?>"

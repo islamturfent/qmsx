@@ -3475,10 +3475,12 @@ Object.assign(translations.tr, {
 Object.assign(translations.tr, {
   trainingTemplatePrefillLabel: "Şablondan Doldur (isteğe bağlı)", trainingTemplateNoneOption: "— Şablon seçilmedi —",
   trainingCompetencyLabel: "Hedef Yetkinlik",
+  trainingCreateFromTemplateButton: "Eğitim Oluştur",
 });
 Object.assign(translations.en, {
   trainingTemplatePrefillLabel: "Fill from Template (optional)", trainingTemplateNoneOption: "— No template selected —",
   trainingCompetencyLabel: "Target Competency",
+  trainingCreateFromTemplateButton: "Create Training",
 });
 Object.assign(translations.tr, {
   customerPerformanceMenuLabel: "Müşteri Performansı", customerPerformanceTitle: "Müşteri Teslimat / Performans",
@@ -3486,8 +3488,8 @@ Object.assign(translations.tr, {
   customerPerformanceListTitle: "Müşteri Kartları", customerPerformanceEmpty: "Henüz teslimat performansı kaydı yok.",
 });
 Object.assign(translations.tr, {
-  dashboardCompetencyTitle: "Yetkinlik Vadesi Geçenler", dashboardCompetencyText: "Gözden geçirilmesi geciken yetkinlik değerlendirmeleri.",
-  dashboardCompetencyEmpty: "Vadesi geçen yetkinlik yok.",
+  dashboardCompetencyTitle: "Yetkinlik Vadesi (Yaklaşan/Geçen)", dashboardCompetencyText: "Son 30 gün içinde gözden geçirilmesi gereken yetkinlik değerlendirmeleri.",
+  dashboardCompetencyEmpty: "Yaklaşan/geçen yetkinlik yok.",
 });
 Object.assign(translations.tr, {
   dashboardPeriodTitle: "Dönem Özeti", dashboardPeriodText: "Şirket panosu, müşteri performansı ve yetkinlik göstergeleri.",
@@ -3502,8 +3504,8 @@ Object.assign(translations.en, {
   dashboardCoqTitle: "Cost of Quality", dashboardMetroTitle: "Calibration & Metrology",
 });
 Object.assign(translations.en, {
-  dashboardCompetencyTitle: "Overdue Competencies", dashboardCompetencyText: "Competency assessments that are overdue for review.",
-  dashboardCompetencyEmpty: "No overdue competencies.",
+  dashboardCompetencyTitle: "Competency Due (Upcoming/Overdue)", dashboardCompetencyText: "Competency assessments that need review within the next 30 days.",
+  dashboardCompetencyEmpty: "No upcoming or overdue competencies.",
 });
 Object.assign(translations.en, {
   customerPerformanceMenuLabel: "Customer Performance", customerPerformanceTitle: "Customer Delivery / Performance",

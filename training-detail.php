@@ -219,9 +219,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ]);
 
                 // Katilimci egitimi tamamlayinca hedef yetkinlik personelin
-                // yetkinlik kaydina islenir (personel eslenirse).
+                // yetkinlik kaydina islenir (personel eslenirse). Puan varsa
+                // yetkinlik seviyesi ve sertifika/puan notu olarak da yazilir.
                 if ($participantStatus === "completed") {
-                    qmsTrainingSyncCompetency($pdo, $trainingId, (int) $participant["user_id"]);
+                    qmsTrainingSyncCompetency($pdo, $trainingId, (int) $participant["user_id"], $participantScore);
                 }
 
                 header("Location: " . $redirect . "&participant=updated");

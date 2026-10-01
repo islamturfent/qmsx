@@ -95,14 +95,16 @@ $pendingStmt = $pdo->prepare("SELECT COUNT(*) FROM document_approvals WHERE appr
 $pendingStmt->execute([$userId]);
 $pendingApprovalsCount = (int) $pendingStmt->fetchColumn();
 
-// Yetkinlik vadesi gecenler (sirket kapsaminda, staff_members uzerinden).
+// Yetkinlik vadesi gecenler/yaklasanlar (sirket kapsaminda, staff_members uzerinden).
 $compScope = qmsCompanyScope('s.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
 $compStmt = $pdo->prepare(
     "SELECT s.first_name, s.last_name, sc.competency_name, sc.next_assessment_date, c.company_name
      FROM staff_competencies sc
      INNER JOIN staff_members s ON s.id = sc.staff_id
      INNER JOIN companies c ON c.id = s.company_id
-     WHERE sc.active = 1 AND sc.next_assessment_date IS NOT NULL AND sc.next_assessment_date < CURDATE()" . $compScope['sql']
+     WHERE sc.active = 1 AND sc.next_assessment_date IS NOT NULL
+       AND sc.next_assessment_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)" . $compScope['sql'] . "
+     ORDER BY sc.next_assessment_date ASC"
 );
 $compStmt->execute($compScope['params']);
 $dashboardCompetencyOverdue = $compStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -667,22 +669,24 @@ $activeNav = "dashboard";
         <section class="page-section console-card">
             <div class="section-heading compact-heading">
                 <div>
-                    <h3 data-i18n="dashboardCompetencyTitle">Yetkinlik Vadesi Geçenler</h3>
-                    <p data-i18n="dashboardCompetencyText">Gözden geçirilmesi geciken yetkinlik değerlendirmeleri.</p>
+                    <h3 data-i18n="dashboardCompetencyTitle">Yetkinlik Vadesi (Yaklaşan/Geçen)</h3>
+                    <p data-i18n="dashboardCompetencyText">Son 30 gün içinde gözden geçirilmesi gereken yetkinlik değerlendirmeleri.</p>
                 </div>
                 <a class="secondary-button" href="competency-matrix.php" data-i18n="competencyMatrixMenuLabel">Yetkinlik Matrisi</a>
             </div>
             <?php if (!$dashboardCompetencyOverdue): ?>
-                <div class="empty-state" data-i18n="dashboardCompetencyEmpty">Vadesi geçen yetkinlik yok.</div>
+                <div class="empty-state" data-i18n="dashboardCompetencyEmpty">Yaklaşan/geçen yetkinlik yok.</div>
             <?php else: ?>
                 <div class="admin-list">
-                    <?php foreach ($dashboardCompetencyOverdue as $c): ?>
+                    <?php foreach ($dashboardCompetencyOverdue as $c):
+                        $cOverdue = (string) $c['next_assessment_date'] < date('Y-m-d');
+                    ?>
                         <div class="admin-list-item">
                             <div class="list-item-main">
                                 <strong><?= htmlspecialchars(trim((string) $c['first_name'] . ' ' . (string) $c['last_name']), ENT_QUOTES, 'UTF-8') ?></strong>
                                 <span><?= htmlspecialchars((string) $c['competency_name'] . ' · ' . (string) $c['company_name'] . ' · vade: ' . (string) $c['next_assessment_date'], ENT_QUOTES, 'UTF-8') ?></span>
                             </div>
-                            <div class="list-item-side"><span class="status-pill">Vadesi geçti</span></div>
+                            <div class="list-item-side"><span class="status-pill <?= $cOverdue ? '' : 'on-track' ?>"><?= $cOverdue ? 'Vadesi geçti' : 'Yaklaşan vade' ?></span></div>
                         </div>
                     <?php endforeach; ?>
                 </div>

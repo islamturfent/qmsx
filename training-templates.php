@@ -178,6 +178,7 @@ $activeNav = "training_templates";
                                 </span>
                             </div>
                             <div class="list-item-side">
+                                <a class="primary-button" href="training-create.php?template_id=<?= (int) $tpl['id'] ?>" data-i18n="trainingCreateFromTemplateButton">Eğitim Oluştur</a>
                                 <a class="secondary-button" href="training-templates.php?edit=<?= (int) $tpl['id'] ?>" data-i18n="editButton">Düzenle</a>
                                 <form method="post" action="training-templates.php" onsubmit="return confirm('Şablon silinsin mi?');"><?= qmsCsrfField('training_templates') ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $tpl['id'] ?>"><button class="secondary-button" type="submit" data-i18n="deleteButton">Sil</button></form>
                             </div>

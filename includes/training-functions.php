@@ -253,7 +253,7 @@ function qmsTrainingFindStaffByUser(PDO $pdo, int $companyId, int $userId): ?arr
  *
  * @return bool Personel bulunup yetkinlik yazildiysa true.
  */
-function qmsTrainingSyncCompetency(PDO $pdo, int $trainingId, int $participantUserId): bool
+function qmsTrainingSyncCompetency(PDO $pdo, int $trainingId, int $participantUserId, ?int $score = null): bool
 {
     $train = $pdo->prepare(
         'SELECT company_id, title, target_competency, completed_date FROM trainings WHERE id = ? AND active = 1 LIMIT 1'
@@ -281,23 +281,40 @@ function qmsTrainingSyncCompetency(PDO $pdo, int $trainingId, int $participantUs
         $achieved = date('Y-m-d');
     }
     $nextAssessment = date('Y-m-d', strtotime($achieved . ' +1 year'));
+
+    // Katilimci puani (0-100) yetkinlik seviyesine (1-5) eşlenir.
+    $level = null;
+    if ($score !== null && $score >= 0 && $score <= 100) {
+        $level = max(1, min(5, (int) round($score / 20)));
+    }
+
     $notes = 'Eğitim tamamlandı: ' . mb_substr(trim((string) $t['title']), 0, 200);
+    if ($score !== null && $score >= 0 && $score <= 100) {
+        $notes .= '. Sertifika/Puan: ' . $score . '/100';
+    }
 
     $find = $pdo->prepare('SELECT id FROM staff_competencies WHERE staff_id = ? AND competency_name = ? AND active = 1 LIMIT 1');
     $find->execute([$staffId, $competency]);
     $existing = $find->fetchColumn();
 
     if ($existing) {
-        $upd = $pdo->prepare(
-            'UPDATE staff_competencies SET achieved_date = ?, next_assessment_date = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-        );
-        $upd->execute([$achieved, $nextAssessment, $notes, (int) $existing]);
+        if ($level !== null) {
+            $upd = $pdo->prepare(
+                'UPDATE staff_competencies SET achieved_date = ?, next_assessment_date = ?, level = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+            );
+            $upd->execute([$achieved, $nextAssessment, $level, $notes, (int) $existing]);
+        } else {
+            $upd = $pdo->prepare(
+                'UPDATE staff_competencies SET achieved_date = ?, next_assessment_date = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+            );
+            $upd->execute([$achieved, $nextAssessment, $notes, (int) $existing]);
+        }
     } else {
         $ins = $pdo->prepare(
             'INSERT INTO staff_competencies (staff_id, competency_name, level, achieved_date, next_assessment_date, notes, active)
-             VALUES (?, ?, NULL, ?, ?, ?, 1)'
+             VALUES (?, ?, ?, ?, ?, ?, 1)'
         );
-        $ins->execute([$staffId, $competency, $achieved, $nextAssessment, $notes]);
+        $ins->execute([$staffId, $competency, $level, $achieved, $nextAssessment, $notes]);
     }
 
     return true;
