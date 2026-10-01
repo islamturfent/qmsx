@@ -13,7 +13,13 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/access.php';
 require_once __DIR__ . '/includes/permissions.php';
 require_once __DIR__ . '/includes/report-export-data.php';
+require_once __DIR__ . '/includes/settings-functions.php';
 require_once __DIR__ . '/lib/dompdf/autoload.inc.php';
+
+// C) Raporlama gorunumu (sistem ayarlari).
+$sysCfgCompany = trim(qmsSetting('report_company_name'));
+$sysCfgFooter = trim(qmsSetting('report_footer'));
+$sysCfgConf = qmsSetting('report_confidential') === '1';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -324,7 +330,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     .two-column td { width: 50%; vertical-align: top; }
     .footer { margin-top: 18px; color: #98a2b3; font-size: 8px; text-align: right; }
     </style></head><body>
-    <h1>QuAmi Yönetim Raporu</h1>
+    <h1>QuAmi Yönetim Raporu' . ($sysCfgCompany !== '' ? ' &middot; ' . $escape($sysCfgCompany) : '') . '</h1>
     <div class="meta"><strong>Şirket:</strong> ' . $escape($report['company_name'])
     . ' &nbsp; | &nbsp; <strong>Dönem:</strong> ' . $escape($report['start_date']) . ' - ' . $escape($report['end_date'])
     . ' &nbsp; | &nbsp; <strong>Oluşturulma:</strong> ' . date('d.m.Y H:i') . '</div>
@@ -432,8 +438,11 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     . $detailSection('Dağıtım Onayı', '<th>Şirket</th><th>Doküman</th><th>Kopya No</th><th>Alıcı</th><th>Konum</th><th>Onay</th>', $docConfirmRows)
     . $detailSection('Doğrulama Bekleyen', '<th>Şirket</th><th>Faaliyet</th><th>Uygunsuzluk</th><th>Şiddet</th><th>Termin</th>', $verificationRows)
     . $detailSection('Denetim İzi', '<th>Şirket</th><th>Kişi</th><th>Kayıt Türü</th><th>İşlem</th><th>Özet</th><th>Tarih</th>', $auditTrailRows)
-    . '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.</div>
-    </body></html>';
+    . '<div class="footer">QuAmi tarafından yetkili kullanıcı için oluşturulmuştur.'
+    . ($sysCfgConf ? ' Gizli ve özeldir.' : '')
+    . ($sysCfgFooter !== '' ? ' ' . $escape($sysCfgFooter) : '')
+    . '</div>'
+    . '</body></html>';
 
 $options = new Options();
 $options->set('defaultFont', 'DejaVu Sans');

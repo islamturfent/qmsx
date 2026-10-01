@@ -3,6 +3,8 @@
 // RBAC servisi: menü öğelerini cari kullanıcı iznine göre gizler.
 require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/settings-functions.php';
+$_qmsSys = qmsSettings();
 
 if (!function_exists('qmsSidebarVisible')) {
     function qmsSidebarVisible(string $action): bool
@@ -45,6 +47,7 @@ require_once __DIR__ . '/app-ui.php';
 
 <button class="sidebar-mobile-toggle" id="sidebarToggle" type="button" aria-label="Menüyü aç veya kapat">☰</button>
 <span id="qmsNotificationState" data-count="<?= $sidebarUnreadCount ?>" data-csrf="<?= htmlspecialchars(qmsCsrfToken('notifications'), ENT_QUOTES, 'UTF-8') ?>" hidden></span>
+<span id="qmsServerDefaults" data-theme="<?= htmlspecialchars((string) ($_qmsSys['default_theme'] ?? 'light'), ENT_QUOTES, 'UTF-8') ?>" data-lang="<?= htmlspecialchars((string) ($_qmsSys['default_lang'] ?? 'tr'), ENT_QUOTES, 'UTF-8') ?>" hidden></span>
 <span id="qmsNotificationIcon" hidden><?= appIcon("notifications", "") ?></span>
 <?php
 $headerUserName = (string) ($_SESSION["qms_full_name"] ?? ($_SESSION["qms_username"] ?? ""));
@@ -197,6 +200,8 @@ $sidebarGroups = [
             ['key' => 'assignments', 'href' => 'super-admin-assignments.php', 'perm' => 'admin.assignments', 'i18n' => 'manageAssignmentsButton', 'label' => 'Admin Atamaları', 'icon' => 'assignments'],
             ['key' => 'permissions', 'href' => 'permissions.php', 'perm' => 'permissions.view', 'i18n' => 'permissionsMenuLabel', 'label' => 'İzinler', 'icon' => 'checkBadge'],
             ['key' => 'ai_settings', 'href' => 'ai-settings.php', 'roles' => ['super_admin', 'system_admin'], 'i18n' => 'aiSettingsMenuLabel', 'label' => 'Yapay Zeka Ayarları', 'icon' => 'cog'],
+            ['key' => 'system_settings', 'href' => 'system-settings.php', 'perm' => 'admin.system', 'i18n' => 'systemSettingsTitle', 'label' => 'Sistem Ayarları', 'icon' => 'cog'],
+            ['key' => 'system_backup', 'href' => 'system-backup.php', 'perm' => 'admin.system', 'i18n' => 'systemBackupTitle', 'label' => 'Veritabanı Yedeği', 'icon' => 'table'],
         ],
     ],
 ];

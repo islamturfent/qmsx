@@ -1418,7 +1418,9 @@ Object.assign(translations.en, {
 
 const languageToggle = document.getElementById("languageToggle");
 
-let currentLanguage = localStorage.getItem("qms-language") || "tr";
+const qmsServerDefaultsEl = document.getElementById("qmsServerDefaults");
+const qmsServerLang = qmsServerDefaultsEl ? qmsServerDefaultsEl.dataset.lang : "";
+let currentLanguage = localStorage.getItem("qms-language") || qmsServerLang || "tr";
 
 const languageGlobeIcon = (document.getElementById("qmsIconGlobe") || {}).innerHTML || "";
 
@@ -3545,6 +3547,18 @@ Object.assign(translations.en, {
 Object.assign(translations.tr, {
   aiStudioMenuLabel: "AI Doküman Stüdyosu",
   aiSettingsMenuLabel: "Yapay Zeka Ayarları",
+  systemSettingsTitle: "Sistem Ayarları", systemSettingsText: "Genel, güvenlik, raporlama ve gönderici ayarları.", systemSettingsKicker: "Sistem Yönetimi",
+  systemSettingsLink: "Sistem Ayarları", systemSettingsGeneralTitle: "A · Genel", systemSettingsGeneralText: "Oturum, görünüm, liste ve yükleme varsayılanları.",
+  sessionTimeoutLabel: "Oturum Zaman Aşımı (dk)", defaultThemeLabel: "Varsayılan Tema", defaultLangLabel: "Varsayılan Dil", pageSizeLabel: "Sayfa Başına Kayıt", uploadMaxMbLabel: "Dosya Yükleme Limiti (MB)",
+  systemSettingsOpsTitle: "A2 · İşletimsel Eşikler", systemSettingsOpsText: "Teslimat eşiği ve denetim izi saklama.",
+  deliveryThresholdLabel: "Teslimat Red Eşiği (0-1)", auditRetentionLabel: "Denetim İzi Saklama (gün)",
+  systemSettingsReportTitle: "C · Raporlama Görünümü", systemSettingsReportText: "Excel/PDF raporların üst/alt bilgisi.",
+  reportCompanyNameLabel: "Rapor Şirket Adı", reportFooterLabel: "Rapor Alt Not", reportConfidentialLabel: "Gizlilik Notu Ekle",
+  systemSettingsMailTitle: "D · E-posta / Gönderici", systemSettingsMailText: "Gönderen görünen ad/adres; SMTP ayrıca E-posta Ayarları'ndadır.",
+  emailFromNameLabel: "Gönderen Adı", emailFromAddressLabel: "Gönderen Adresi",
+  systemSettingsSecurityTitle: "E · Güvenlik", systemSettingsSecurityText: "Şifre politikası ve 2FA bayrağı.",
+  passwordMinLengthLabel: "Minimum Şifre Uzunluğu", twofaRequiredLabel: "2FA Gerekli (kademeli)",
+  systemBackupLink: "Veritabanı Yedeği", systemBackupTitle: "Veritabanı Yedeği", systemBackupText: "mysqldump ile tüm şemayı ve veriyi tek SQL dosyası olarak indirin.", systemBackupButton: "Yedeği İndir (.sql)",
   aiStudioTitle: "AI Doküman Stüdyosu", aiStudioKicker: "Yapay Zeka",
   aiStudioText: "Dokümanı tarif edin (yazıyla ya da sesle) ve taslağı üretin.",
   aiStudioPromptTitle: "Dokümanı Tarif Et", aiStudioPromptText: "Mikrofon ile söyleyin veya yazın; türü seçip üretin.",
@@ -3572,6 +3586,18 @@ Object.assign(translations.tr, {
 Object.assign(translations.en, {
   aiStudioMenuLabel: "AI Document Studio",
   aiSettingsMenuLabel: "AI Settings",
+  systemSettingsTitle: "System Settings", systemSettingsText: "General, security, reporting and sender settings.", systemSettingsKicker: "System Management",
+  systemSettingsLink: "System Settings", systemSettingsGeneralTitle: "A · General", systemSettingsGeneralText: "Session, appearance, list and upload defaults.",
+  sessionTimeoutLabel: "Session Timeout (min)", defaultThemeLabel: "Default Theme", defaultLangLabel: "Default Language", pageSizeLabel: "Records Per Page", uploadMaxMbLabel: "Upload Limit (MB)",
+  systemSettingsOpsTitle: "A2 · Operational Thresholds", systemSettingsOpsText: "Delivery threshold and audit trail retention.",
+  deliveryThresholdLabel: "Delivery Rejection Threshold (0-1)", auditRetentionLabel: "Audit Trail Retention (days)",
+  systemSettingsReportTitle: "C · Reporting Appearance", systemSettingsReportText: "Header/footer of Excel and PDF reports.",
+  reportCompanyNameLabel: "Report Company Name", reportFooterLabel: "Report Footer Note", reportConfidentialLabel: "Add Confidentiality Note",
+  systemSettingsMailTitle: "D · Email / Sender", systemSettingsMailText: "Sender display name/address; SMTP lives in Email Settings.",
+  emailFromNameLabel: "Sender Name", emailFromAddressLabel: "Sender Address",
+  systemSettingsSecurityTitle: "E · Security", systemSettingsSecurityText: "Password policy and 2FA flag.",
+  passwordMinLengthLabel: "Minimum Password Length", twofaRequiredLabel: "2FA Required (phased)",
+  systemBackupLink: "Database Backup", systemBackupTitle: "Database Backup", systemBackupText: "Download the full schema and data as a single SQL file via mysqldump.", systemBackupButton: "Download Backup (.sql)",
   aiStudioTitle: "AI Document Studio", aiStudioKicker: "Artificial Intelligence",
   aiStudioText: "Describe the document (type or speak) and generate the draft.",
   aiStudioPromptTitle: "Describe the Document", aiStudioPromptText: "Speak via the microphone or type; choose the type and generate.",

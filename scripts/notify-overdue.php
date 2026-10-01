@@ -18,6 +18,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once dirname(__DIR__) . '/config/database.php';
 require_once dirname(__DIR__) . '/includes/notifications.php';
 require_once dirname(__DIR__) . '/includes/mailer.php';
+require_once dirname(__DIR__) . '/includes/settings-functions.php';
 
 // --all: her geciken kayit icin ilgili sirketin TUM aktif kullanicilarina
 // (sorumlu ve adminler dahil) da bildirim bas; varsayilan mod yalnizca sorumlu
@@ -331,7 +332,8 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
 // Varsayilan esik %5'tir; QMS_DELIVERY_REJECT_THRESHOLD ortam degiskeni ile
 // ayarlanabilir (0-1 arasi). Teste izin vermek icin ayrica --threshold=<0-1>
 // argumani da kabul edilir (arguman ortam degerinden onceliklidir).
-$deliveryRejectThreshold = 0.05;
+// Varsayilan esik ayar tablosundan gelir; arguman (--threshold) onceliklidir.
+$deliveryRejectThreshold = max(0.01, min(0.99, (float) qmsSetting('delivery_reject_threshold', '0.05')));
 foreach ($argv ?? [] as $arg) {
     if (preg_match('/^--threshold=([0-9]+(?:\.[0-9]+)?)$/', $arg, $m)) {
         $deliveryRejectThreshold = max(0.01, min(0.99, (float) $m[1]));

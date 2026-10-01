@@ -4,7 +4,9 @@ const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 const sunIconHtml = (document.getElementById("qmsIconSun") || {}).innerHTML || "☀️";
 const moonIconHtml = (document.getElementById("qmsIconMoon") || {}).innerHTML || "🌙";
 
-const savedTheme = localStorage.getItem("qms-theme");
+const serverDefaults = document.getElementById("qmsServerDefaults");
+const serverTheme = serverDefaults ? serverDefaults.dataset.theme : "";
+const savedTheme = localStorage.getItem("qms-theme") || serverTheme;
 
 function updateThemeColor(darkMode) {
     if (themeColorMeta) {

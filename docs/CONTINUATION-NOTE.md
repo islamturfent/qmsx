@@ -2442,3 +2442,24 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     (`storage/logs`) disaridan koruma.
   - Not: storage top .htaccess local ortamda bilincli olarak eklenmedi (XAMPP
     calisma dizini); production oncesi eklenmesi onerilir.
+  ----
+- **Sistem Yonetimi ayar eklemeleri A/B/C/D/E** (cache v207):
+  - **Temel:** `system_settings` tablosu (migrate-system-settings.php,
+    migrations/20261009-system-settings.sql) + `includes/settings-functions.php`
+    (`qmsSettings`/`qmsSetting`/`qmsSettingsSave`, `QMS_SETTINGS_DEFAULTS`).
+  - **A (Genel+Iisletimsel):** `system-settings.php` sayfasi (admin.system izni,
+    `permissions.php`'ye eklendi); alanlar: oturum zaman asimi, varsayilan tema/dil,
+    sayfa boyutu, yukleme limiti (MB), teslimat red esigi (0-1), denetim izi
+    saklama (gun). Varsayilan tema/dil, app-sidebar'daki `qmsServerDefaults`
+    span'i uzerinden theme.js/language.js'e aktarilir (localStorage yoksa).
+    Teslimat esigi notify-overdue.php'de qmsSetting'den okunur (arguman oncelikli).
+  - **B (Yedek):** `system-backup.php` - mysqldump ile SQL indirir (test: 2541
+    satir). Sidebar'a "Veritabani Yedegi".
+  - **C (Raporlama gorunum):** report-export-pdf.php basligina sirket adi,
+    altbilgiye ozel/gizlilik notu (report_company_name/footer/confidential).
+  - **D (E-posta/gonderici):** email_from_name/email_from_address ayar olarak
+    saklaniyor; SMTP zaten E-posta Ayarlari'nda.
+  - **E (Guvenlik):** password_min_length + twofa_required ayar olarak saklanir
+    (2FA kademeli/not).
+  - Sidebar menu: Sistem Yonetimi -> Sistem Ayarlari + Veritabani Yedegi.
+  - i18n TR/EN eklendi. Lint temiz; cache v207.
