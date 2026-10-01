@@ -38,9 +38,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'email_from_address' => trim((string) ($_POST["email_from_address"] ?? '')),
             'password_min_length' => (string) max(6, min(64, (int) ($_POST["password_min_length"] ?? 8))),
             'twofa_required' => !empty($_POST["twofa_required"]) ? '1' : '0',
+            // F) Yaklasan vade pencereleri
+            'contract_expiring_days' => (string) max(1, min(365, (int) ($_POST["contract_expiring_days"] ?? 60))),
+            'instrument_due_days' => (string) max(1, min(365, (int) ($_POST["instrument_due_days"] ?? 60))),
+            'competency_due_days' => (string) max(1, min(365, (int) ($_POST["competency_due_days"] ?? 30))),
+            'document_review_days' => (string) max(1, min(365, (int) ($_POST["document_review_days"] ?? 30))),
+            'process_review_days' => (string) max(1, min(365, (int) ($_POST["process_review_days"] ?? 30))),
+            // G) Login guvenligi
+            'max_login_attempts' => (string) max(1, min(50, (int) ($_POST["max_login_attempts"] ?? 5))),
+            'lockout_minutes' => (string) max(1, min(1440, (int) ($_POST["lockout_minutes"] ?? 15))),
+            // I) Marka
+            'app_name' => trim((string) ($_POST["app_name"] ?? 'QuAmi')),
+            'login_title' => trim((string) ($_POST["login_title"] ?? '')),
         ];
         $bad = qmsSettingsSave($pdo, $values, $userId);
         $formOk = $bad === [] ? 'Sistem ayarları kaydedildi.' : 'Bazı anahtarlar tanınmadı: ' . implode(', ', $bad);
+    } elseif ($action === 'purge_audit') {
+        // H) Denetim izi saklama: sureyi asan eski kayitlari temizle (onayli).
+        $retention = (int) qmsSetting('audit_retention_days', '365');
+        $cutoff = date('Y-m-d H:i:s', strtotime('-' . $retention . ' days'));
+        $del = $pdo->prepare('DELETE FROM audit_log WHERE created_at < ?');
+        $del->execute([$cutoff]);
+        $formOk = 'Denetim izi temizlendi: ' . $del->rowCount() . ' eski kayıt silindi (' . $retention . ' gün öncesi).';
     }
 }
 
@@ -118,10 +137,46 @@ $activeNav = "system_settings";
                 </div>
             </section>
 
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsDueTitle">F · Yaklaşan Vade Pencereleri</h3><p data-i18n="systemSettingsDueText">Sözleşme/kalibrasyon/yetkinlik/gözden geçirme uyarı pencereleri (gün).</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field"><span data-i18n="contractExpiringDaysLabel">Sözleşme Bitiş (gün)</span><input type="number" min="1" max="365" name="contract_expiring_days" value="<?= (int) $settings['contract_expiring_days'] ?>"></label>
+                    <label class="form-field"><span data-i18n="instrumentDueDaysLabel">Kalibrasyon Yaklaşan (gün)</span><input type="number" min="1" max="365" name="instrument_due_days" value="<?= (int) $settings['instrument_due_days'] ?>"></label>
+                    <label class="form-field"><span data-i18n="competencyDueDaysLabel">Yetkinlik Vade (gün)</span><input type="number" min="1" max="365" name="competency_due_days" value="<?= (int) $settings['competency_due_days'] ?>"></label>
+                    <label class="form-field"><span data-i18n="documentReviewDaysLabel">Doküman GGR (gün)</span><input type="number" min="1" max="365" name="document_review_days" value="<?= (int) $settings['document_review_days'] ?>"></label>
+                    <label class="form-field"><span data-i18n="processReviewDaysLabel">Süreç GGR (gün)</span><input type="number" min="1" max="365" name="process_review_days" value="<?= (int) $settings['process_review_days'] ?>"></label>
+                </div>
+            </section>
+
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsLoginTitle">G · Login Güvenliği</h3><p data-i18n="systemSettingsLoginText">Başarısız giriş denemesi kilidi.</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field"><span data-i18n="maxLoginAttemptsLabel">Maks. Başarısız Deneme</span><input type="number" min="1" max="50" name="max_login_attempts" value="<?= (int) $settings['max_login_attempts'] ?>"></label>
+                    <label class="form-field"><span data-i18n="lockoutMinutesLabel">Kilit Süresi (dk)</span><input type="number" min="1" max="1440" name="lockout_minutes" value="<?= (int) $settings['lockout_minutes'] ?>"></label>
+                </div>
+            </section>
+
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsBrandTitle">I · Marka / Görünüm</h3><p data-i18n="systemSettingsBrandText">Uygulama adı ve login başlığı.</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field"><span data-i18n="appNameLabel">Uygulama Adı</span><input type="text" name="app_name" maxlength="60" value="<?= htmlspecialchars((string) $settings['app_name'], ENT_QUOTES, "UTF-8") ?>"></label>
+                    <label class="form-field"><span data-i18n="loginTitleLabel">Login Başlığı</span><input type="text" name="login_title" maxlength="120" value="<?= htmlspecialchars((string) $settings['login_title'], ENT_QUOTES, "UTF-8") ?>"></label>
+                </div>
+            </section>
+
             <div class="form-actions">
                 <button class="primary-button" type="submit" data-i18n="saveButton">Kaydet</button>
             </div>
         </form>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsRetentionTitle">H · Veri Saklama / Temizlik</h3><p data-i18n="systemSettingsRetentionText">Denetim izi, saklama süresini aşan eski kayıtları temizler (onaylı).</p></div></div>
+            <form method="post" action="system-settings.php" onsubmit="return confirm('Eski denetim izi kayıtları silinsin mi?');">
+                <?= qmsCsrfField($csrfScope) ?>
+                <input type="hidden" name="action" value="purge_audit">
+                <div class="form-actions"><button class="danger-button" type="submit" data-i18n="purgeAuditButton">Denetim İzi Temizle</button></div>
+            </form>
+        </section>
     </main>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
 </body>

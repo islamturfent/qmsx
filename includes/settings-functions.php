@@ -31,6 +31,18 @@ const QMS_SETTINGS_DEFAULTS = [
     // E) Guvenlik
     'password_min_length' => '8',         // sifre min. uzunluk
     'twofa_required' => '0',              // '1' = 2FA gerekli (kademeli, not)
+    // F) Yaklasan vade pencereleri (gun)
+    'contract_expiring_days' => '60',     // sozlesme bitis uyarı penceresi
+    'instrument_due_days' => '60',        // olcu alett/kalibrasyon yaklasan
+    'competency_due_days' => '30',        // yetkinlik vade yaklasan
+    'document_review_days' => '30',       // dokuman gozden gecirme penceresi
+    'process_review_days' => '30',        // surec gozden gecirme penceresi
+    // G) Login guvenligi
+    'max_login_attempts' => '5',          // hatali giris kilidi esigi
+    'lockout_minutes' => '15',            // kilit suresi (dk)
+    // I) Marka / gorunum
+    'app_name' => 'QuAmi',
+    'login_title' => 'Kalite Yönetim Sistemi',
 ];
 
 /** @return array<string, string> Birlesmis sistem ayarlari (default + DB override). */

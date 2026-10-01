@@ -2463,3 +2463,18 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     (2FA kademeli/not).
   - Sidebar menu: Sistem Yonetimi -> Sistem Ayarlari + Veritabani Yedegi.
   - i18n TR/EN eklendi. Lint temiz; cache v207.
+  ----
+- **Sistem Yonetimi F/G/H/I** (cache v208):
+  - **F (Yaklasan vade pencereleri, gun):** contract_expiring_days,
+    instrument_due_days, competency_due_days, document_review_days,
+    process_review_days. Dashboard'da sozlesme/kalibrasyon/yetkinlik pencereleri
+    bu ayarlardan okunuyor.
+  - **G (Login guvenligi):** `login_attempts` tablosu (migrate-login-attempts)
+    + login.php max_login_attempts/lockout_minutes esigi: kullanici adi/IP icin
+    kilit penceresindeki hatali denemeler sayilir, esik asilinca kisa sureli
+    engellenir; basarili giriste gecmis temizlenir.
+  - **H (Veri saklama/temizlik):** system-settings.php'de 'Denetim Izi Temizle'
+    butonu (onayli) audit_retention_days oncesi eski audit_log kayitlarini siler.
+  - **I (Marka/gorunum):** app_name + login_title; login.php baslik/logo/login
+    basligi bu ayarlardan gelir.
+  - i18n TR/EN eklendi. Lint temiz; cache v208.

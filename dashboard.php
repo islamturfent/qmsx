@@ -50,6 +50,7 @@ require_once __DIR__ . '/includes/satisfaction-functions.php';
 
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/audit-log-functions.php';
+require_once __DIR__ . '/includes/settings-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
@@ -69,8 +70,9 @@ $dashboardImprovements = qmsImprovementList($pdo, $userId, qmsCurrentRole(), 'op
 // Metroloji / olay / sozlesme widget verileri.
 $dashboardOverdueInstruments = qmsInstrumentList($pdo, $userId, qmsCurrentRole(), 'overdue');
 $dashboardOpenIncidents = qmsIncidentList($pdo, $userId, qmsCurrentRole(), 'open');
+$contractDueDays = (int) qmsSetting('contract_expiring_days', '60');
 $dashboardExpiringContracts = array_values(array_filter(qmsContractList($pdo, $userId, qmsCurrentRole(), ''), static fn($c): bool =>
-    $c['status'] === 'active' && $c['end_date'] !== null && (string) $c['end_date'] <= date('Y-m-d', strtotime('+60 days'))
+    $c['status'] === 'active' && $c['end_date'] !== null && (string) $c['end_date'] <= date('Y-m-d', strtotime('+' . $contractDueDays . ' days'))
 ));
 
 // Performans karti, raporlama sayfasindaki ile ayni metrigi kullanir; boylece
@@ -101,13 +103,14 @@ $pendingApprovalsCount = (int) $pendingStmt->fetchColumn();
 
 // Yetkinlik vadesi gecenler/yaklasanlar (sirket kapsaminda, staff_members uzerinden).
 $compScope = qmsCompanyScope('s.company_id', qmsVisibleCompanyIds($pdo, $userId, qmsCurrentRole()));
+$compDueDays = (int) qmsSetting('competency_due_days', '30');
 $compStmt = $pdo->prepare(
     "SELECT s.first_name, s.last_name, sc.competency_name, sc.next_assessment_date, c.company_name
      FROM staff_competencies sc
      INNER JOIN staff_members s ON s.id = sc.staff_id
      INNER JOIN companies c ON c.id = s.company_id
      WHERE sc.active = 1 AND sc.next_assessment_date IS NOT NULL
-       AND sc.next_assessment_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)" . $compScope['sql'] . "
+       AND sc.next_assessment_date <= DATE_ADD(CURDATE(), INTERVAL " . $compDueDays . " DAY)" . $compScope['sql'] . "
      ORDER BY sc.next_assessment_date ASC"
 );
 $compStmt->execute($compScope['params']);
@@ -125,7 +128,8 @@ $dashCriticalIncidentsKpi = $scopedCount("SELECT COUNT(*) FROM incidents WHERE a
 
 // Metroloji ozet (Donem Ozeti grubu).
 $dashInstrumentsTotal = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1" . $scopeClause);
-$dashInstrumentsDueSoon = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND next_calibration_date IS NOT NULL AND next_calibration_date >= CURDATE() AND next_calibration_date <= DATE_ADD(CURDATE(), INTERVAL 60 DAY)" . $scopeClause);
+$instrumentDueDays = (int) qmsSetting('instrument_due_days', '60');
+$dashInstrumentsDueSoon = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND next_calibration_date IS NOT NULL AND next_calibration_date >= CURDATE() AND next_calibration_date <= DATE_ADD(CURDATE(), INTERVAL " . $instrumentDueDays . " DAY)" . $scopeClause);
 
 // Müşteri performansı (red eşiği %5 ustu musteri + ort. red + ort. zamaninda).
 $dashLowCustomers = 0;
