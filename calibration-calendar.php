@@ -16,7 +16,7 @@ $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
 
 $companyScope = qmsCompanyScope('co.id', qmsVisibleCompanyIds($pdo, $userId, $role));
-$companyStmt = $pdo->prepare('SELECT companies.id, companies.company_name FROM companies WHERE companies.active = 1' . $companyScope['sql'] . ' ORDER BY companies.company_name');
+$companyStmt = $pdo->prepare('SELECT co.id, co.company_name FROM companies co WHERE co.active = 1' . $companyScope['sql'] . ' ORDER BY co.company_name');
 $companyStmt->execute($companyScope['params']);
 $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 $selectedCompanyId = (int) ($_GET["company_id"] ?? 0);
