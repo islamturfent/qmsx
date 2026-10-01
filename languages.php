@@ -129,7 +129,7 @@ $activeNav = "languages";
                     <form method="post" action="languages.php" enctype="multipart/form-data" style="display:flex;align-items:center;gap:8px"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="action" value="import"><input type="hidden" name="lang" value="<?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?>"><input type="file" name="import_file" accept=".json,application/json" style="font-size:12px"><button class="secondary-button" type="submit">İçe Aktar (JSON)</button></form>
                 </div>
             </div>
-            <div style="height:10px;background:#eef0f5;border-radius:999px;overflow:hidden;margin:4px 0 12px"><div style="height:100%;width:<?= (int) $pct ?>%;background:#465fff;border-radius:999px"></div></div>
+            <div style="height:10px;background:var(--gray-100);border-radius:999px;overflow:hidden;margin:4px 0 12px"><div style="height:100%;width:<?= (int) $pct ?>%;background:#465fff;border-radius:999px"></div></div>
             <form method="post" action="languages.php">
                 <?= qmsCsrfField($csrfScope) ?>
                 <input type="hidden" name="action" value="translate"><input type="hidden" name="lang" value="<?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?>">
@@ -138,8 +138,8 @@ $activeNav = "languages";
                     <tbody>
                         <?php foreach ($allKeys as $ak): ?>
                             <?php $has = array_key_exists($ak, $editTranslations) && $editTranslations[$ak] !== ''; ?>
-                            <tr<?= $has ? '' : ' style="background:#fff8ec"' ?>>
-                                <td><code><?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?></code></td>
+                            <tr<?= $has ? '' : ' style="background:var(--gray-100)"' ?>>
+                                <td><code style="color:var(--text-body)"><?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?></code></td>
                                 <td class="muted-color"><?= htmlspecialchars((string) ($trRef[$ak] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><input type="hidden" name="tkey[]" value="<?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?>"><input type="text" name="tval[]" value="<?= htmlspecialchars((string) ($editTranslations[$ak] ?? ''), ENT_QUOTES, 'UTF-8') ?>" style="width:100%" placeholder="<?= htmlspecialchars('Çevir: ' . ($trRef[$ak] ?? $ak), ENT_QUOTES, 'UTF-8') ?>"></td>
                             </tr>
