@@ -2332,3 +2332,17 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   alttin altinda en guncel kalibrasyon kaydi (tarih + sonuc labeli + sertifika no
   + laboratuvar) gosterilir. `qcmsInstCalibList` kullanilir (yeni
   `instrument-calibration-functions.php` require). Lint temiz; cache v202.
+  ----
+- **Bakim / toparlama turu** (cache v203; tag `v0.1.0`):
+  - **Git housekeeping:** `git status` temiz (main, tek dal). Anlamli milestone
+    tag `v0.1.0` eklendi. Push yapilmadi (kullanici istemediginden).
+  - **i18n kontrolu:** Oturumda eklenen tum anahtarlar (`dashboardReviewTitle`,
+    `dashboardSatisfaction*`, `satisfactionEmpty`, `downloadXlsxButton`,
+    `deliveryAddRecord`, `deliveryReportButton`, `trainingCreateFromTemplateButton`,
+    `aiTransfer*`, `aiTemplateTypeLabel`, `aiSaveTemplateButton`) her iki dilde de
+    (tr+en) dogrulandi - eksik yok.
+  - **Bos/kullnailmayin dosya:** 0 byte dosya yok. Kok PHP 'yetim' taramasinda tek
+    aday `search.php` cikti; `assets/js/sidebar.js`'ten referansli oldugu icin
+    gercektende kullaniliyor - silme yok. 120 kok PHP + ~60 migration script tutarli.
+  - **Not:** Gorsel tur + hizli duzeltme turu kullanici onayina birakildi (asagida).
+  - Lint temiz; cache v203.
