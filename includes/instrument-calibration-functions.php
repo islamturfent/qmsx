@@ -21,7 +21,7 @@ const QMS_INSTRUMENT_CALIB_STORAGE = __DIR__ . '/../storage/calibrations';
 /** Kapsam içindeki kalibrasyon kayitlari (en yeni once). */
 function qmsInstCalibList(PDO $pdo, int $userId, string $role, int $instrumentId = 0, string $resultFilter = ''): array
 {
-    $scope = qmsCompanyScope('c.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+    $scope = qmsCompanyScope('k.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
     $sql = 'SELECT k.*, i.name AS instrument_name, i.instrument_code, co.company_name
             FROM instrument_calibrations k
             INNER JOIN instruments i ON i.id = k.instrument_id
