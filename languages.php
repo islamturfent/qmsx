@@ -141,7 +141,7 @@ $activeNav = "languages";
                             <tr<?= $has ? '' : ' style="background:var(--gray-100)"' ?>>
                                 <td><code style="color:var(--text-body)"><?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?></code></td>
                                 <td class="muted-color"><?= htmlspecialchars((string) ($trRef[$ak] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
-                                <td><input type="hidden" name="tkey[]" value="<?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?>"><input type="text" name="tval[]" value="<?= htmlspecialchars((string) ($editTranslations[$ak] ?? ''), ENT_QUOTES, 'UTF-8') ?>" style="width:100%" placeholder="<?= htmlspecialchars('Çevir: ' . ($trRef[$ak] ?? $ak), ENT_QUOTES, 'UTF-8') ?>"></td>
+                                <td style="display:block!important"><input type="hidden" name="tkey[]" value="<?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?>"><input type="text" name="tval[]" value="<?= htmlspecialchars((string) ($editTranslations[$ak] ?? ''), ENT_QUOTES, 'UTF-8') ?>" style="width:100%;background:var(--surface-color);color:var(--text-body);border:1px solid var(--border-subtle);border-radius:6px;padding:7px 10px" placeholder="<?= htmlspecialchars('Çevir: ' . ($trRef[$ak] ?? $ak), ENT_QUOTES, 'UTF-8') ?>"></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
