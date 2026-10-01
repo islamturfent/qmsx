@@ -60,20 +60,53 @@ function qmsTranslationSave(PDO $pdo, string $lang, string $key, string $value):
     $stmt->execute([$lang, mb_substr(trim($key), 0, 120), trim($value)]);
 }
 
-/** Secili dilin anahtar seti (TR sabitinden kopyalanir, cikti ceviri olarak). */
-function qmsLanguageEditorSource(PDO $pdo): array
+/** Sistemde kullanilan tum ceviri anahtarlari (language.js TR + PHP data-i18n). */
+function qmsTranslationKeys(): array
 {
-    // Cevirilecek anahtar listesi: language.js'teki tr anahtarlarndan bir taslak.
-    // Basit ve guvenli yontem: dil editoru, kullanicinin girdigi anahtarlara
-    // guvenir; bu fonksiyon yalnizca ornek olarak birkac temel anahtari dondurur.
-    return [
-        'dashboardLinkLabel' => '',
-        'sidebarOverviewLabel' => '',
-        'loginTitle' => '',
-        'loginText' => '',
-        'saveButton' => '',
-        'cancelButton' => '',
-        'editButton' => '',
-        'deleteButton' => '',
-    ];
+    $keys = [];
+    $jsPath = __DIR__ . '/../assets/js/language.js';
+    if (is_file($jsPath)) {
+        $js = (string) file_get_contents($jsPath);
+        // translations.tr.key = "..."
+        if (preg_match_all('/translations\.tr\.(\w+)\s*=/', $js, $m)) {
+            foreach ($m[1] as $k) { $keys[$k] = true; }
+        }
+        // Object.assign(translations.tr, { key: ... })
+        if (preg_match_all('/Object\.assign\(translations\.tr,\s*\{(.*?)\n\s*\}\)/s', $js, $blk)) {
+            foreach ($blk[1] as $b) {
+                if (preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*:/', $b, $km)) {
+                    foreach ($km[1] as $k) { if (strpos($k, 'http') === false) { $keys[$k] = true; } }
+                }
+            }
+        }
+    }
+    // PHP sayfalarinda kullanilan data-i18n anahtarlari.
+    $phpRoot = __DIR__ . '/../';
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($phpRoot, FilesystemIterator::SKIP_DOTS));
+    foreach ($it as $f) {
+        if ($f->getExtension() !== 'php') { continue; }
+        $txt = (string) file_get_contents($f->getPathname());
+        if (preg_match_all('/data-i18n=\"([A-Za-z_][A-Za-z0-9_]*)\"/', $txt, $m)) {
+            foreach ($m[1] as $k) { $keys[$k] = true; }
+        }
+    }
+    $out = array_keys($keys);
+    sort($out, SORT_STRING);
+    return $out;
+}
+
+/** Turkce referans deger (isimlendirme kolayligi icin). */
+function qmsTranslationRef(): array
+{
+    static $ref = null;
+    if ($ref !== null) { return $ref; }
+    $ref = [];
+    $jsPath = __DIR__ . '/../assets/js/language.js';
+    if (is_file($jsPath)) {
+        $js = (string) file_get_contents($jsPath);
+        if (preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*:\s*"([^"]*)"/', $js, $m)) {
+            foreach ($m[1] as $i => $k) { $ref[$k] = $m[2][$i]; }
+        }
+    }
+    return $ref;
 }

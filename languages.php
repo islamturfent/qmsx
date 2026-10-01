@@ -34,6 +34,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
         $message = "$count çeviri kaydedildi.";
+    } elseif ($act === 'import') {
+        $lang = strtolower(trim((string) ($_POST["lang"] ?? '')));
+        $raw = '';
+        if (!empty($_FILES['import_file']['tmp_name']) && is_uploaded_file($_FILES['import_file']['tmp_name'])) {
+            $raw = (string) file_get_contents($_FILES['import_file']['tmp_name']);
+        } else {
+            $raw = trim((string) ($_POST["import_json"] ?? ''));
+        }
+        $data = json_decode($raw, true);
+        $count = 0;
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                if (is_string($k) && is_string($v)) { qmsTranslationSave($pdo, $lang, $k, $v); $count++; }
+            }
+            $message = "$count çeviri içe aktarıldı.";
+        } else {
+            $message = 'Geçersiz JSON.';
+        }
     } elseif ($act === 'export') {
         $lang = strtolower(trim((string) ($_POST["lang"] ?? '')));
         $data = qmsLanguageTranslations($pdo, $lang);
@@ -47,6 +65,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 $languages = qmsLanguages($pdo);
 $editLang = strtolower(trim((string) ($_GET["edit"] ?? '')));
 $editTranslations = $editLang !== '' ? qmsLanguageTranslations($pdo, $editLang) : [];
+$allKeys = qmsTranslationKeys();
+$trRef = qmsTranslationRef();
+$translatedCount = 0;
+foreach ($allKeys as $ak) { if (array_key_exists($ak, $editTranslations) && $editTranslations[$ak] !== '') { $translatedCount++; } }
+$totalKeys = count($allKeys);
+$pct = $totalKeys > 0 ? (int) round($translatedCount / $totalKeys * 100) : 0;
 $activeNav = "languages";
 
 ?>
@@ -96,25 +120,30 @@ $activeNav = "languages";
         <?php if ($editLang !== ''): ?>
         <section class="page-section console-card">
             <div class="section-heading compact-heading">
-                <div><h3 data-i18n="languagesTranslateTitle">Çeviriler · <?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?></h3></div>
-                <form method="post" action="languages.php" style="display:inline">
-                    <?= qmsCsrfField($csrfScope) ?>
-                    <input type="hidden" name="action" value="export"><input type="hidden" name="lang" value="<?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?>">
-                    <button class="secondary-button" type="submit">Dışa Aktar (JSON)</button>
-                </form>
+                <div>
+                    <h3 data-i18n="languagesTranslateTitle">Çeviriler · <?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?></h3>
+                    <p><?= (int) $translatedCount ?> / <?= (int) $totalKeys ?> tamamlandı · %<?= (int) $pct ?></p>
+                </div>
+                <div class="report-export-actions">
+                    <form method="post" action="languages.php" style="display:inline"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="action" value="export"><input type="hidden" name="lang" value="<?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?>"><button class="secondary-button" type="submit">Dışa Aktar</button></form>
+                    <form method="post" action="languages.php" enctype="multipart/form-data" style="display:flex;align-items:center;gap:8px"><?= qmsCsrfField($csrfScope) ?><input type="hidden" name="action" value="import"><input type="hidden" name="lang" value="<?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?>"><input type="file" name="import_file" accept=".json,application/json" style="font-size:12px"><button class="secondary-button" type="submit">İçe Aktar (JSON)</button></form>
+                </div>
             </div>
+            <div style="height:10px;background:#eef0f5;border-radius:999px;overflow:hidden;margin:4px 0 12px"><div style="height:100%;width:<?= (int) $pct ?>%;background:#465fff;border-radius:999px"></div></div>
             <form method="post" action="languages.php">
                 <?= qmsCsrfField($csrfScope) ?>
                 <input type="hidden" name="action" value="translate"><input type="hidden" name="lang" value="<?= htmlspecialchars($editLang, ENT_QUOTES, 'UTF-8') ?>">
-                <div class="report-table-wrap"><table class="report-table">
-                    <thead><tr><th data-i18n="langKeyLabel">Anahtar</th><th data-i18n="langValueLabel">Çeviri</th></tr></thead>
+                <div class="report-table-wrap"><table class="report-table" style="table-layout:fixed">
+                    <thead><tr><th style="width:34%">Anahtar</th><th style="width:22%">TR (referans)</th><th data-i18n="langValueLabel">Çeviri</th></tr></thead>
                     <tbody>
-                        <?php if (!$editTranslations): ?><tr><td colspan="2" class="muted-color">Henüz çeviri yok — aşağıya anahtar + çeviri ekleyin.</td></tr><?php endif; ?>
-                        <?php foreach ($editTranslations as $k => $v): ?>
-                            <tr><td><input type="text" name="tkey[]" value="<?= htmlspecialchars((string) $k, ENT_QUOTES, 'UTF-8') ?>" readonly></td><td><input type="text" name="tval[]" value="<?= htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8') ?>"></td></tr>
+                        <?php foreach ($allKeys as $ak): ?>
+                            <?php $has = array_key_exists($ak, $editTranslations) && $editTranslations[$ak] !== ''; ?>
+                            <tr<?= $has ? '' : ' style="background:#fff8ec"' ?>>
+                                <td><code><?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?></code></td>
+                                <td class="muted-color"><?= htmlspecialchars((string) ($trRef[$ak] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><input type="hidden" name="tkey[]" value="<?= htmlspecialchars($ak, ENT_QUOTES, 'UTF-8') ?>"><input type="text" name="tval[]" value="<?= htmlspecialchars((string) ($editTranslations[$ak] ?? ''), ENT_QUOTES, 'UTF-8') ?>" style="width:100%" placeholder="<?= htmlspecialchars('Çevir: ' . ($trRef[$ak] ?? $ak), ENT_QUOTES, 'UTF-8') ?>"></td>
+                            </tr>
                         <?php endforeach; ?>
-                        <tr><td><input type="text" name="tkey[]" placeholder="ornek: saveButton"></td><td><input type="text" name="tval[]" placeholder="çeviri"></td></tr>
-                        <tr><td><input type="text" name="tkey[]" placeholder="ornek: dashboardLinkLabel"></td><td><input type="text" name="tval[]" placeholder="çeviri"></td></tr>
                     </tbody>
                 </table></div>
                 <div class="form-actions"><button class="primary-button" type="submit">Çevirileri Kaydet</button></div>
