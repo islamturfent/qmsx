@@ -2324,3 +2324,11 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   - **Item 3 (Dashboard rapor entegrasyonu):** Yukaridaki iki metrik grubu Donem
     Ozeti + widget olarak eklendi; review/memnuniyet rapor export'lariyla tutarli.
   - Lint temiz; cache v201.
+- **Kalibrasyon & Metroloji: alet listesine son kalibrasyon ozeti** (cache v202):
+  Modul zaten gecmis (`instrument-calibrations.php`), sertifika dosyasi
+  (storage/calibrations + `qmsInstCalibAttachCert`), rapor export kalibrasyon
+  bolumu (`calibration_list`, `calibration_fail`, cert_number/lab) iceriyordu.
+  Eksik olan gecmis gorunurlugu kapatildi: `instruments.php` alet listesinde her
+  alttin altinda en guncel kalibrasyon kaydi (tarih + sonuc labeli + sertifika no
+  + laboratuvar) gosterilir. `qcmsInstCalibList` kullanilir (yeni
+  `instrument-calibration-functions.php` require). Lint temiz; cache v202.

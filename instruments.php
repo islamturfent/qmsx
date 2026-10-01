@@ -12,6 +12,7 @@ require_once __DIR__ . '/includes/access.php';
 qmsRequirePermission('operations.view');
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/instrument-functions.php';
+require_once __DIR__ . '/includes/instrument-calibration-functions.php';
 
 $userId = (int) ($_SESSION["qms_user_id"] ?? 0);
 $role = qmsCurrentRole();
@@ -88,6 +89,16 @@ if (!in_array($statusFilter, $allowedFilters, true)) {
 }
 $rows = qmsInstrumentList($pdo, $userId, $role, $statusFilter);
 $allRows = qmsInstrumentList($pdo, $userId, $role);
+
+// Son kalibrasyon ozeti: alet basina en guncel kalibrasyon kaydi
+// (tarih, sonuc, sertifika no, laboratuvar) - gecmis derinligi.
+$latestCalib = [];
+foreach (qmsInstCalibList($pdo, $userId, $role) as $kc) {
+    $kid = (int) $kc['instrument_id'];
+    if (!isset($latestCalib[$kid])) {
+        $latestCalib[$kid] = $kc;
+    }
+}
 $activeCount = 0;
 $overdueCount = 0;
 foreach ($allRows as $r) {
@@ -181,6 +192,9 @@ if ($editing) {
                                     <?php else: ?><span class="status-badge <?= $row['status'] === 'active' ? 'status-pill' : '' ?>"><?= htmlspecialchars(qmsInstrumentStatusLabel($row['status']), ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
                                     <?php if ($row['instrument_type']): ?> · <?= htmlspecialchars($row['instrument_type'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?><?php if ($row['location']): ?> · <?= htmlspecialchars($row['location'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?>
                                     <?php if ($row['next_calibration_date']): ?> · sonraki <?= htmlspecialchars((string) $row['next_calibration_date'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?><?= $row['responsible'] ? ' · ' . htmlspecialchars($row['responsible'], ENT_QUOTES, 'UTF-8') : '' ?>
+                                    <?php if (isset($latestCalib[(int) $row['id']])): $lc = $latestCalib[(int) $row['id']]; ?>
+                                        · son kal: <?= htmlspecialchars((string) ($lc['calibration_date'] ?? '—'), ENT_QUOTES, 'UTF-8') ?> (<?= htmlspecialchars(qmsInstCalibResultLabel((string) $lc['result']), ENT_QUOTES, 'UTF-8') ?>)<?= !empty($lc['cert_number']) ? ' · sert #' . htmlspecialchars((string) $lc['cert_number'], ENT_QUOTES, 'UTF-8') : '' ?><?= !empty($lc['lab_name']) ? ' · ' . htmlspecialchars((string) $lc['lab_name'], ENT_QUOTES, 'UTF-8') : '' ?>
+                                    <?php endif; ?>
                                 </span>
                             </div>
                             <div class="list-item-side">
