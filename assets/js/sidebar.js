@@ -95,6 +95,35 @@ if (notificationState && topbarActions && languageButton) {
     foot.textContent = "Tümünü Gör";
     panel.appendChild(foot);
 
+    // Tümünü Okundu Işaretle (hizli aksiyon) - panelde.
+    if (unreadCount > 0) {
+        const markAllBtn = document.createElement("button");
+        markAllBtn.type = "button";
+        markAllBtn.className = "notification-panel-footer notification-panel-markall";
+        markAllBtn.setAttribute("data-i18n", "markAllReadButton");
+        markAllBtn.textContent = "Tümünü Okundu ";
+        markAllBtn.addEventListener("click", function () {
+            const body = new URLSearchParams();
+            body.set("form_type", "mark_all_read");
+            body.set("csrf", notificationState.dataset.csrf || "");
+            fetch("notifications.php", {
+                method: "POST",
+                body: body,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            }).then(function () {
+                bellBtn.classList.add("is-empty");
+                bellBtn.classList.remove("has-notifications");
+                const badge = bellBtn.querySelector(".notification-bell-count");
+                if (badge) badge.textContent = "0";
+                list.querySelectorAll(".notification-panel-item").forEach(function (it) {
+                    it.classList.add("is-read");
+                });
+                if (markAllBtn.parentNode) markAllBtn.parentNode.removeChild(markAllBtn);
+            }).catch(function () {});
+        });
+        panel.insertBefore(markAllBtn, foot);
+    }
+
     bellBtn.addEventListener("click", function (event) {
         event.stopPropagation();
         panel.hidden = !panel.hidden;

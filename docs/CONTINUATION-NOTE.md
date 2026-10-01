@@ -2365,3 +2365,20 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
      grubuna "İç Anket Yanıt" + "İç Memnuniyet" metrikleri (qmsInternalSurveyList,
      yeni require).
   - Lint temiz; cache v204.
+  ----
+- **Hepsi sirayla: bildirim/sozlesme/GGR-widget/yeni yuzey** (cache v205):
+  1. **Bildirim okundu akisi guclendirme:** header bildirim paneline (sidebar.js)
+     "Tumunu Okundu Işaretle" hizli aksiyonu; `include/app-sidebar.php`'e
+     notify csrf token (data-csrf) eklendi (fetch POST mark_all_read). Zil ile
+     merkezde okundu/mark_all zaten vardi; panel aksiyonu eklendi.
+  2. **Musteri Sozlesmeleri derinlesme:** dogrulandi - coklu dosya yukleme
+     (attachment_files[] + qmsContractAddAttachments) + indirme gorunumu mevcut;
+     kod degisikligi gerekmedi.
+  3. **Yonetimin Gozden Gecirmesi widget:** dashboard'a son GGR kayitlari
+     listesi (baslik/sirket/tarih/kalem adedi + durum pill, review-detail baglanti).
+     i18n `dashboardReviewWidget*`, `dashboardReviewEmpty`.
+  4. **Yeni yuzey - Son Etkinlik:** dashboard'a son denetim izi kayitlari
+     widget'i (entity + action labeli, ozet, aktor/zaman), audit-trail baglanti.
+     i18n `dashboardAuditLog*`. (Yeni include audit-log-functions + review-functions.)
+  5. **Gorsel tur:** kullaniciya birakildi; düzeltme gerektiren yere gore yapilacak.
+  - Lint temiz; cache v205.

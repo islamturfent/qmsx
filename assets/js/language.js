@@ -3502,6 +3502,9 @@ Object.assign(translations.tr, {
   dashboardAuditTitle: "Denetim & Rapor Durumu", dashboardAuditText: "Devam eden denetimler ve rapor durumu.",
   dashboardCoqTitle: "Kalite Maliyeti", dashboardMetroTitle: "Kalibrasyon & Metroloji",
   dashboardReviewTitle: "Yönetimin Gözden Geçirmesi",
+  dashboardReviewWidgetTitle: "Yönetimin Gözden Geçirmesi", dashboardReviewWidgetText: "Son yönetim gözden geçirme kayıtları ve durumları.",
+  dashboardReviewEmpty: "Henüz gözden geçirme kaydı yok.",
+  dashboardAuditLogTitle: "Son Etkinlik", dashboardAuditLogText: "Denetim izine yazılan son hareketler.", dashboardAuditLogEmpty: "Henüz denetim izi kaydı yok.",
   dashboardSatisfactionTitle: "Müşteri Memnuniyeti", dashboardSatisfactionText: "En güncel memnuniyet anketlerinin ortalama puanı.",
   satisfactionEmpty: "Henüz müşteri memnuniyeti anketi yok.",
 });
@@ -3511,6 +3514,9 @@ Object.assign(translations.en, {
   dashboardAuditTitle: "Audit & Report Status", dashboardAuditText: "Ongoing audits and report status.",
   dashboardCoqTitle: "Cost of Quality", dashboardMetroTitle: "Calibration & Metrology",
   dashboardReviewTitle: "Management Review",
+  dashboardReviewWidgetTitle: "Management Review", dashboardReviewWidgetText: "Recent management review records and their status.",
+  dashboardReviewEmpty: "No management review records yet.",
+  dashboardAuditLogTitle: "Recent Activity", dashboardAuditLogText: "Latest actions written to the audit trail.", dashboardAuditLogEmpty: "No audit trail records yet.",
   dashboardSatisfactionTitle: "Customer Satisfaction", dashboardSatisfactionText: "Average score of the most recent satisfaction surveys.",
   satisfactionEmpty: "No customer satisfaction surveys yet.",
 });

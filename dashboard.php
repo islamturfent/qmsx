@@ -48,6 +48,8 @@ require_once __DIR__ . '/includes/incident-functions.php';
 require_once __DIR__ . '/includes/contract-functions.php';
 require_once __DIR__ . '/includes/satisfaction-functions.php';
 require_once __DIR__ . '/includes/internal-survey-functions.php';
+require_once __DIR__ . '/includes/review-functions.php';
+require_once __DIR__ . '/includes/audit-log-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
@@ -188,6 +190,14 @@ foreach ($internalSurveys as $is) {
     }
 }
 $internalAvgRating = $internalRatingCount > 0 ? round($internalRatingSum / $internalRatingCount, 1) : 0;
+
+// Yonetimin gozden gecirmesi widget'i (son kayitlar).
+$dashboardReviews = array_slice(qmsReviewList($pdo, $userId, qmsCurrentRole()), 0, 5);
+
+// Son etkinlik (denetim izi) widget'i.
+$dashboardAuditLog = array_slice(qmsAuditLogList($pdo, $userId, qmsCurrentRole(), ['limit' => 6]), 0, 6);
+$auditEntityLabels = qmsAuditLogEntityLabels();
+$auditActionLabels = qmsAuditLogActionLabels();
 
 // Denetim & rapor durumu (sirket scope).
 $dashOpenAudits = $scopedCount("SELECT COUNT(*) FROM audits WHERE active=1 AND status IN ('planned','in_progress')" . $scopeClause);
@@ -410,6 +420,56 @@ $activeNav = "dashboard";
                                 <span><?= htmlspecialchars((string) $sv['company_name'] . ' · yanıt: ' . (int) $sv['response_count'], ENT_QUOTES, 'UTF-8') ?></span>
                             </div>
                             <div class="list-item-side"><span class="status-pill"><?= $sv['avg_score'] !== null ? (float) $sv['avg_score'] . '/5' : '—' ?></span></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardReviewWidgetTitle">Yönetimin Gözden Geçirmesi</h3>
+                    <p data-i18n="dashboardReviewWidgetText">Son yönetim gözden geçirme kayıtları ve durumları.</p>
+                </div>
+                <a class="secondary-button" href="reviews.php" data-i18n="reviewsTitle">Tümü</a>
+            </div>
+            <?php if (!$dashboardReviews): $reviewStatusLabels = qmsReviewStatusLabels(); ?>
+                <div class="empty-state" data-i18n="dashboardReviewEmpty">Henüz gözden geçirme kaydı yok.</div>
+            <?php else: $reviewStatusLabels = qmsReviewStatusLabels(); ?>
+                <div class="admin-list">
+                    <?php foreach ($dashboardReviews as $rv): ?>
+                        <div class="admin-list-item">
+                            <div class="list-item-main">
+                                <strong><a href="review-detail.php?id=<?= (int) $rv['id'] ?>"><?= htmlspecialchars((string) $rv['title'], ENT_QUOTES, 'UTF-8') ?></a></strong>
+                                <span><?= htmlspecialchars((string) $rv['company_name'] . ' · ' . (string) $rv['review_date'] . ' · ' . (string) ($rv['item_count'] ?? 0) . ' kalem', ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="list-item-side"><span class="status-pill"><?= htmlspecialchars((string) ($reviewStatusLabels[$rv['status']] ?? $rv['status']), ENT_QUOTES, 'UTF-8') ?></span></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardAuditLogTitle">Son Etkinlik</h3>
+                    <p data-i18n="dashboardAuditLogText">Denetim izine yazılan son hareketler.</p>
+                </div>
+                <a class="secondary-button" href="audit-trail.php" data-i18n="auditTrailMenuLabel">Denetim İzi</a>
+            </div>
+            <?php if (!$dashboardAuditLog): ?>
+                <div class="empty-state" data-i18n="dashboardAuditLogEmpty">Henüz denetim izi kaydı yok.</div>
+            <?php else: ?>
+                <div class="admin-list">
+                    <?php foreach ($dashboardAuditLog as $al): ?>
+                        <div class="admin-list-item">
+                            <div class="list-item-main">
+                                <strong><?= htmlspecialchars((string) ($auditEntityLabels[$al['entity_type']] ?? $al['entity_type']), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars((string) ($auditActionLabels[$al['action']] ?? $al['action']), ENT_QUOTES, 'UTF-8') ?></strong>
+                                <span><?= htmlspecialchars(mb_substr((string) $al['summary'], 0, 120), ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="list-item-side"><span class="muted-color"><?= htmlspecialchars((string) ($al['actor_name'] ?? 'Sistem') . ' · ' . date('d.m H:i', strtotime((string) $al['created_at'])), ENT_QUOTES, 'UTF-8') ?></span></div>
                         </div>
                     <?php endforeach; ?>
                 </div>

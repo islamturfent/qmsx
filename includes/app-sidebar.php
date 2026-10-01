@@ -2,6 +2,7 @@
 
 // RBAC servisi: menü öğelerini cari kullanıcı iznine göre gizler.
 require_once __DIR__ . '/access.php';
+require_once __DIR__ . '/csrf.php';
 
 if (!function_exists('qmsSidebarVisible')) {
     function qmsSidebarVisible(string $action): bool
@@ -43,7 +44,7 @@ require_once __DIR__ . '/app-ui.php';
 ?>
 
 <button class="sidebar-mobile-toggle" id="sidebarToggle" type="button" aria-label="Menüyü aç veya kapat">☰</button>
-<span id="qmsNotificationState" data-count="<?= $sidebarUnreadCount ?>" hidden></span>
+<span id="qmsNotificationState" data-count="<?= $sidebarUnreadCount ?>" data-csrf="<?= htmlspecialchars(qmsCsrfToken('notifications'), ENT_QUOTES, 'UTF-8') ?>" hidden></span>
 <span id="qmsNotificationIcon" hidden><?= appIcon("notifications", "") ?></span>
 <?php
 $headerUserName = (string) ($_SESSION["qms_full_name"] ?? ($_SESSION["qms_username"] ?? ""));
