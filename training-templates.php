@@ -125,10 +125,13 @@ $activeNav = "training_templates";
         </div>
     </header>
     <main class="page-container">
-        <section class="page-heading">
-            <span class="section-kicker" data-i18n="trainingTemplatesKicker">Eğitim Yönetimi</span>
-            <h1 data-i18n="trainingTemplatesTitle">Eğitim Şablonları</h1>
-            <p data-i18n="trainingTemplatesText">Tekrar kullanılacak eğitim tanımlarını burada saklayın.</p>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="trainingTemplatesKicker">Eğitim Yönetimi</span>
+                <h1 data-i18n="trainingTemplatesTitle">Eğitim Şablonları</h1>
+                <p data-i18n="trainingTemplatesText">Tekrar kullanılacak eğitim tanımlarını burada saklayın.</p>
+            </div>
+            <a class="primary-button" href="training-create.php" data-i18n="trainingCreateFromTemplateButton">Eğitim Oluştur</a>
         </section>
 
         <?php if ($formSuccess !== ''): ?>
