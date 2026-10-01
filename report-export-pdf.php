@@ -20,6 +20,13 @@ require_once __DIR__ . '/lib/dompdf/autoload.inc.php';
 $sysCfgCompany = trim(qmsSetting('report_company_name'));
 $sysCfgFooter = trim(qmsSetting('report_footer'));
 $sysCfgConf = qmsSetting('report_confidential') === '1';
+// K) Rapor logosu.
+$sysCfgLogoPath = trim(qmsSetting('report_logo'));
+$sysLogoHtml = '';
+if ($sysCfgLogoPath !== '' && is_file(__DIR__ . '/' . $sysCfgLogoPath)) {
+    $mime = function_exists('mime_content_type') ? mime_content_type(__DIR__ . '/' . $sysCfgLogoPath) : 'image/png';
+    $sysLogoHtml = '<img src="data:' . $mime . ';base64,' . base64_encode((string) file_get_contents(__DIR__ . '/' . $sysCfgLogoPath)) . '" style="max-height:44px;max-width:160px;margin-bottom:4px">';
+}
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -330,6 +337,7 @@ $html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><style>
     .two-column td { width: 50%; vertical-align: top; }
     .footer { margin-top: 18px; color: #98a2b3; font-size: 8px; text-align: right; }
     </style></head><body>
+    ' . $sysLogoHtml . '
     <h1>QuAmi Yönetim Raporu' . ($sysCfgCompany !== '' ? ' &middot; ' . $escape($sysCfgCompany) : '') . '</h1>
     <div class="meta"><strong>Şirket:</strong> ' . $escape($report['company_name'])
     . ' &nbsp; | &nbsp; <strong>Dönem:</strong> ' . $escape($report['start_date']) . ' - ' . $escape($report['end_date'])

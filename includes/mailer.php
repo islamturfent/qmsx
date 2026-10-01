@@ -150,13 +150,19 @@ function qmsMailSend(string $to, ?string $toName, string $subject, string $htmlB
  */
 function qmsMailNotificationContent(string $title, string $message, ?string $linkUrl, ?string $category = null): array
 {
+    require_once __DIR__ . '/settings-functions.php';
     $cfg = qmsMailConfig();
+    $sysApp = trim(qmsSetting('app_name', 'QuAmi'));
+    $mailPrefix = trim(qmsSetting('mail_subject_prefix'));
+    $mailSignature = trim(qmsSetting('mail_signature'));
+    $subject = $mailPrefix !== '' ? $mailPrefix . ' ' . $title : $title;
+    $appNameEsc = htmlspecialchars($sysApp, ENT_QUOTES, 'UTF-8');
     $base = rtrim((string) ($cfg['base_url'] ?? ''), '/');
     $appHome = $base !== '' ? $base . '/dashboard.php' : '';
 
     $html = '<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef0f5;padding:28px 16px;font-family:Arial,Helvetica,sans-serif">'
         . '<tr><td align="center"><div style="max-width:560px;width:100%;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e4e7ec;box-shadow:0 4px 14px rgba(16,24,40,0.06)">'
-        . '<div style="background:#466cf5;color:#ffffff;padding:20px 28px;font-size:17px;font-weight:bold">QuAmi <span style="font-weight:400;opacity:.85">· Bildirim</span></div>'
+        . '<div style="background:#466cf5;color:#ffffff;padding:20px 28px;font-size:17px;font-weight:bold">' . $appNameEsc . ' <span style="font-weight:400;opacity:.85">· Bildirim</span></div>'
         . '<div style="padding:24px 28px">'
         . ($category !== null && $category !== '' ? '<span style="display:inline-block;background:#eef2ff;color:#3538cd;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;margin-bottom:12px">' . htmlspecialchars($category, ENT_QUOTES, 'UTF-8') . '</span>' : '')
         . '<h2 style="color:#101828;margin:0 0 10px;font-size:19px">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</h2>'
@@ -164,10 +170,12 @@ function qmsMailNotificationContent(string $title, string $message, ?string $lin
         . ($linkUrl ? '<p style="margin:20px 0 0"><a href="' . htmlspecialchars($linkUrl, ENT_QUOTES, 'UTF-8') . '" style="background:#466cf5;color:#ffffff;text-decoration:none;padding:11px 20px;border-radius:8px;display:inline-block;font-weight:600">Kaydı Aç</a></p>' : '')
         . '</div>'
         . '<div style="border-top:1px solid #eef0f5;padding:14px 28px;color:#98a2b3;font-size:11px">'
-        . 'Bu mesaj QuAmi tarafından otomatik gönderilmiştir.'
+        . 'Bu mesaj ' . $appNameEsc . ' tarafından otomatik gönderilmiştir.'
         . ($appHome !== '' ? ' · <a href="' . htmlspecialchars($appHome, ENT_QUOTES, 'UTF-8') . '" style="color:#98a2b3">Uygulamayı Aç</a>' : '')
+        . ($mailSignature !== '' ? ' · ' . htmlspecialchars($mailSignature, ENT_QUOTES, 'UTF-8') : '')
         . '</div>'
         . '</div></td></tr></table>';
 
-    return ['subject' => $title, 'html' => $html, 'plain' => $title . "\n\n" . $message . ($linkUrl ? "\n\nKaydı aç: " . $linkUrl : '')];
+    $plain = $subject . "\n\n" . $message . ($linkUrl ? "\n\nKaydı aç: " . $linkUrl : '') . ($mailSignature !== '' ? "\n\n" . $mailSignature : '');
+    return ['subject' => $subject, 'html' => $html, 'plain' => $plain];
 }

@@ -2478,3 +2478,17 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   - **I (Marka/gorunum):** app_name + login_title; login.php baslik/logo/login
     basligi bu ayarlardan gelir.
   - i18n TR/EN eklendi. Lint temiz; cache v208.
+  ----
+- **Sistem Yonetimi K/L/M/N** (cache v209):
+  - **K (Rapor logosu):** `report_logo` ayari; system-settings C bolumunde logo
+    yukleme/kaldirma (storage/logos); report-export-pdf.php basliginda data-URI
+    img olarak gosterilir.
+  - **L (Yeni hesap varsayilanlari):** default_user_lang, default_user_theme,
+    default_notifications_enabled; app-sidebar qmsServerDefaults bu degerleri
+    onceler (yeni kullanici fallback).
+  - **M (Denetim izi arsiv):** system-settings H bolumunde "Arsivle + Temizle"
+    butonu - retention oncesi eski audit_log kayitlarini JSON indirir ve siler.
+  - **N (E-posta sablon metni):** mail_subject_prefix, mail_signature;
+    includes/mailer.php qmsMailNotificationContent konu oneki + imza + uygulama
+    adi kullanir (subject/plain/html).
+  - i18n TR/EN eklendi. Lint temiz; cache v209.

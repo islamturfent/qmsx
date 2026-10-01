@@ -41,6 +41,15 @@ const QMS_SETTINGS_DEFAULTS = [
     // I) Marka / gorunum
     'app_name' => 'QuAmi',
     'login_title' => 'Kalite Yönetim Sistemi',
+    // K) Rapor markası (kaydedilmis logo dosya yolu)
+    'report_logo' => '',
+    // L) Yeni hesap varsayilanlari
+    'default_user_lang' => 'tr',
+    'default_user_theme' => 'light',
+    'default_notifications_enabled' => '1',
+    // N) E-posta sablon metni
+    'mail_subject_prefix' => '',
+    'mail_signature' => '',
 ];
 
 /** @return array<string, string> Birlesmis sistem ayarlari (default + DB override). */

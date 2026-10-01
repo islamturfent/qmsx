@@ -47,7 +47,7 @@ require_once __DIR__ . '/app-ui.php';
 
 <button class="sidebar-mobile-toggle" id="sidebarToggle" type="button" aria-label="Menüyü aç veya kapat">☰</button>
 <span id="qmsNotificationState" data-count="<?= $sidebarUnreadCount ?>" data-csrf="<?= htmlspecialchars(qmsCsrfToken('notifications'), ENT_QUOTES, 'UTF-8') ?>" hidden></span>
-<span id="qmsServerDefaults" data-theme="<?= htmlspecialchars((string) ($_qmsSys['default_theme'] ?? 'light'), ENT_QUOTES, 'UTF-8') ?>" data-lang="<?= htmlspecialchars((string) ($_qmsSys['default_lang'] ?? 'tr'), ENT_QUOTES, 'UTF-8') ?>" hidden></span>
+<span id="qmsServerDefaults" data-theme="<?= htmlspecialchars((string) ($_qmsSys['default_user_theme'] ?? $_qmsSys['default_theme'] ?? 'light'), ENT_QUOTES, 'UTF-8') ?>" data-lang="<?= htmlspecialchars((string) ($_qmsSys['default_user_lang'] ?? $_qmsSys['default_lang'] ?? 'tr'), ENT_QUOTES, 'UTF-8') ?>" hidden></span>
 <span id="qmsNotificationIcon" hidden><?= appIcon("notifications", "") ?></span>
 <?php
 $headerUserName = (string) ($_SESSION["qms_full_name"] ?? ($_SESSION["qms_username"] ?? ""));

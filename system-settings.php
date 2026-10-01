@@ -50,10 +50,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // I) Marka
             'app_name' => trim((string) ($_POST["app_name"] ?? 'QuAmi')),
             'login_title' => trim((string) ($_POST["login_title"] ?? '')),
-            // (D e-posta ayarlari mail-settings.php sayfasinda yonetilir)
+            // L) Yeni hesap varsayilanlari
+            'default_user_lang' => in_array((string) ($_POST["default_user_lang"] ?? 'tr'), ['tr', 'en'], true) ? (string) $_POST["default_user_lang"] : 'tr',
+            'default_user_theme' => in_array((string) ($_POST["default_user_theme"] ?? 'light'), ['light', 'dark'], true) ? (string) $_POST["default_user_theme"] : 'light',
+            'default_notifications_enabled' => !empty($_POST["default_notifications_enabled"]) ? '1' : '0',
+            // N) E-posta sablon metni
+            'mail_subject_prefix' => trim((string) ($_POST["mail_subject_prefix"] ?? '')),
+            'mail_signature' => trim((string) ($_POST["mail_signature"] ?? '')),
         ];
+        // K) Rapor logosu yukleme / kaldirma.
+        if (!empty($_POST["report_logo_remove"]) && $_POST["report_logo_remove"] === '1') {
+            $values['report_logo'] = '';
+        } elseif (!empty($_FILES['report_logo']['tmp_name']) && is_uploaded_file($_FILES['report_logo']['tmp_name'])) {
+            $logoExt = strtolower(pathinfo((string) $_FILES['report_logo']['name'], PATHINFO_EXTENSION));
+            if (in_array($logoExt, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'], true)) {
+                $logoName = 'logo-' . bin2hex(random_bytes(8)) . '.' . $logoExt;
+                $logoPath = __DIR__ . '/storage/logos/' . $logoName;
+                if (@move_uploaded_file($_FILES['report_logo']['tmp_name'], $logoPath)) {
+                    $values['report_logo'] = 'storage/logos/' . $logoName;
+                }
+            }
+        }
         $bad = qmsSettingsSave($pdo, $values, $userId);
         $formOk = $bad === [] ? 'Sistem ayarları kaydedildi.' : 'Bazı anahtarlar tanınmadı: ' . implode(', ', $bad);
+    } elseif ($action === 'archive_audit') {
+        // M) Denetim izi arsivle (retention oncesini).
+        $retention = (int) qmsSetting('audit_retention_days', '365');
+        $cutoff = date('Y-m-d H:i:s', strtotime('-' . $retention . ' days'));
+        $sel = $pdo->prepare('SELECT * FROM audit_log WHERE created_at < ? ORDER BY id ASC');
+        $sel->execute([$cutoff]);
+        $rows = $sel->fetchAll(PDO::FETCH_ASSOC);
+        if ($rows) {
+            $del = $pdo->prepare('DELETE FROM audit_log WHERE created_at < ?');
+            $del->execute([$cutoff]);
+            $filename = 'audit-archive-' . date('Ymd-His') . '.json';
+            header('Content-Type: application/json; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            echo json_encode(['archived' => count($rows), 'retention_days' => $retention, 'records' => $rows], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+        $formOk = 'Arşivlenecek eski denetim izi kaydı yok.';
     } elseif ($action === 'purge_audit') {
         // H) Denetim izi saklama: sureyi asan eski kayitlari temizle (onayli).
         $retention = (int) qmsSetting('audit_retention_days', '365');
@@ -90,7 +126,7 @@ $activeNav = "system_settings";
         <?php if ($formError !== ""): ?><div class="form-message error"><?= htmlspecialchars($formError, ENT_QUOTES, "UTF-8") ?></div><?php endif; ?>
         <?php if ($formOk !== ""): ?><div class="form-message success"><?= htmlspecialchars($formOk, ENT_QUOTES, "UTF-8") ?></div><?php endif; ?>
 
-        <form method="post" action="system-settings.php">
+        <form method="post" action="system-settings.php" enctype="multipart/form-data">
             <?= qmsCsrfField($csrfScope) ?>
             <input type="hidden" name="action" value="save">
 
@@ -119,6 +155,7 @@ $activeNav = "system_settings";
                     <label class="form-field"><span data-i18n="reportCompanyNameLabel">Rapor Şirket Adı</span><input type="text" name="report_company_name" maxlength="160" value="<?= htmlspecialchars((string) $settings['report_company_name'], ENT_QUOTES, "UTF-8") ?>" placeholder="örn. ACME Kalite A.Ş."></label>
                     <label class="form-field"><span data-i18n="reportFooterLabel">Rapor Alt Not</span><input type="text" name="report_footer" maxlength="255" value="<?= htmlspecialchars((string) $settings['report_footer'], ENT_QUOTES, "UTF-8") ?>"></label>
                     <label class="form-field form-field-wide"><span data-i18n="reportConfidentialLabel">Gizlilik Notu Ekle</span><label class="toggle-field"><input type="checkbox" name="report_confidential" value="1" <?= $settings['report_confidential'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
+                    <label class="form-field form-field-wide"><span data-i18n="reportLogoLabel">Rapor Logosu</span><input type="file" name="report_logo" accept="image/png,image/jpeg,image/svg+xml,image/gif,image/webp"><?php if (!empty($settings['report_logo'])): ?><small>Mevcut: <?= htmlspecialchars((string) $settings['report_logo'], ENT_QUOTES, "UTF-8") ?></small> <label class="toggle-field"><input type="checkbox" name="report_logo_remove" value="1"><span class="toggle-slider"></span></label> Logo kaldır<?php endif; ?></label>
                 </div>
             </section>
 
@@ -157,6 +194,23 @@ $activeNav = "system_settings";
                 </div>
             </section>
 
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsNewAcctTitle">L · Yeni Hesap Varsayılanları</h3><p data-i18n="systemSettingsNewAcctText">Yeni kullanıcıların başlangıç dili/teması ve bildirim varsayılanı.</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field"><span data-i18n="defaultUserLangLabel">Varsayılan Dil</span><select name="default_user_lang"><option value="tr" <?= $settings['default_user_lang'] === 'tr' ? 'selected' : '' ?>>Türkçe</option><option value="en" <?= $settings['default_user_lang'] === 'en' ? 'selected' : '' ?>>English</option></select></label>
+                    <label class="form-field"><span data-i18n="defaultUserThemeLabel">Varsayılan Tema</span><select name="default_user_theme"><option value="light" <?= $settings['default_user_theme'] === 'light' ? 'selected' : '' ?>>Açık</option><option value="dark" <?= $settings['default_user_theme'] === 'dark' ? 'selected' : '' ?>>Koyu</option></select></label>
+                    <label class="form-field form-field-wide"><span data-i18n="defaultNotificationsLabel">E-posta Bildirimleri</span><label class="toggle-field"><input type="checkbox" name="default_notifications_enabled" value="1" <?= $settings['default_notifications_enabled'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
+                </div>
+            </section>
+
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsMailTextTitle">N · E-posta Şablon Metni</h3><p data-i18n="systemSettingsMailTextText">Bildirim e-postalarının konu öneki ve imzası.</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field"><span data-i18n="mailSubjectPrefixLabel">Konu Öneki</span><input type="text" name="mail_subject_prefix" maxlength="60" value="<?= htmlspecialchars((string) $settings['mail_subject_prefix'], ENT_QUOTES, "UTF-8") ?>" placeholder="örn. [QMS]"></label>
+                    <label class="form-field form-field-wide"><span data-i18n="mailSignatureLabel">İmza</span><input type="text" name="mail_signature" maxlength="160" value="<?= htmlspecialchars((string) $settings['mail_signature'], ENT_QUOTES, "UTF-8") ?>"></label>
+                </div>
+            </section>
+
             <div class="form-actions" style="margin-top:20px;">
                 <button class="primary-button" type="submit" data-i18n="saveButton">Kaydet</button>
             </div>
@@ -164,11 +218,18 @@ $activeNav = "system_settings";
 
         <section class="page-section console-card">
             <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsRetentionTitle">H · Veri Saklama / Temizlik</h3><p data-i18n="systemSettingsRetentionText">Denetim izi, saklama süresini aşan eski kayıtları temizler (onaylı).</p></div></div>
+            <div class="two-col">
             <form method="post" action="system-settings.php" onsubmit="return confirm('Eski denetim izi kayıtları silinsin mi?');">
                 <?= qmsCsrfField($csrfScope) ?>
                 <input type="hidden" name="action" value="purge_audit">
                 <div class="form-actions"><button class="danger-button" type="submit" data-i18n="purgeAuditButton">Denetim İzi Temizle</button></div>
             </form>
+            <form method="post" action="system-settings.php">
+                <?= qmsCsrfField($csrfScope) ?>
+                <input type="hidden" name="action" value="archive_audit">
+                <div class="form-actions"><button class="secondary-button" type="submit" data-i18n="archiveAuditButton">Arşivle + Temizle (JSON)</button></div>
+            </form>
+            </div>
         </section>
     </main>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>
