@@ -164,7 +164,7 @@ $activeNav = "system_settings";
                 </div>
             </section>
 
-            <div class="form-actions">
+            <div class="form-actions" style="margin-top:20px;">
                 <button class="primary-button" type="submit" data-i18n="saveButton">Kaydet</button>
             </div>
         </form>
