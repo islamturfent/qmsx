@@ -2284,3 +2284,10 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     getirir; her satir icin "Vadesi gecti"/"Yaklasan vade" durum rozeti ve baslik
     "Yetkinlik Vadesi (Yaklasan/Gecen)" olarak guncellendi. i18n guncellendi.
   - Lint temiz; cache v196.
+- **AI sessle komut guclendirme: otomatik uretim** (cache v197):
+  `ai-document-studio.php` sesli komut ayristirici artik tetikleyici kelime
+  algilayinca ("uret", "olustur", "basla", "tamam"...) formu otomatik
+  gonderir (submitGenerate). Kelime siniri kontrolu Turkce harflerle yapilir;
+  "uretim" gibi sozcuklerin parcasiysa tetiklenmez. Surekli dinlemede son
+  sonuc (isFinal) tespit edilince `parseVoice` ile tur/baslik islenir, sonra
+  generate formu otomatik submit edilir. Lint temiz; cache v197.

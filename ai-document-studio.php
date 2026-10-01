@@ -277,11 +277,29 @@ $templateTypes = qmsDocumentTemplateTypeLabels();
         var titleInput = document.getElementById("aiTitle");
         var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        // B) Sesli komut ayrıştırıcı: tür + başlık + açıklama.
+        // B) Sesli komut ayrıştırıcı: tür + başlık + açıklama + otomatik üretim.
         var typeMap = { "politika":"policy", "prosedür":"procedure", "prosedur":"procedure", "proses":"procedure",
             "talimat":"instruction", "yönerge":"guideline", "yonerge":"guideline", "kılavuz":"guideline",
             "form":"form", "kayıt formu":"form", "plan":"plan", "kontrol listesi":"checklist",
             "checklist":"checklist", "şartname":"specification", "sartname":"specification", "rapor":"report" };
+        var submitted = false;
+        // Komut tetikleyici kelimeler. 'üretim' gibi sözcüklerin parçasıysa
+        // tetiklenmez (Türkçe harflerle kelime sınırı kontrolü).
+        function isTriggerWord(lower) {
+            var triggers = ["üret", "uret", "oluştur", "olustur", "üretin", "uretin", "başlat", "baslat", "başla", "basla", "tamam"];
+            for (var i = 0; i < triggers.length; i++) {
+                var re = new RegExp("(^|[^a-zçğıöşü])" + triggers[i] + "([^a-zçğıöşü]|$)", "i");
+                if (re.test(lower)) return true;
+            }
+            return false;
+        }
+        function submitGenerate() {
+            var hidden = document.querySelector('form input[name="form_type"][value="generate"]');
+            if (!hidden) return false;
+            var form = hidden.closest('form');
+            if (form) { form.submit(); return true; }
+            return false;
+        }
         function parseVoice(t) {
             if (!typeSelect) return;
             var lower = t.toLowerCase();
@@ -310,18 +328,31 @@ $templateTypes = qmsDocumentTemplateTypeLabels();
             prompt.focus();
             try { rec.start(); } catch (e) { }
         });
-        rec.onstart = function () { active = true; voiceBtn.classList.add("is-listening"); if (status) status.textContent = "Dinleniyor... konuşun. Bitirince tekrar tıklayın."; };
+        rec.onstart = function () { active = true; voiceBtn.classList.add("is-listening"); if (status) status.textContent = "Dinleniyor... konuşun. Bitirince 'üret' deyin."; };
         rec.onend = function () {
             active = false;
             voiceBtn.classList.remove("is-listening");
-            if (status) { status.textContent = "Komut algılandı; tür/başlık otomatik işlendi. Düzenleyip Taslağı Üret deyin."; }
             if (prompt.value) { parseVoice(prompt.value); }
+            if (status && !submitted) { status.textContent = "Komut algılandı; tür/başlık otomatik işlendi. 'üret' dediyseniz taslak üretilir."; }
         };
         rec.onerror = function (e) { if (status) status.textContent = "Ses hatası: " + (e.error || ""); voiceBtn.classList.remove("is-listening"); };
         rec.onresult = function (e) {
+            if (submitted) return;
             var transcript = "";
-            for (var i = e.resultIndex; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+            var sawFinal = false;
+            for (var i = e.resultIndex; i < e.results.length; i++) {
+                transcript += e.results[i][0].transcript;
+                if (e.results[i].isFinal) sawFinal = true;
+            }
             prompt.value = transcript;
+            // Kullanıcı 'üret/oluştur/tamam' dediğinde otomatik üret.
+            if (sawFinal && isTriggerWord(transcript)) {
+                submitted = true;
+                parseVoice(transcript);
+                if (status) status.textContent = "Üretiliyor...";
+                try { rec.stop(); } catch (err) { }
+                submitGenerate();
+            }
         };
     })();
 
