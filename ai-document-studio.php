@@ -120,7 +120,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $pdo->prepare("UPDATE documents SET current_revision = '01' WHERE id = ?")->execute([$docId]);
                 $pdo->commit();
                 $transferredId = $docId;
-                header("Location: document-detail.php?id=" . $docId . "&created=1");
+                // Taslak birinci revizyon olarak kaydedildikten sonra kullaniciyi
+                // dogrudan Web Dokuman Editoru'ne gotur (icerigi burada duzenler).
+                header("Location: document-edit.php?id=" . $docId);
                 exit;
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) {

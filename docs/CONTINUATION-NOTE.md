@@ -2291,3 +2291,8 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   "uretim" gibi sozcuklerin parcasiysa tetiklenmez. Surekli dinlemede son
   sonuc (isFinal) tespit edilince `parseVoice` ile tur/baslik islenir, sonra
   generate formu otomatik submit edilir. Lint temiz; cache v197.
+- **AI Studyo: transfer sonrasi Web Editor'e yonlendirme** (cache v198):
+  `ai-document-studio.php` transfer akisi (dokumana aktar) artik kullaniciyi
+  `document-detail.php` yerine dogrudan `document-edit.php?id=NEW` (Web Dokuman
+  Editoru) acar; draft statusuyle HTML icerik textarea + TinyMCE ile duzenlenebilir
+  sekilde yuklenir, kayit yeni revizyon olusturur. Lint temiz; cache v198.
