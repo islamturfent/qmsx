@@ -98,7 +98,7 @@ $activeNav = "system_settings";
                 <div class="form-grid">
                     <label class="form-field"><span data-i18n="reportCompanyNameLabel">Rapor Şirket Adı</span><input type="text" name="report_company_name" maxlength="160" value="<?= htmlspecialchars((string) $settings['report_company_name'], ENT_QUOTES, "UTF-8") ?>" placeholder="örn. ACME Kalite A.Ş."></label>
                     <label class="form-field"><span data-i18n="reportFooterLabel">Rapor Alt Not</span><input type="text" name="report_footer" maxlength="255" value="<?= htmlspecialchars((string) $settings['report_footer'], ENT_QUOTES, "UTF-8") ?>"></label>
-                    <label class="form-field form-field-wide"><span data-i18n="reportConfidentialLabel">Gizlilik Notu Ekle</span><label class="toggle-switch"><input type="checkbox" name="report_confidential" value="1" <?= $settings['report_confidential'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
+                    <label class="form-field form-field-wide"><span data-i18n="reportConfidentialLabel">Gizlilik Notu Ekle</span><label class="toggle-field"><input type="checkbox" name="report_confidential" value="1" <?= $settings['report_confidential'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
                 </div>
             </section>
 
@@ -114,7 +114,7 @@ $activeNav = "system_settings";
                 <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsSecurityTitle">E · Güvenlik</h3><p data-i18n="systemSettingsSecurityText">Şifre politikası ve 2FA bayrağı.</p></div></div>
                 <div class="form-grid">
                     <label class="form-field"><span data-i18n="passwordMinLengthLabel">Minimum Şifre Uzunluğu</span><input type="number" min="6" max="64" name="password_min_length" value="<?= (int) $settings['password_min_length'] ?>"></label>
-                    <label class="form-field"><span data-i18n="twofaRequiredLabel">2FA Gerekli (kademeli)</span><label class="toggle-switch"><input type="checkbox" name="twofa_required" value="1" <?= $settings['twofa_required'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
+                    <label class="form-field"><span data-i18n="twofaRequiredLabel">2FA Gerekli (kademeli)</span><label class="toggle-field"><input type="checkbox" name="twofa_required" value="1" <?= $settings['twofa_required'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
                 </div>
             </section>
 
