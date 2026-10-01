@@ -2296,3 +2296,13 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   `document-detail.php` yerine dogrudan `document-edit.php?id=NEW` (Web Dokuman
   Editoru) acar; draft statusuyle HTML icerik textarea + TinyMCE ile duzenlenebilir
   sekilde yuklenir, kayit yeni revizyon olusturur. Lint temiz; cache v198.
+- **Musteri Teslimat / Performans Karti tamamlama** (cache v199): Modul buyuk
+  olcude mevcuttu (KPI kartlari `customer-delivery-performance.php`, red esigi
+  bildirimi `delivery_rejection` notify-overdue.php'de, rapor export'ununda
+  delivery bolumu). Eksik olan kapatildi:
+  - **Dashboard Donem Ozeti** "Musteri & Yetkinlik" grubuna "Ort. Zamaninda
+    Teslimat" (% on-time) metriği eklendi (`dashOnTimeAvg`, dashboard.php
+    delivery toplam sorgusu `orders_total`/`on_time_orders` ile genisletildi).
+  - `customer-delivery-performance.php` basligina "Teslimat Kaydi" + "Rapor"
+    butonlari eklendi (kayit girisinde ve rapora hizli erisim). i18n
+    `deliveryAddRecord`, `deliveryReportButton`. Lint temiz; cache v199.

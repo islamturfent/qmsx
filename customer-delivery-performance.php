@@ -103,10 +103,16 @@ $activeNav = "customer_performance";
         </div>
     </header>
     <main class="page-container">
-        <section class="page-heading">
-            <span class="section-kicker" data-i18n="customerPerformanceKicker">Teslimat Performansı</span>
-            <h1 data-i18n="customerPerformanceTitle">Müşteri Teslimat / Performans</h1>
-            <p data-i18n="customerPerformanceText">Her müşterinin zamanında teslimat ve red oranının güncel görünümü.</p>
+        <section class="page-heading page-heading-actions">
+            <div>
+                <span class="section-kicker" data-i18n="customerPerformanceKicker">Teslimat Performansı</span>
+                <h1 data-i18n="customerPerformanceTitle">Müşteri Teslimat / Performans</h1>
+                <p data-i18n="customerPerformanceText">Her müşterinin zamanında teslimat ve red oranının güncel görünümü.</p>
+            </div>
+            <div class="heading-actions-group">
+                <a class="primary-button" href="delivery-performance.php" data-i18n="deliveryAddRecord">Teslimat Kaydı</a>
+                <a class="secondary-button" href="reports.php" data-i18n="deliveryReportButton">Rapor</a>
+            </div>
         </section>
 
         <section class="dashboard-grid compact-dashboard-grid">

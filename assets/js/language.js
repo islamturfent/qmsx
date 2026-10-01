@@ -3486,6 +3486,7 @@ Object.assign(translations.tr, {
   customerPerformanceMenuLabel: "Müşteri Performansı", customerPerformanceTitle: "Müşteri Teslimat / Performans",
   customerPerformanceKicker: "Teslimat Performansı", customerPerformanceText: "Her müşterinin zamanında teslimat ve red oranının güncel görünümü.",
   customerPerformanceListTitle: "Müşteri Kartları", customerPerformanceEmpty: "Henüz teslimat performansı kaydı yok.",
+  deliveryAddRecord: "Teslimat Kaydı", deliveryReportButton: "Rapor",
 });
 Object.assign(translations.tr, {
   dashboardCompetencyTitle: "Yetkinlik Vadesi (Yaklaşan/Geçen)", dashboardCompetencyText: "Son 30 gün içinde gözden geçirilmesi gereken yetkinlik değerlendirmeleri.",
@@ -3511,6 +3512,7 @@ Object.assign(translations.en, {
   customerPerformanceMenuLabel: "Customer Performance", customerPerformanceTitle: "Customer Delivery / Performance",
   customerPerformanceKicker: "Delivery Performance", customerPerformanceText: "Current view of each customer's on-time and rejection rates.",
   customerPerformanceListTitle: "Customer Cards", customerPerformanceEmpty: "No delivery performance records yet.",
+  deliveryAddRecord: "Delivery Record", deliveryReportButton: "Report",
 });
 Object.assign(translations.en, {
   trainingTemplatesMenuLabel: "Training Templates", trainingTemplatesTitle: "Training Templates",

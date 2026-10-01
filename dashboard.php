@@ -123,23 +123,29 @@ $dashCriticalIncidentsKpi = $scopedCount("SELECT COUNT(*) FROM incidents WHERE a
 $dashInstrumentsTotal = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1" . $scopeClause);
 $dashInstrumentsDueSoon = $scopedCount("SELECT COUNT(*) FROM instruments WHERE active=1 AND next_calibration_date IS NOT NULL AND next_calibration_date >= CURDATE() AND next_calibration_date <= DATE_ADD(CURDATE(), INTERVAL 60 DAY)" . $scopeClause);
 
-// Müşteri performansı (red eşiği %5 ustu musteri + ort. red).
+// Müşteri performansı (red eşiği %5 ustu musteri + ort. red + ort. zamaninda).
 $dashLowCustomers = 0;
 $dashRejectTotal = 0;
 $dashDeliverQty = 0;
+$dashOrdersTotal = 0;
+$dashOnTimeTotal = 0;
 $delivStmt = $pdo->prepare(
-    "SELECT customer_name, SUM(quantity_delivered) qd, SUM(quantity_rejected) qr
+    "SELECT customer_name, SUM(orders_total) ot, SUM(on_time_orders) ontime,
+            SUM(quantity_delivered) qd, SUM(quantity_rejected) qr
      FROM delivery_performance WHERE active = 1" . $scopeClause . " GROUP BY customer_name, company_id"
 );
 $delivStmt->execute($scopeParams);
 foreach ($delivStmt as $drow) {
     $dashDeliverQty += (int) $drow['qd'];
     $dashRejectTotal += (int) $drow['qr'];
+    $dashOrdersTotal += (int) $drow['ot'];
+    $dashOnTimeTotal += (int) $drow['ontime'];
     if ((int) $drow['qd'] > 0 && ((int) $drow['qr'] / (int) $drow['qd']) > 0.05) {
         $dashLowCustomers++;
     }
 }
 $dashRejectAvg = $dashDeliverQty > 0 ? round(($dashRejectTotal / $dashDeliverQty) * 100, 1) : 0;
+$dashOnTimeAvg = $dashOrdersTotal > 0 ? round(($dashOnTimeTotal / $dashOrdersTotal) * 100, 1) : 0;
 $dashCompetencyOverdueCount = count($dashboardCompetencyOverdue);
 
 // Denetim & rapor durumu (sirket scope).
@@ -651,6 +657,7 @@ $activeNav = "dashboard";
                     <h4 data-i18n="dashboardCustomerTitle">Müşteri & Yetkinlik</h4>
                     <div class="metric-mini-row">
                         <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Düşük Performanslı Müşteri</span><strong><?= $dashLowCustomers ?></strong></div></a>
+                        <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Ort. Zamanında Teslimat</span><strong>%<?= $dashOnTimeAvg ?></strong></div></a>
                         <a href="customer-delivery-performance.php"><div><span class="metric-mini-label">Ort. Red Oranı</span><strong>%<?= $dashRejectAvg ?></strong></div></a>
                         <a href="competency-matrix.php"><div><span class="metric-mini-label">Yetkinlik Vadesi Geçen</span><strong><?= $dashCompetencyOverdueCount ?></strong></div></a>
                         <a href="satisfaction-surveys.php"><div><span class="metric-mini-label">Memnuniyet Puanı</span><strong><?= (int) round((float) $reportMetrics['satisfaction_avg'], 0) ?>/5</strong></div></a>
