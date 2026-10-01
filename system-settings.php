@@ -50,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // I) Marka
             'app_name' => trim((string) ($_POST["app_name"] ?? 'QuAmi')),
             'login_title' => trim((string) ($_POST["login_title"] ?? '')),
+            // (D e-posta ayarlari mail-settings.php sayfasinda yonetilir)
         ];
         $bad = qmsSettingsSave($pdo, $values, $userId);
         $formOk = $bad === [] ? 'Sistem ayarları kaydedildi.' : 'Bazı anahtarlar tanınmadı: ' . implode(', ', $bad);
@@ -118,14 +119,6 @@ $activeNav = "system_settings";
                     <label class="form-field"><span data-i18n="reportCompanyNameLabel">Rapor Şirket Adı</span><input type="text" name="report_company_name" maxlength="160" value="<?= htmlspecialchars((string) $settings['report_company_name'], ENT_QUOTES, "UTF-8") ?>" placeholder="örn. ACME Kalite A.Ş."></label>
                     <label class="form-field"><span data-i18n="reportFooterLabel">Rapor Alt Not</span><input type="text" name="report_footer" maxlength="255" value="<?= htmlspecialchars((string) $settings['report_footer'], ENT_QUOTES, "UTF-8") ?>"></label>
                     <label class="form-field form-field-wide"><span data-i18n="reportConfidentialLabel">Gizlilik Notu Ekle</span><label class="toggle-field"><input type="checkbox" name="report_confidential" value="1" <?= $settings['report_confidential'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
-                </div>
-            </section>
-
-            <section class="page-section console-card">
-                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsMailTitle">D · E-posta / Gönderici</h3><p data-i18n="systemSettingsMailText">Gönderen görünen ad/adres; SMTP ayrıca E-posta Ayarları'ndadır.</p></div></div>
-                <div class="form-grid">
-                    <label class="form-field"><span data-i18n="emailFromNameLabel">Gönderen Adı</span><input type="text" name="email_from_name" maxlength="120" value="<?= htmlspecialchars((string) $settings['email_from_name'], ENT_QUOTES, "UTF-8") ?>"></label>
-                    <label class="form-field"><span data-i18n="emailFromAddressLabel">Gönderen Adresi (boş = SMTP ayarı)</span><input type="email" name="email_from_address" maxlength="160" value="<?= htmlspecialchars((string) $settings['email_from_address'], ENT_QUOTES, "UTF-8") ?>"></label>
                 </div>
             </section>
 

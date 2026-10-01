@@ -25,9 +25,7 @@ const QMS_SETTINGS_DEFAULTS = [
     'report_company_name' => '',          // Excel/PDF rapor ustbilgisi
     'report_footer' => '',                // Excel/PDF rapor altbilgi notu
     'report_confidential' => '0',         // '1' = gizlilik notu ekle
-    // D) E-posta / bildirim
-    'email_from_name' => 'QuAmi',         // gonderici gorunen ad
-    'email_from_address' => '',           // gonderici adres (bos = mail ayarlarindan)
+    // D) E-posta / bildirim - gonderici ad/adres E-posta Ayarlari'nda (mail-settings.php)
     // E) Guvenlik
     'password_min_length' => '8',         // sifre min. uzunluk
     'twofa_required' => '0',              // '1' = 2FA gerekli (kademeli, not)
