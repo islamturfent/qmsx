@@ -57,6 +57,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // N) E-posta sablon metni
             'mail_subject_prefix' => trim((string) ($_POST["mail_subject_prefix"] ?? '')),
             'mail_signature' => trim((string) ($_POST["mail_signature"] ?? '')),
+            // O) Otomatik bakim / yedek
+            'auto_backup_enabled' => !empty($_POST["auto_backup_enabled"]) ? '1' : '0',
+            'auto_backup_interval_hours' => (string) max(1, min(168, (int) ($_POST["auto_backup_interval_hours"] ?? 24))),
+            'auto_backup_retain' => (string) max(1, min(90, (int) ($_POST["auto_backup_retain"] ?? 7))),
+            // J) Guvenlik uygulamasi
+            'maintenance_mode' => !empty($_POST["maintenance_mode"]) ? '1' : '0',
+            'maintenance_message' => trim((string) ($_POST["maintenance_message"] ?? '')),
+            'login_ip_allow' => trim((string) ($_POST["login_ip_allow"] ?? '')),
         ];
         // K) Rapor logosu yukleme / kaldirma.
         if (!empty($_POST["report_logo_remove"]) && $_POST["report_logo_remove"] === '1') {
@@ -208,6 +216,24 @@ $activeNav = "system_settings";
                 <div class="form-grid">
                     <label class="form-field"><span data-i18n="mailSubjectPrefixLabel">Konu Öneki</span><input type="text" name="mail_subject_prefix" maxlength="60" value="<?= htmlspecialchars((string) $settings['mail_subject_prefix'], ENT_QUOTES, "UTF-8") ?>" placeholder="örn. [QMS]"></label>
                     <label class="form-field form-field-wide"><span data-i18n="mailSignatureLabel">İmza</span><input type="text" name="mail_signature" maxlength="160" value="<?= htmlspecialchars((string) $settings['mail_signature'], ENT_QUOTES, "UTF-8") ?>"></label>
+                </div>
+            </section>
+
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsBackupTitle">O · Otomatik Bakım / Yedek</h3><p data-i18n="systemSettingsBackupText">Zamanlanmış otomatik veritabanı yedeği ve saklama adedi.</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field form-field-wide"><span data-i18n="autoBackupEnabledLabel">Otomatik Yedek</span><label class="toggle-field"><input type="checkbox" name="auto_backup_enabled" value="1" <?= $settings['auto_backup_enabled'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
+                    <label class="form-field"><span data-i18n="autoBackupIntervalLabel">Yedek Aralığı (saat)</span><input type="number" min="1" max="168" name="auto_backup_interval_hours" value="<?= (int) $settings['auto_backup_interval_hours'] ?>"></label>
+                    <label class="form-field"><span data-i18n="autoBackupRetainLabel">Saklanacak Yedek Sayısı</span><input type="number" min="1" max="90" name="auto_backup_retain" value="<?= (int) $settings['auto_backup_retain'] ?>"></label>
+                </div>
+            </section>
+
+            <section class="page-section console-card">
+                <div class="section-heading compact-heading"><div><h3 data-i18n="systemSettingsSecurityApplyTitle">J · Güvenlik Uygulaması</h3><p data-i18n="systemSettingsSecurityApplyText">Bakım modu ve login IP kısıtı gerçekten uygulanır.</p></div></div>
+                <div class="form-grid">
+                    <label class="form-field form-field-wide"><span data-i18n="maintenanceModeLabel">Bakım Modu</span><label class="toggle-field"><input type="checkbox" name="maintenance_mode" value="1" <?= $settings['maintenance_mode'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label></label>
+                    <label class="form-field form-field-wide"><span data-i18n="maintenanceMessageLabel">Bakım Mesajı</span><input type="text" name="maintenance_message" maxlength="255" value="<?= htmlspecialchars((string) $settings['maintenance_message'], ENT_QUOTES, "UTF-8") ?>"></label>
+                    <label class="form-field form-field-wide"><span data-i18n="loginIpAllowLabel">İzinli Login IP'leri (virgülle ayır)</span><input type="text" name="login_ip_allow" maxlength="500" value="<?= htmlspecialchars((string) $settings['login_ip_allow'], ENT_QUOTES, "UTF-8") ?>" placeholder="örn. 192.168.1.10, 10.0.0.5"><small data-i18n="loginIpAllowHint">Boş bırakılırsa kısıtlama yok; liste doluysa sadece bu IP'ler giriş sayfasına erişebilir.</small></label>
                 </div>
             </section>
 

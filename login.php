@@ -16,6 +16,12 @@ $loginIp = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
 $sysAppName = trim(qmsSetting('app_name', 'QuAmi'));
 $sysLoginTitle = trim(qmsSetting('login_title', 'Kalite Yönetim Sistemi'));
 
+// J) Bakim modu + login IP kistisi.
+$sysMaintenance = qmsSetting('maintenance_mode') === '1';
+$maintenanceMsg = trim(qmsSetting('maintenance_message'));
+$ipAllow = array_values(array_filter(array_map('trim', explode(',', qmsSetting('login_ip_allow')))));
+$ipBlocked = $ipAllow !== [] && !in_array($loginIp, $ipAllow, true);
+
 if (isset($_SESSION["qms_logged_in"]) && $_SESSION["qms_logged_in"] === true) {
     header("Location: " . qmsLandingPage((string) ($_SESSION["qms_role"] ?? "")));
     exit;
@@ -57,22 +63,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user["password_hash"])) {
-        // Oturum sabitlemeyi onlemek icin giris aninda oturum kimligi yenilenir
-        // (oturum verisi korunur, yalnizca id degisir).
-        session_regenerate_id(true);
+        if ($sysMaintenance && $user["role"] !== "super_admin") {
+            $loginError = $maintenanceMsg !== '' ? $maintenanceMsg : 'Sistem bakımdadır. Lütfen daha sonra tekrar deneyiniz.';
+        } else {
+            // Oturum sabitlemeyi onlemek icin giris aninda oturum kimligi yenilenir
+            // (oturum verisi korunur, yalnizca id degisir).
+            session_regenerate_id(true);
 
-        $_SESSION["qms_logged_in"] = true;
-        $_SESSION["qms_user_id"] = (int) $user["id"];
-        $_SESSION["qms_username"] = $user["username"];
-        $_SESSION["qms_full_name"] = $user["full_name"];
-        $_SESSION["qms_role"] = $user["role"];
+            $_SESSION["qms_logged_in"] = true;
+            $_SESSION["qms_user_id"] = (int) $user["id"];
+            $_SESSION["qms_username"] = $user["username"];
+            $_SESSION["qms_full_name"] = $user["full_name"];
+            $_SESSION["qms_role"] = $user["role"];
+            $_SESSION["qms_last_activity"] = time();
 
-        // Basarili giris: kullanici adinin hatali gecmisini temizle.
-        $clear = $pdo->prepare('DELETE FROM login_attempts WHERE username = ?');
-        $clear->execute([$username]);
+            // Basarili giris: kullanici adinin hatali gecmisini temizle.
+            $clear = $pdo->prepare('DELETE FROM login_attempts WHERE username = ?');
+            $clear->execute([$username]);
 
-        header("Location: " . qmsLandingPage((string) $user["role"]));
-        exit;
+            header("Location: " . qmsLandingPage((string) $user["role"]));
+            exit;
+        }
     }
 
     // Basarisiz giris: denemeyi kaydet (kilit icin).
@@ -132,6 +143,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <main class="page-container auth-page">
 
+        <?php if ($sysMaintenance): ?><div class="form-message warning"><?= htmlspecialchars($maintenanceMsg ?: 'Sistem bakımdadır.', ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+
+        <?php if ($ipBlocked): ?>
+        <section class="welcome-card auth-intro"><h1 data-i18n="loginTitle"><?= htmlspecialchars($sysLoginTitle ?: $sysAppName, ENT_QUOTES, "UTF-8") ?></h1><p class="muted-color">Erişim bu IP için kısıtlı.</p></section>
+        <section class="login-card"><h2>Erişim engellendi</h2><p class="muted-color">IP adresiniz bu sisteme erişim listesinde değil. Yöneticinize başvurun.</p></section>
+        <?php else: ?>
+
         <section class="welcome-card auth-intro">
             <h1 data-i18n="loginTitle"><?= htmlspecialchars($sysLoginTitle ?: $sysAppName, ENT_QUOTES, "UTF-8") ?></h1>
 
@@ -166,6 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </button>
             </form>
         </section>
+        <?php endif; ?>
 
     </main>
 

@@ -54,6 +54,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && (($_POST["action"] ?? "") === "back
             exit;
         }
     }
+} elseif ($_SERVER["REQUEST_METHOD"] === "POST" && (($_POST["action"] ?? "") === "export_full_json")) {
+    qmsCsrfVerify($csrfScope, $_POST["csrf"] ?? null);
+
+    $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    $filename = 'qms-full-data-' . date('Ymd-His') . '.json';
+    header('Content-Type: application/json; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: private, no-store');
+
+    $out = fopen('php://output', 'w');
+    fwrite($out, "{\n");
+    $first = true;
+    foreach ($tables as $table) {
+        $tableEscaped = '`' . str_replace('`', '``', (string) $table) . '`';
+        $rows = $pdo->query('SELECT * FROM ' . $tableEscaped)->fetchAll(PDO::FETCH_ASSOC);
+        if (!$first) {
+            fwrite($out, ",\n");
+        }
+        $first = false;
+        fwrite($out, json_encode((string) $table, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        fwrite($out, ':');
+        fwrite($out, json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+    fwrite($out, "\n}\n");
+    fclose($out);
+    exit;
 }
 
 ?>
@@ -80,6 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && (($_POST["action"] ?? "") === "back
 
         <section class="page-section console-card">
             <div class="section-heading compact-heading"><div><h3 data-i18n="systemBackupTitle">Yedek Al</h3><p data-i18n="systemBackupText">İndirme, yedeği oluşturduktan sonra otomatik başlar.</p></div></div>
+            <div class="two-col">
             <form method="post" action="system-backup.php">
                 <?= qmsCsrfField($csrfScope) ?>
                 <input type="hidden" name="action" value="backup">
@@ -87,6 +114,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && (($_POST["action"] ?? "") === "back
                     <button class="primary-button" type="submit" data-i18n="systemBackupButton">Yedeği İndir (.sql)</button>
                 </div>
             </form>
+            <form method="post" action="system-backup.php">
+                <?= qmsCsrfField($csrfScope) ?>
+                <input type="hidden" name="action" value="export_full_json">
+                <div class="form-actions">
+                    <button class="secondary-button" type="submit" data-i18n="systemBackupJsonButton">Tüm Veriyi İndir (JSON)</button>
+                </div>
+            </form>
+            </div>
+            <p class="settings-hint" data-i18n="systemBackupJsonHint">JSON dışa aktarımı mysqldump'tan bağımsızdır; tüm tabloları tablo bazlı olarak tek dosyada toplar.</p>
         </section>
     </main>
     <script src="assets/js/theme.js"></script><script src="assets/js/language.js"></script><script src="assets/js/sidebar.js"></script><script src="assets/js/pwa.js"></script>

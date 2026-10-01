@@ -2503,3 +2503,24 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     okur, header dil dugmesi DB dilleri arasinda doner, disi diller icin
     language-data.php'den ceviri alir (fetch) ve uygular.
   - Sidebar Sistem Yonetimi -> Dil Yonetimi. i18n TR/EN. Lint temiz; cache v210.
+  ----
+- **Ayarlar gelistirmesi: Otomatik yedek + J guvenlik uygulamasi + tam veri JSON
+  cekim** (cache v212):
+  - Yeni ayar anahtarlari (settings-functions.php varsayilanlari): O grubu
+    `auto_backup_enabled`, `auto_backup_interval_hours`, `auto_backup_retain`;
+    J grubu `maintenance_mode`, `maintenance_message`, `login_ip_allow`.
+  - `scripts/auto-backup.php` (CLI): ayar kapaliysa cikar; son yedekten bu yana
+    interval gecmediyse atlar; `storage/backups/backup-*.sql` yazar; son `retain`
+    adet yedegi saklar. mysqldump'u XAMPP yolundan bulur.
+  - Windows Task Scheduler: "QuAmi_AutoBackup" (HOURLY) gorevi kuruldu (script
+    kendi interval kontrolunu yapar). Production cron icin ayni komut kullanilir:
+    `php -f path/scripts/auto-backup.php`.
+  - J guvenlik GERCEKTEN uygulanir: login.php bakim modu (super_admin haric
+    giris engel) + login IP allowlist (bos ise kistisiz) + giris oncesi engel
+    karti; app-sidebar.php oturum suresi (`session_timeout_min`) asimsa session
+    destroy -> login'e yonlendirir (her istekte aktivite sifirlanir).
+  - `system-settings.php`: O ve J bolumleri eklendi (toggle + alanlar + IP listesi),
+    POST handler degerleri guncellendi. `system-backup.php`: "Tum Veriyi Indir
+    (JSON)" butonu - mysqldump'tan bagimsiz, `SHOW TABLES` ile tum tablolari
+    tablo bazli JSON olarak stream eder.
+  - i18n TR/EN eklendi. Lint temiz; cache v212.

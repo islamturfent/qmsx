@@ -50,6 +50,14 @@ const QMS_SETTINGS_DEFAULTS = [
     // N) E-posta sablon metni
     'mail_subject_prefix' => '',
     'mail_signature' => '',
+    // O) Otomatik bakim / yedek
+    'auto_backup_enabled' => '0',
+    'auto_backup_interval_hours' => '24',
+    'auto_backup_retain' => '7',
+    // J) Guvenlik uygulamasi
+    'maintenance_mode' => '0',
+    'maintenance_message' => 'Sistem bakımdadır. Lütfen daha sonra tekrar deneyiniz.',
+    'login_ip_allow' => '',
 ];
 
 /** @return array<string, string> Birlesmis sistem ayarlari (default + DB override). */

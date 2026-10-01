@@ -8,6 +8,19 @@ require_once __DIR__ . '/language-functions.php';
 $_qmsLangs = qmsLanguages($pdo, true);
 $_qmsSys = qmsSettings();
 
+// J) Oturum suresi: aktif oturum sureyi asmissa sonlandir (login'e gonder).
+$_qmsTimeout = (int) ($_qmsSys['session_timeout_min'] ?? 60);
+if ($_qmsTimeout > 0 && !empty($_SESSION['qms_logged_in'])) {
+    $_SESSION['qms_last_activity'] = (int) ($_SESSION['qms_last_activity'] ?? time());
+    if (time() - $_SESSION['qms_last_activity'] > $_qmsTimeout * 60) {
+        $_SESSION = [];
+        @session_destroy();
+        header('Location: login.php');
+        exit;
+    }
+    $_SESSION['qms_last_activity'] = time();
+}
+
 if (!function_exists('qmsSidebarVisible')) {
     function qmsSidebarVisible(string $action): bool
     {
