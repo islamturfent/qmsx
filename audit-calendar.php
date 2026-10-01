@@ -26,7 +26,7 @@ if (!in_array($selectedCompanyId, array_map('intval', array_column($companies, '
 }
 
 // Mevcut yillar.
-$yearStmt = $pdo->prepare('SELECT DISTINCT YEAR(a.planned_date) AS y FROM audits a INNER JOIN companies co ON co.id = a.company_id WHERE a.active = 1 AND a.planned_date IS NOT NULL' . $companyScope['sql'] . ' ORDER BY y DESC');
+$yearStmt = $pdo->prepare('SELECT DISTINCT YEAR(a.planned_date) AS y FROM audits a INNER JOIN companies ON companies.id = a.company_id WHERE a.active = 1 AND a.planned_date IS NOT NULL' . $companyScope['sql'] . ' ORDER BY y DESC');
 $yearStmt->execute($companyScope['params']);
 $availableYears = array_map('intval', array_filter(array_column($yearStmt->fetchAll(PDO::FETCH_ASSOC), 'y')));
 $selectedYear = (int) ($_GET["year"] ?? (int) date("Y"));
@@ -46,12 +46,17 @@ if ($selectedCompanyId > 0) {
     $params[] = $selectedCompanyId;
 }
 
+// Sirket kapsami: sirket kullanicisi/denetci/sistem admini yalnizca gordugu sirketlerin denetimlerini gorur.
+$auditScope = qmsCompanyScope('a.company_id', qmsVisibleCompanyIds($pdo, $userId, $role));
+$where .= $auditScope['sql'];
+$params = array_merge($params, $auditScope['params']);
+
 $auditStmt = $pdo->prepare(
-    "SELECT a.id, a.title, a.audit_type, a.planned_date, a.status, co.company_name,
+    "SELECT a.id, a.title, a.audit_type, a.planned_date, a.status, companies.company_name,
             (SELECT COUNT(*) FROM audit_checklist_items ci WHERE ci.audit_id = a.id AND ci.active = 1 AND ci.result_status <> 'pending') AS done,
             (SELECT COUNT(*) FROM audit_checklist_items ci WHERE ci.audit_id = a.id AND ci.active = 1) AS total
      FROM audits a
-     INNER JOIN companies co ON co.id = a.company_id
+     INNER JOIN companies ON companies.id = a.company_id
      WHERE " . $where . "
      ORDER BY a.planned_date ASC, a.id ASC"
 );
