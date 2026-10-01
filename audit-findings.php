@@ -18,7 +18,7 @@ $role = qmsCurrentRole();
 // Sirket kapsami: yalnizca gorebildigi sirketlerin denetim bulgulari.
 $companyScope = qmsCompanyScope('co.id', qmsVisibleCompanyIds($pdo, $userId, $role));
 
-$companyStmt = $pdo->prepare('SELECT companies.id, companies.company_name FROM companies WHERE companies.active = 1' . $companyScope['sql'] . ' ORDER BY companies.company_name');
+$companyStmt = $pdo->prepare('SELECT co.id, co.company_name FROM companies co WHERE co.active = 1' . $companyScope['sql'] . ' ORDER BY co.company_name');
 $companyStmt->execute($companyScope['params']);
 $companies = $companyStmt->fetchAll(PDO::FETCH_ASSOC);
 
