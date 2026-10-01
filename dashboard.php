@@ -317,6 +317,33 @@ $activeNav = "dashboard";
             </div>
         </section>
 
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardCompetencyTitle">Yetkinlik Vadesi (Yaklaşan/Geçen)</h3>
+                    <p data-i18n="dashboardCompetencyText">Son 30 gün içinde gözden geçirilmesi gereken yetkinlik değerlendirmeleri.</p>
+                </div>
+                <a class="secondary-button" href="competency-matrix.php" data-i18n="competencyMatrixMenuLabel">Yetkinlik Matrisi</a>
+            </div>
+            <?php if (!$dashboardCompetencyOverdue): ?>
+                <div class="empty-state" data-i18n="dashboardCompetencyEmpty">Yaklaşan/geçen yetkinlik yok.</div>
+            <?php else: ?>
+                <div class="admin-list">
+                    <?php foreach ($dashboardCompetencyOverdue as $c):
+                        $cOverdue = (string) $c['next_assessment_date'] < date('Y-m-d');
+                    ?>
+                        <div class="admin-list-item">
+                            <div class="list-item-main">
+                                <strong><?= htmlspecialchars(trim((string) $c['first_name'] . ' ' . (string) $c['last_name']), ENT_QUOTES, 'UTF-8') ?></strong>
+                                <span><?= htmlspecialchars((string) $c['competency_name'] . ' · ' . (string) $c['company_name'] . ' · vade: ' . (string) $c['next_assessment_date'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="list-item-side"><span class="status-pill <?= $cOverdue ? '' : 'on-track' ?>"><?= $cOverdue ? 'Vadesi geçti' : 'Yaklaşan vade' ?></span></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
         <?php if ($dashboardAnnouncements): ?>
         <section class="page-section console-card">
             <div class="section-heading compact-heading">
@@ -666,32 +693,6 @@ $activeNav = "dashboard";
             </div>
         </section>
 
-        <section class="page-section console-card">
-            <div class="section-heading compact-heading">
-                <div>
-                    <h3 data-i18n="dashboardCompetencyTitle">Yetkinlik Vadesi (Yaklaşan/Geçen)</h3>
-                    <p data-i18n="dashboardCompetencyText">Son 30 gün içinde gözden geçirilmesi gereken yetkinlik değerlendirmeleri.</p>
-                </div>
-                <a class="secondary-button" href="competency-matrix.php" data-i18n="competencyMatrixMenuLabel">Yetkinlik Matrisi</a>
-            </div>
-            <?php if (!$dashboardCompetencyOverdue): ?>
-                <div class="empty-state" data-i18n="dashboardCompetencyEmpty">Yaklaşan/geçen yetkinlik yok.</div>
-            <?php else: ?>
-                <div class="admin-list">
-                    <?php foreach ($dashboardCompetencyOverdue as $c):
-                        $cOverdue = (string) $c['next_assessment_date'] < date('Y-m-d');
-                    ?>
-                        <div class="admin-list-item">
-                            <div class="list-item-main">
-                                <strong><?= htmlspecialchars(trim((string) $c['first_name'] . ' ' . (string) $c['last_name']), ENT_QUOTES, 'UTF-8') ?></strong>
-                                <span><?= htmlspecialchars((string) $c['competency_name'] . ' · ' . (string) $c['company_name'] . ' · vade: ' . (string) $c['next_assessment_date'], ENT_QUOTES, 'UTF-8') ?></span>
-                            </div>
-                            <div class="list-item-side"><span class="status-pill <?= $cOverdue ? '' : 'on-track' ?>"><?= $cOverdue ? 'Vadesi geçti' : 'Yaklaşan vade' ?></span></div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </section>
     </main>
 
     <script src="assets/js/theme.js"></script>

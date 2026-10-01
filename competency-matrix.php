@@ -83,6 +83,34 @@ foreach ($rows as $row) {
     }
 }
 
+// Yetkinlik vadesi yaklasan/gecen listesi (dashboard widget'i ile tutarli).
+$dueItems = [];
+$upcomingCount = 0;
+$dueLimit = date('Y-m-d', strtotime('+30 days'));
+$today = date('Y-m-d');
+foreach ($people as $sid => $person) {
+    foreach ($person['competencies'] as $comp) {
+        $next = (string) ($comp['next'] ?? '');
+        if ($next === '') {
+            continue;
+        }
+        if ($next <= $dueLimit) {
+            $isOverdue = $next < $today;
+            $dueItems[] = [
+                'person' => $person['name'],
+                'company' => $person['company'],
+                'comp' => $comp['name'],
+                'next' => $next,
+                'overdue' => $isOverdue,
+            ];
+            if (!$isOverdue) {
+                $upcomingCount++;
+            }
+        }
+    }
+}
+usort($dueItems, static fn($a, $b) => strcmp($a['next'], $b['next']));
+
 // Kullanici eslestirme secenekleri (gorunur sirketlerin kullanicilari).
 $userOptions = [];
 if ($companyIds !== null) {
@@ -152,6 +180,36 @@ $activeNav = "competency_matrix";
                     <strong class="dashboard-card-number"><?= $overdueCount ?></strong>
                 </div>
             </div>
+            <div class="dashboard-card metric-blue">
+                <div class="dashboard-card-content">
+                    <span class="dashboard-card-label">Yaklaşan Vade</span>
+                    <strong class="dashboard-card-number"><?= $upcomingCount ?></strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardCompetencyTitle">Yetkinlik Vadesi (Yaklaşan/Geçen)</h3>
+                    <p data-i18n="dashboardCompetencyText">Son 30 gün içinde gözden geçirilmesi gereken yetkinlik değerlendirmeleri.</p>
+                </div>
+            </div>
+            <?php if (!$dueItems): ?>
+                <div class="empty-state" data-i18n="dashboardCompetencyEmpty">Yaklaşan/geçen yetkinlik yok.</div>
+            <?php else: ?>
+                <div class="admin-list">
+                    <?php foreach ($dueItems as $d): ?>
+                        <div class="admin-list-item">
+                            <div class="list-item-main">
+                                <strong><?= htmlspecialchars($d['person'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <span><?= htmlspecialchars((string) $d['comp'] . ' · ' . (string) $d['company'] . ' · vade: ' . (string) $d['next'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="list-item-side"><span class="status-pill <?= $d['overdue'] ? '' : 'on-track' ?>"><?= $d['overdue'] ? 'Vadesi geçti' : 'Yaklaşan vade' ?></span></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <section class="page-section">
