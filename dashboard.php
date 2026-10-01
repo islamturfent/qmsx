@@ -47,7 +47,7 @@ require_once __DIR__ . '/includes/instrument-functions.php';
 require_once __DIR__ . '/includes/incident-functions.php';
 require_once __DIR__ . '/includes/contract-functions.php';
 require_once __DIR__ . '/includes/satisfaction-functions.php';
-require_once __DIR__ . '/includes/internal-survey-functions.php';
+
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/audit-log-functions.php';
 
@@ -177,19 +177,9 @@ $dashImplementedImprovements = $scopedCount("SELECT COUNT(*) FROM improvements W
 $satisfactionSurveys = qmsSatisfactionSurveyList($pdo, $userId, qmsCurrentRole());
 $lastSurvey = $satisfactionSurveys ? $satisfactionSurveys[0] : null;
 
-// Ic memnuniyet anketi (Donem Ozeti grubu).
-$internalSurveys = qmsInternalSurveyList($pdo, $userId, qmsCurrentRole());
-$internalResponses = 0;
-$internalRatingSum = 0.0;
-$internalRatingCount = 0;
-foreach ($internalSurveys as $is) {
-    $internalResponses += (int) ($is['respond_count'] ?? 0);
-    if (($is['avg_rating'] ?? null) !== null) {
-        $internalRatingSum += (float) $is['avg_rating'];
-        $internalRatingCount++;
-    }
-}
-$internalAvgRating = $internalRatingCount > 0 ? round($internalRatingSum / $internalRatingCount, 1) : 0;
+// Ic memnuniyet anketi (Donem Ozeti grubu) - rapor export metrikleriyle birebir tutarli.
+$internalResponses = (int) ($reportMetrics['internal_survey_respondents'] ?? 0);
+$internalAvgRating = round((float) ($reportMetrics['internal_survey_avg'] ?? 0), 1);
 
 // Yonetimin gozden gecirmesi widget'i (son kayitlar).
 $dashboardReviews = array_slice(qmsReviewList($pdo, $userId, qmsCurrentRole()), 0, 5);

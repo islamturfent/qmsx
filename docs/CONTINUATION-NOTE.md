@@ -2382,3 +2382,21 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
      i18n `dashboardAuditLog*`. (Yeni include audit-log-functions + review-functions.)
   5. **Gorsel tur:** kullaniciya birakildi; düzeltme gerektiren yere gore yapilacak.
   - Lint temiz; cache v205.
+  ----
+- **Tutarlilik turu (dashboard vs rapor export)** (cache v206):
+  - **Duzeltilen:** Ic memnuniyet ortalamasi Dashboard'da anket ortalamalarinin basit
+    ortalamasiydi; rapor export'unda ise yanit sayisiyla agirlikli (sum(avg*answers)/
+    answers). Dashboard artik `reportMetrics['internal_survey_avg']` ve
+    `['internal_survey_respondents']` kullaniyor -> rapor export'u ile birebir.
+  - **Dogrulanan (uyumlu):**
+    * OFI "Acik Iyilestirme" = status NOT IN (rejected, closed, implemented)
+      hem dashboard hem rapor (uyumluydu).
+    * OFI "Uygulanan" = status='implemented' (uyumluydu).
+    * Memnuniyet Puani dashboard `reportMetrics['satisfaction_avg']` kullaniyordu
+      (zaten uyumluydu).
+    * Teslimat on-time formulu on_time/orders*100 (dashboard ve rapor ayni; donem
+      farki kasitli: dashboard canli, rapor donem).
+  - **Semantik fark (bilincli):** Dashboard bazli metrikler (GGR, teslimat, OFI)
+    canli (tum zaman) saygi; rapor donem filtreli. Formul ayni; kapsam farki kasitli
+    ve dokumante edildi.
+  - Lint temiz; cache v206.
