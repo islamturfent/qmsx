@@ -3499,12 +3499,18 @@ Object.assign(translations.tr, {
   dashboardCompanyKpisTitle: "Şirket Panosu", dashboardCustomerTitle: "Müşteri & Yetkinlik",
   dashboardAuditTitle: "Denetim & Rapor Durumu", dashboardAuditText: "Devam eden denetimler ve rapor durumu.",
   dashboardCoqTitle: "Kalite Maliyeti", dashboardMetroTitle: "Kalibrasyon & Metroloji",
+  dashboardReviewTitle: "Yönetimin Gözden Geçirmesi",
+  dashboardSatisfactionTitle: "Müşteri Memnuniyeti", dashboardSatisfactionText: "En güncel memnuniyet anketlerinin ortalama puanı.",
+  satisfactionEmpty: "Henüz müşteri memnuniyeti anketi yok.",
 });
 Object.assign(translations.en, {
   dashboardPeriodTitle: "Period Summary", dashboardPeriodText: "Company dashboard, customer performance and competency indicators.",
   dashboardCompanyKpisTitle: "Company Dashboard", dashboardCustomerTitle: "Customer & Competency",
   dashboardAuditTitle: "Audit & Report Status", dashboardAuditText: "Ongoing audits and report status.",
   dashboardCoqTitle: "Cost of Quality", dashboardMetroTitle: "Calibration & Metrology",
+  dashboardReviewTitle: "Management Review",
+  dashboardSatisfactionTitle: "Customer Satisfaction", dashboardSatisfactionText: "Average score of the most recent satisfaction surveys.",
+  satisfactionEmpty: "No customer satisfaction surveys yet.",
 });
 Object.assign(translations.en, {
   dashboardCompetencyTitle: "Competency Due (Upcoming/Overdue)", dashboardCompetencyText: "Competency assessments that need review within the next 30 days.",

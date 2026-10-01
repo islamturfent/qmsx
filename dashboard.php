@@ -46,6 +46,7 @@ require_once __DIR__ . '/includes/improvement-functions.php';
 require_once __DIR__ . '/includes/instrument-functions.php';
 require_once __DIR__ . '/includes/incident-functions.php';
 require_once __DIR__ . '/includes/contract-functions.php';
+require_once __DIR__ . '/includes/satisfaction-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
@@ -147,6 +148,27 @@ foreach ($delivStmt as $drow) {
 $dashRejectAvg = $dashDeliverQty > 0 ? round(($dashRejectTotal / $dashDeliverQty) * 100, 1) : 0;
 $dashOnTimeAvg = $dashOrdersTotal > 0 ? round(($dashOnTimeTotal / $dashOrdersTotal) * 100, 1) : 0;
 $dashCompetencyOverdueCount = count($dashboardCompetencyOverdue);
+
+// Yonetimin gozden gecirmesi (Donem Ozeti grubu).
+$dashReviews = $scopedCount("SELECT COUNT(*) FROM management_reviews WHERE active=1" . $scopeClause);
+$dashReviewsCompleted = $scopedCount("SELECT COUNT(*) FROM management_reviews WHERE active=1 AND status='completed'" . $scopeClause);
+$dashReviewOverdueItems = $scopedCount(
+    "SELECT COUNT(*) FROM management_review_items i
+     INNER JOIN management_reviews r ON r.id = i.review_id
+     WHERE r.active = 1 AND i.due_date IS NOT NULL AND i.due_date < CURDATE()" . $scopeClause
+);
+$dashReviewLast = null;
+$dashReviewNext = null;
+$rvLast = $pdo->prepare("SELECT MAX(review_date) FROM management_reviews WHERE active=1 AND status='completed'" . $scopeClause);
+$rvLast->execute($scopeParams);
+$dashReviewLast = $rvLast->fetchColumn();
+$rvNext = $pdo->prepare("SELECT MIN(next_review_date) FROM management_reviews WHERE active=1 AND status<>'completed' AND next_review_date IS NOT NULL AND next_review_date >= CURDATE()" . $scopeClause);
+$rvNext->execute($scopeParams);
+$dashReviewNext = $rvNext->fetchColumn();
+
+// Memnuniyet: son anketler (widget icin).
+$satisfactionSurveys = qmsSatisfactionSurveyList($pdo, $userId, qmsCurrentRole());
+$lastSurvey = $satisfactionSurveys ? $satisfactionSurveys[0] : null;
 
 // Denetim & rapor durumu (sirket scope).
 $dashOpenAudits = $scopedCount("SELECT COUNT(*) FROM audits WHERE active=1 AND status IN ('planned','in_progress')" . $scopeClause);
@@ -344,6 +366,31 @@ $activeNav = "dashboard";
                                 <span><?= htmlspecialchars((string) $c['competency_name'] . ' · ' . (string) $c['company_name'] . ' · vade: ' . (string) $c['next_assessment_date'], ENT_QUOTES, 'UTF-8') ?></span>
                             </div>
                             <div class="list-item-side"><span class="status-pill <?= $cOverdue ? '' : 'on-track' ?>"><?= $cOverdue ? 'Vadesi geçti' : 'Yaklaşan vade' ?></span></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section class="page-section console-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <h3 data-i18n="dashboardSatisfactionTitle">Müşteri Memnuniyeti</h3>
+                    <p data-i18n="dashboardSatisfactionText">En güncel memnuniyet anketlerinin ortalama puanı.</p>
+                </div>
+                <a class="secondary-button" href="satisfaction-surveys.php" data-i18n="satisfactionMenuLabel">Memnuniyet Anketleri</a>
+            </div>
+            <?php if (!$satisfactionSurveys): ?>
+                <div class="empty-state" data-i18n="satisfactionEmpty">Henüz müşteri memnuniyeti anketi yok.</div>
+            <?php else: ?>
+                <div class="admin-list">
+                    <?php foreach (array_slice($satisfactionSurveys, 0, 5) as $sv): ?>
+                        <div class="admin-list-item">
+                            <div class="list-item-main">
+                                <strong><?= htmlspecialchars((string) $sv['title'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <span><?= htmlspecialchars((string) $sv['company_name'] . ' · yanıt: ' . (int) $sv['response_count'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="list-item-side"><span class="status-pill"><?= $sv['avg_score'] !== null ? (float) $sv['avg_score'] . '/5' : '—' ?></span></div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -678,6 +725,16 @@ $activeNav = "dashboard";
                         <a href="quality-cost-trend.php"><div><span class="metric-mini-label">Yıllık COQ</span><strong>₺<?= number_format($dashCoqTotal, 0, ',', '.') ?></strong></div></a>
                         <a href="quality-cost-trend.php"><div><span class="metric-mini-label">Hata Maliyeti</span><strong>₺<?= number_format($dashCoqFailure, 0, ',', '.') ?></strong></div></a>
                         <a href="quality-cost-trend.php"><div><span class="metric-mini-label">Hata Oranı</span><strong>%<?= $dashCoqFailurePct ?></strong></div></a>
+                    </div>
+                </div>
+                <div class="period-overview-group">
+                    <h4 data-i18n="dashboardReviewTitle">Yönetimin Gözden Geçirmesi</h4>
+                    <div class="metric-mini-row">
+                        <a href="reviews.php"><div><span class="metric-mini-label">Gözden Geçirme</span><strong><?= $dashReviews ?></strong></div></a>
+                        <a href="reviews.php"><div><span class="metric-mini-label">Tamamlanan</span><strong><?= $dashReviewsCompleted ?></strong></div></a>
+                        <a href="reviews.php"><div><span class="metric-mini-label">Son GGR</span><strong><?= $dashReviewLast ? htmlspecialchars(date('d.m.Y', strtotime((string) $dashReviewLast)), ENT_QUOTES, 'UTF-8') : '—' ?></strong></div></a>
+                        <a href="reviews.php"><div><span class="metric-mini-label">Sıradaki GGR</span><strong><?= $dashReviewNext ? htmlspecialchars(date('d.m.Y', strtotime((string) $dashReviewNext)), ENT_QUOTES, 'UTF-8') : '—' ?></strong></div></a>
+                        <a href="reviews.php"><div><span class="metric-mini-label">Geciken Aksiyon</span><strong class="<?= $dashReviewOverdueItems > 0 ? 'danger-text' : '' ?>"><?= $dashReviewOverdueItems ?></strong></div></a>
                     </div>
                 </div>
             </div>

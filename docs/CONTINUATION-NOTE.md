@@ -2312,3 +2312,15 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   (Tarih/Kisi/Kayit Turu/Islem/Ozet/Sirket/IP sutunlari, filtreler korunur).
   Aksiyon alanina "Excel İndir" butonu eklendi. i18n `downloadXlsxButton`.
   Lint temiz; cache v200.
+- **Memnuniyet + Yonetimin Gozden Gecirmesi -> Dashboard entegrasyonu** (cache v201):
+  - **Item 1 (Memnuniyet):** `dashboard.php`'ye "Musteri Memnuniyeti" widget'i eklendi
+    (son 5 anket baslik + sirket + yanit + ort. puan /5), `qmsSatisfactionSurveyList`
+    kullanir (yeni `includes/satisfaction-functions.php` require). i18n
+    `dashboardSatisfactionTitle`, `dashboardSatisfactionText`, `satisfactionEmpty`.
+  - **Item 2 (Gozden Gecirme):** Donem Ozeti'ne "Yonetimin Gozden Gecirmesi" grubu
+    eklendi: Gozden Gecirme, Tamamlanan, Son GGR (tarih), Siradaki GGR (tarih),
+    Geciken Aksiyon (management_review_items due_date < CURDATE). i18n
+    `dashboardReviewTitle`. (GGR raporu zaten reports/export'te mevcuttu.)
+  - **Item 3 (Dashboard rapor entegrasyonu):** Yukaridaki iki metrik grubu Donem
+    Ozeti + widget olarak eklendi; review/memnuniyet rapor export'lariyla tutarli.
+  - Lint temiz; cache v201.
