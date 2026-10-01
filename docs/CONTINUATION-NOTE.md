@@ -2400,3 +2400,19 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     canli (tum zaman) saygi; rapor donem filtreli. Formul ayni; kapsam farki kasitli
     ve dokumante edildi.
   - Lint temiz; cache v206.
+  ----
+- **FINAL KAPANIŞ:**
+  - **Cron/job kurulumu (Windows Task Scheduler):**
+    * Görev: `QuAmi_OverdueNotify` (etkin, gunsu 08:00, her gün).
+    * Komut: `"C:\xampp\php\php.exe" -f "C:\xampp\htdocs\qmsx\scripts\notify-overdue.php"`
+    * `schtasks /Run` ile bir kez calistirildi; CLI testi `Overdue notifications generated: 1`
+      (overdue_complaint) dondu. Varsayilan mod (sorumlu + admin); tum kullanicilara
+      icin komuta `--all` eklenir.
+  - **Git remote + push:** `origin` = `https://github.com/islamturfent/qmsx.git`.
+    `main -> origin/main` ve `v0.1.0 -> origin/v0.1.0` basariyla iterildi
+    (repo public, bosdu; `git credential-manager erase` + `repo` kapsamli PAT ile).
+    Bundan sonra her commit icin: `git push origin main`.
+  - **Durum:** QMSx ozellik yüzeyleri ve dashboard/rapor entegrasyonlari kapsamli;
+    cache v206; tek tag v0.1.0. Kalan notlar: Collabora/Ofis entegrasyonu proje
+    sonrasi (kasitsiz olarak dokunulmadi).
+  - Bu final girdisi push edildi; cache v206.
