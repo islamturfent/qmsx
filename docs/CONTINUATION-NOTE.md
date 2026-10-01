@@ -2492,3 +2492,14 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     includes/mailer.php qmsMailNotificationContent konu oneki + imza + uygulama
     adi kullanir (subject/plain/html).
   - i18n TR/EN eklendi. Lint temiz; cache v209.
+  ----
+- **Dil Yonetimi modulu (yeni dil ekleme)** (cache v210):
+  - `languages` + `translations` tablolari (migrate-languages.php),
+    `includes/language-functions.php` (qmsLanguages/qmsLanguageTranslations /
+    qmsLanguageUpsert/qmsTranslationSave), `language-data.php` (JSON ucu).
+  - `languages.php` (super admin): yeni dil ekle (kod/ad/yerel ad), secili dilin
+    kiris anahtar-ceviri satirlari, kaydet, JSON disa aktar.
+  - Front-end: app-sidebar `qmsLanguagesJson` enjekte; language.js aktif dilleri
+    okur, header dil dugmesi DB dilleri arasinda doner, disi diller icin
+    language-data.php'den ceviri alir (fetch) ve uygular.
+  - Sidebar Sistem Yonetimi -> Dil Yonetimi. i18n TR/EN. Lint temiz; cache v210.

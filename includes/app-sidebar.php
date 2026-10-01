@@ -4,6 +4,8 @@
 require_once __DIR__ . '/access.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/settings-functions.php';
+require_once __DIR__ . '/language-functions.php';
+$_qmsLangs = qmsLanguages($pdo, true);
 $_qmsSys = qmsSettings();
 
 if (!function_exists('qmsSidebarVisible')) {
@@ -74,6 +76,7 @@ if (isset($pdo, $_SESSION["qms_user_id"])) {
 <span id="qmsIconUserMenuChevron" hidden><?= appIcon("chevronDown", "") ?></span>
 <span id="qmsIconUserMenuLogout" hidden><?= appIcon("logout", "") ?></span>
 <script type="application/json" id="qmsNotificationRecent"><?= json_encode($sidebarRecentNotifications, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+<script type="application/json" id="qmsLanguagesJson"><?= json_encode($_qmsLangs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
 <?php
 $dashboardHref = $sidebarRole === 'company_user' ? 'company-overview.php' : 'dashboard.php';
@@ -202,6 +205,7 @@ $sidebarGroups = [
             ['key' => 'ai_settings', 'href' => 'ai-settings.php', 'roles' => ['super_admin', 'system_admin'], 'i18n' => 'aiSettingsMenuLabel', 'label' => 'Yapay Zeka Ayarları', 'icon' => 'cog'],
             ['key' => 'system_settings', 'href' => 'system-settings.php', 'perm' => 'admin.system', 'i18n' => 'systemSettingsTitle', 'label' => 'Sistem Ayarları', 'icon' => 'cog'],
             ['key' => 'system_backup', 'href' => 'system-backup.php', 'perm' => 'admin.system', 'i18n' => 'systemBackupTitle', 'label' => 'Veritabanı Yedeği', 'icon' => 'table'],
+            ['key' => 'languages', 'href' => 'languages.php', 'perm' => 'admin.system', 'i18n' => 'languagesTitle', 'label' => 'Dil Yönetimi', 'icon' => 'globe'],
         ],
     ],
 ];

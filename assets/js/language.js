@@ -1420,35 +1420,58 @@ const languageToggle = document.getElementById("languageToggle");
 
 const qmsServerDefaultsEl = document.getElementById("qmsServerDefaults");
 const qmsServerLang = qmsServerDefaultsEl ? qmsServerDefaultsEl.dataset.lang : "";
-let currentLanguage = localStorage.getItem("qms-language") || qmsServerLang || "tr";
+
+// Aktif diller (sunucu); tr/en her zaman yerlesiktir.
+try {
+    var qmsLangsRaw = JSON.parse((document.getElementById("qmsLanguagesJson") || {}).textContent || "[]");
+    availableLanguages = qmsLangsRaw && qmsLangsRaw.length ? qmsLangsRaw : [{code:"tr"},{code:"en"}];
+    if (!availableLanguages.some(function(l){return l.code === "tr";})) availableLanguages.unshift({code:"tr"});
+    if (!availableLanguages.some(function(l){return l.code === "en";})) availableLanguages.push({code:"en"});
+} catch (e) {
+    availableLanguages = [{code:"tr"},{code:"en"}];
+}
+
+let currentLanguage = localStorage.getItem("qms-language");
+if (!currentLanguage || !availableLanguages.some(function(l){return l.code === currentLanguage;})) {
+    currentLanguage = qmsServerLang && availableLanguages.some(function(l){return l.code === qmsServerLang;}) ? qmsServerLang : "tr";
+}
 
 const languageGlobeIcon = (document.getElementById("qmsIconGlobe") || {}).innerHTML || "";
 
-// Dil degistir butonunu TailAdmin tarzi ikon + etiket olarak cizer (globe + TR/EN).
+// Dil butonunu ikon + kod etiketi olarak cizer.
 function renderLanguageButton() {
     if (!languageToggle) return;
-    const label = currentLanguage === "tr" ? "EN" : "TR";
-    languageToggle.innerHTML = '<span class="topbar-btn-icon">' + languageGlobeIcon + '</span><span class="topbar-btn-label">' + label + '</span>';
+    const code = (currentLanguage || "tr").toUpperCase();
+    languageToggle.innerHTML = '<span class="topbar-btn-icon">' + languageGlobeIcon + '</span><span class="topbar-btn-label">' + code + '</span>';
+}
+
+function ensureLanguageLoaded(language, done) {
+    // Yerlesik diller (tr/en) hazir; disi diller icin sunucudan ceviri al.
+    if (translations[language] && Object.keys(translations[language]).length) { if (done) done(); return; }
+    if (language === "tr" || language === "en") { if (done) done(); return; }
+    translations[language] = {};
+    fetch("language-data.php?lang=" + encodeURIComponent(language)).then(function(r){return r.json();}).then(function(d){
+        const t = d.translations || {};
+        for (var k in t) { translations[language][k] = t[k]; }
+        applyLanguage(language, true);
+    }).catch(function(){ applyLanguage(language, true); });
+}
+
+function applyLanguage(language) {
+    document.documentElement.lang = language;
+    document.querySelectorAll("[data-i18n]").forEach(function(element) {
+        const key = element.getAttribute("data-i18n");
+        if (translations[language] && translations[language][key]) {
+            element.textContent = translations[language][key];
+        }
+    });
+    currentLanguage = language;
+    renderLanguageButton();
+    localStorage.setItem("qms-language", language);
 }
 
 function changeLanguage(language) {
-
-    document.documentElement.lang = language;
-
-    document.querySelectorAll("[data-i18n]").forEach(function(element) {
-
-        const key = element.getAttribute("data-i18n");
-
-        if (translations[language][key]) {
-            element.textContent = translations[language][key];
-        }
-
-    });
-
-    currentLanguage = language;
-    renderLanguageButton();
-
-    localStorage.setItem("qms-language", language);
+    ensureLanguageLoaded(language, function(){ applyLanguage(language); });
 }
 
 translations.tr.editorView = "Web Editöründe Görüntüle";
@@ -3457,14 +3480,13 @@ translations.en.instrumentDelete = "Delete";
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {
-
-    if (currentLanguage === "tr") {
-        currentLanguage = "en";
-    } else {
-        currentLanguage = "tr";
+    // Secili dilin ardindaki ilk dile geg; dongu (DB'deki aktif diller).
+    var idx = 0;
+    for (var i = 0; i < availableLanguages.length; i++) {
+        if (availableLanguages[i].code === currentLanguage) { idx = i; break; }
     }
-
-    changeLanguage(currentLanguage);
+    var next = availableLanguages[(idx + 1) % availableLanguages.length];
+    changeLanguage(next.code || "en");
 });
 // Eğitim Şablonlari / Yetkinlik Matrisi
 Object.assign(translations.tr, {
@@ -3566,6 +3588,7 @@ Object.assign(translations.tr, {
   systemSettingsBrandTitle: "I · Marka / Görünüm", systemSettingsBrandText: "Uygulama adı ve login başlığı.", appNameLabel: "Uygulama Adı", loginTitleLabel: "Login Başlığı",
   systemSettingsRetentionTitle: "H · Veri Saklama / Temizlik", systemSettingsRetentionText: "Denetim izi, saklama süresini aşan eski kayıtları temizler (onaylı).", purgeAuditButton: "Denetim İzi Temizle",
   systemBackupLink: "Veritabanı Yedeği", systemBackupTitle: "Veritabanı Yedeği", systemBackupText: "mysqldump ile tüm şemayı ve veriyi tek SQL dosyası olarak indirin.", systemBackupButton: "Yedeği İndir (.sql)",
+  languagesTitle: "Dil Yönetimi", languagesText: "Yeni diller ekleyin ve çevirileri yönetin.", languagesAddTitle: "Yeni Dil Ekle", langCodeLabel: "Dil Kodu (örn. de)", langNameLabel: "Dil Adı", langNativeLabel: "Yerel Ad", languagesAddButton: "Dil Ekle", languagesListTitle: "Diller", languagesTranslateTitle: "Çeviriler ·", langKeyLabel: "Anahtar", langValueLabel: "Çeviri",
   aiStudioTitle: "AI Doküman Stüdyosu", aiStudioKicker: "Yapay Zeka",
   aiStudioText: "Dokümanı tarif edin (yazıyla ya da sesle) ve taslağı üretin.",
   aiStudioPromptTitle: "Dokümanı Tarif Et", aiStudioPromptText: "Mikrofon ile söyleyin veya yazın; türü seçip üretin.",
@@ -3612,6 +3635,7 @@ Object.assign(translations.en, {
   systemSettingsBrandTitle: "I · Brand / Appearance", systemSettingsBrandText: "Application name and login headline.", appNameLabel: "Application Name", loginTitleLabel: "Login Headline",
   systemSettingsRetentionTitle: "H · Data Retention / Cleanup", systemSettingsRetentionText: "Purges audit trail records older than the retention period (confirmed).", purgeAuditButton: "Purge Audit Trail",
   systemBackupLink: "Database Backup", systemBackupTitle: "Database Backup", systemBackupText: "Download the full schema and data as a single SQL file via mysqldump.", systemBackupButton: "Download Backup (.sql)",
+  languagesTitle: "Language Management", languagesText: "Add new languages and manage translations.", languagesAddTitle: "Add New Language", langCodeLabel: "Language Code (e.g. de)", langNameLabel: "Language Name", langNativeLabel: "Native Name", languagesAddButton: "Add Language", languagesListTitle: "Languages", languagesTranslateTitle: "Translations ·", langKeyLabel: "Key", langValueLabel: "Translation",
   aiStudioTitle: "AI Document Studio", aiStudioKicker: "Artificial Intelligence",
   aiStudioText: "Describe the document (type or speak) and generate the draft.",
   aiStudioPromptTitle: "Describe the Document", aiStudioPromptText: "Speak via the microphone or type; choose the type and generate.",
