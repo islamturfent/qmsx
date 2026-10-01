@@ -42,7 +42,7 @@ function qmsPermissions(): array
         'admin.assignments' => ['super_admin'],
         'admin.office' => ['super_admin'],
         'admin.mail' => ['super_admin'],
-        'admin.system' => ['super_admin', 'system_admin'],
+        'admin.system' => ['super_admin'],
         'my_audits.view' => ['auditor'],
         'notifications.view' => ['super_admin', 'system_admin', 'company_user', 'auditor'],
         'profile.edit' => ['super_admin', 'system_admin', 'company_user', 'auditor'],

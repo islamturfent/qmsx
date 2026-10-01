@@ -184,14 +184,14 @@ $sidebarGroups = [
         ],
     ],
     [
-        'label_key' => 'sidebarGroupSystemLabel', 'label' => 'Sistem Ayarları & Loglar', 'icon' => 'cog',
+        'label_key' => 'sidebarGroupSystemLabel', 'label' => 'Sistem Ayarları & Loglar', 'icon' => 'cog', 'super_only' => true,
         'items' => [
             ['key' => 'audit_trail', 'href' => 'audit-trail.php', 'perm' => 'audit_trail.view', 'i18n' => 'auditTrailMenuLabel', 'label' => 'Denetim İzi (Audit Trail)', 'icon' => 'checkBadge'],
             ['key' => 'audit_trail_report', 'href' => 'audit-trail-report.php', 'perm' => 'audit_trail.view', 'i18n' => 'auditTrailReportTitle', 'label' => 'Denetim İzi Raporu', 'icon' => 'reports'],
         ],
     ],
     [
-        'label_key' => 'sidebarManagementLabel', 'label' => 'Sistem Yönetimi', 'icon' => 'cog',
+        'label_key' => 'sidebarManagementLabel', 'label' => 'Sistem Yönetimi', 'icon' => 'cog', 'super_only' => true,
         'items' => [
             ['key' => 'office_settings', 'href' => 'office-settings.php', 'perm' => 'admin.office', 'i18n' => 'officeSettingsTitle', 'label' => 'Ofis Entegrasyonu', 'icon' => 'office'],
             ['key' => 'mail_settings', 'href' => 'mail-settings.php', 'perm' => 'admin.mail', 'i18n' => 'mailSettingsMenuLabel', 'label' => 'E-posta Ayarları', 'icon' => 'notifications'],
@@ -219,6 +219,10 @@ $sidebarGroups = [
     <nav class="sidebar-nav" aria-label="Ana menü">
         <?php foreach ($sidebarGroups as $group): ?>
             <?php
+            // Sistem Ayarlari & Loglar + Sistem Yonetimi gruplari yalnizca super admin.
+            if (!empty($group['super_only']) && $sidebarRole !== 'super_admin') {
+                continue;
+            }
             $visible = [];
             foreach ($group['items'] as $item) {
                 if (isset($item['roles']) && is_array($item['roles'])) {
