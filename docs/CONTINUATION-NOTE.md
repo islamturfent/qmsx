@@ -2346,3 +2346,22 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
     gercektende kullaniliyor - silme yok. 120 kok PHP + ~60 migration script tutarli.
   - **Not:** Gorsel tur + hizli duzeltme turu kullanici onayina birakildi (asagida).
   - Lint temiz; cache v203.
+  ----
+- **5 madde: yeni yuzeyler + derinlestirme** (cache v204):
+  1. **Surec Envanteri -> overdu workbench:** `includes/due-workbench-functions.php`
+     surec gozden gecirme vadesi gecen bolumu eklendi (QMS_OVERDUE_SECTIONS +
+     sorgu, `reviews` ikon) ve `overdue-export.php`'ye (xlsx + pdf) surec satiri.
+     i18n `overdueProcessesLabel`. (Not: `process_review_overdue` bildirimi
+     zaten notify-overdue.php'de vardi; sadece konsolide geciken isler + export'a
+     eklendi.)
+  2. **Iyilestirme -> Donem Ozeti:** `dashboard.php` Donem Ozeti "Sirket Panosu"
+     grubuna "Açık İyileştirme" + "Uygulanan İyileştirme" metrikleri (OFI).
+  3. **Sozlesme coklu dosya eki:** Zaten kuruluydu (`contracts.php`
+     `attachment_files[]` multiple + `qmsContractAddAttachments`) - kod degisikligi
+     gerekmedi, dogrulandi.
+  4. **Denetim Bulgulari -> CAPA:** `audit-findings.php` CAPA sutunu artik
+     tıklanabilir (nc varsa nonconformity-detail'e gider; CAPA 0 ise "CAPA ekle").
+  5. **Ic Memnuniyet Anketi -> Donem Ozeti:** `dashboard.php` "Musteri & Yetkinlik"
+     grubuna "İç Anket Yanıt" + "İç Memnuniyet" metrikleri (qmsInternalSurveyList,
+     yeni require).
+  - Lint temiz; cache v204.

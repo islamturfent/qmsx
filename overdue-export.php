@@ -39,6 +39,7 @@ $sectionTitles = [
     'findings' => 'Dış Denetim Bulgusu',
     'documents' => 'Doküman Gözden Geçirme',
     'complaints' => 'Şikayet',
+    'processes' => 'Süreç Gözden Geçirme',
 ];
 $severityLabels = ['minor' => 'Küçük', 'major' => 'Büyük', 'critical' => 'Kritik'];
 $dateStamp = date('d.m.Y H:i');
@@ -55,6 +56,7 @@ if ($format === 'xlsx') {
         'findings' => ['Bulgular', 4],
         'documents' => ['Doküman GGR', 4],
         'complaints' => ['Şikayet', 4],
+        'processes' => ['Süreç GGR', 4],
     ];
 
     $summaryRows = [

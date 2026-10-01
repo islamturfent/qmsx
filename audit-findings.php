@@ -194,10 +194,14 @@ $activeNav = "audit_findings";
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <?php if ((int) $f["capa_count"] > 0): ?>
-                                            <span class="status-pill"><?= (int) $f["capa_count"] ?> faaliyet</span>
+                                        <?php if (!empty($f["nc_id"])): ?>
+                                            <?php if ((int) $f["capa_count"] > 0): ?>
+                                                <a href="nonconformity-detail.php?id=<?= (int) $f["nc_id"] ?>"><span class="status-pill"><?= (int) $f["capa_count"] ?> faaliyet</span></a>
+                                            <?php else: ?>
+                                                <a class="secondary-button secondary-button-sm" href="nonconformity-detail.php?id=<?= (int) $f["nc_id"] ?>">CAPA ekle</a>
+                                            <?php endif; ?>
                                         <?php else: ?>
-                                            <span class="record-card-label" data-i18n="auditFindingsNoCapa">Faaliyet yok</span>
+                                            <span class="record-card-label" data-i18n="auditFindingsNoCapa">Bağlı NC yok</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

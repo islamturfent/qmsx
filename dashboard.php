@@ -47,6 +47,7 @@ require_once __DIR__ . '/includes/instrument-functions.php';
 require_once __DIR__ . '/includes/incident-functions.php';
 require_once __DIR__ . '/includes/contract-functions.php';
 require_once __DIR__ . '/includes/satisfaction-functions.php';
+require_once __DIR__ . '/includes/internal-survey-functions.php';
 
 // Yayinda olan duyurular (kullanicinin gorebildigi kapsamda).
 $dashboardAnnouncements = qmsAnnouncementList($pdo, $userId, qmsCurrentRole(), true);
@@ -166,9 +167,27 @@ $rvNext = $pdo->prepare("SELECT MIN(next_review_date) FROM management_reviews WH
 $rvNext->execute($scopeParams);
 $dashReviewNext = $rvNext->fetchColumn();
 
+// Iyilestirme firsatlari (Donem Ozeti grubu).
+$dashOpenImprovements = count($dashboardImprovements);
+$dashImplementedImprovements = $scopedCount("SELECT COUNT(*) FROM improvements WHERE active=1 AND status='implemented'" . $scopeClause);
+
 // Memnuniyet: son anketler (widget icin).
 $satisfactionSurveys = qmsSatisfactionSurveyList($pdo, $userId, qmsCurrentRole());
 $lastSurvey = $satisfactionSurveys ? $satisfactionSurveys[0] : null;
+
+// Ic memnuniyet anketi (Donem Ozeti grubu).
+$internalSurveys = qmsInternalSurveyList($pdo, $userId, qmsCurrentRole());
+$internalResponses = 0;
+$internalRatingSum = 0.0;
+$internalRatingCount = 0;
+foreach ($internalSurveys as $is) {
+    $internalResponses += (int) ($is['respond_count'] ?? 0);
+    if (($is['avg_rating'] ?? null) !== null) {
+        $internalRatingSum += (float) $is['avg_rating'];
+        $internalRatingCount++;
+    }
+}
+$internalAvgRating = $internalRatingCount > 0 ? round($internalRatingSum / $internalRatingCount, 1) : 0;
 
 // Denetim & rapor durumu (sirket scope).
 $dashOpenAudits = $scopedCount("SELECT COUNT(*) FROM audits WHERE active=1 AND status IN ('planned','in_progress')" . $scopeClause);
@@ -698,6 +717,8 @@ $activeNav = "dashboard";
                         <div><span class="metric-mini-label">Kalibrasyon (geçik)</span><strong><?= $dashCalib ?></strong></div>
                         <a href="incidents.php"><div><span class="metric-mini-label">Açık Olay</span><strong><?= $dashOpenIncidentsKpi ?></strong></div></a>
                         <a href="incidents.php"><div><span class="metric-mini-label">Kritik Olay</span><strong class="<?= $dashCriticalIncidentsKpi > 0 ? 'danger-text' : '' ?>"><?= $dashCriticalIncidentsKpi ?></strong></div></a>
+                        <a href="improvements.php"><div><span class="metric-mini-label">Açık İyileştirme</span><strong><?= $dashOpenImprovements ?></strong></div></a>
+                        <a href="improvements.php"><div><span class="metric-mini-label">Uygulanan İyileştirme</span><strong><?= $dashImplementedImprovements ?></strong></div></a>
                     </div>
                 </div>
                 <div class="period-overview-group">
@@ -709,6 +730,8 @@ $activeNav = "dashboard";
                         <a href="competency-matrix.php"><div><span class="metric-mini-label">Yetkinlik Vadesi Geçen</span><strong><?= $dashCompetencyOverdueCount ?></strong></div></a>
                         <a href="satisfaction-surveys.php"><div><span class="metric-mini-label">Memnuniyet Puanı</span><strong><?= (int) round((float) $reportMetrics['satisfaction_avg'], 0) ?>/5</strong></div></a>
                         <a href="satisfaction-surveys.php"><div><span class="metric-mini-label">Memnuniyet Yanıtı</span><strong><?= (int) $reportMetrics['satisfaction_count'] ?></strong></div></a>
+                        <a href="internal-surveys.php"><div><span class="metric-mini-label">İç Anket Yanıt</span><strong><?= $internalResponses ?></strong></div></a>
+                        <a href="internal-surveys.php"><div><span class="metric-mini-label">İç Memnuniyet</span><strong><?= $internalAvgRating ?>/5</strong></div></a>
                     </div>
                 </div>
                 <div class="period-overview-group">

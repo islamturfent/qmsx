@@ -13,7 +13,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/access.php';
 
 /** Geciken kaydin referans etiketi / simgesi. */
-const QMS_OVERDUE_SECTIONS = ['actions', 'nonconformities', 'trainings', 'equipment', 'findings', 'documents', 'complaints'];
+const QMS_OVERDUE_SECTIONS = ['actions', 'nonconformities', 'trainings', 'equipment', 'findings', 'documents', 'complaints', 'processes'];
 
 /**
  * Kapsam icindeki geciken kayitlari sekisyon seklinde toplar.
@@ -36,6 +36,7 @@ function qmsOverdueWorkbench(PDO $pdo, int $userId, string $role): array
         'findings' => ['label_key' => 'overdueFindingsLabel', 'icon' => 'external', 'count' => 0, 'rows' => []],
         'documents' => ['label_key' => 'overdueDocumentsLabel', 'icon' => 'documents', 'count' => 0, 'rows' => []],
         'complaints' => ['label_key' => 'overdueComplaintsLabel', 'icon' => 'complaints', 'count' => 0, 'rows' => []],
+        'processes' => ['label_key' => 'overdueProcessesLabel', 'icon' => 'reviews', 'count' => 0, 'rows' => []],
     ];
 
     // Geciken duzeltici faaliyet (sirket uygunsuzluk uzerinden).
@@ -193,6 +194,27 @@ function qmsOverdueWorkbench(PDO $pdo, int $userId, string $role): array
             'due' => (string) $row['due_date'],
             'extra' => (string) $row['complaint_code'],
             'link' => 'complaint-detail.php?id=' . (int) $row['id'],
+        ];
+    }
+
+    // Gozden gecirilmesi gecen proses (surec envanteri).
+    $scopeProcesses = qmsCompanyScope('p.company_id', $companyIds);
+    $stmt = $pdo->prepare(
+        "SELECT p.id, p.process_name, p.review_date, p.owner_name, co.company_name
+         FROM processes p
+         INNER JOIN companies co ON co.id = p.company_id
+         WHERE p.active = 1 AND p.review_date IS NOT NULL AND p.review_date < ?" . $scopeProcesses['sql'] . '
+         ORDER BY p.review_date ASC, p.id ASC'
+    );
+    $stmt->execute(array_merge([$today], $scopeProcesses['params']));
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $sections['processes']['rows'][] = [
+            'id' => (int) $row['id'],
+            'title' => (string) $row['process_name'],
+            'company' => (string) $row['company_name'],
+            'due' => (string) $row['review_date'],
+            'extra' => (string) ($row['owner_name'] ?? ''),
+            'link' => 'processes.php?edit=' . (int) $row['id'],
         ];
     }
 
