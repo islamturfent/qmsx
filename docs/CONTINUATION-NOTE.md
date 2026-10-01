@@ -2251,3 +2251,21 @@ Continue on the QuAmi codebase rooted at `C:\xampp\htdocs\qmsx`.
   "Web Dokuman Editoru ile Olustur" butonu. Secilince dosya yuklemeden dokuman
   kaydedilir ve `document-edit.php?id=NEW` acilir (iciniz web editorde yazar).
   i18n `saveAndOpenWebEditorButton`. Web modunda dosya dogrulamasi atlanir.
+- **AI Dokuman Studusu: A/B/C** (cache v195): `ai-document-studio.php`
+  kullanici onayli A, B, C isleri tek yuzeyde kodlandi:
+  - **A - Tek tikla dokumana aktar**: `form_type=transfer`. `qmsAiDraftToHtml`
+    ile duz metin -> guvenli HTML; `documents` (draft, rev 01) + `document_versions`
+    (`mime_type='text/html'`, dosya `storage/documents/<hash>.html`) olusturulur;
+    sonra `document-detail.php?id=NEW`'e yonlendirir. (Not: devir sirasinda
+    bulunan PostgreSQL tarzi `'document-'||?` concat MySQL icin bozuktu; `$origName`
+    PHP parametresiyle duzeltildi.)
+  - **C - Sablon olarak kaydet**: `form_type=save_template`. Mevcut
+    `qmsDocumentTemplateAdd()` ile `document_templates`'a kaydeder (AI turu ->
+    sablon turu haritasi `templateTypeMap`), sonra `document-templates.php?created=1`.
+  - **B - Sesli komut ayristirici (JS)**: `parseVoice()` Web Speech sonucunu isler
+    - tur anahtar kelimesi (politika/prosedur/talimat/yonerge/form/plan/kontrol
+    listesi/sartname/rapor) -> tip select'ine; `baslik: ...` kalibi -> baslik
+    input'ua; tam metin -> aciklama. Sunucu LLM cagrisi gerektirmez (ucretsiz).
+  - Yeni i18n TR/EN: `aiTransferTitle`, `aiTransferText`, `aiTransferCodeLabel`,
+    `aiTransferButton`, `aiSaveTemplateButton`, `aiTemplateTypeLabel`.
+  - Lint temiz; cache v195.
