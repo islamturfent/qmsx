@@ -628,77 +628,40 @@ $activeNav = "dashboard";
                     <h3 data-i18n="dashboardTrendsTitle">Son 12 Ay Trendleri</h3>
                     <p data-i18n="dashboardTrendsText">Aylık denetim, uygunsuzluk, tamamlanan aksiyon, eğitim ve şikayet hareketi.</p>
                 </div>
-                <div class="trend-period-toggle">
-                    <span class="trend-period-item is-active" data-i18n="dashboardTrendPeriodLabel">Son 12 Ay</span>
+                <div class="trend-period-toggle" id="trendPeriodToggle">
+                    <button class="trend-period-item is-active" type="button" data-period="12m" data-i18n="dashboardTrendPeriod12m">Son 12 Ay</button>
+                    <button class="trend-period-item" type="button" data-period="30d" data-i18n="dashboardTrendPeriod30d">30 Gün</button>
+                    <button class="trend-period-item" type="button" data-period="7d" data-i18n="dashboardTrendPeriod7d">7 Gün</button>
+                    <button class="trend-period-item" type="button" data-period="24h" data-i18n="dashboardTrendPeriod24h">24 Saat</button>
                 </div>
             </div>
-            <?php
-            $trendRows = array_values($dashboardTrend);
-            $trendSeries = [
-                ["key" => "audits", "label" => "Denetimler", "i18n" => "dashboardTrendAuditsLabel", "color" => "#465fff"],
-                ["key" => "nonconformities", "label" => "Uygunsuzluklar", "i18n" => "dashboardTrendNonconformitiesLabel", "color" => "#f79009"],
-                ["key" => "actions_completed", "label" => "Tamamlanan Aksiyon", "i18n" => "dashboardTrendActionsLabel", "color" => "#7a5af8"],
-                ["key" => "trainings_completed", "label" => "Tamamlanan Eğitim", "i18n" => "dashboardTrendTrainingsLabel", "color" => "#12b76a"],
-                ["key" => "complaints", "label" => "Şikayetler", "i18n" => "dashboardTrendComplaintsLabel", "color" => "#f04438"],
-            ];
-
-            $chartW = 760; $chartH = 250; $padL = 10; $padR = 10; $padT = 16; $padB = 28;
-            $n = count($trendRows);
-            $globalMax = 1;
-            foreach ($trendSeries as $s) { foreach ($trendRows as $row) { $globalMax = max($globalMax, (int) $row[$s["key"]]); } }
-            $plotW = $chartW - $padL - $padR;
-            $plotH = $chartH - $padT - $padB;
-            $step = $n > 1 ? $plotW / ($n - 1) : 0;
-            $seriesTotals = [];
-            ?>
             <div class="trend-chart-wrap">
-                <svg class="trend-chart-svg" viewBox="0 0 <?= $chartW ?> <?= $chartH ?>" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Son 12 ay trendi">
-                    <defs>
-                        <?php foreach ($trendSeries as $i => $s): ?>
-                            <linearGradient id="trendGrad<?= $i ?>" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="<?= $s["color"] ?>" stop-opacity="0.26"/>
-                                <stop offset="100%" stop-color="<?= $s["color"] ?>" stop-opacity="0"/>
-                            </linearGradient>
-                        <?php endforeach; ?>
-                    </defs>
-
-                    <?php for ($g = 0; $g <= 3; $g++): $gy = $padT + ($plotH * $g / 3); ?>
-                        <line class="trend-gridline" x1="<?= $padL ?>" y1="<?= number_format($gy, 1, '.', '') ?>" x2="<?= $chartW - $padR ?>" y2="<?= number_format($gy, 1, '.', '') ?>"/>
-                    <?php endfor; ?>
-
-                    <?php foreach ($trendSeries as $i => $s):
-                        $pts = []; $sum = 0;
-                        foreach ($trendRows as $j => $row) {
-                            $v = (int) $row[$s["key"]]; $sum += $v;
-                            $x = $padL + ($j * $step);
-                            $y = $padT + $plotH - ($globalMax > 0 ? ($v / $globalMax) * $plotH : 0);
-                            $pts[] = [$x, $y];
-                        }
-                        $seriesTotals[$s["key"]] = $sum;
-                        $line = ""; $bottomY = $padT + $plotH;
-                        foreach ($pts as $k => $p) {
-                            $line .= ($k === 0 ? "M" : "L") . number_format($p[0], 1, '.', '') . " " . number_format($p[1], 1, '.', '') . " ";
-                        }
-                        $area = $line . "L" . number_format($pts[count($pts) - 1][0], 1, '.', '') . " " . $bottomY . " L" . number_format($pts[0][0], 1, '.', '') . " " . $bottomY . " Z";
-                    ?>
-                        <path class="trend-area" d="<?= $area ?>" fill="url(#trendGrad<?= $i ?>)" stroke="none"/>
-                        <path class="trend-line" d="<?= $line ?>" fill="none" stroke="<?= $s["color"] ?>" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
-                    <?php endforeach; ?>
-
-                    <?php foreach ($trendRows as $j => $xrow): $lx = $padL + ($j * $step); ?>
-                        <text class="trend-xlabel" x="<?= number_format($lx, 1, '.', '') ?>" y="<?= $chartH - 7 ?>"><?= htmlspecialchars((string) $xrow["label"], ENT_QUOTES, "UTF-8") ?></text>
-                    <?php endforeach; ?>
-                </svg>
+                <div class="trend-chart" id="trendChart"></div>
             </div>
-            <div class="trend-legend">
-                <?php foreach ($trendSeries as $s): ?>
-                    <span class="trend-legend-chip">
+            <div class="trend-legend" id="trendLegend">
+                <?php $trendSeriesMeta = [
+                    ["key" => "audits", "label" => "Denetimler", "i18n" => "dashboardTrendAuditsLabel", "color" => "#465fff"],
+                    ["key" => "nonconformities", "label" => "Uygunsuzluklar", "i18n" => "dashboardTrendNonconformitiesLabel", "color" => "#f79009"],
+                    ["key" => "actions_completed", "label" => "Tamamlanan Aksiyon", "i18n" => "dashboardTrendActionsLabel", "color" => "#7a5af8"],
+                    ["key" => "trainings_completed", "label" => "Tamamlanan Eğitim", "i18n" => "dashboardTrendTrainingsLabel", "color" => "#12b76a"],
+                    ["key" => "complaints", "label" => "Şikayetler", "i18n" => "dashboardTrendComplaintsLabel", "color" => "#f04438"],
+                ]; ?>
+                <?php foreach ($trendSeriesMeta as $s): ?>
+                    <button class="trend-legend-chip is-on" type="button" data-key="<?= $s["key"] ?>">
                         <i class="trend-legend-dot" style="background:<?= $s["color"] ?>"></i>
                         <span data-i18n="<?= $s["i18n"] ?>"><?= htmlspecialchars($s["label"], ENT_QUOTES, "UTF-8") ?></span>
-                        <strong><?= htmlspecialchars((string) ($seriesTotals[$s["key"]] ?? 0), ENT_QUOTES, "UTF-8") ?></strong>
-                    </span>
+                        <strong class="trend-chip-total">0</strong>
+                    </button>
                 <?php endforeach; ?>
             </div>
+
+            <?php $trendPeriodData = qmsTrendPeriodData($pdo, $userId, qmsCurrentRole()); ?>
+            <script>
+            window.TREND = {
+                periods: <?= json_encode($trendPeriodData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+                series: <?= json_encode($trendSeriesMeta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
+            };
+            </script>
         </section>
 
         <section class="page-section console-card">
@@ -905,6 +868,123 @@ $activeNav = "dashboard";
 
     </main>
 
+    <script>
+    (function () {
+        var TREND = window.TREND || { periods: {}, series: [] };
+        var chartEl = document.getElementById('trendChart');
+        var legendEl = document.getElementById('trendLegend');
+        var toggleEl = document.getElementById('trendPeriodToggle');
+        if (!chartEl || !TREND.periods['12m']) return;
+
+        var period = '12m';
+        var active = {};
+        TREND.series.forEach(function (s) { active[s.key] = true; });
+
+        var W = 760, H = 250, pL = 10, pR = 10, pT = 16, pB = 28;
+
+        function esc(v) {
+            return String(v).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function render() {
+            var pd = TREND.periods[period] || { labels: [], series: {} };
+            var labels = pd.labels || [];
+            var n = labels.length;
+            if (!n) return;
+            var plotW = W - pL - pR, plotH = H - pT - pB;
+            var step = n > 1 ? plotW / (n - 1) : 0;
+            var globalMax = 1;
+            TREND.series.forEach(function (s) {
+                (pd.series[s.key] || []).forEach(function (v) { if (+v > globalMax) globalMax = +v; });
+            });
+
+            var chips = legendEl.querySelectorAll('.trend-legend-chip');
+            chips.forEach(function (ch) {
+                var key = ch.getAttribute('data-key');
+                var arr = pd.series[key] || [];
+                var sum = arr.reduce(function (a, b) { return a + (+b || 0); }, 0);
+                var t = ch.querySelector('.trend-chip-total');
+                if (t) t.textContent = sum;
+                ch.classList.toggle('is-on', !!active[key]);
+                ch.classList.toggle('is-off', !active[key]);
+            });
+
+            var defs = TREND.series.map(function (s, i) {
+                return '<linearGradient id="tg' + i + '" x1="0" y1="0" x2="0" y2="1">' +
+                    '<stop offset="0%" stop-color="' + s.color + '" stop-opacity="0.26"/>' +
+                    '<stop offset="100%" stop-color="' + s.color + '" stop-opacity="0"/></linearGradient>';
+            }).join('');
+
+            var grid = '';
+            for (var g = 0; g <= 3; g++) {
+                var gy = pT + plotH * g / 3;
+                grid += '<line class="trend-gridline" x1="' + pL + '" y1="' + gy.toFixed(1) + '" x2="' + (W - pR) + '" y2="' + gy.toFixed(1) + '"/>';
+            }
+
+            var areas = '', lines = '';
+            TREND.series.forEach(function (s, i) {
+                if (active[s.key] === false) return;
+                var arr = pd.series[s.key] || [];
+                var pts = [];
+                for (var j = 0; j < n; j++) {
+                    var v = +arr[j] || 0;
+                    var x = pL + j * step;
+                    var y = pT + plotH - (globalMax > 0 ? (v / globalMax) * plotH : 0);
+                    pts.push([x, y]);
+                }
+                var line = '', area = '';
+                pts.forEach(function (p, k) { line += (k === 0 ? 'M' : 'L') + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ' '; });
+                var bottom = pT + plotH;
+                area = line + 'L' + pts[pts.length - 1][0].toFixed(1) + ' ' + bottom + ' L' + pts[0][0].toFixed(1) + ' ' + bottom + ' Z';
+                areas += '<path class="trend-area" d="' + area + '" fill="url(#tg' + i + ')" stroke="none"/>';
+                lines += '<path class="trend-line" d="' + line + '" fill="none" stroke="' + s.color + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+            });
+
+            var labelStep = 1;
+            if (period === '30d') labelStep = 5;
+            else if (period === '24h') labelStep = 4;
+            var xlabels = '';
+            labels.forEach(function (la, j) {
+                if (j % labelStep !== 0 && j !== n - 1) return;
+                xlabels += '<text class="trend-xlabel" x="' + (pL + j * step).toFixed(1) + '" y="' + (H - 7) + '">' + esc(la) + '</text>';
+            });
+
+            chartEl.innerHTML = '<svg class="trend-chart-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Tren">' +
+                '<defs>' + defs + '</defs>' + grid + areas + lines + xlabels + '</svg>';
+        }
+
+        function setPeriod(p) {
+            period = p;
+            if (toggleEl) {
+                toggleEl.querySelectorAll('.trend-period-item').forEach(function (it) {
+                    it.classList.toggle('is-active', it.getAttribute('data-period') === p);
+                });
+            }
+            render();
+        }
+
+        if (legendEl) {
+            legendEl.addEventListener('click', function (e) {
+                var chip = e.target.closest('.trend-legend-chip');
+                if (!chip) return;
+                var key = chip.getAttribute('data-key');
+                active[key] = !active[key];
+                render();
+            });
+        }
+        if (toggleEl) {
+            toggleEl.addEventListener('click', function (e) {
+                var it = e.target.closest('.trend-period-item');
+                if (!it) return;
+                setPeriod(it.getAttribute('data-period'));
+            });
+        }
+
+        render();
+    })();
+    </script>
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/language.js"></script>
     <script src="assets/js/sidebar.js"></script>

@@ -6012,3 +6012,33 @@ html {
     display: inline-block;
     flex-shrink: 0;
 }
+
+/* Dönem seçici + lejant toggle butonları */
+.trend-period-item {
+    border: none;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+.trend-legend-chip {
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-strong-color);
+    font: inherit;
+    cursor: pointer;
+    color: var(--muted-color);
+}
+.trend-legend-chip:hover {
+    border-color: var(--brand-300);
+}
+.trend-legend-chip.is-on {
+    color: var(--text-color);
+}
+.trend-legend-chip.is-on strong {
+    color: var(--text-color);
+}
+.trend-legend-chip.is-off {
+    opacity: 0.45;
+}
+.trend-legend-chip.is-off .trend-legend-dot {
+    filter: grayscale(1);
+}

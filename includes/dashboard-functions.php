@@ -500,3 +500,79 @@ function qmsCockpitKpiMatrix(PDO $pdo, int $userId, bool $isSuperAdmin, int $yea
 
     return $companies;
 }
+
+/**
+ * Donem bazli trend kovalari (panel): 12 ay / 30 gun / 7 gun / 24 saat.
+ * Seriler: audits, nonconformities, actions_completed, trainings_completed, complaints.
+ *
+ * @return array<string, array{labels: array<int,string>, series: array<string, array<int,int>>}>
+ */
+function qmsTrendPeriodData(PDO $pdo, int $userId, string $role): array
+{
+    $companyIds = qmsVisibleCompanyIds($pdo, $userId, $role);
+    $scope = qmsCompanyScope('co.id', $companyIds);
+
+    $periods = [
+        '12m' => ['fmt' => '%Y-%m',      'start' => date('Y-m-01', strtotime('-11 months')), 'step' => 'P1M', 'dur' => 12, 'label' => 'monthY'],
+        '30d' => ['fmt' => '%Y-%m-%d',   'start' => date('Y-m-d', strtotime('-29 days')),      'step' => 'P1D', 'dur' => 30, 'label' => 'day'],
+        '7d'  => ['fmt' => '%Y-%m-%d',   'start' => date('Y-m-d', strtotime('-6 days')),       'step' => 'P1D', 'dur' => 7,  'label' => 'dayM'],
+        '24h' => ['fmt' => '%Y-%m-%d %H:00', 'start' => date('Y-m-d H:00', strtotime('-23 hours')), 'step' => 'PT1H', 'dur' => 24, 'label' => 'hour'],
+    ];
+
+    $monthsShort = qmsMonthShortLabels();
+    $result = [];
+
+    foreach ($periods as $pk => $p) {
+        $buckets = [];
+        $dt = new DateTime($p['start']);
+        for ($i = 0; $i < $p['dur']; $i++) {
+            $key = $dt->format($p['fmt']);
+            $label = match ($p['label']) {
+                'monthY' => $monthsShort[(int) $dt->format('n')] . ' ' . $dt->format('y'),
+                'day'    => (string) $dt->format('j'),
+                'dayM'   => $dt->format('j') . ' ' . $monthsShort[(int) $dt->format('n')],
+                'hour'   => $dt->format('H') . ':00',
+                default  => (string) $key,
+            };
+            $buckets[$key] = [
+                'label' => $label,
+                'audits' => 0, 'nonconformities' => 0, 'actions_completed' => 0,
+                'trainings_completed' => 0, 'complaints' => 0,
+            ];
+            $dt->add(new DateInterval($p['step']));
+        }
+
+        $startParam = $p['start'];
+        $fmt = $p['fmt'];
+
+        $fillQ = static function (string $sql, string $col) use ($pdo, $scope, $startParam, &$buckets): void {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(array_merge([$startParam], $scope['params']));
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $k = (string) ($row['g'] ?? '');
+                if (isset($buckets[$k])) {
+                    $buckets[$k][$col] += (int) $row['c'];
+                }
+            }
+        };
+
+        $fillQ("SELECT DATE_FORMAT(a.created_at, '{$fmt}') AS g, COUNT(*) AS c FROM audits a INNER JOIN companies co ON co.id=a.company_id WHERE a.active=1 AND a.created_at >= ?" . $scope['sql'] . ' GROUP BY g', 'audits');
+        $fillQ("SELECT DATE_FORMAT(n.created_at, '{$fmt}') AS g, COUNT(*) AS c FROM nonconformities n INNER JOIN companies co ON co.id=n.company_id WHERE n.active=1 AND n.created_at >= ?" . $scope['sql'] . ' GROUP BY g', 'nonconformities');
+        $fillQ("SELECT DATE_FORMAT(ca.completed_at, '{$fmt}') AS g, COUNT(*) AS c FROM corrective_actions ca INNER JOIN nonconformities n ON n.id=ca.nonconformity_id INNER JOIN companies co ON co.id=n.company_id WHERE ca.active=1 AND ca.completed_at IS NOT NULL AND ca.completed_at >= ?" . $scope['sql'] . ' GROUP BY g', 'actions_completed');
+        $fillQ("SELECT DATE_FORMAT(t.completed_date, '{$fmt}') AS g, COUNT(*) AS c FROM trainings t INNER JOIN companies co ON co.id=t.company_id WHERE t.active=1 AND t.completed_date IS NOT NULL AND t.completed_date >= ?" . $scope['sql'] . ' GROUP BY g', 'trainings_completed');
+        $fillQ("SELECT DATE_FORMAT(cc.created_at, '{$fmt}') AS g, COUNT(*) AS c FROM complaints cc INNER JOIN companies co ON co.id=cc.company_id WHERE cc.active=1 AND cc.created_at >= ?" . $scope['sql'] . ' GROUP BY g', 'complaints');
+
+        $result[$pk] = [
+            'labels' => array_map(static fn($b) => $b['label'], array_values($buckets)),
+            'series' => [
+                'audits'             => array_map(static fn($b) => $b['audits'], array_values($buckets)),
+                'nonconformities'    => array_map(static fn($b) => $b['nonconformities'], array_values($buckets)),
+                'actions_completed'  => array_map(static fn($b) => $b['actions_completed'], array_values($buckets)),
+                'trainings_completed'=> array_map(static fn($b) => $b['trainings_completed'], array_values($buckets)),
+                'complaints'         => array_map(static fn($b) => $b['complaints'], array_values($buckets)),
+            ],
+        ];
+    }
+
+    return $result;
+}
