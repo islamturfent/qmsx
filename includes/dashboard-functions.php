@@ -513,10 +513,10 @@ function qmsTrendPeriodData(PDO $pdo, int $userId, string $role): array
     $scope = qmsCompanyScope('co.id', $companyIds);
 
     $periods = [
-        '12m' => ['fmt' => '%Y-%m',      'start' => date('Y-m-01', strtotime('-11 months')), 'step' => 'P1M', 'dur' => 12, 'label' => 'monthY'],
-        '30d' => ['fmt' => '%Y-%m-%d',   'start' => date('Y-m-d', strtotime('-29 days')),      'step' => 'P1D', 'dur' => 30, 'label' => 'day'],
-        '7d'  => ['fmt' => '%Y-%m-%d',   'start' => date('Y-m-d', strtotime('-6 days')),       'step' => 'P1D', 'dur' => 7,  'label' => 'dayM'],
-        '24h' => ['fmt' => '%Y-%m-%d %H:00', 'start' => date('Y-m-d H:00', strtotime('-23 hours')), 'step' => 'PT1H', 'dur' => 24, 'label' => 'hour'],
+        '12m' => ['fmt' => '%Y-%m',          'keyfmt' => 'Y-m',     'start' => date('Y-m-01', strtotime('-11 months')), 'step' => 'P1M', 'dur' => 12, 'label' => 'monthY'],
+        '30d' => ['fmt' => '%Y-%m-%d',       'keyfmt' => 'Y-m-d',   'start' => date('Y-m-d', strtotime('-29 days')), 'step' => 'P1D', 'dur' => 30, 'label' => 'day'],
+        '7d'  => ['fmt' => '%Y-%m-%d',       'keyfmt' => 'Y-m-d',   'start' => date('Y-m-d', strtotime('-6 days')), 'step' => 'P1D', 'dur' => 7,  'label' => 'dayM'],
+        '24h' => ['fmt' => '%Y-%m-%d %H:00', 'keyfmt' => 'Y-m-d H:00', 'start' => date('Y-m-d H:00', strtotime('-23 hours')), 'step' => 'PT1H', 'dur' => 24, 'label' => 'hour'],
     ];
 
     $monthsShort = qmsMonthShortLabels();
@@ -526,7 +526,7 @@ function qmsTrendPeriodData(PDO $pdo, int $userId, string $role): array
         $buckets = [];
         $dt = new DateTime($p['start']);
         for ($i = 0; $i < $p['dur']; $i++) {
-            $key = $dt->format($p['fmt']);
+            $key = $dt->format($p['keyfmt']);
             $label = match ($p['label']) {
                 'monthY' => $monthsShort[(int) $dt->format('n')] . ' ' . $dt->format('y'),
                 'day'    => (string) $dt->format('j'),

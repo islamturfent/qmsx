@@ -5966,6 +5966,7 @@ html {
     border: 1px solid var(--border-subtle);
     border-radius: var(--border-radius, 16px);
     padding: 16px 12px 6px;
+    overflow: hidden;
 }
 .trend-chart {
     width: 100%;
