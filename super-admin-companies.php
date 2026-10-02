@@ -26,7 +26,12 @@ $companyFormData = [
     "tax_number" => "",
     "sector" => "",
     "city" => "",
-    "contact_email" => ""
+    "contact_email" => "",
+    "website" => "",
+    "phone" => "",
+    "address" => "",
+    "contact_person" => "",
+    "brand_name" => ""
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -37,20 +42,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "tax_number" => trim($_POST["tax_number"] ?? ""),
         "sector" => trim($_POST["sector"] ?? ""),
         "city" => trim($_POST["city"] ?? ""),
-        "contact_email" => trim($_POST["contact_email"] ?? "")
+        "contact_email" => trim($_POST["contact_email"] ?? ""),
+        "website" => trim($_POST["website"] ?? ""),
+        "phone" => trim($_POST["phone"] ?? ""),
+        "address" => trim($_POST["address"] ?? ""),
+        "contact_person" => trim($_POST["contact_person"] ?? ""),
+        "brand_name" => trim($_POST["brand_name"] ?? "")
     ];
 
     if ($companyFormData["company_name"] === "") {
         $companyFormError = "Lütfen şirket adını girin.";
-    } elseif (
-        $companyFormData["contact_email"] !== "" &&
-        !filter_var($companyFormData["contact_email"], FILTER_VALIDATE_EMAIL)
-    ) {
+    } elseif ($companyFormData["contact_email"] === "") {
+        $companyFormError = "Lütfen şirket e-postasını girin.";
+    } elseif (!filter_var($companyFormData["contact_email"], FILTER_VALIDATE_EMAIL)) {
         $companyFormError = "Lütfen geçerli bir şirket e-posta adresi girin.";
     } else {
         $insertCompany = $pdo->prepare(
-            "INSERT INTO companies (company_name, tax_number, sector, city, contact_email, active)
-             VALUES (:company_name, :tax_number, :sector, :city, :contact_email, 1)"
+            "INSERT INTO companies (company_name, tax_number, sector, city, contact_email, website, phone, address, contact_person, brand_name, active)
+             VALUES (:company_name, :tax_number, :sector, :city, :contact_email, :website, :phone, :address, :contact_person, :brand_name, 1)"
         );
         $insertCompany->execute($companyFormData);
 
@@ -163,9 +172,16 @@ $companies = $companiesStmt->fetchAll(PDO::FETCH_ASSOC);
                         </label>
 
                         <label class="form-field form-field-wide">
-                            <span data-i18n="companyEmailLabel">Şirket E-postası</span>
-                            <input type="email" name="contact_email" value="<?= htmlspecialchars($companyFormData["contact_email"], ENT_QUOTES, "UTF-8") ?>">
+                            <span data-i18n="companyEmailLabel">Şirket E-postası *</span>
+                            <input type="email" name="contact_email" value="<?= htmlspecialchars($companyFormData["contact_email"], ENT_QUOTES, "UTF-8") ?>" required>
                         </label>
+
+                        <label class="form-field"><span data-i18n="companyWebsiteLabel">Web Sitesi</span><input type="text" name="website" value="<?= htmlspecialchars($companyFormData["website"], ENT_QUOTES, "UTF-8") ?>"></label>
+                        <label class="form-field"><span data-i18n="companyPhoneLabel">Telefon</span><input type="text" name="phone" value="<?= htmlspecialchars($companyFormData["phone"], ENT_QUOTES, "UTF-8") ?>"></label>
+                        <label class="form-field form-field-wide"><span data-i18n="companyAddressLabel">Adres</span><input type="text" name="address" value="<?= htmlspecialchars($companyFormData["address"], ENT_QUOTES, "UTF-8") ?>"></label>
+                        <label class="form-field"><span data-i18n="contactPersonLabel">Yetkili Kişi</span><input type="text" name="contact_person" value="<?= htmlspecialchars($companyFormData["contact_person"], ENT_QUOTES, "UTF-8") ?>"></label>
+                        <label class="form-field"><span data-i18n="brandNameLabel">Marka Adı</span><input type="text" name="brand_name" value="<?= htmlspecialchars($companyFormData["brand_name"], ENT_QUOTES, "UTF-8") ?>"></label>
+                        <small class="form-wide-hint" data-i18n="companyOptionalHint">Şirket adı ve e-postası zorunludur; diğer alanlar isteğe bağlıdır.</small>
                     </div>
 
                     <div class="form-actions">
@@ -188,13 +204,17 @@ $companies = $companiesStmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endif; ?>
 
                     <?php foreach ($companies as $company): ?>
-                        <a class="admin-list-item" href="company-detail.php?id=<?= (int) $company["id"] ?>">
+                        <div class="admin-list-item">
                             <div>
                                 <strong><?= htmlspecialchars($company["company_name"], ENT_QUOTES, "UTF-8") ?></strong>
                                 <span><?= htmlspecialchars(trim(($company["city"] ?? "") . " " . ($company["sector"] ?? "")), ENT_QUOTES, "UTF-8") ?></span>
                             </div>
-                            <span class="status-pill" data-i18n="activeStatusLabel">Aktif</span>
-                        </a>
+                            <div class="admin-list-actions">
+                                <span class="status-pill" data-i18n="activeStatusLabel">Aktif</span>
+                                <a class="secondary-button" href="company-profile.php?id=<?= (int) $company["id"] ?>" data-i18n="companyProfileButton">Profil</a>
+                                <a class="secondary-button" href="company-detail.php?id=<?= (int) $company["id"] ?>" data-i18n="companyWorkspaceButton">Çalışma Alanı</a>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>

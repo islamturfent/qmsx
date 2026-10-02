@@ -5689,3 +5689,73 @@ html {
 @media (max-width: 560px) {
     .landing-ai-highlights { grid-template-columns: 1fr; }
 }
+
+/* --- COMPANY PROFILE --- */
+.page-heading-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.form-wide-hint {
+    grid-column: 1 / -1;
+    color: var(--muted-color);
+    font-size: 12.5px;
+}
+
+.company-logo-block {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.company-logo-preview {
+    width: 96px;
+    height: 96px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface-strong-color);
+    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.company-logo-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.company-logo-placeholder {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--brand-500);
+}
+
+.company-logo-controls {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toggle-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--muted-color);
+}
