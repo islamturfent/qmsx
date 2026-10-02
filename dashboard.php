@@ -636,7 +636,7 @@ $activeNav = "dashboard";
                 </div>
             </div>
             <div class="trend-chart-wrap">
-                <div class="trend-chart" id="trendChart"></div>
+                <div class="trend-plot" id="trendChart"></div>
             </div>
             <div class="trend-legend" id="trendLegend">
                 <?php $trendSeriesMeta = [

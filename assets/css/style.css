@@ -6059,7 +6059,7 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
     padding: 16px 12px 6px;
     overflow: hidden;
 }
-.trend-chart {
+.trend-plot {
     width: 100%;
     height: auto;
     overflow: hidden;
