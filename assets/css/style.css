@@ -4998,8 +4998,8 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
     position: relative;
     overflow: hidden;
     background:
-        radial-gradient(900px 460px at 12% -10%, var(--brand-50), transparent 60%),
-        linear-gradient(135deg, var(--brand-25), var(--surface-color) 62%);
+        radial-gradient(900px 460px at 12% -10%, var(--brand-soft), transparent 60%),
+        linear-gradient(135deg, var(--surface-strong-color), var(--surface-color) 62%);
 }
 
 .landing-hero h1 em {
