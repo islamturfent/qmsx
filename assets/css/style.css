@@ -5949,68 +5949,87 @@ html {
 }
 
 /* --- FAQ (TailAdmin Faq's 2 accordion) --- */
-.landing-faq-card {
-    max-width: 780px;
+.landing-faq-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    max-width: 1020px;
     margin: 0 auto;
 }
+@media (min-width: 768px) {
+    .landing-faq-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 24px;
+        align-items: start;
+    }
+}
+.landing-faq-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 .faq-item {
-    background: var(--surface-color);
-    border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    margin-bottom: 12px;
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    border-radius: 12px;
+    background: var(--surface-muted);
+    transition: background-color 0.2s ease;
 }
 .faq-item.is-open {
-    border-color: var(--brand-300);
-    box-shadow: var(--shadow-theme-sm);
+    background: var(--brand-soft);
 }
 .faq-question {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 16px 20px;
-    background: transparent;
+    gap: 14px;
+    padding: 16px 22px;
     border: none;
+    background: transparent;
     font: inherit;
-    text-align: left;
     cursor: pointer;
+    text-align: left;
+}
+.faq-q {
+    font-size: 16px;
+    font-weight: 500;
     color: var(--text-color);
-    font-weight: 600;
-    font-size: 15px;
 }
 .faq-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
-    background: var(--brand-soft);
-    color: var(--brand-500);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
     flex-shrink: 0;
-    transition: transform 0.25s ease, background 0.25s ease;
+    color: var(--gray-500);
+}
+.faq-icon svg {
+    display: block;
 }
 .faq-item.is-open .faq-icon {
-    transform: rotate(45deg);
-    background: var(--brand-500);
-    color: #fff;
+    color: var(--text-color);
+}
+.faq-ico-minus {
+    display: none;
+}
+.faq-item.is-open .faq-ico-minus {
+    display: block;
+}
+.faq-item.is-open .faq-ico-plus {
+    display: none;
 }
 .faq-answer {
     display: none;
-    padding: 0 20px 16px;
-    color: var(--muted-color);
-    font-size: 14px;
-    line-height: 1.6;
+    border-top: 1px solid var(--brand-200);
+    padding: 20px 22px;
 }
 .faq-item.is-open .faq-answer {
     display: block;
 }
 .faq-answer p {
     margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-color);
 }
 
 /* -- Son 12 Ay Trendleri — TailAdmin analytics tarzı -- */

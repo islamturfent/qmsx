@@ -300,55 +300,77 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
             </div>
         </section>
 
-        <!-- FAQ -->
+        <!-- FAQ (TailAdmin Faq's 2) -->
         <section class="landing-section landing-wrap landing-faq" id="landing-faq">
             <div class="landing-section-head">
                 <span class="landing-kicker" data-i18n="landingFaqKicker">SSS</span>
                 <h2 data-i18n="landingFaqTitle">Sık Sorulan Sorular</h2>
                 <p data-i18n="landingFaqText">Kalite yönetim sürecinizle ilgili en çok merak edilenleri yanıtladık.</p>
             </div>
-            <div class="landing-faq-card">
-                <div class="faq-item is-open">
-                    <button class="faq-question" type="button" aria-expanded="true">
-                        <span data-i18n="faq1Q">QuAmi nedir?</span>
-                        <span class="faq-icon">+</span>
-                    </button>
-                    <div class="faq-answer"><p data-i18n="faq1A">QuAmi; doküman kontrolü, denetim, uygunsuzluk/CAPA, risk, eğitim ve raporlama süreçlerini tek panelde toplayan bir kalite yönetim sistemidir.</p></div>
+            <div class="landing-faq-grid">
+                <div class="landing-faq-col">
+                    <div class="faq-item is-open">
+                        <button class="faq-question" type="button" aria-expanded="true">
+                            <span class="faq-q" data-i18n="faq1Q">QuAmi nedir?</span>
+                            <span class="faq-icon">
+                                <svg class="faq-ico-plus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 7v14M7 14h14"/></svg>
+                                <svg class="faq-ico-minus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 14h14"/></svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer"><p data-i18n="faq1A">QuAmi; doküman kontrolü, denetim, uygunsuzluk/CAPA, risk, eğitim ve raporlama süreçlerini tek panelde toplayan bir kalite yönetim sistemidir.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-q" data-i18n="faq2Q">Yapay zeka ile nasıl doküman oluştururum?</span>
+                            <span class="faq-icon">
+                                <svg class="faq-ico-plus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 7v14M7 14h14"/></svg>
+                                <svg class="faq-ico-minus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 14h14"/></svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer"><p data-i18n="faq2A">AI Doküman Stüdyosu'nda dokümanı sesle veya yazıyla tarif edin; taslak anında oluşur, web editöründe düzenleyip şablon olarak kaydedebilirsiniz.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-q" data-i18n="faq3Q">Denetime hazırlık nasıl takip edilir?</span>
+                            <span class="faq-icon">
+                                <svg class="faq-ico-plus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 7v14M7 14h14"/></svg>
+                                <svg class="faq-ico-minus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 14h14"/></svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer"><p data-i18n="faq3A">Vade takibi, gecikme bildirimleri ve dönem özeti otomatik çalışır; güncel doküman ve aksiyon durumlarıyla denetime her an hazır olursunuz.</p></div>
+                    </div>
                 </div>
-                <div class="faq-item">
-                    <button class="faq-question" type="button" aria-expanded="false">
-                        <span data-i18n="faq2Q">Yapay zeka ile nasıl doküman oluştururum?</span>
-                        <span class="faq-icon">+</span>
-                    </button>
-                    <div class="faq-answer"><p data-i18n="faq2A">AI Doküman Stüdyosu'nda dokümanı sesle veya yazıyla tarif edin; taslak anında oluşur, web editöründe düzenleyip şablon olarak kaydedebilirsiniz.</p></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" type="button" aria-expanded="false">
-                        <span data-i18n="faq3Q">Denetime hazırlık nasıl takip edilir?</span>
-                        <span class="faq-icon">+</span>
-                    </button>
-                    <div class="faq-answer"><p data-i18n="faq3A">Vade takibi, gecikme bildirimleri ve dönem özeti otomatik çalışır; güncel doküman ve aksiyon durumlarıyla denetime her an hazır olursunuz.</p></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" type="button" aria-expanded="false">
-                        <span data-i18n="faq4Q">Hangi dillerde kullanabilirim?</span>
-                        <span class="faq-icon">+</span>
-                    </button>
-                    <div class="faq-answer"><p data-i18n="faq4A">Türkçe ve İngilizce yerleşik dillerdir; Dil Yönetimi bölümünden yeni diller ekleyebilir, çevirileri yönetebilirsiniz.</p></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" type="button" aria-expanded="false">
-                        <span data-i18n="faq5Q">Sesli komut destekleniyor mu?</span>
-                        <span class="faq-icon">+</span>
-                    </button>
-                    <div class="faq-answer"><p data-i18n="faq5A">Evet; AI Doküman Stüdyosu mikrofonla dokümanı tarif etmenize, böylece işlemleri daha hızlı yürütmenize olanak tanır.</p></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" type="button" aria-expanded="false">
-                        <span data-i18n="faq6Q">Verilerim güvende mi?</span>
-                        <span class="faq-icon">+</span>
-                    </button>
-                    <div class="faq-answer"><p data-i18n="faq6A">RBAC izinleri, CSRF koruması ve oturum/otomatik yedek ayarlarıyla verileriniz korunur; süper admin tüm erişimi yönetir.</p></div>
+                <div class="landing-faq-col">
+                    <div class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-q" data-i18n="faq4Q">Hangi dillerde kullanabilirim?</span>
+                            <span class="faq-icon">
+                                <svg class="faq-ico-plus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 7v14M7 14h14"/></svg>
+                                <svg class="faq-ico-minus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 14h14"/></svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer"><p data-i18n="faq4A">Türkçe ve İngilizce yerleşik dillerdir; Dil Yönetimi bölümünden yeni diller ekleyebilir, çevirileri yönetebilirsiniz.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-q" data-i18n="faq5Q">Sesli komut destekleniyor mu?</span>
+                            <span class="faq-icon">
+                                <svg class="faq-ico-plus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 7v14M7 14h14"/></svg>
+                                <svg class="faq-ico-minus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 14h14"/></svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer"><p data-i18n="faq5A">Evet; AI Doküman Stüdyosu mikrofonla dokümanı tarif etmenize, böylece işlemleri daha hızlı yürütmenize olanak tanır.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-q" data-i18n="faq6Q">Verilerim güvende mi?</span>
+                            <span class="faq-icon">
+                                <svg class="faq-ico-plus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 7v14M7 14h14"/></svg>
+                                <svg class="faq-ico-minus" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 14h14"/></svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer"><p data-i18n="faq6A">RBAC izinleri, CSRF koruması ve oturum/otomatik yedek ayarlarıyla verileriniz korunur; süper admin tüm erişimi yönetir.</p></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -424,7 +446,7 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
         questions.forEach(function (btn) {
             btn.addEventListener('click', function () {
                 var item = btn.closest('.faq-item');
-                var card = btn.closest('.landing-faq-card');
+                var card = btn.closest('.landing-faq-grid');
                 var willOpen = !item.classList.contains('is-open');
                 if (card) {
                     card.querySelectorAll('.faq-item.is-open').forEach(function (o) {
