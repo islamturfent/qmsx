@@ -237,6 +237,40 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
             </div>
         </section>
 
+        <!-- AI SECTION -->
+        <section class="landing-section landing-wrap landing-ai" id="landing-ai">
+            <div class="landing-ai-panel">
+                <div class="landing-ai-intro">
+                    <span class="landing-kicker" data-i18n="landingAiSecKicker">Yapay Zeka Öne Çıkan</span>
+                    <h2 data-i18n="landingAiSecTitle">Yapay zeka desteğiyle daha az iş, daha hızlı sonuç.</h2>
+                    <p data-i18n="landingAiSecText">AI Doküman Stüdyosu; taslak üretiminden sesli komuta kadar doküman süreçlerinizi otomatikleştirir ve ekibinizi denetime hazır tutar.</p>
+                    <a class="primary-button landing-button" href="ai-document-studio.php" data-i18n="landingAiSecCta">AI Stüdyo'yu Aç</a>
+                </div>
+                <div class="landing-ai-highlights">
+                    <article class="ai-card">
+                        <div class="ai-card-icon"><?= svg_icon('mic') ?></div>
+                        <h3 data-i18n="landingAiCard1Title">Sesli Komut</h3>
+                        <p data-i18n="landingAiCard1Text">Dokümanı konuşarak tarif edin; taslak anında hazır.</p>
+                    </article>
+                    <article class="ai-card">
+                        <div class="ai-card-icon"><?= svg_icon('spark') ?></div>
+                        <h3 data-i18n="landingAiCard2Title">Taslak Üretimi</h3>
+                        <p data-i18n="landingAiCard2Text">Tarife göre kalite yönetim uyumlu taslak otomatik oluşur.</p>
+                    </article>
+                    <article class="ai-card">
+                        <div class="ai-card-icon"><?= svg_icon('edit') ?></div>
+                        <h3 data-i18n="landingAiCard3Title">Web Editörü</h3>
+                        <p data-i18n="landingAiCard3Text">Taslağı çevrim içi editörde düzenleyin ve son halini verin.</p>
+                    </article>
+                    <article class="ai-card">
+                        <div class="ai-card-icon"><?= svg_icon('file') ?></div>
+                        <h3 data-i18n="landingAiCard4Title">Aktar & Kaydet</h3>
+                        <p data-i18n="landingAiCard4Text">Dokümana aktarın ya da şablon olarak yeniden kullanın.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
         <!-- STEPS -->
         <section class="landing-section landing-wrap" id="landing-steps">
             <div class="landing-section-head">
@@ -343,6 +377,10 @@ function svg_icon(string $name): string
         'risk'     => '<path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16h.01"/>',
         'training' => '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10h4v6h-4"/><path d="M7 10h5M7 14h3"/>',
         'report'   => '<path d="M3 4h18M5 4v16h14V4"/><rect x="7" y="8" width="3" height="6" fill="currentColor" stroke="none"/><rect x="12" y="8" width="3" height="9" fill="currentColor" stroke="none"/><rect x="17" y="8" width="3" height="3" fill="currentColor" stroke="none"/>',
+        'mic'      => '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11v1a7 7 0 0 0 14 0v-1"/><path d="M12 19v2"/>',
+        'spark'    => '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+        'edit'     => '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+        'file'     => '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 12h6M10 16h4"/>',
     ];
     $body = $paths[$name] ?? $paths['report'];
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $body . '</svg>';
