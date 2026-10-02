@@ -5405,3 +5405,29 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
     .landing-solutions, .landing-steps { grid-template-columns: 1fr; }
     .visual-card-grid { grid-template-columns: 1fr; }
 }
+
+/* --- LANDING HEADER NAV --- */
+.landing-nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    margin: 0 auto;
+    padding: 0 8px;
+}
+
+.landing-nav a {
+    color: var(--muted-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.landing-nav a:hover {
+    color: var(--brand-500);
+}
+
+@media (max-width: 760px) {
+    .landing-nav { display: none; }
+}

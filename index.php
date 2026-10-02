@@ -26,7 +26,7 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
     <meta name="author" content="Islam Turfent">
 </head>
 
-<body class="has-sidebar landing-body">
+<body class="landing-body">
 
     <header class="topbar landing-header">
         <div class="topbar-inner">
@@ -37,6 +37,12 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
                     <span data-i18n="landingBrandTagline">Kalite Yönetim Sistemi</span>
                 </div>
             </a>
+
+            <nav class="landing-nav" aria-label="Ana menü">
+                <a href="#landing-solutions" data-i18n="landingNavSolutions">Özellikler</a>
+                <a href="#landing-steps" data-i18n="landingNavHow">Nasıl Çalışır?</a>
+                <a href="#landing-cta" data-i18n="landingNavStart">Başla</a>
+            </nav>
 
             <div class="topbar-actions">
                 <button class="topbar-button" id="languageToggle" type="button">EN</button>
@@ -158,7 +164,7 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
         </section>
 
         <!-- STEPS -->
-        <section class="landing-section landing-wrap">
+        <section class="landing-section landing-wrap" id="landing-steps">
             <div class="landing-section-head">
                 <span class="landing-kicker" data-i18n="landingStepsKicker">Nasıl Çalışır?</span>
                 <h2 data-i18n="landingStepsTitle">Sürece 4 adımda hazır olun.</h2>
@@ -172,7 +178,7 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
         </section>
 
         <!-- CTA -->
-        <section class="landing-cta landing-wrap">
+        <section class="landing-cta landing-wrap" id="landing-cta">
             <div class="landing-cta-inner">
                 <div>
                     <h2 data-i18n="landingCtaTitle">Kalite yolculuğunuza bugün başlayın.</h2>
