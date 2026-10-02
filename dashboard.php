@@ -628,36 +628,75 @@ $activeNav = "dashboard";
                     <h3 data-i18n="dashboardTrendsTitle">Son 12 Ay Trendleri</h3>
                     <p data-i18n="dashboardTrendsText">Aylık denetim, uygunsuzluk, tamamlanan aksiyon, eğitim ve şikayet hareketi.</p>
                 </div>
+                <div class="trend-period-toggle">
+                    <span class="trend-period-item is-active" data-i18n="dashboardTrendPeriodLabel">Son 12 Ay</span>
+                </div>
             </div>
             <?php
             $trendRows = array_values($dashboardTrend);
             $trendSeries = [
-                ["key" => "audits", "label" => "Denetimler", "i18n" => "dashboardTrendAuditsLabel", "icon" => "check", "color" => "blue"],
-                ["key" => "nonconformities", "label" => "Uygunsuzluklar", "i18n" => "dashboardTrendNonconformitiesLabel", "icon" => "alert", "color" => "orange"],
-                ["key" => "actions_completed", "label" => "Tamamlanan Aksiyon", "i18n" => "dashboardTrendActionsLabel", "icon" => "checkBadge", "color" => "violet"],
-                ["key" => "trainings_completed", "label" => "Tamamlanan Eğitim", "i18n" => "dashboardTrendTrainingsLabel", "icon" => "training", "color" => "teal"],
-                ["key" => "complaints", "label" => "Şikayetler", "i18n" => "dashboardTrendComplaintsLabel", "icon" => "complaints", "color" => "brand"],
+                ["key" => "audits", "label" => "Denetimler", "i18n" => "dashboardTrendAuditsLabel", "color" => "#465fff"],
+                ["key" => "nonconformities", "label" => "Uygunsuzluklar", "i18n" => "dashboardTrendNonconformitiesLabel", "color" => "#f79009"],
+                ["key" => "actions_completed", "label" => "Tamamlanan Aksiyon", "i18n" => "dashboardTrendActionsLabel", "color" => "#7a5af8"],
+                ["key" => "trainings_completed", "label" => "Tamamlanan Eğitim", "i18n" => "dashboardTrendTrainingsLabel", "color" => "#12b76a"],
+                ["key" => "complaints", "label" => "Şikayetler", "i18n" => "dashboardTrendComplaintsLabel", "color" => "#f04438"],
             ];
+
+            $chartW = 760; $chartH = 250; $padL = 10; $padR = 10; $padT = 16; $padB = 28;
+            $n = count($trendRows);
+            $globalMax = 1;
+            foreach ($trendSeries as $s) { foreach ($trendRows as $row) { $globalMax = max($globalMax, (int) $row[$s["key"]]); } }
+            $plotW = $chartW - $padL - $padR;
+            $plotH = $chartH - $padT - $padB;
+            $step = $n > 1 ? $plotW / ($n - 1) : 0;
+            $seriesTotals = [];
             ?>
-            <div class="trend-list">
-                <?php foreach ($trendSeries as $series): ?>
-                    <?php $seriesMax = 1; foreach ($trendRows as $row) { $seriesMax = max($seriesMax, (int) $row[$series["key"]]); } ?>
-                    <div class="trend-series">
-                        <div class="trend-series-head">
-                            <?= appIcon($series["icon"], "trend-series-icon") ?>
-                            <span data-i18n="<?= $series["i18n"] ?>"><?= htmlspecialchars($series["label"], ENT_QUOTES, "UTF-8") ?></span>
-                        </div>
-                        <div class="trend-strip">
-                            <?php foreach ($trendRows as $row): ?>
-                                <?php $trendValue = (int) $row[$series["key"]]; $trendHeight = $trendValue > 0 ? round(($trendValue / $seriesMax) * 100) : 0; ?>
-                                <div class="trend-bar" title="<?= htmlspecialchars($row["label"] . ": " . $trendValue, ENT_QUOTES, "UTF-8") ?>">
-                                    <span class="trend-bar-value"><?= $trendValue > 0 ? $trendValue : "" ?></span>
-                                    <span class="trend-bar-track"><span class="trend-bar-fill bar-<?= $series["color"] ?>" style="height:<?= $trendHeight ?>%"></span></span>
-                                    <span class="trend-bar-label"><?= htmlspecialchars($row["label"], ENT_QUOTES, "UTF-8") ?></span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+            <div class="trend-chart-wrap">
+                <svg class="trend-chart-svg" viewBox="0 0 <?= $chartW ?> <?= $chartH ?>" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Son 12 ay trendi">
+                    <defs>
+                        <?php foreach ($trendSeries as $i => $s): ?>
+                            <linearGradient id="trendGrad<?= $i ?>" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="<?= $s["color"] ?>" stop-opacity="0.26"/>
+                                <stop offset="100%" stop-color="<?= $s["color"] ?>" stop-opacity="0"/>
+                            </linearGradient>
+                        <?php endforeach; ?>
+                    </defs>
+
+                    <?php for ($g = 0; $g <= 3; $g++): $gy = $padT + ($plotH * $g / 3); ?>
+                        <line class="trend-gridline" x1="<?= $padL ?>" y1="<?= number_format($gy, 1, '.', '') ?>" x2="<?= $chartW - $padR ?>" y2="<?= number_format($gy, 1, '.', '') ?>"/>
+                    <?php endfor; ?>
+
+                    <?php foreach ($trendSeries as $i => $s):
+                        $pts = []; $sum = 0;
+                        foreach ($trendRows as $j => $row) {
+                            $v = (int) $row[$s["key"]]; $sum += $v;
+                            $x = $padL + ($j * $step);
+                            $y = $padT + $plotH - ($globalMax > 0 ? ($v / $globalMax) * $plotH : 0);
+                            $pts[] = [$x, $y];
+                        }
+                        $seriesTotals[$s["key"]] = $sum;
+                        $line = ""; $bottomY = $padT + $plotH;
+                        foreach ($pts as $k => $p) {
+                            $line .= ($k === 0 ? "M" : "L") . number_format($p[0], 1, '.', '') . " " . number_format($p[1], 1, '.', '') . " ";
+                        }
+                        $area = $line . "L" . number_format($pts[count($pts) - 1][0], 1, '.', '') . " " . $bottomY . " L" . number_format($pts[0][0], 1, '.', '') . " " . $bottomY . " Z";
+                    ?>
+                        <path class="trend-area" d="<?= $area ?>" fill="url(#trendGrad<?= $i ?>)" stroke="none"/>
+                        <path class="trend-line" d="<?= $line ?>" fill="none" stroke="<?= $s["color"] ?>" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+                    <?php endforeach; ?>
+
+                    <?php foreach ($trendRows as $j => $xrow): $lx = $padL + ($j * $step); ?>
+                        <text class="trend-xlabel" x="<?= number_format($lx, 1, '.', '') ?>" y="<?= $chartH - 7 ?>"><?= htmlspecialchars((string) $xrow["label"], ENT_QUOTES, "UTF-8") ?></text>
+                    <?php endforeach; ?>
+                </svg>
+            </div>
+            <div class="trend-legend">
+                <?php foreach ($trendSeries as $s): ?>
+                    <span class="trend-legend-chip">
+                        <i class="trend-legend-dot" style="background:<?= $s["color"] ?>"></i>
+                        <span data-i18n="<?= $s["i18n"] ?>"><?= htmlspecialchars($s["label"], ENT_QUOTES, "UTF-8") ?></span>
+                        <strong><?= htmlspecialchars((string) ($seriesTotals[$s["key"]] ?? 0), ENT_QUOTES, "UTF-8") ?></strong>
+                    </span>
                 <?php endforeach; ?>
             </div>
         </section>
