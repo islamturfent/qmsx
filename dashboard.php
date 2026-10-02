@@ -825,12 +825,42 @@ $activeNav = "dashboard";
                 </div>
                 <a class="secondary-button" href="audit-programs.php" data-i18n="auditProgramsMenuLabel">Denetim Programları</a>
             </div>
-            <div class="metric-mini-row">
-                <a href="audit-programs.php"><div><span class="metric-mini-label">Devam Eden Denetim</span><strong><?= $dashOpenAudits ?></strong></div></a>
-                <a href="audit-programs.php"><div><span class="metric-mini-label">Vadeyi Geçen</span><strong class="<?= $dashAuditOverdue > 0 ? 'danger-text' : '' ?>"><?= $dashAuditOverdue ?></strong></div></a>
-                <a href="reports.php"><div><span class="metric-mini-label">Taslak Rapor</span><strong><?= $dashAuditReportDraft ?></strong></div></a>
-                <a href="reports.php"><div><span class="metric-mini-label">Kesinleşmiş Rapor</span><strong><?= $dashAuditReportFinal ?></strong></div></a>
-                <a href="actions.php"><div><span class="metric-mini-label">Denetim Kaynaklı Açık NC</span><strong><?= $dashAuditOpenNc ?></strong></div></a>
+            <div class="ta-stat-grid">
+                <a class="ta-stat-tile" href="audit-programs.php">
+                    <span class="ta-stat-ic ic-brand"><?= appIcon('check', '') ?></span>
+                    <div class="ta-stat-info">
+                        <span class="ta-stat-label">Devam Eden Denetim</span>
+                        <strong class="ta-stat-value"><?= $dashOpenAudits ?></strong>
+                    </div>
+                </a>
+                <a class="ta-stat-tile" href="audit-programs.php">
+                    <span class="ta-stat-ic ic-warn"><?= appIcon('alert', '') ?></span>
+                    <div class="ta-stat-info">
+                        <span class="ta-stat-label">Vadeyi Geçen</span>
+                        <strong class="ta-stat-value <?= $dashAuditOverdue > 0 ? 'danger-text' : '' ?>"><?= $dashAuditOverdue ?></strong>
+                    </div>
+                </a>
+                <a class="ta-stat-tile" href="reports.php">
+                    <span class="ta-stat-ic ic-soft"><?= appIcon('documents', '') ?></span>
+                    <div class="ta-stat-info">
+                        <span class="ta-stat-label">Taslak Rapor</span>
+                        <strong class="ta-stat-value"><?= $dashAuditReportDraft ?></strong>
+                    </div>
+                </a>
+                <a class="ta-stat-tile" href="reports.php">
+                    <span class="ta-stat-ic ic-ok"><?= appIcon('checkBadge', '') ?></span>
+                    <div class="ta-stat-info">
+                        <span class="ta-stat-label">Kesinleşmiş Rapor</span>
+                        <strong class="ta-stat-value"><?= $dashAuditReportFinal ?></strong>
+                    </div>
+                </a>
+                <a class="ta-stat-tile" href="actions.php">
+                    <span class="ta-stat-ic ic-warn"><?= appIcon('warning', '') ?></span>
+                    <div class="ta-stat-info">
+                        <span class="ta-stat-label">Denetim Kaynaklı Açık NC</span>
+                        <strong class="ta-stat-value"><?= $dashAuditOpenNc ?></strong>
+                    </div>
+                </a>
             </div>
         </section>
 

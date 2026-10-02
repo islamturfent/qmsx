@@ -5759,3 +5759,180 @@ html {
     font-size: 14px;
     color: var(--muted-color);
 }
+
+/* ============================================================
+   Dashboard TailAdmin polish — Son 12 Ay Trendleri / Dönem Özeti / Denetim & Rapor Durumu
+   ============================================================ */
+
+/* -- Son 12 Ay Trendleri -- */
+.trend-list { gap: 22px; }
+.trend-series { gap: 10px; }
+.trend-series-head {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+.trend-series-icon { color: var(--brand-500); }
+.trend-strip { gap: 8px; align-items: flex-end; }
+.trend-bar { gap: 5px; cursor: default; }
+.trend-bar:hover .trend-bar-fill { filter: brightness(1.08); }
+.trend-bar-value {
+    min-height: 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-color);
+    line-height: 1.2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.trend-bar-track {
+    height: 76px;
+    border-radius: 8px;
+    background: var(--surface-muted);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+}
+.trend-bar-fill {
+    display: block;
+    width: 100%;
+    border-radius: 6px 6px 2px 2px;
+    transition: height 0.25s ease, filter 0.15s ease;
+}
+.trend-bar-fill.bar-blue   { background: linear-gradient(180deg, var(--brand-400), var(--brand-600)); }
+.trend-bar-fill.bar-orange { background: linear-gradient(180deg, #fd853a, var(--orange-500, #f79009)); }
+.trend-bar-fill.bar-violet { background: linear-gradient(180deg, #b692f6, var(--purple-500, #7a5af8)); }
+.trend-bar-fill.bar-teal   { background: linear-gradient(180deg, #5ce0b7, var(--success-500, #12b76a)); }
+.trend-bar-fill.bar-brand  { background: linear-gradient(180deg, var(--brand-400), var(--brand-600)); }
+.trend-bar-label { font-size: 10.5px; font-weight: 600; color: var(--muted-color); }
+
+/* -- Dönem Özeti (period grid) -- */
+.period-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+    margin-top: 4px;
+}
+.period-overview-group {
+    background: var(--surface-strong-color);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--border-radius, 16px);
+    padding: 16px 18px;
+}
+.period-overview-group h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+.period-overview-group h4::before {
+    content: "";
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--brand-500);
+}
+.period-overview-grid .metric-mini-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 10px;
+    margin: 0;
+}
+.period-overview-grid .metric-mini-row > div,
+.period-overview-grid a > div {
+    min-width: 0;
+    background: var(--surface-color);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 10px 12px;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.period-overview-grid a:hover > div {
+    border-color: var(--brand-300);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-theme-sm);
+}
+.period-overview-grid .metric-mini-label { font-size: 11px; color: var(--muted-color); }
+.period-overview-grid strong {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+/* -- Dönem Özeti (summary card) -- */
+.summary-card .summary-headline {
+    font-size: 18px;
+    font-weight: 650;
+}
+.summary-card .summary-point {
+    font-size: 14px;
+}
+
+/* -- Denetim & Rapor Durumu (stat tiles) -- */
+.ta-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+}
+.ta-stat-tile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 16px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ta-stat-tile:hover {
+    border-color: var(--brand-300);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-theme-sm);
+    text-decoration: none;
+}
+.ta-stat-ic {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.ta-stat-ic svg { width: 22px; height: 22px; }
+.ta-stat-ic.ic-brand { background: rgba(70, 95, 255, 0.12); color: var(--brand-500); }
+.ta-stat-ic.ic-warn   { background: rgba(247, 144, 9, 0.14); color: var(--warning-500, #f79009); }
+.ta-stat-ic.ic-soft   { background: var(--surface-muted); color: var(--muted-color); }
+.ta-stat-ic.ic-ok     { background: rgba(18, 183, 106, 0.14); color: var(--success-500, #12b76a); }
+.ta-stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.ta-stat-label {
+    font-size: 12px;
+    color: var(--muted-color);
+    line-height: 1.3;
+}
+.ta-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: -0.02em;
+}
+@media (max-width: 560px) {
+    .ta-stat-grid { grid-template-columns: 1fr; }
+}
