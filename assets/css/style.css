@@ -5937,6 +5937,17 @@ html {
     .ta-stat-grid { grid-template-columns: 1fr; }
 }
 
+.inline-form {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+.inline-form .danger-button {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
 /* -- Son 12 Ay Trendleri — TailAdmin analytics tarzı -- */
 .trend-period-toggle {
     display: inline-flex;

@@ -21,6 +21,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $act = (string) ($_POST["action"] ?? "");
     if ($act === 'add' && qmsLanguageUpsert($pdo, (string) ($_POST["code"] ?? ''), (string) ($_POST["name"] ?? ''), (string) ($_POST["native_name"] ?? ''))) {
         $message = 'Dil eklendi: ' . htmlspecialchars(trim((string) $_POST["name"]), ENT_QUOTES, 'UTF-8');
+    } elseif ($act === 'delete') {
+        $code = strtolower(trim((string) ($_POST["code"] ?? '')));
+        if ($code === 'tr' || $code === 'en') {
+            $message = 'Türkçe ve İngilizce dilleri silinemez.';
+        } else {
+            $delT = $pdo->prepare('DELETE FROM translations WHERE lang = ?');
+            $delT->execute([$code]);
+            $delL = $pdo->prepare('DELETE FROM languages WHERE code = ?');
+            $delL->execute([$code]);
+            $message = "Dil silindi: " . htmlspecialchars($code, ENT_QUOTES, 'UTF-8');
+        }
+        if (strtolower(trim((string) ($_GET["edit"] ?? ''))) === $code) {
+            header('Location: languages.php');
+            exit;
+        }
     } elseif ($act === 'translate') {
         $lang = strtolower(trim((string) ($_POST["lang"] ?? '')));
         $keys = (array) ($_POST["tkey"] ?? []);
@@ -110,7 +125,17 @@ $activeNav = "languages";
                     <?php foreach ($languages as $lang): ?>
                         <div class="admin-list-item">
                             <div class="list-item-main"><strong><?= htmlspecialchars($lang['native_name'], ENT_QUOTES, 'UTF-8') ?></strong><span><?= htmlspecialchars($lang['code'] . ' · ' . $lang['name'], ENT_QUOTES, 'UTF-8') ?></span></div>
-                            <div class="list-item-side"><a class="secondary-button" href="languages.php?edit=<?= htmlspecialchars($lang['code'], ENT_QUOTES, 'UTF-8') ?>">Çevirileri Düzenle</a></div>
+                            <div class="list-item-side">
+                                <a class="secondary-button" href="languages.php?edit=<?= htmlspecialchars($lang['code'], ENT_QUOTES, 'UTF-8') ?>">Çevirileri Düzenle</a>
+                                <?php if (!in_array($lang['code'], ['tr', 'en'], true)): ?>
+                                <form class="inline-form" method="post" action="languages.php" onsubmit="return confirm('Bu dil ve tüm çevirileri silinsin mi?');">
+                                    <?= qmsCsrfField($csrfScope) ?>
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="code" value="<?= htmlspecialchars($lang['code'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <button class="danger-button" type="submit" data-i18n="langDeleteButton">Sil</button>
+                                </form>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
