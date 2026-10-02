@@ -4962,10 +4962,6 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
     min-height: 100vh;
 }
 
-html {
-    background: var(--bg-color);
-}
-
 .landing-header {
     position: sticky;
     top: 0;
