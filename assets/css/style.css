@@ -4958,8 +4958,12 @@ body.dark-mode .calendar-item-company { color: var(--gray-400); }
    Design tokens'tan beslenir; koyu moda body.dark-mode ile uyar.
    ============================================================ */
 .landing-body {
-    background: var(--surface-muted);
+    background: var(--bg-color);
     min-height: 100vh;
+}
+
+html {
+    background: var(--bg-color);
 }
 
 .landing-header {
