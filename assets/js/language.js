@@ -1686,10 +1686,20 @@ if (!currentLanguage || !availableLanguages.some(function(l){return l.code === c
 
 const languageGlobeIcon = (document.getElementById("qmsIconGlobe") || {}).innerHTML || "";
 
-// Dil butonunu ikon + kod etiketi olarak cizer.
+// Tıklandığında geçilecek (hedef) dil kodu.
+function nextLanguageCode() {
+    if (!availableLanguages || !availableLanguages.length) return "en";
+    var idx = 0;
+    for (var i = 0; i < availableLanguages.length; i++) {
+        if (availableLanguages[i].code === currentLanguage) { idx = i; break; }
+    }
+    return (availableLanguages[(idx + 1) % availableLanguages.length] || { code: "en" }).code;
+}
+
+// Dil butonunu ikon + hedef kod etiketi olarak cizer (tıklanınca o dile geçer).
 function renderLanguageButton() {
     if (!languageToggle) return;
-    const code = (currentLanguage || "tr").toUpperCase();
+    const code = (nextLanguageCode() || "en").toUpperCase();
     languageToggle.innerHTML = '<span class="topbar-btn-icon">' + languageGlobeIcon + '</span><span class="topbar-btn-label">' + code + '</span>';
 }
 
@@ -3728,13 +3738,8 @@ translations.en.instrumentDelete = "Delete";
 changeLanguage(currentLanguage);
 
 languageToggle.addEventListener("click", function() {
-    // Secili dilin ardindaki ilk dile geg; dongu (DB'deki aktif diller).
-    var idx = 0;
-    for (var i = 0; i < availableLanguages.length; i++) {
-        if (availableLanguages[i].code === currentLanguage) { idx = i; break; }
-    }
-    var next = availableLanguages[(idx + 1) % availableLanguages.length];
-    changeLanguage(next.code || "en");
+    // Butonda gosterilen (hedef) dile gec.
+    changeLanguage(nextLanguageCode() || "en");
 });
 // Eğitim Şablonlari / Yetkinlik Matrisi
 Object.assign(translations.tr, {
