@@ -56,60 +56,134 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
 
     <main class="landing-page">
 
-        <!-- HERO -->
-        <section class="landing-hero landing-wrap">
-            <div class="landing-hero-content">
-                <span class="landing-kicker" data-i18n="landingKicker">Kalite süreçleri için merkezi platform</span>
-                <h1><span data-i18n="landingTitle">Denetimden raporlamaya, tüm kalite süreçleri</span> <em data-i18n="landingTitleEm">tek ekranda</em>.</h1>
-                <p data-i18n="landingText">
-                    QuAmi; doküman kontrolü, denetim, uygunsuzluk (CAPA), risk, eğitim ve performans süreçlerini uçtan uca
-                    yöneten modern bir kalite yönetim sistemidir. Denetime her an hazır olun.
-                </p>
-                <div class="landing-actions">
-                    <a class="primary-button landing-button" href="<?= $href ?>" data-i18n="<?= $isLoggedIn ? 'goDashboardButton' : 'goLoginButton' ?>">
-                        <?= $isLoggedIn ? 'Dashboard’a Git' : 'Giriş Yap' ?>
-                    </a>
-                    <a class="secondary-button landing-button landing-ghost" href="#landing-solutions" data-i18n="landingExploreButton">Özellikleri Keşfet</a>
+        <!-- HERO SLIDER -->
+        <section class="landing-slider landing-wrap">
+            <div class="landing-slides">
+
+                <div class="landing-hero landing-slide is-active">
+                    <div class="landing-hero-content">
+                        <span class="landing-kicker" data-i18n="landingKicker">Kalite süreçleri için merkezi platform</span>
+                        <h1><span data-i18n="landingTitle">Denetimden raporlamaya, tüm kalite süreçleri</span> <em data-i18n="landingTitleEm">tek ekranda</em>.</h1>
+                        <p data-i18n="landingText">
+                            QuAmi; doküman kontrolü, denetim, uygunsuzluk (CAPA), risk, eğitim ve performans süreçlerini uçtan uca
+                            yöneten modern bir kalite yönetim sistemidir. Denetime her an hazır olun.
+                        </p>
+                        <div class="landing-actions">
+                            <a class="primary-button landing-button" href="<?= $href ?>" data-i18n="<?= $isLoggedIn ? 'goDashboardButton' : 'goLoginButton' ?>">
+                                <?= $isLoggedIn ? 'Dashboard’a Git' : 'Giriş Yap' ?>
+                            </a>
+                            <a class="secondary-button landing-button landing-ghost" href="#landing-solutions" data-i18n="landingExploreButton">Özellikleri Keşfet</a>
+                        </div>
+                        <div class="landing-trust" data-i18n="landingTrustLine">ISO uyumlu süreçler · İzlenebilirlik · Otomatik raporlama</div>
+                    </div>
+
+                    <div class="landing-hero-visual" aria-label="QuAmi özet paneli">
+                        <div class="visual-card visual-card-main">
+                            <div class="visual-card-head">
+                                <span class="visual-title">
+                                    <span class="visual-dot"></span>
+                                    <span data-i18n="landingPanelLive">Canlı Pano</span>
+                                </span>
+                                <span class="visual-badge" data-i18n="landingPanelLive2">7/24</span>
+                            </div>
+                            <div class="visual-card-grid">
+                                <div class="visual-metric">
+                                    <span data-i18n="landingPanelAudits">Denetim Takibi</span>
+                                    <strong>12</strong>
+                                    <div class="visual-bar"><i style="width:64%"></i></div>
+                                </div>
+                                <div class="visual-metric">
+                                    <span data-i18n="landingPanelDocs">Aktif Doküman</span>
+                                    <strong>86</strong>
+                                    <div class="visual-bar"><i style="width:82%"></i></div>
+                                </div>
+                                <div class="visual-metric">
+                                    <span data-i18n="landingPanelReports">Açık Aksiyon</span>
+                                    <strong>4</strong>
+                                    <div class="visual-bar"><i style="width:38%"></i></div>
+                                </div>
+                                <div class="visual-metric">
+                                    <span data-i18n="landingPanelCompliance">Uyum Oranı</span>
+                                    <strong>%98</strong>
+                                    <div class="visual-bar"><i style="width:98%"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="visual-card visual-card-float">
+                            <span class="visual-float-label" data-i18n="landingPanelReport">Aylık Rapor</span>
+                            <strong>Denetime Hazır</strong>
+                        </div>
+                    </div>
                 </div>
-                <div class="landing-trust" data-i18n="landingTrustLine">ISO uyumlu süreçler · İzlenebilirlik · Otomatik raporlama</div>
+
+                <div class="landing-hero landing-slide">
+                    <div class="landing-hero-content">
+                        <span class="landing-kicker" data-i18n="landingAiKicker">Yapay Zeka Desteği</span>
+                        <h1><span data-i18n="landingAiTitle">Dokümanları yapay zekayla</span> <em data-i18n="landingAiTitleEm">anında hazırlayın</em>.</h1>
+                        <p data-i18n="landingAiText">AI Doküman Stüdyosu ile dokümanı sesle veya yazıyla tarif edin; taslak saniyeler içinde oluşsun. Web editöründe düzenleyin, şablon olarak kaydedin.</p>
+                        <div class="landing-actions">
+                            <a class="primary-button landing-button" href="ai-document-studio.php" data-i18n="landingAiCta">AI Stüdyo</a>
+                            <a class="secondary-button landing-button landing-ghost" href="<?= $href ?>" data-i18n="<?= $isLoggedIn ? 'goDashboardButton' : 'goLoginButton' ?>"><?= $isLoggedIn ? 'Dashboard’a Git' : 'Giriş Yap' ?></a>
+                        </div>
+                        <div class="landing-trust" data-i18n="landingAiTrust">Sesli komut · Taslak üretimi · Şablona kaydetme</div>
+                    </div>
+
+                    <div class="landing-hero-visual" aria-label="AI Doküman Stüdyosu">
+                        <div class="visual-card visual-card-main">
+                            <div class="visual-card-head">
+                                <span class="visual-title"><span class="visual-dot"></span><span data-i18n="landingAiStudio">AI Doküman Stüdyosu</span></span>
+                                <span class="visual-badge">AI</span>
+                            </div>
+                            <div class="ai-chat">
+                                <div class="ai-bubble ai-prompt" data-i18n="landingAiPrompt">"ISO iç denetim prosedürü taslağı oluştur"</div>
+                                <div class="ai-bubble ai-reply"><span data-i18n="landingAiReply">Taslak hazır</span> · <strong>Bölüm 1 — Kapsam</strong></div>
+                            </div>
+                            <div class="ai-chips">
+                                <span class="ai-chip" data-i18n="landingAiChipDoc">Dokümana Aktar</span>
+                                <span class="ai-chip" data-i18n="landingAiChipTpl">Şablon Olarak Kaydet</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="landing-hero landing-slide">
+                    <div class="landing-hero-content">
+                        <span class="landing-kicker" data-i18n="landingAutoKicker">Otomasyon</span>
+                        <h1><span data-i18n="landingAutoTitle">Vade takibi ve bildirimler</span> <em data-i18n="landingAutoTitleEm">kendiliğinden</em>.</h1>
+                        <p data-i18n="landingAutoText">Geçiken işler, sözleşme/kalibrasyon/eğitim vadeleri ve dönem özetleri otomatik işler; ekibiniz denetime her an hazır olur.</p>
+                        <div class="landing-actions">
+                            <a class="primary-button landing-button" href="<?= $href ?>" data-i18n="<?= $isLoggedIn ? 'goDashboardButton' : 'goLoginButton' ?>"><?= $isLoggedIn ? 'Dashboard’a Git' : 'Giriş Yap' ?></a>
+                            <a class="secondary-button landing-button landing-ghost" href="#landing-steps" data-i18n="landingAutoGhost">Nasıl Çalışır?</a>
+                        </div>
+                        <div class="landing-trust" data-i18n="landingAutoTrust">Gecikme bildirimi · Vade uyarıları · Dönem özeti</div>
+                    </div>
+
+                    <div class="landing-hero-visual" aria-label="Otomatik bildirimler">
+                        <div class="visual-card visual-card-main">
+                            <div class="visual-card-head">
+                                <span class="visual-title"><span class="visual-dot"></span><span data-i18n="landingAutoLive">Otomatik Bildirimler</span></span>
+                                <span class="visual-badge" data-i18n="landingAutoBadge">Açık</span>
+                            </div>
+                            <div class="auto-list">
+                                <div class="auto-row"><span data-i18n="landingAutoItem1">Geçiken Denetim</span><strong class="auto-flag">Uyarı</strong></div>
+                                <div class="auto-row"><span data-i18n="landingAutoItem2">Sözleşme Bitişi</span><strong class="auto-flag">30 gün</strong></div>
+                                <div class="auto-row"><span data-i18n="landingAutoItem3">Kalibrasyon Vadesi</span><strong class="auto-flag">7 gün</strong></div>
+                                <div class="auto-row"><span data-i18n="landingAutoItem4">Yetkinlik Vadesi</span><strong class="auto-flag">15 gün</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="landing-hero-visual" aria-label="QuAmi özet paneli">
-                <div class="visual-card visual-card-main">
-                    <div class="visual-card-head">
-                        <span class="visual-title">
-                            <span class="visual-dot"></span>
-                            <span data-i18n="landingPanelLive">Canlı Pano</span>
-                        </span>
-                        <span class="visual-badge" data-i18n="landingPanelLive2">7/24</span>
-                    </div>
-                    <div class="visual-card-grid">
-                        <div class="visual-metric">
-                            <span data-i18n="landingPanelAudits">Denetim Takibi</span>
-                            <strong>12</strong>
-                            <div class="visual-bar"><i style="width:64%"></i></div>
-                        </div>
-                        <div class="visual-metric">
-                            <span data-i18n="landingPanelDocs">Aktif Doküman</span>
-                            <strong>86</strong>
-                            <div class="visual-bar"><i style="width:82%"></i></div>
-                        </div>
-                        <div class="visual-metric">
-                            <span data-i18n="landingPanelReports">Açık Aksiyon</span>
-                            <strong>4</strong>
-                            <div class="visual-bar"><i style="width:38%"></i></div>
-                        </div>
-                        <div class="visual-metric">
-                            <span data-i18n="landingPanelCompliance">Uyum Oranı</span>
-                            <strong>%98</strong>
-                            <div class="visual-bar"><i style="width:98%"></i></div>
-                        </div>
-                    </div>
+            <div class="landing-slider-controls">
+                <button class="slider-arrow slider-prev" type="button" aria-label="Önceki">‹</button>
+                <div class="slider-dots">
+                    <button class="slider-dot is-active" type="button" aria-label="1"></button>
+                    <button class="slider-dot" type="button" aria-label="2"></button>
+                    <button class="slider-dot" type="button" aria-label="3"></button>
                 </div>
-                <div class="visual-card visual-card-float">
-                    <span class="visual-float-label" data-i18n="landingPanelReport">Aylık Rapor</span>
-                    <strong>Denetime Hazır</strong>
-                </div>
+                <button class="slider-arrow slider-next" type="button" aria-label="Sonraki">›</button>
             </div>
         </section>
 
@@ -223,6 +297,38 @@ $ctaLabel = $isLoggedIn ? 'Dashboard' : 'Giriş Yap';
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/language.js"></script>
     <script src="assets/js/pwa.js"></script>
+    <script>
+    // Hero slider
+    (function () {
+        var slides = document.querySelectorAll('.landing-slide');
+        if (!slides.length) return;
+        var dots = [].slice.call(document.querySelectorAll('.slider-dot'));
+        var idx = 0;
+        var total = slides.length;
+        var timer = null;
+
+        function show(i) {
+            idx = (i + total) % total;
+            slides.forEach(function (s, j) { s.classList.toggle('is-active', j === idx); });
+            if (dots.length) dots.forEach(function (d, j) { d.classList.toggle('is-active', j === idx); });
+            restart();
+        }
+        function next() { show(idx + 1); }
+        function prev() { show(idx - 1); }
+        function restart() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(next, 6000);
+        }
+
+        var n = document.querySelector('.slider-next');
+        var p = document.querySelector('.slider-prev');
+        if (n) n.addEventListener('click', next);
+        if (p) p.addEventListener('click', prev);
+        dots.forEach(function (d, j) { d.addEventListener('click', function () { show(j); }); });
+
+        restart();
+    })();
+    </script>
 </body>
 </html>
 <?php
